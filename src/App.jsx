@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Header from './components/Header'
 import Hero from './components/Hero'
+import GameTimeline from './components/GameTimeline'
 import GameShowcase from './components/GameShowcase'
 import About from './components/About'
 import Footer from './components/Footer'
@@ -21,6 +22,7 @@ function App() {
           <Header />
           <main>
             <Hero />
+            <GameTimeline />
             <GameShowcase />
             <About />
           </main>

@@ -12,6 +12,7 @@ export default function Header() {
 
   const navItems = [
     { id: 'home', label: '首页', labelEn: 'HOME' },
+    { id: 'timeline', label: '历程', labelEn: 'TIMELINE' },
     { id: 'games', label: '作品', labelEn: 'GAMES' },
     { id: 'about', label: '关于', labelEn: 'ABOUT' },
   ]

@@ -537,6 +537,36 @@
   padding-top: 0.8rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+.card-links {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  background: rgba(0, 229, 255, 0.05);
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  border-radius: 4px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.card-link:hover {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+  transform: translateY(-2px);
+}
+
 .card-engine {
   font-family: var(--font-mono);
   font-size: 0.8rem;

@@ -1,0 +1,164 @@
+/* ============================================
+   CASSETTE FUTURISM - GLOBAL STYLES
+   ============================================ */
+
+:root {
+  --bg-deep: #050508;
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #101018;
+  --bg-tertiary: #1a1a28;
+  --bg-card: #0c0c14;
+
+  --text-primary: #d4d4d8;
+  --text-secondary: #71717a;
+  --text-dim: #3f3f46;
+
+  --amber: #ff9500;
+  --amber-dim: #b36800;
+  --amber-bright: #ffb340;
+  --amber-glow: 0 0 10px rgba(255, 149, 0, 0.4), 0 0 30px rgba(255, 149, 0, 0.1);
+  --amber-glow-strong: 0 0 10px rgba(255, 149, 0, 0.6), 0 0 40px rgba(255, 149, 0, 0.2), 0 0 80px rgba(255, 149, 0, 0.1);
+
+  --cyan: #00e5ff;
+  --cyan-dim: #0097a7;
+  --cyan-glow: 0 0 10px rgba(0, 229, 255, 0.3), 0 0 30px rgba(0, 229, 255, 0.1);
+
+  --green: #39ff14;
+  --green-dim: #1b8a00;
+  --green-glow: 0 0 10px rgba(57, 255, 20, 0.4), 0 0 30px rgba(57, 255, 20, 0.1);
+
+  --red: #ff2d2d;
+
+  --font-display: 'Orbitron', 'Share Tech Mono', monospace;
+  --font-mono: 'VT323', monospace;
+  --font-body: 'Share Tech Mono', 'Courier New', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--amber-dim);
+}
+
+/* Selection */
+::selection {
+  background: var(--amber);
+  color: var(--bg-deep);
+}
+
+/* ============================================
+   SCANLINES OVERLAY
+   ============================================ */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.12) 0px,
+    rgba(0, 0, 0, 0.12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+.scanlines::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+  pointer-events: none;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes blink-slow {
+  0%, 70% { opacity: 1; }
+  71%, 100% { opacity: 0.3; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 0.95; }
+  10% { opacity: 0.98; }
+  15% { opacity: 0.96; }
+  20% { opacity: 1; }
+  50% { opacity: 0.98; }
+  80% { opacity: 0.96; }
+  90% { opacity: 1; }
+  100% { opacity: 0.97; }
+}
+
+@keyframes reel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes skill-fill-anim {
+  from { width: 0; }
+}
+
+@keyframes card-enter {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.blink { animation: blink 1s step-end infinite; }
+.blink-slow { animation: blink-slow 2s ease-in-out infinite; }

@@ -1,7 +1,8 @@
 import { games } from '../data/games'
 
 export default function GameTimeline() {
-  const sortedGames = [...games].sort((a, b) => new Date(b.date) - new Date(a.date))
+  // 按时间正序排序（从旧到新）
+  const sortedGames = [...games].sort((a, b) => new Date(a.date) - new Date(b.date))
 
   const getLinkIcon = (type) => {
     const icons = {
@@ -10,15 +11,6 @@ export default function GameTimeline() {
       taptap: '📱'
     }
     return icons[type] || '🔗'
-  }
-
-  const getLinkLabel = (type) => {
-    const labels = {
-      gmhub: 'GMHub',
-      bilibili: 'Bilibili',
-      taptap: 'TapTap'
-    }
-    return labels[type] || '链接'
   }
 
   return (
@@ -76,7 +68,7 @@ export default function GameTimeline() {
                       className="timeline-link"
                     >
                       <span className="link-icon">{getLinkIcon(type)}</span>
-                      <span className="link-label">{getLinkLabel(type)}</span>
+                      <span className="link-label">{type.toUpperCase()}</span>
                     </a>
                   ))}
                 </div>

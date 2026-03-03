@@ -11,9 +11,38 @@ export default function Footer() {
           <span className="footer-text">GAME PORTFOLIO SYSTEM</span>
         </div>
         <div className="footer-links">
-          <a href="#" className="footer-link">[GITHUB]</a>
-          <a href="#" className="footer-link">[ITCH.IO]</a>
-          <a href="#" className="footer-link">[EMAIL]</a>
+          <a
+            href="https://github.com/Sogenmaple"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
+          >
+            [GITHUB]
+          </a>
+          <a
+            href="https://space.bilibili.com/389369217"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
+          >
+            [BILIBILI]
+          </a>
+          <a
+            href="https://www.taptap.cn/developer/338837"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
+          >
+            [TAPTAP]
+          </a>
+          <a
+            href="https://qm.qq.com/q/AxbQpuKKsK"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
+          >
+            [QQ 群：950087304]
+          </a>
         </div>
         <div className="footer-copyright">
           &copy; {new Date().getFullYear()} 汤圆 // ALL RIGHTS RESERVED

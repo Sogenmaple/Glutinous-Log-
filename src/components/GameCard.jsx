@@ -5,20 +5,93 @@ export default function GameCard({ game, index }) {
     prototype: '原型',
   }
 
-  const getLinkIcon = (type) => {
-    const icons = {
-      gmhub: '🎮',
-      bilibili: '📺',
-      taptap: '📱'
+  const renderVectorIcon = (type) => {
+    switch (type) {
+      case 'dimension':
+        return (
+          <svg className="card-icon-vector icon-dimension" viewBox="0 0 44 44">
+            <rect x="8" y="8" width="28" height="28" fill="none" stroke="var(--cyan)" strokeWidth="2" transform="rotate(45 22 22)" />
+            <rect x="12" y="12" width="20" height="20" fill="none" stroke="var(--cyan)" strokeWidth="2" transform="rotate(-45 22 22)" />
+          </svg>
+        )
+      case 'antimatter':
+        return (
+          <svg className="card-icon-vector icon-antimatter" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="16" fill="none" stroke="var(--purple)" strokeWidth="3" />
+            <circle cx="22" cy="22" r="7" fill="var(--purple)" opacity="0.8" />
+          </svg>
+        )
+      case 'soundwave':
+        return (
+          <svg className="card-icon-vector icon-soundwave" viewBox="0 0 44 44">
+            <rect x="12" y="8" width="6" height="28" fill="var(--cyan)" rx="2" />
+            <rect x="26" y="13" width="6" height="18" fill="var(--cyan)" rx="2" />
+          </svg>
+        )
+      case 'blocks':
+        return (
+          <svg className="card-icon-vector icon-blocks" viewBox="0 0 44 44">
+            <rect x="8" y="8" width="18" height="18" fill="none" stroke="var(--amber)" strokeWidth="2" rx="2" />
+            <rect x="18" y="18" width="18" height="18" fill="none" stroke="var(--amber)" strokeWidth="2" rx="2" />
+          </svg>
+        )
+      case 'bubble':
+        return (
+          <svg className="card-icon-vector icon-bubble" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="14" fill="none" stroke="var(--cyan)" strokeWidth="3" />
+            <circle cx="16" cy="16" r="4" fill="var(--cyan)" opacity="0.5" />
+          </svg>
+        )
+      case 'fist':
+        return (
+          <svg className="card-icon-vector icon-fist" viewBox="0 0 44 44">
+            <rect x="10" y="12" width="24" height="26" fill="var(--amber)" rx="6" />
+            <rect x="6" y="18" width="32" height="6" fill="var(--amber-dim)" rx="2" />
+          </svg>
+        )
+      default:
+        return (
+          <svg className="card-icon-vector" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="12" fill="none" stroke="var(--amber)" strokeWidth="2" />
+          </svg>
+        )
     }
-    return icons[type] || '🔗'
+  }
+
+  const renderLinkIcon = (type) => {
+    switch (type) {
+      case 'gmhub':
+        return (
+          <svg className="link-icon-svg" viewBox="0 0 24 24">
+            <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+          </svg>
+        )
+      case 'bilibili':
+        return (
+          <svg className="link-icon-svg" viewBox="0 0 24 24">
+            <path d="M19.07 16.03c.67.92 1.41 1.81 2.43 2.43.57.35 1.17.61 1.68 1.03.77.63.83 1.78.09 2.42-.71.61-1.74.51-2.53.07-.82-.46-1.51-1.12-2.12-1.82-3.31 1.62-7.24 1.62-10.55 0-.61.7-1.3 1.36-2.12 1.82-.79.44-1.82.54-2.53-.07-.74-.64-.68-1.79.09-2.42.51-.42 1.11-.68 1.68-1.03 1.02-.62 1.76-1.51 2.43-2.43H3V11h18v5.03h-1.93zM7.5 13c-.83 0-1.5-.67-1.5-1.5S6.67 10 7.5 10s1.5.67 1.5 1.5S8.33 13 7.5 13zm9 0c-.83 0-1.5-.67-1.5-1.5S15.67 10 16.5 10s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+          </svg>
+        )
+      case 'taptap':
+        return (
+          <svg className="link-icon-svg" viewBox="0 0 24 24">
+            <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+          </svg>
+        )
+      default:
+        return (
+          <svg className="link-icon-svg" viewBox="0 0 24 24">
+            <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+          </svg>
+        )
+    }
   }
 
   return (
     <div className="game-card" style={{ animationDelay: `${index * 0.1}s` }}>
       <div className="card-screen">
         <div className="card-screen-content">
-          <div className="card-icon">{game.icon}</div>
+          {renderVectorIcon(game.iconType)}
         </div>
         <div className="card-scanline"></div>
       </div>
@@ -45,7 +118,7 @@ export default function GameCard({ game, index }) {
                 className="card-link"
                 title={type}
               >
-                <span className="link-icon">{getLinkIcon(type)}</span>
+                {renderLinkIcon(type)}
               </a>
             ))}
           </div>

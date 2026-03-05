@@ -3,20 +3,28 @@ import { useState, useEffect, useRef } from 'react'
 export default function Intro({ onComplete }) {
   const [isExpanding, setIsExpanding] = useState(false)
   const canvasRef = useRef(null)
+  const titleCanvasRef = useRef(null)
   const animationRef = useRef(null)
   const timeRef = useRef(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    const titleCanvas = titleCanvasRef.current
+    if (!canvas || !titleCanvas) return
 
     const ctx = canvas.getContext('2d')
+    const titleCtx = titleCanvas.getContext('2d')
     let width = canvas.width = window.innerWidth
     let height = canvas.height = window.innerHeight
+
+    // 标题 Canvas 尺寸
+    titleCanvas.width = width
+    titleCanvas.height = height
 
     // 代码字符集
     const chars = '01TGXYZWABXY'
     const fontSize = 11
+    const titleFontSize = Math.min(width, height) * 0.08
 
     // 四个球体
     const balls = [
@@ -31,6 +39,23 @@ export default function Intro({ onComplete }) {
     const drops = []
     for (let i = 0; i < columns; i++) {
       drops[i] = Math.random() * -100
+    }
+
+    // 标题文字流动代码
+    const titleText = '汤圆的窝'
+    const titleDrops = []
+    const titleX = width / 2
+    const titleY = height / 2
+    const charWidth = titleFontSize * 1.2
+    const totalWidth = titleText.length * charWidth
+    const startX = titleX - totalWidth / 2
+
+    for (let i = 0; i < titleText.length; i++) {
+      titleDrops[i] = []
+      const charColumns = Math.floor(charWidth / 8)
+      for (let j = 0; j < charColumns; j++) {
+        titleDrops[i][j] = Math.random() * -20
+      }
     }
 
     // 绘制代码雨
@@ -136,6 +161,41 @@ export default function Intro({ onComplete }) {
         drops[i]++
       }
 
+      // 绘制标题文字流动代码
+      titleCtx.clearRect(0, 0, width, height)
+      titleCtx.font = `900 ${titleFontSize}px var(--font-display)`
+      titleCtx.textBaseline = 'middle'
+
+      for (let i = 0; i < titleText.length; i++) {
+        const charX = startX + i * charWidth
+        const char = titleText[i]
+
+        // 绘制文字轮廓（白色）
+        titleCtx.fillStyle = 'rgba(255, 255, 255, 0.9)'
+        titleCtx.fillText(char, charX, titleY)
+
+        // 在文字内部绘制流动的代码
+        titleCtx.font = `${titleFontSize * 0.4}px monospace`
+        for (let j = 0; j < titleDrops[i].length; j++) {
+          const x = charX - charWidth / 2 + j * 8
+          const y = titleDrops[i][j] * 10 + titleY - titleFontSize / 2
+
+          // 检查是否在文字范围内
+          if (y > titleY - titleFontSize / 2 && y < titleY + titleFontSize / 2) {
+            titleCtx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.random() * 0.5})`
+            const codeChar = chars.charAt(Math.floor(Math.random() * chars.length))
+            titleCtx.fillText(codeChar, x, y)
+          }
+
+          if (titleDrops[i][j] * 10 > titleFontSize && Math.random() > 0.95) {
+            titleDrops[i][j] = Math.random() * -20
+          }
+          titleDrops[i][j]++
+        }
+
+        titleCtx.font = `900 ${titleFontSize}px var(--font-display)`
+      }
+
       animationRef.current = requestAnimationFrame(draw)
     }
 
@@ -144,6 +204,8 @@ export default function Intro({ onComplete }) {
     const handleResize = () => {
       width = canvas.width = window.innerWidth
       height = canvas.height = window.innerHeight
+      titleCanvas.width = window.innerWidth
+      titleCanvas.height = window.innerHeight
     }
 
     window.addEventListener('resize', handleResize)
@@ -168,6 +230,7 @@ export default function Intro({ onComplete }) {
       <canvas ref={canvasRef} className="intro-canvas" />
       <div className="intro-title">
         <h1 className="title-text">汤圆的窝</h1>
+        <canvas ref={titleCanvasRef} className="title-canvas" />
       </div>
     </div>
   )

@@ -1,12 +1,16 @@
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
+import { useNavigate } from 'react-router-dom'
 
 export default function PostCard({ post }) {
   const { ref, isVisible } = useScrollAnimation()
+  const navigate = useNavigate()
 
   return (
     <article
       ref={ref}
       className={`post-card cassette-card ${isVisible ? 'visible' : ''}`}
+      onClick={() => navigate(`/post/${post.id}`)}
+      style={{ cursor: 'pointer' }}
     >
       {/* 卡片装饰角 */}
       <div className="card-corner corner-tl"></div>

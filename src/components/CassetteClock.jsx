@@ -40,7 +40,7 @@ export default function CassetteClock() {
   const year = time.getFullYear()
   const month = time.getMonth() + 1
   const date = time.getDate()
-  const weekday = ['日', '一', '二', '三', '四', '五', 六'][time.getDay()]
+  const weekday = ['日', '一', '二', '三', '四', '五', '六'][time.getDay()]
   const displayDate = `${year}.${formatTime(month)}.${formatTime(date)}`
   const displayWeekday = `周${weekday}`
 

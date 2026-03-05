@@ -52,107 +52,64 @@ export default function CassetteClock() {
       }}
     >
       <div className="cassette-clock-body">
-        {/* 磁带孔 */}
-        <div className="cassette-clock-holes">
-          <div className="cassette-clock-hole"></div>
-          <div className="cassette-clock-hole"></div>
-        </div>
-
         {/* 磁带窗口 - 时钟表盘 */}
         <div className="cassette-clock-window">
-          {/* 左卷轴 - 时针（带变速旋转动画） */}
-          <div
-            className="cassette-clock-reel left-reel"
-            style={{
-              animationDuration: `${3 + (seconds % 10) * 0.3}s`,
-            }}
-          >
-            <div className="reel-center">
-              <div
-                className="reel-hand hour-hand"
-                style={{ transform: `rotate(${hourAngle}deg)` }}
-              >
-                <div className="hand-tip"></div>
-              </div>
-            </div>
-            <div className="reel-teeth">
-              {[...Array(6)].map((_, i) => (
+          {/* 左卷轴 */}
+          <div className="cassette-clock-reel left-reel">
+            <div className="reel-spokes">
+              {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="reel-tooth"
+                  className="reel-spoke"
                   style={{ transform: `rotate(${i * 60}deg)` }}
                 ></div>
               ))}
             </div>
+            {/* 时针 */}
+            <div
+              className="reel-hand hour-hand"
+              style={{ transform: `rotate(${hourAngle}deg)` }}
+            >
+              <div className="hand-bar"></div>
+            </div>
+            <div className="reel-hub"></div>
           </div>
 
-          {/* 磁带 */}
-          <div className="cassette-clock-tape"></div>
-
-          {/* 右卷轴 - 分针（反向变速旋转） */}
-          <div
-            className="cassette-clock-reel right-reel"
-            style={{
-              animationDuration: `${2.5 + (minutes % 10) * 0.2}s`,
-              animationDirection: 'reverse',
-            }}
-          >
-            <div className="reel-center">
-              <div
-                className="reel-hand minute-hand"
-                style={{ transform: `rotate(${minuteAngle}deg)` }}
-              >
-                <div className="hand-tip"></div>
-              </div>
-            </div>
-            <div className="reel-teeth">
-              {[...Array(6)].map((_, i) => (
+          {/* 右卷轴 */}
+          <div className="cassette-clock-reel right-reel">
+            <div className="reel-spokes">
+              {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="reel-tooth"
+                  className="reel-spoke"
                   style={{ transform: `rotate(${i * 60}deg)` }}
                 ></div>
               ))}
             </div>
-          </div>
-
-          {/* 中心秒针显示 */}
-          <div className="cassette-clock-center">
-            <div className="seconds-display">{displaySeconds}</div>
-            <div className="center-dot"></div>
+            {/* 分针 */}
+            <div
+              className="reel-hand minute-hand"
+              style={{ transform: `rotate(${minuteAngle}deg)` }}
+            >
+              <div className="hand-bar"></div>
+            </div>
+            <div className="reel-hub"></div>
           </div>
         </div>
 
-        {/* 标签 - 时间数字显示 */}
-        <div className="cassette-clock-label">
-          <div className="time-main">
-            <span className="time-display">{displayTime}</span>
-            <span className="seconds-small">:{displaySeconds}</span>
-          </div>
+        {/* 时间显示区 */}
+        <div className="cassette-clock-display">
+          <div className="time-display">{displayTime}</div>
           <div className="date-display">
             <span className="date-text">{displayDate}</span>
-            <span className="date-separator">|</span>
+            <span className="date-sep">·</span>
             <span className="weekday-text">{displayWeekday}</span>
           </div>
-          <span className="clock-brand">CASSETTE CHRONO</span>
         </div>
 
-        {/* 底部装饰 */}
-        <div className="cassette-clock-bottom">
-          <div className="cassette-clock-groove"></div>
-          <div className="cassette-clock-groove"></div>
-          <div className="cassette-clock-groove"></div>
-        </div>
-
-        {/* 装饰螺丝 */}
-        <div className="cassette-clock-screw screw-top-left"></div>
-        <div className="cassette-clock-screw screw-top-right"></div>
-        <div className="cassette-clock-screw screw-bottom-left"></div>
-        <div className="cassette-clock-screw screw-bottom-right"></div>
+        {/* 底部装饰线 */}
+        <div className="cassette-clock-deco-line"></div>
       </div>
-
-      {/* 时钟光晕效果 */}
-      <div className="cassette-clock-glow"></div>
     </div>
   )
 }

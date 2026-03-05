@@ -37,8 +37,8 @@ export default function Intro({ onComplete }) {
     const draw = () => {
       timeRef.current += 1
 
-      // 半透明黑色背景，形成拖尾效果
-      ctx.fillStyle = 'rgba(0, 5, 0, 0.12)'
+      // 半透明白色背景（反相效果），形成拖尾
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
       ctx.fillRect(0, 0, width, height)
 
       const centerX = width / 2
@@ -82,9 +82,8 @@ export default function Intro({ onComplete }) {
           const dist = Math.sqrt(dx * dx + dy * dy)
 
           if (dist < currentRadius) {
-            const brightness = 0.5 + Math.random() * 0.5
-            const greenVar = Math.floor(180 + brightness * 75)
-            ctx.fillStyle = `rgba(0, ${greenVar}, ${Math.floor(brightness * 200)}, ${brightness})`
+            const brightness = 0.3 + Math.random() * 0.7
+            ctx.fillStyle = `rgba(0, 0, 0, ${brightness})`
             const char = chars.charAt(Math.floor(Math.random() * chars.length))
             ctx.fillText(char, x, y)
           }
@@ -92,14 +91,14 @@ export default function Intro({ onComplete }) {
 
         ctx.restore()
 
-        // 绘制球体模糊光晕（融球效果关键）- 多层渐变
+        // 绘制球体模糊光晕（融球效果关键）- 黑白渐变
         const gradient1 = ctx.createRadialGradient(
           ballCenterX, ballCenterY, currentRadius * 0.5,
           ballCenterX, ballCenterY, currentRadius * 1.5
         )
-        gradient1.addColorStop(0, 'rgba(0, 255, 100, 0.25)')
-        gradient1.addColorStop(0.5, 'rgba(0, 200, 50, 0.12)')
-        gradient1.addColorStop(1, 'rgba(0, 150, 30, 0)')
+        gradient1.addColorStop(0, 'rgba(0, 0, 0, 0.2)')
+        gradient1.addColorStop(0.5, 'rgba(50, 50, 50, 0.1)')
+        gradient1.addColorStop(1, 'rgba(100, 100, 100, 0)')
         ctx.fillStyle = gradient1
         ctx.beginPath()
         ctx.arc(ballCenterX, ballCenterY, currentRadius * 1.5, 0, Math.PI * 2)
@@ -110,21 +109,21 @@ export default function Intro({ onComplete }) {
           ballCenterX, ballCenterY, currentRadius * 0.8,
           ballCenterX, ballCenterY, currentRadius * 2.0
         )
-        gradient2.addColorStop(0, 'rgba(0, 255, 80, 0.08)')
-        gradient2.addColorStop(1, 'rgba(0, 255, 80, 0)')
+        gradient2.addColorStop(0, 'rgba(30, 30, 30, 0.08)')
+        gradient2.addColorStop(1, 'rgba(30, 30, 30, 0)')
         ctx.fillStyle = gradient2
         ctx.beginPath()
         ctx.arc(ballCenterX, ballCenterY, currentRadius * 2.0, 0, Math.PI * 2)
         ctx.fill()
 
-        // 绘制球体边框光晕（带模糊，用于融球效果）
+        // 绘制球体边框（黑色，反相效果）
         ctx.beginPath()
         ctx.arc(ballCenterX, ballCenterY, currentRadius * 0.95, 0, Math.PI * 2)
-        const pulseOpacity = 0.6 + Math.sin(timeRef.current * 0.05) * 0.25
-        ctx.strokeStyle = `rgba(0, 255, 120, ${pulseOpacity})`
+        const pulseOpacity = 0.7 + Math.sin(timeRef.current * 0.05) * 0.3
+        ctx.strokeStyle = `rgba(0, 0, 0, ${pulseOpacity})`
         ctx.lineWidth = 2.5
-        ctx.shadowColor = '#00ff88'
-        ctx.shadowBlur = 25
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
+        ctx.shadowBlur = 20
         ctx.stroke()
         ctx.shadowBlur = 0
       })
@@ -169,7 +168,6 @@ export default function Intro({ onComplete }) {
       <canvas ref={canvasRef} className="intro-canvas" />
       <div className="intro-title">
         <h1 className="title-text">汤圆的窝</h1>
-        <div className="title-cursor">_</div>
       </div>
     </div>
   )

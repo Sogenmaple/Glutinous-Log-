@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { getTypeIcon } from '../icons/TypeIcons'
 
 export default function PostListAdmin({ onEdit }) {
   const [posts, setPosts] = useState([])
@@ -62,14 +63,15 @@ export default function PostListAdmin({ onEdit }) {
               <tr key={post.id}>
                 <td>
                   <span className="post-type-icon">
-                    {post.type === 'project' ? '🎮' : post.type === 'devlog' ? '📝' : post.type === 'tech' ? '💻' : post.type === 'design' ? '🎨' : '☕'}
+                    {getTypeIcon(post.type, 20)}
                   </span>
                 </td>
                 <td className="post-title-cell">{post.title}</td>
                 <td>{post.category}</td>
                 <td>
                   <span className={`status-badge ${post.status}`}>
-                    {post.status === 'published' ? '✅ 已发布' : '📝 草稿'}
+                    <span className="status-indicator"></span>
+                    {post.status === 'published' ? '已发布' : '草稿'}
                   </span>
                 </td>
                 <td>{post.date || post.createdAt?.split('T')[0]}</td>

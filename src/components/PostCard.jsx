@@ -1,5 +1,6 @@
 import { useScrollAnimation } from '../hooks/useScrollAnimation'
 import { useNavigate } from 'react-router-dom'
+import { getTypeIcon } from './icons/TypeIcons'
 
 export default function PostCard({ post }) {
   const { ref, isVisible } = useScrollAnimation()
@@ -22,7 +23,9 @@ export default function PostCard({ post }) {
       <div className="post-content">
         {/* 头部信息 */}
         <div className="post-header">
-          <span className="post-type">{post.type === 'project' ? '🎮' : post.type === 'devlog' ? '📝' : post.type === 'tech' ? '💻' : post.type === 'design' ? '🎨' : '☕'}</span>
+          <span className="post-type-icon">
+            {getTypeIcon(post.type, 18)}
+          </span>
           <span className="post-category">{post.category}</span>
           <span className="post-date">{post.date}</span>
         </div>

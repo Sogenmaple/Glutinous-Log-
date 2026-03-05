@@ -101,11 +101,11 @@ export default function PostEditor({ post, onBack }) {
           <div className="form-group">
             <label>类型 *</label>
             <select name="type" value={formData.type} onChange={handleChange}>
-              <option value="project">🎮 游戏项目</option>
-              <option value="devlog">📝 开发日志</option>
-              <option value="tech">💻 技术分享</option>
-              <option value="design">🎨 设计笔记</option>
-              <option value="life">☕ 生活随笔</option>
+              <option value="project">游戏项目</option>
+              <option value="devlog">开发日志</option>
+              <option value="tech">技术分享</option>
+              <option value="design">设计笔记</option>
+              <option value="life">生活随笔</option>
             </select>
           </div>
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import PostCard from './PostCard'
 import { posts, categories, types } from '../data/posts'
+import { getTypeIcon } from './icons/TypeIcons'
 
 export default function PostList() {
   const [activeCategory, setActiveCategory] = useState('all')
@@ -29,6 +30,7 @@ export default function PostList() {
               className={`type-btn ${activeType === type.id ? 'active' : ''}`}
               onClick={() => setActiveType(type.id)}
             >
+              {type.id !== 'all' && getTypeIcon(type.id, 16)}
               {type.name}
             </button>
           ))}

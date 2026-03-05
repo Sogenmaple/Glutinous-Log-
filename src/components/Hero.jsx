@@ -49,8 +49,10 @@ export default function Hero() {
           <span className="cta-text">&gt; 查看作品集</span>
           <span className="cta-bracket">]</span>
         </a>
+        <div className="hero-clock">
+          <CassetteClock />
+        </div>
       </div>
-      <CassetteClock />
     </section>
   )
 }

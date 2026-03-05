@@ -89,63 +89,7 @@ export default function Intro({ onComplete }) {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
       ctx.fillRect(0, 0, width, height)
 
-      // 第一遍：绘制激光线（最底层）- 只连接中心球和轨道球
-      const laserCenterBall = balls.find(b => b.isCenter)
-      if (laserCenterBall) {
-        const x1 = laserCenterBall.x * width
-        const y1 = laserCenterBall.y * height
-        const ballRadius1 = laserCenterBall.radius * Math.min(width, height)
-        const pulse1 = 1 + Math.sin(timeRef.current * 0.05) * 0.05
-        const currentRadius1 = ballRadius1 * pulse1
-
-        // 遍历所有轨道球，只与中心球连线
-        balls.forEach((orbitalBall) => {
-          if (orbitalBall.isCenter) return // 跳过中心球自己
-
-          const x2 = orbitalBall.x * width
-          const y2 = orbitalBall.y * height
-          const ballRadius2 = orbitalBall.radius * Math.min(width, height)
-          const pulse2 = 1 + Math.sin(timeRef.current * 0.05) * 0.05
-          const currentRadius2 = ballRadius2 * pulse2
-
-          // 计算球体之间的角度
-          const angle = Math.atan2(y2 - y1, x2 - x1)
-
-          // 绘制 2 条激光线，连接点在球体边缘
-          const lineCount = 2
-          const opacity = 0.35
-          const lineWidth = 1.5
-
-          for (let line = 0; line < lineCount; line++) {
-            // 每条线的偏移角度不同，连接点在边缘不同位置
-            const edgeAngleOffset = (line - (lineCount - 1) / 2) * 0.12
-            const startEdgeAngle = angle + edgeAngleOffset
-            const endEdgeAngle = angle + Math.PI + edgeAngleOffset
-
-            // 连接点在球体边缘
-            const startX = x1 + Math.cos(startEdgeAngle) * currentRadius1 * 0.9
-            const startY = y1 + Math.sin(startEdgeAngle) * currentRadius1 * 0.9
-            const endX = x2 + Math.cos(endEdgeAngle) * currentRadius2 * 0.9
-            const endY = y2 + Math.sin(endEdgeAngle) * currentRadius2 * 0.9
-
-            ctx.beginPath()
-            ctx.moveTo(startX, startY)
-            ctx.lineTo(endX, endY)
-            // 使用黑色，经过 invert(1) 后变成白色
-            ctx.strokeStyle = `rgba(0, 0, 0, ${opacity})`
-            ctx.lineWidth = lineWidth
-            ctx.lineCap = 'round'
-            ctx.lineJoin = 'round'
-            // 黑色光晕，经过 invert(1) 后变成白色光晕
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-            ctx.shadowBlur = 15
-            ctx.stroke()
-            ctx.shadowBlur = 0
-          }
-        })
-      }
-
-      // 第二遍：绘制球体光晕和边框（覆盖激光线）
+      // 第一遍：绘制球体光晕和边框（最底层）
       balls.forEach((ball) => {
         const ballCenterX = ball.x * width
         const ballCenterY = ball.y * height
@@ -194,7 +138,7 @@ export default function Intro({ onComplete }) {
         }
       })
 
-      // 第三遍：绘制代码雨（在球体之上，眼睛之下）
+      // 第二遍：绘制代码雨（在球体之上，眼睛之下）
       ctx.font = `${fontSize}px monospace`
       for (let i = 0; i < columns; i++) {
         const x = i * fontSize
@@ -211,7 +155,7 @@ export default function Intro({ onComplete }) {
         drops[i]++
       }
 
-      // 第四遍：绘制中心球眼睛（最上层，在所有元素之上）
+      // 第三遍：绘制中心球眼睛（最上层，在所有元素之上）
       const centerBall = balls.find(b => b.isCenter)
       if (centerBall) {
         const ballCenterX = centerBall.x * width

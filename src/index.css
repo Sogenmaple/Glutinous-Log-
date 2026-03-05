@@ -22,6 +22,7 @@
   --cyan: #00e5ff;
   --cyan-dim: #0097a7;
   --cyan-glow: 0 0 10px rgba(0, 229, 255, 0.3), 0 0 30px rgba(0, 229, 255, 0.1);
+  --cyan-glow-strong: 0 0 15px rgba(0, 229, 255, 0.5), 0 0 40px rgba(0, 229, 255, 0.2);
 
   --green: #39ff14;
   --green-dim: #1b8a00;
@@ -34,6 +35,11 @@
   --font-display: 'Orbitron', 'Share Tech Mono', monospace;
   --font-mono: 'VT323', monospace;
   --font-body: 'Share Tech Mono', 'Courier New', monospace;
+
+  /* 新增装饰变量 */
+  --grid-line: rgba(255, 149, 0, 0.03);
+  --border-subtle: rgba(255, 149, 0, 0.08);
+  --border-focus: rgba(255, 149, 0, 0.25);
 }
 
 * {
@@ -509,6 +515,28 @@ body {
   overflow: hidden;
 }
 
+/* 卡片边角装饰 */
+.timeline-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-top: 2px solid var(--amber-dim);
+  border-right: 2px solid var(--amber-dim);
+  border-radius: 0 8px 0 0;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.timeline-card:hover::after {
+  border-color: var(--amber);
+  opacity: 1;
+  width: 30px;
+  height: 30px;
+}
+
 .timeline-card::before {
   content: '';
   position: absolute;
@@ -528,6 +556,29 @@ body {
   border-color: var(--amber);
   box-shadow: var(--amber-glow), inset 0 0 60px rgba(255, 149, 0, 0.05);
   transform: translateY(-8px) scale(1.02);
+}
+
+/* 开发中状态脉冲光环 */
+.timeline-status.development {
+  position: relative;
+}
+
+.timeline-status.development::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 3px;
+  background: linear-gradient(45deg, var(--green), var(--cyan), var(--green));
+  background-size: 200% 200%;
+  z-index: -1;
+  opacity: 0.3;
+  animation: gradient-rotate 3s linear infinite;
+}
+
+@keyframes gradient-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .timeline-header {
@@ -789,9 +840,25 @@ body {
   transition: all 0.3s ease;
 }
 
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
 .header--scrolled {
   border-bottom-color: rgba(255, 149, 0, 0.3);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 149, 0, 0.1);
+}
+
+.header--scrolled::after {
+  opacity: 1;
 }
 
 .header-content {
@@ -898,6 +965,21 @@ body {
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
   -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+}
+
+.hero-bg-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255, 149, 0, 0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 30%, rgba(0, 229, 255, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+  animation: bg-pulse 8s ease-in-out infinite;
+}
+
+@keyframes bg-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
 }
 
 .hero-content {
@@ -1356,6 +1438,29 @@ body {
   background: var(--bg-card);
   border: 1px solid rgba(255, 149, 0, 0.15);
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 40px rgba(255, 149, 0, 0.05);
+}
+
+/* Terminal 装饰性扫描线 */
+.about-terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--amber-dim), transparent);
+  animation: scanline-move 3s linear infinite;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+@keyframes scanline-move {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 0.3; }
+  90% { opacity: 0.3; }
+  100% { transform: translateY(400px); opacity: 0; }
 }
 
 .terminal-header {
@@ -1472,6 +1577,20 @@ body {
   padding: 3rem 2rem;
   text-align: center;
   border-top: 1px solid rgba(255, 149, 0, 0.1);
+  position: relative;
+  background: linear-gradient(180deg, transparent 0%, rgba(255, 149, 0, 0.02) 100%);
+}
+
+/* Footer 装饰线 */
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--amber), transparent);
 }
 
 .footer-content {
@@ -1546,10 +1665,12 @@ body {
 /* ============================================
    RESPONSIVE
    ============================================ */
+
+/* 平板端 (768px) */
 @media (max-width: 768px) {
   .hero {
     flex-direction: column;
-    gap: 2rem;
+    gap: 3rem;
     padding: 5rem 1.5rem 3rem;
   }
 
@@ -1559,6 +1680,7 @@ body {
 
   .hero-stats {
     gap: 0.8rem;
+    flex-wrap: wrap;
   }
 
   .cassette-body {
@@ -1579,8 +1701,12 @@ body {
   }
 
   .nav-item {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .nav-label-en {
+    display: none;
   }
 
   .section-title {
@@ -1589,7 +1715,7 @@ body {
 
   .terminal-body {
     padding: 1rem;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 
   .skill-bar {
@@ -1609,6 +1735,148 @@ body {
   .timeline-item.right .timeline-dot {
     width: 44px;
     height: 44px;
+  }
+
+  .timeline-card {
+    padding: 1rem;
+  }
+
+  .about-content {
+    padding: 0 1rem;
+  }
+}
+
+/* 手机端 (480px) */
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  .hero {
+    padding: 4rem 1rem 2rem;
+    gap: 2rem;
+  }
+
+  .hero-label {
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .hero-cta {
+    font-size: 1rem;
+    padding: 0.6rem 1.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .cassette-body {
+    width: 180px;
+    height: 120px;
+  }
+
+  .section-title {
+    font-size: 0.9rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .timeline-title {
+    font-size: 1.1rem;
+  }
+
+  .timeline-desc {
+    font-size: 0.85rem;
+  }
+
+  .timeline-tag {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+  }
+
+  .terminal-body {
+    font-size: 0.85rem;
+    padding: 0.8rem;
+  }
+
+  .skill-name {
+    font-size: 0.8rem;
+    width: 70px;
+  }
+
+  .skill-percent {
+    font-size: 0.75rem;
+    width: 35px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .footer-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* 触摸优化 */
+  .nav-item,
+  .hero-cta,
+  .timeline-link,
+  .game-card {
+    min-height: 44px;
+  }
+}
+
+/* 小屏手机 (360px) */
+@media (max-width: 360px) {
+  html {
+    font-size: 13px;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .cassette-body {
+    width: 160px;
+    height: 105px;
+  }
+
+  .games-grid {
+    gap: 1rem;
+  }
+
+  .timeline-card {
+    padding: 0.8rem;
+  }
+}
+
+/* 横屏优化 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero {
+    min-height: auto;
+    padding: 4rem 2rem;
+  }
+
+  .hero-content {
+    max-width: 60%;
+  }
+
+  .cassette-body {
+    width: 180px;
+    height: 120px;
   }
 }
 

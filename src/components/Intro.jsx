@@ -89,25 +89,7 @@ export default function Intro({ onComplete }) {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
       ctx.fillRect(0, 0, width, height)
 
-      ctx.font = `${fontSize}px monospace`
-
-      // 绘制全屏代码雨（黑色）
-      for (let i = 0; i < columns; i++) {
-        const x = i * fontSize
-        const y = drops[i] * fontSize
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
-        const char = chars.charAt(Math.floor(Math.random() * chars.length))
-        ctx.fillText(char, x, y)
-
-        // 重置或继续下落
-        if (y > height && Math.random() > 0.975) {
-          drops[i] = 0
-        }
-        drops[i]++
-      }
-
-      // 第一遍：绘制激光线（最底层）
+      // 第一遍：绘制激光线（最底层，在代码雨之前）
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           const ball1 = balls[i]
@@ -130,9 +112,9 @@ export default function Intro({ onComplete }) {
           const distanceRatio = Math.min(distance / maxDistance, 1)
 
           // 根据距离计算线的数量、粗细和透明度
-          const lineCount = Math.floor(2 + distanceRatio * 5) // 2-7 条线
-          const baseLineWidth = 1 + distanceRatio * 3 // 1-4px
-          const baseOpacity = 0.2 + distanceRatio * 0.4 // 0.2-0.6
+          const lineCount = Math.floor(1 + distanceRatio * 3) // 1-4 条线
+          const baseLineWidth = 0.8 + distanceRatio * 1.5 // 0.8-2.3px
+          const baseOpacity = 0.15 + distanceRatio * 0.25 // 0.15-0.4
 
           // 计算球体之间的角度
           const angle = Math.atan2(y2 - y1, x2 - x1)
@@ -140,18 +122,18 @@ export default function Intro({ onComplete }) {
           // 绘制多条激光线，连接点在球体边缘
           for (let line = 0; line < lineCount; line++) {
             // 每条线的偏移角度不同，连接点在边缘不同位置
-            const edgeAngleOffset = (line - (lineCount - 1) / 2) * 0.15
+            const edgeAngleOffset = (line - (lineCount - 1) / 2) * 0.12
             const startEdgeAngle = angle + edgeAngleOffset
             const endEdgeAngle = angle + Math.PI + edgeAngleOffset
 
             // 连接点在球体边缘
-            const startX = x1 + Math.cos(startEdgeAngle) * currentRadius1 * 0.9
-            const startY = y1 + Math.sin(startEdgeAngle) * currentRadius1 * 0.9
-            const endX = x2 + Math.cos(endEdgeAngle) * currentRadius2 * 0.9
-            const endY = y2 + Math.sin(endEdgeAngle) * currentRadius2 * 0.9
+            const startX = x1 + Math.cos(startEdgeAngle) * currentRadius1 * 0.85
+            const startY = y1 + Math.sin(startEdgeAngle) * currentRadius1 * 0.85
+            const endX = x2 + Math.cos(endEdgeAngle) * currentRadius2 * 0.85
+            const endY = y2 + Math.sin(endEdgeAngle) * currentRadius2 * 0.85
 
-            const opacity = baseOpacity * (1 - Math.abs(line - (lineCount - 1) / 2) / lineCount)
-            const lineWidth = baseLineWidth * (1 - Math.abs(line - (lineCount - 1) / 2) / (lineCount + 1))
+            const opacity = baseOpacity * (1 - Math.abs(line - (lineCount - 1) / 2) / (lineCount + 1))
+            const lineWidth = baseLineWidth * (1 - Math.abs(line - (lineCount - 1) / 2) / (lineCount * 2))
 
             ctx.beginPath()
             ctx.moveTo(startX, startY)
@@ -161,8 +143,8 @@ export default function Intro({ onComplete }) {
             ctx.lineWidth = lineWidth
             ctx.lineCap = 'round'
             // 黑色光晕，经过 invert(1) 后变成白色光晕
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)'
-            ctx.shadowBlur = 12 + distanceRatio * 18
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)'
+            ctx.shadowBlur = 8 + distanceRatio * 10
             ctx.stroke()
             ctx.shadowBlur = 0
           }
@@ -292,6 +274,23 @@ export default function Intro({ onComplete }) {
         ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2)
         ctx.fillStyle = `rgba(255, 255, 255, ${eyeParams.eyeOpacity})`
         ctx.fill()
+      }
+
+      // 第四遍：绘制代码雨（在眼睛之下，球体和激光线之上）
+      ctx.font = `${fontSize}px monospace`
+      for (let i = 0; i < columns; i++) {
+        const x = i * fontSize
+        const y = drops[i] * fontSize
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
+        const char = chars.charAt(Math.floor(Math.random() * chars.length))
+        ctx.fillText(char, x, y)
+
+        // 重置或继续下落
+        if (y > height && Math.random() > 0.975) {
+          drops[i] = 0
+        }
+        drops[i]++
       }
 
       animationRef.current = requestAnimationFrame(draw)

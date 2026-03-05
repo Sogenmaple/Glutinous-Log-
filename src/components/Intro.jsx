@@ -39,17 +39,16 @@ export default function Intro({ onComplete }) {
 
     // 四个球体
     const balls = [
-      { x: 0.5, y: 0.5, radius: 0.12, angle: 0, speed: 0, orbitRadius: 0, isCenter: true },
-      { x: 0.5, y: 0.5, radius: 0.08, angle: 0, speed: 0.015, orbitRadius: 0.2, isCenter: false },
-      { x: 0.5, y: 0.5, radius: 0.06, angle: 2, speed: -0.02, orbitRadius: 0.28, isCenter: false },
-      { x: 0.5, y: 0.5, radius: 0.07, angle: 4, speed: 0.012, orbitRadius: 0.35, isCenter: false },
+      { x: 0.5, y: 0.5, radius: 0.12, angle: 0, speed: 0, orbitRadius: 0, isCenter: true, rings: [] },
+      { x: 0.5, y: 0.5, radius: 0.08, angle: 0, speed: 0.015, orbitRadius: 0.2, isCenter: false, rings: [] },
+      { x: 0.5, y: 0.5, radius: 0.06, angle: 2, speed: -0.02, orbitRadius: 0.28, isCenter: false, rings: [] },
+      { x: 0.5, y: 0.5, radius: 0.07, angle: 4, speed: 0.012, orbitRadius: 0.35, isCenter: false, rings: [] },
     ]
 
-    // 扩散圆环
-    const rings = []
-    const ringInterval = 60 // 每 60 帧生成一个圆环
-    const ringSpeed = 2 // 圆环扩散速度
-    const maxRingRadius = 0.8 // 最大半径
+    // 圆环参数
+    const ringInterval = 80 // 每 80 帧生成一个圆环
+    const ringSpeed = 1.5 // 圆环扩散速度
+    const maxRingRadius = 0.6 // 最大半径
 
     // 眼睛参数
     const eyes = {
@@ -95,37 +94,45 @@ export default function Intro({ onComplete }) {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
       ctx.fillRect(0, 0, width, height)
 
-      // 生成新的扩散圆环
-      if (timeRef.current % ringInterval === 0) {
-        rings.push({
-          radius: 0.12, // 从中心球半径开始
-          width: 3, // 初始环宽
-          opacity: 0.5,
-        })
-      }
-
-      // 更新和绘制扩散圆环
-      for (let i = rings.length - 1; i >= 0; i--) {
-        const ring = rings[i]
-        ring.radius += ringSpeed / Math.min(width, height)
-        ring.width = 1 + (ring.radius / maxRingRadius) * 4 // 环宽随半径增大
-        ring.opacity = 0.5 * (1 - ring.radius / maxRingRadius)
-
-        if (ring.radius >= maxRingRadius) {
-          rings.splice(i, 1)
-          continue
+      // 为每个球体生成和绘制扩散圆环
+      balls.forEach((ball) => {
+        // 生成新的扩散圆环
+        if (timeRef.current % ringInterval === 0) {
+          ball.rings.push({
+            radius: ball.radius * 0.8,
+            width: 2,
+            opacity: 0.25,
+          })
         }
 
-        const ringPixelRadius = ring.radius * Math.min(width, height)
-        ctx.beginPath()
-        ctx.arc(centerX, centerY, ringPixelRadius, 0, Math.PI * 2)
-        ctx.strokeStyle = `rgba(0, 0, 0, ${ring.opacity})`
-        ctx.lineWidth = ring.width
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'
-        ctx.shadowBlur = 8
-        ctx.stroke()
-        ctx.shadowBlur = 0
-      }
+        // 更新和绘制扩散圆环
+        for (let i = ball.rings.length - 1; i >= 0; i--) {
+          const ring = ball.rings[i]
+          ring.radius += ringSpeed / Math.min(width, height)
+          ring.width = 0.5 + (ring.radius / maxRingRadius) * 3
+          ring.opacity = 0.25 * (1 - ring.radius / maxRingRadius)
+
+          if (ring.radius >= maxRingRadius) {
+            ball.rings.splice(i, 1)
+            return
+          }
+
+          const ballCenterX = ball.x * width
+          const ballCenterY = ball.y * height
+          const ringPixelRadius = ring.radius * Math.min(width, height)
+
+          // 使用更柔和的圆环，让它们可以融合
+          ctx.beginPath()
+          ctx.arc(ballCenterX, ballCenterY, ringPixelRadius, 0, Math.PI * 2)
+          ctx.strokeStyle = `rgba(0, 0, 0, ${ring.opacity})`
+          ctx.lineWidth = ring.width
+          ctx.lineCap = 'round'
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.2)'
+          ctx.shadowBlur = 5
+          ctx.stroke()
+          ctx.shadowBlur = 0
+        }
+      })
 
       // 第一遍：绘制球体光晕和边框（最底层）
       balls.forEach((ball) => {

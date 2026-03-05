@@ -104,13 +104,13 @@ export default function Intro({ onComplete }) {
         })
       }
 
-      // 更新和绘制扩散圆环（物理水波纹效果）
+      // 更新和绘制扩散圆环（物理水波纹效果 + 轨道球扭曲）
       for (let i = rings.length - 1; i >= 0; i--) {
         const ring = rings[i]
 
         // 物理水波纹：速度随半径衰减（阻尼效果）
         const decayFactor = Math.max(0.3, 1 - ring.radius / maxRingRadius)
-        ring.speed = 3 * decayFactor // 速度从 3 逐渐降到 0.9
+        ring.speed = 3 * decayFactor
         ring.radius += ring.speed / Math.min(width, height)
 
         // 环宽随半径增大（能量扩散）
@@ -125,8 +125,45 @@ export default function Intro({ onComplete }) {
         }
 
         const ringPixelRadius = ring.radius * Math.min(width, height)
+
+        // 绘制扭曲的圆环（受轨道球影响）
         ctx.beginPath()
-        ctx.arc(centerX, centerY, ringPixelRadius, 0, Math.PI * 2)
+        const segments = 360
+        for (let angle = 0; angle <= segments; angle++) {
+          const rad = (angle / segments) * Math.PI * 2
+          let x = centerX + Math.cos(rad) * ringPixelRadius
+          let y = centerY + Math.sin(rad) * ringPixelRadius
+
+          // 计算每个轨道球对这个点的扭曲影响
+          balls.forEach((ball) => {
+            if (ball.isCenter) return
+
+            const ballX = ball.x * width
+            const ballY = ball.y * height
+            const ballRadius = ball.radius * Math.min(width, height) * 2
+
+            const dx = x - ballX
+            const dy = y - ballY
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            const influenceRadius = ballRadius * 3
+
+            // 如果点在影响范围内，产生扭曲
+            if (distance < influenceRadius) {
+              const influence = (1 - distance / influenceRadius) * 0.5
+              const pushAngle = Math.atan2(dy, dx)
+              const pushDistance = influence * ballRadius * 2
+              x += Math.cos(pushAngle) * pushDistance
+              y += Math.sin(pushAngle) * pushDistance
+            }
+          })
+
+          if (angle === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
+          }
+        }
+
         ctx.strokeStyle = `rgba(0, 0, 0, ${ring.opacity})`
         ctx.lineWidth = ring.width
         ctx.lineCap = 'round'

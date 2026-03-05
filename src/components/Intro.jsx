@@ -11,8 +11,8 @@ export default function Intro({ onComplete }) {
   const eyeParams = {
     eyeRadius: 0.18,
     baseOffsetX: 0.45,
-    baseOffsetY: 0.2,
-    maxEyeOffset: 0.3,
+    baseOffsetY: 0,      // 上下居中
+    maxEyeOffset: 0.45,  // 增大活动范围
     smoothFactor: 0.15,
     eyeOpacity: 0.95,
     glowOpacity: 0.4,

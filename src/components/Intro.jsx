@@ -435,6 +435,28 @@ export default function Intro({ onComplete }) {
           >
             重置默认值
           </button>
+
+          <button
+            onClick={() => {
+              const config = JSON.stringify(eyeParams, null, 2)
+              navigator.clipboard.writeText(config).then(() => {
+                alert('参数已复制到剪贴板！\n\n' + config + '\n\n请粘贴到 Intro.jsx 的 useState 初始值中')
+              })
+            }}
+            style={{
+              width: '100%',
+              padding: '8px',
+              background: 'rgba(0,255,100,0.2)',
+              color: '#00ff64',
+              border: '1px solid rgba(0,255,100,0.5)',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginTop: '10px',
+              fontWeight: 'bold',
+            }}
+          >
+            💾 应用并保存（复制配置）
+          </button>
         </div>
       )}
     </div>

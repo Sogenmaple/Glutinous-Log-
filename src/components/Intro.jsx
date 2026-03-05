@@ -2,8 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 
 export default function Intro({ onComplete }) {
   const [isExpanding, setIsExpanding] = useState(false)
-  const [showDebug, setShowDebug] = useState(false)
-  const [eyeParams, setEyeParams] = useState({
+  const canvasRef = useRef(null)
+  const animationRef = useRef(null)
+  const timeRef = useRef(0)
+  const mouseRef = useRef({ x: 0.5, y: 0.5 })
+
+  // 眼睛参数配置
+  const eyeParams = {
     eyeRadius: 0.18,
     baseOffsetX: 0.45,
     baseOffsetY: 0.2,
@@ -11,11 +16,7 @@ export default function Intro({ onComplete }) {
     smoothFactor: 0.15,
     eyeOpacity: 0.95,
     glowOpacity: 0.4,
-  })
-  const canvasRef = useRef(null)
-  const animationRef = useRef(null)
-  const timeRef = useRef(0)
-  const mouseRef = useRef({ x: 0.5, y: 0.5 })
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -263,202 +264,6 @@ export default function Intro({ onComplete }) {
       onClick={handleClick}
     >
       <canvas ref={canvasRef} className="intro-canvas" />
-      
-      {/* 调试面板切换按钮 */}
-      <button
-        onClick={(e) => { e.stopPropagation(); setShowDebug(!showDebug); }}
-        style={{
-          position: 'fixed',
-          top: '10px',
-          right: '10px',
-          zIndex: 1000,
-          padding: '8px 12px',
-          background: 'rgba(0,0,0,0.7)',
-          color: 'white',
-          border: '1px solid rgba(255,255,255,0.3)',
-          borderRadius: '4px',
-          cursor: 'pointer',
-          fontSize: '12px',
-        }}
-      >
-        {showDebug ? '隐藏调试' : '调试模式'}
-      </button>
-
-      {/* 调试面板 */}
-      {showDebug && (
-        <div
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            position: 'fixed',
-            top: '50px',
-            right: '10px',
-            zIndex: 1000,
-            width: '280px',
-            padding: '15px',
-            background: 'rgba(0,0,0,0.85)',
-            color: 'white',
-            border: '1px solid rgba(255,255,255,0.3)',
-            borderRadius: '8px',
-            fontSize: '12px',
-            fontFamily: 'monospace',
-          }}
-        >
-          <h3 style={{ margin: '0 0 10px 0', fontSize: '14px', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '8px' }}>
-            👀 眼睛参数
-          </h3>
-          
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '4px' }}>
-              眼睛半径：{eyeParams.eyeRadius.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min="0.05"
-              max="0.35"
-              step="0.01"
-              value={eyeParams.eyeRadius}
-              onChange={(e) => setEyeParams({ ...eyeParams, eyeRadius: parseFloat(e.target.value) })}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '4px' }}>
-              眼睛间距 X：{eyeParams.baseOffsetX.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min="0.2"
-              max="0.7"
-              step="0.01"
-              value={eyeParams.baseOffsetX}
-              onChange={(e) => setEyeParams({ ...eyeParams, baseOffsetX: parseFloat(e.target.value) })}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '4px' }}>
-              眼睛位置 Y：{eyeParams.baseOffsetY.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min="0.05"
-              max="0.4"
-              step="0.01"
-              value={eyeParams.baseOffsetY}
-              onChange={(e) => setEyeParams({ ...eyeParams, baseOffsetY: parseFloat(e.target.value) })}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '4px' }}>
-              最大偏移：{eyeParams.maxEyeOffset.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min="0.1"
-              max="0.5"
-              step="0.01"
-              value={eyeParams.maxEyeOffset}
-              onChange={(e) => setEyeParams({ ...eyeParams, maxEyeOffset: parseFloat(e.target.value) })}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '4px' }}>
-              平滑因子：{eyeParams.smoothFactor.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min="0.02"
-              max="0.3"
-              step="0.01"
-              value={eyeParams.smoothFactor}
-              onChange={(e) => setEyeParams({ ...eyeParams, smoothFactor: parseFloat(e.target.value) })}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '4px' }}>
-              眼睛不透明度：{eyeParams.eyeOpacity.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min="0.5"
-              max="1.0"
-              step="0.01"
-              value={eyeParams.eyeOpacity}
-              onChange={(e) => setEyeParams({ ...eyeParams, eyeOpacity: parseFloat(e.target.value) })}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ display: 'block', marginBottom: '4px' }}>
-              光晕强度：{eyeParams.glowOpacity.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min="0.1"
-              max="0.8"
-              step="0.01"
-              value={eyeParams.glowOpacity}
-              onChange={(e) => setEyeParams({ ...eyeParams, glowOpacity: parseFloat(e.target.value) })}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <button
-            onClick={() => setEyeParams({
-              eyeRadius: 0.18,
-              baseOffsetX: 0.45,
-              baseOffsetY: 0.2,
-              maxEyeOffset: 0.3,
-              smoothFactor: 0.15,
-              eyeOpacity: 0.95,
-              glowOpacity: 0.4,
-            })}
-            style={{
-              width: '100%',
-              padding: '6px',
-              background: 'rgba(255,255,255,0.1)',
-              color: 'white',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginTop: '10px',
-            }}
-          >
-            重置默认值
-          </button>
-
-          <button
-            onClick={() => {
-              const config = JSON.stringify(eyeParams, null, 2)
-              navigator.clipboard.writeText(config).then(() => {
-                alert('参数已复制到剪贴板！\n\n' + config + '\n\n请粘贴到 Intro.jsx 的 useState 初始值中')
-              })
-            }}
-            style={{
-              width: '100%',
-              padding: '8px',
-              background: 'rgba(0,255,100,0.2)',
-              color: '#00ff64',
-              border: '1px solid rgba(0,255,100,0.5)',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginTop: '10px',
-              fontWeight: 'bold',
-            }}
-          >
-            💾 应用并保存（复制配置）
-          </button>
-        </div>
-      )}
     </div>
   )
 }

@@ -55,6 +55,33 @@ export default function GameTimeline() {
             <rect x="6" y="18" width="32" height="6" fill="var(--amber-dim)" rx="2" />
           </svg>
         )
+      case 'code':
+        return (
+          <svg className="vector-icon icon-code" viewBox="0 0 44 44">
+            <path d="M14 14 L8 22 L14 30" fill="none" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M30 14 L36 22 L30 30" fill="none" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="24" y1="10" x2="20" y2="34" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+        )
+      case 'go':
+        return (
+          <svg className="vector-icon icon-go" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="var(--cyan)" strokeWidth="2" />
+            <circle cx="22" cy="14" r="4" fill="var(--cyan)" />
+            <circle cx="16" cy="26" r="4" fill="none" stroke="var(--cyan)" strokeWidth="2" />
+            <circle cx="28" cy="26" r="4" fill="none" stroke="var(--cyan)" strokeWidth="2" />
+          </svg>
+        )
+      case 'chess':
+        return (
+          <svg className="vector-icon icon-chess" viewBox="0 0 44 44">
+            <rect x="10" y="10" width="24" height="24" fill="none" stroke="var(--purple)" strokeWidth="2" />
+            <line x1="10" y1="18" x2="34" y2="18" stroke="var(--purple)" strokeWidth="1.5" />
+            <line x1="10" y1="26" x2="34" y2="26" stroke="var(--purple)" strokeWidth="1.5" />
+            <line x1="18" y1="10" x2="18" y2="34" stroke="var(--purple)" strokeWidth="1.5" />
+            <line x1="26" y1="10" x2="26" y2="34" stroke="var(--purple)" strokeWidth="1.5" />
+          </svg>
+        )
       default:
         return (
           <svg className="vector-icon" viewBox="0 0 44 44">
@@ -137,7 +164,12 @@ export default function GameTimeline() {
                 <span className="timeline-jam">{game.jam}</span>
               </div>
 
-              <h3 className="timeline-title">{game.title}</h3>
+              <div className="timeline-title-row">
+                <h3 className="timeline-title">{game.title}</h3>
+                {game.status === 'development' && (
+                  <span className="timeline-status development">开发中</span>
+                )}
+              </div>
 
               <p className="timeline-desc">{game.description}</p>
 

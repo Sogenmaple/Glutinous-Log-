@@ -29,11 +29,6 @@
   opacity: 0;
 }
 
-.intro-overlay.expanding .intro-hint {
-  opacity: 0;
-  transform: scale(2);
-}
-
 .intro-canvas {
   position: absolute;
   top: 0;
@@ -41,63 +36,4 @@
   width: 100%;
   height: 100%;
   transition: transform 1.5s cubic-bezier(0.7, 0, 0.3, 1), opacity 1s ease;
-}
-
-.intro-title {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.title-text {
-  font-family: var(--font-display);
-  font-size: 5rem;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.5em;
-  margin: 0;
-  position: relative;
-  z-index: 11;
-}
-
-.title-canvas {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 10;
-}
-
-.title-cursor {
-  font-family: var(--font-mono);
-  font-size: 2.2rem;
-  color: #ffffff;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
-  animation: cursor-blink 1s step-end infinite;
-  margin-top: 0.5rem;
-}
-
-@keyframes cursor-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-/* 移动端适配 */
-@media (max-width: 480px) {
-  .title-text {
-    font-size: 2rem;
-    letter-spacing: 0.2em;
-  }
-
-  .title-cursor {
-    font-size: 1.5rem;
-  }
 }

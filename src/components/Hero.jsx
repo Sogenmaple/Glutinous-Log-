@@ -50,9 +50,7 @@ export default function Hero() {
           <span className="cta-bracket">]</span>
         </a>
       </div>
-      <div className="hero-clock">
-        <CassetteClock />
-      </div>
+      <CassetteClock />
     </section>
   )
 }

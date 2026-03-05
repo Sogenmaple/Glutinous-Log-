@@ -1127,12 +1127,6 @@ body :not(code):not(pre) {
   animation: slide-up 0.8s ease-out;
 }
 
-.hero-clock {
-  z-index: 1;
-  animation: slide-up 1s ease-out 0.3s both;
-  margin-top: 2rem;
-}
-
 .hero-label {
   font-family: var(--font-mono);
   font-size: 1.15rem;

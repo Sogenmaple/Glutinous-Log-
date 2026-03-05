@@ -16,7 +16,7 @@
   overflow: hidden;
   transition: all 1.5s cubic-bezier(0.7, 0, 0.3, 1);
   /* 融球效果滤镜 - 高对比度产生融合效果 */
-  filter: contrast(18) brightness(1.05);
+  filter: contrast(15) brightness(1.1);
 }
 
 .intro-overlay.expanding {

@@ -49,8 +49,8 @@ export default function Intro({ onComplete }) {
         }
       })
 
-      // 白色背景
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
+      // 纯黑背景
+      ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, width, height)
 
       ctx.font = `${fontSize}px monospace`
@@ -60,7 +60,7 @@ export default function Intro({ onComplete }) {
         const x = i * fontSize
         const y = drops[i] * fontSize
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.02)'
         const char = chars.charAt(Math.floor(Math.random() * chars.length))
         ctx.fillText(char, x, y)
 
@@ -71,7 +71,7 @@ export default function Intro({ onComplete }) {
         drops[i]++
       }
 
-      // 绘制球体区域（白色遮罩 + 清晰代码）
+      // 绘制球体区域
       balls.forEach((ball) => {
         const ballCenterX = ball.x * width
         const ballCenterY = ball.y * height
@@ -81,20 +81,7 @@ export default function Intro({ onComplete }) {
         const pulse = 1 + Math.sin(timeRef.current * 0.05) * 0.05
         const currentRadius = ballRadius * pulse
 
-        // 绘制球体遮罩（白色，盖住全屏淡代码）
-        const gradient = ctx.createRadialGradient(
-          ballCenterX, ballCenterY, currentRadius * 0.7,
-          ballCenterX, ballCenterY, currentRadius
-        )
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)')
-        gradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.88)')
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
-        ctx.fillStyle = gradient
-        ctx.beginPath()
-        ctx.arc(ballCenterX, ballCenterY, currentRadius, 0, Math.PI * 2)
-        ctx.fill()
-
-        // 在球体内绘制清晰的白色代码
+        // 在球体内绘制清晰的白色代码（在遮罩之前）
         ctx.save()
         ctx.beginPath()
         ctx.arc(ballCenterX, ballCenterY, currentRadius * 0.95, 0, Math.PI * 2)
@@ -111,7 +98,7 @@ export default function Intro({ onComplete }) {
           const dist = Math.sqrt(dx * dx + dy * dy)
 
           if (dist < currentRadius * 0.95) {
-            const brightness = 0.6 + Math.random() * 0.4
+            const brightness = 0.7 + Math.random() * 0.3
             ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`
             const char = chars.charAt(Math.floor(Math.random() * chars.length))
             ctx.fillText(char, x, y)
@@ -120,14 +107,14 @@ export default function Intro({ onComplete }) {
 
         ctx.restore()
 
-        // 球体边框（白色）
+        // 球体边框（白色光晕）
         ctx.beginPath()
         ctx.arc(ballCenterX, ballCenterY, currentRadius * 0.95, 0, Math.PI * 2)
-        const pulseOpacity = 0.7 + Math.sin(timeRef.current * 0.05) * 0.3
+        const pulseOpacity = 0.6 + Math.sin(timeRef.current * 0.05) * 0.3
         ctx.strokeStyle = `rgba(255, 255, 255, ${pulseOpacity})`
         ctx.lineWidth = 2.5
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)'
-        ctx.shadowBlur = 20
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.6)'
+        ctx.shadowBlur = 25
         ctx.stroke()
         ctx.shadowBlur = 0
       })

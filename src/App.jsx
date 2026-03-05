@@ -6,17 +6,18 @@ import GameShowcase from './components/GameShowcase'
 import About from './components/About'
 import Footer from './components/Footer'
 import ScanLines from './components/ScanLines'
-import BootSequence from './components/BootSequence'
+import Intro from './components/Intro'
 import './App.css'
+import './styles/intro.css'
 
 function App() {
-  const [booted, setBooted] = useState(false)
+  const [showIntro, setShowIntro] = useState(true)
 
   return (
     <div className="app">
       <ScanLines />
-      {!booted ? (
-        <BootSequence onComplete={() => setBooted(true)} />
+      {showIntro ? (
+        <Intro onComplete={() => setShowIntro(false)} />
       ) : (
         <>
           <Header />

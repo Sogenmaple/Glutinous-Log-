@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 
 export default function Hero() {
   const [text, setText] = useState('')
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const fullText = '游戏创作者 / 独立开发者'
 
   useEffect(() => {
@@ -15,6 +16,18 @@ export default function Hero() {
       }
     }, 80)
     return () => clearInterval(timer)
+  }, [])
+
+  // 鼠标视差效果
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 20
+      const y = (e.clientY / window.innerHeight - 0.5) * 20
+      setMousePos({ x, y })
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
   return (
@@ -49,7 +62,12 @@ export default function Hero() {
           <span className="cta-bracket">]</span>
         </a>
       </div>
-      <div className="hero-decoration">
+      <div
+        className="hero-decoration"
+        style={{
+          transform: `translate(${mousePos.x * -1}px, ${mousePos.y * -1}px) rotate(${mousePos.x * 0.5}deg)`,
+        }}
+      >
         <div className="cassette">
           <div className="cassette-body">
             <div className="cassette-holes">

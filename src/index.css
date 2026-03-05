@@ -154,6 +154,60 @@ body {
   100% { opacity: 0.97; }
 }
 
+/* 滚动触发动画 */
+@keyframes timeline-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(60px) translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}
+
+@keyframes timeline-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateY(60px) translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}
+
+@keyframes card-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes glow-flicker {
+  0%, 100% { opacity: 0.8; filter: blur(8px); }
+  50% { opacity: 1; filter: blur(12px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
 @keyframes reel-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -452,7 +506,8 @@ body {
   position: relative;
   width: 45%;
   margin-bottom: 4rem;
-  animation: slide-up 0.6s ease-out both;
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .timeline-item.left {
@@ -460,6 +515,7 @@ body {
   clear: left;
   padding-right: 3.5rem;
   text-align: right;
+  transform: translateX(-50px) translateY(40px);
 }
 
 .timeline-item.right {
@@ -467,6 +523,12 @@ body {
   clear: right;
   padding-left: 3.5rem;
   text-align: left;
+  transform: translateX(50px) translateY(40px);
+}
+
+.timeline-item.visible {
+  opacity: 1;
+  transform: translateX(0) translateY(0);
 }
 
 .timeline-dot {
@@ -683,8 +745,25 @@ body {
   letter-spacing: 0.05em;
   background: rgba(0, 229, 255, 0.05);
   border-radius: 3px;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.timeline-tag::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.timeline-tag:hover::before {
+  left: 100%;
 }
 
 .timeline-tag:hover {
@@ -692,7 +771,8 @@ body {
   border-color: var(--cyan);
   color: var(--cyan);
   text-shadow: var(--cyan-glow);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 229, 255, 0.2);
 }
 
 .timeline-links {
@@ -901,25 +981,64 @@ body {
   font-size: 0.9rem;
   padding: 0.4rem 1rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  overflow: hidden;
 }
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 149, 0, 0.05);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.nav-item:hover::before {
+  transform: scaleX(1);
+}
+
 .nav-item .nav-label-en {
   display: none;
   font-size: 0.7rem;
   color: var(--text-dim);
+  transition: all 0.3s ease;
 }
+
 .nav-item:hover {
   color: var(--amber);
   border-color: rgba(255, 149, 0, 0.3);
 }
+
 .nav-item:hover .nav-label-en {
   display: block;
+  animation: fade-in 0.3s ease;
 }
+
 .nav-item.active {
   color: var(--amber);
   border-color: var(--amber);
   text-shadow: var(--amber-glow);
+  background: rgba(255, 149, 0, 0.08);
+}
+
+/* 导航项激活指示器 */
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--amber);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--amber);
 }
 
 .header-status {
@@ -1059,17 +1178,64 @@ body {
   text-decoration: none;
   border: 1px solid var(--amber-dim);
   padding: 0.8rem 2rem;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 0.05em;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
 }
+
+/* CTA 按钮填充动画 */
+.hero-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.hero-cta:hover::before {
+  left: 100%;
+}
+
 .hero-cta:hover {
   background: rgba(255, 149, 0, 0.1);
   border-color: var(--amber);
   text-shadow: var(--amber-glow);
   box-shadow: var(--amber-glow), inset 0 0 30px rgba(255, 149, 0, 0.05);
+  transform: translateY(-2px);
 }
+
+.hero-cta:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: var(--amber-glow), inset 0 0 20px rgba(255, 149, 0, 0.1);
+}
+
+/* 点击波纹效果 */
+.hero-cta::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 149, 0, 0.3);
+  transform: scale(0);
+  animation: none;
+}
+
+.hero-cta:active::after {
+  animation: pulse-ring 0.6s ease-out;
+}
+
 .cta-bracket {
   color: var(--text-dim);
+  transition: all 0.3s ease;
+}
+
+.hero-cta:hover .cta-bracket {
+  color: var(--amber);
+  text-shadow: var(--amber-glow);
 }
 
 /* Cassette Tape */
@@ -1246,13 +1412,49 @@ body {
   background: var(--bg-card);
   border: 1px solid rgba(255, 149, 0, 0.1);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(60px) scale(0.95);
+}
+
+.game-card.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
   animation: card-enter 0.6s ease-out both;
 }
+
 .game-card:hover {
   border-color: var(--amber);
   box-shadow: var(--amber-glow), inset 0 0 40px rgba(255, 149, 0, 0.02);
-  transform: translateY(-4px);
+  transform: translateY(-8px) scale(1.02);
+}
+
+/* 卡片图标悬停旋转 */
+.game-card:hover .card-icon-vector {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 卡片链接悬停效果 */
+.card-link {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.card-link::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 100%;
+  height: 2px;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  transition: transform 0.3s ease;
+}
+
+.card-link:hover::after {
+  transform: translateX(-50%) scaleX(1);
 }
 
 .card-screen {
@@ -1352,6 +1554,19 @@ body {
   color: var(--cyan-dim);
   letter-spacing: 0.05em;
   border-radius: 3px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-tag:hover {
+  background: rgba(0, 229, 255, 0.15);
+  border-color: var(--cyan);
+  color: var(--cyan);
+  text-shadow: var(--cyan-glow);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 229, 255, 0.2);
 }
 
 .card-links {

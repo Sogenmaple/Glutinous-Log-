@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { games } from '../data/games'
 
 export default function GameTimeline() {
   const [hoveredId, setHoveredId] = useState(null)
+  const [visibleItems, setVisibleItems] = useState(new Set())
 
   // 按时间正序排序（从旧到新，精确到年月日）
   const sortedGames = [...games].sort((a, b) => {
@@ -10,6 +11,30 @@ export default function GameTimeline() {
     const dateB = new Date(b.date)
     return dateA - dateB
   })
+
+  // 滚动触发动画
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = parseInt(entry.target.dataset.id)
+            setVisibleItems((prev) => new Set([...prev, id]))
+          }
+        })
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -100px 0px',
+      }
+    )
+
+    document.querySelectorAll('.timeline-item').forEach((item) => {
+      observer.observe(item)
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   const renderVectorIcon = (type) => {
     switch (type) {
@@ -149,8 +174,9 @@ export default function GameTimeline() {
         {sortedGames.map((game, index) => (
           <div
             key={game.id}
-            className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}
-            style={{ animationDelay: `${index * 0.15}s` }}
+            data-id={game.id}
+            className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'} ${visibleItems.has(game.id) ? 'visible' : ''}`}
+            style={{ animationDelay: `${index * 0.1}s` }}
             onMouseEnter={() => setHoveredId(game.id)}
             onMouseLeave={() => setHoveredId(null)}
           >

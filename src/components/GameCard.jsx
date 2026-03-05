@@ -1,9 +1,34 @@
+import { useEffect, useRef, useState } from 'react'
+
 export default function GameCard({ game, index }) {
+  const [isVisible, setIsVisible] = useState(false)
+  const cardRef = useRef(null)
   const statusMap = {
     released: '已发布',
     dev: '开发中',
     prototype: '原型',
   }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.unobserve(entry.target)
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px 0px',
+      }
+    )
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
 
   const renderVectorIcon = (type) => {
     switch (type) {
@@ -88,7 +113,11 @@ export default function GameCard({ game, index }) {
   }
 
   return (
-    <div className="game-card" style={{ animationDelay: `${index * 0.1}s` }}>
+    <div
+      ref={cardRef}
+      className={`game-card ${isVisible ? 'visible' : ''}`}
+      style={{ animationDelay: `${index * 0.1}s` }}
+    >
       <div className="card-screen">
         <div className="card-screen-content">
           {renderVectorIcon(game.iconType)}

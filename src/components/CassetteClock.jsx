@@ -36,6 +36,14 @@ export default function CassetteClock() {
   const displayTime = `${formatTime(hours)}:${formatTime(minutes)}`
   const displaySeconds = formatTime(seconds)
 
+  // 日期信息
+  const year = time.getFullYear()
+  const month = time.getMonth() + 1
+  const date = time.getDate()
+  const weekday = ['日', '一', '二', '三', '四', '五', 六'][time.getDay()]
+  const displayDate = `${year}.${formatTime(month)}.${formatTime(date)}`
+  const displayWeekday = `周${weekday}`
+
   return (
     <div
       className="cassette-clock"
@@ -117,8 +125,16 @@ export default function CassetteClock() {
 
         {/* 标签 - 时间数字显示 */}
         <div className="cassette-clock-label">
-          <span className="time-display">{displayTime}</span>
-          <span className="clock-brand">CASSETTE</span>
+          <div className="time-main">
+            <span className="time-display">{displayTime}</span>
+            <span className="seconds-small">:{displaySeconds}</span>
+          </div>
+          <div className="date-display">
+            <span className="date-text">{displayDate}</span>
+            <span className="date-separator">|</span>
+            <span className="weekday-text">{displayWeekday}</span>
+          </div>
+          <span className="clock-brand">CASSETTE CHRONO</span>
         </div>
 
         {/* 底部装饰 */}

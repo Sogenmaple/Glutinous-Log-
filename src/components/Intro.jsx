@@ -131,19 +131,21 @@ export default function Intro({ onComplete }) {
         ctx.arc(ballCenterX, ballCenterY, currentRadius * 2.0, 0, Math.PI * 2)
         ctx.fill()
 
-        // 球体边框
-        ctx.beginPath()
-        ctx.arc(ballCenterX, ballCenterY, currentRadius * 0.95, 0, Math.PI * 2)
-        const pulseOpacity = 0.6 + Math.sin(timeRef.current * 0.05) * 0.25
-        ctx.strokeStyle = `rgba(0, 0, 0, ${pulseOpacity})`
-        ctx.lineWidth = 2.5
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-        ctx.shadowBlur = 20
-        ctx.stroke()
-        ctx.shadowBlur = 0
+        // 球体边框（中心球不绘制边框，避免白线）
+        if (!ball.isCenter) {
+          ctx.beginPath()
+          ctx.arc(ballCenterX, ballCenterY, currentRadius * 0.95, 0, Math.PI * 2)
+          const pulseOpacity = 0.6 + Math.sin(timeRef.current * 0.05) * 0.25
+          ctx.strokeStyle = `rgba(0, 0, 0, ${pulseOpacity})`
+          ctx.lineWidth = 2.5
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
+          ctx.shadowBlur = 20
+          ctx.stroke()
+          ctx.shadowBlur = 0
+        }
       })
 
-      // 绘制中心球眼睛（最上层，在所有球体之后）
+      // 绘制中心球（眼睛 + 边框，在所有其他球体之后）
       const centerBall = balls.find(b => b.isCenter)
       if (centerBall) {
         const ballCenterX = centerBall.x * width

@@ -41,29 +41,34 @@
   transition: transform 1.5s cubic-bezier(0.7, 0, 0.3, 1), opacity 1s ease;
 }
 
-.intro-hint {
+.intro-title {
   position: absolute;
-  bottom: 15%;
-  font-family: var(--font-mono);
-  font-size: 1rem;
-  color: var(--green);
-  text-shadow: var(--green-glow);
-  letter-spacing: 0.2em;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
   z-index: 10;
-  animation: hint-blink 1.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
-.hint-text {
+.title-text {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--green);
+  text-shadow: var(--green-glow-strong);
+  letter-spacing: 0.3em;
+  margin: 0;
   opacity: 0.9;
 }
 
-.hint-cursor {
+.title-cursor {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  color: var(--green);
+  text-shadow: var(--green-glow);
   animation: cursor-blink 1s step-end infinite;
-}
-
-@keyframes hint-blink {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  margin-top: 0.5rem;
 }
 
 @keyframes cursor-blink {
@@ -73,8 +78,12 @@
 
 /* 移动端适配 */
 @media (max-width: 480px) {
-  .intro-hint {
-    font-size: 0.85rem;
-    bottom: 12%;
+  .title-text {
+    font-size: 2rem;
+    letter-spacing: 0.2em;
+  }
+
+  .title-cursor {
+    font-size: 1.5rem;
   }
 }

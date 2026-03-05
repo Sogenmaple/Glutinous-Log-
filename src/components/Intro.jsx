@@ -4,6 +4,7 @@ export default function Intro({ onComplete }) {
   const [isExpanding, setIsExpanding] = useState(false)
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
+  const timeRef = useRef(0)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -14,79 +15,100 @@ export default function Intro({ onComplete }) {
     let height = canvas.height = window.innerHeight
 
     // 代码字符集
-    const chars = '01ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    const fontSize = 14
-    const columns = Math.floor(width / fontSize)
+    const chars = '01TGXYWZ'
+    const fontSize = 12
+
+    // 四个球体
+    const balls = [
+      { x: 0.5, y: 0.5, radius: 0.12, angle: 0, speed: 0, orbitRadius: 0, isCenter: true },
+      { x: 0.5, y: 0.5, radius: 0.08, angle: 0, speed: 0.008, orbitRadius: 0.2, isCenter: false },
+      { x: 0.5, y: 0.5, radius: 0.06, angle: 2, speed: -0.012, orbitRadius: 0.28, isCenter: false },
+      { x: 0.5, y: 0.5, radius: 0.07, angle: 4, speed: 0.006, orbitRadius: 0.35, isCenter: false },
+    ]
 
     // 每列的下落位置
+    const columns = Math.floor(width / fontSize)
     const drops = []
     for (let i = 0; i < columns; i++) {
       drops[i] = Math.random() * -100
     }
 
-    // 扩展动画
-    let expandRadius = 0
-    if (isExpanding) {
-      const expandAnimation = () => {
-        expandRadius += 50
-        if (expandRadius < Math.max(width, height) * 2) {
-          requestAnimationFrame(expandAnimation)
-        }
-      }
-      expandAnimation()
-    }
-
     // 绘制代码雨
     const draw = () => {
+      timeRef.current += 1
+
       // 半透明黑色背景，形成拖尾效果
       ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'
       ctx.fillRect(0, 0, width, height)
 
-      // 只绘制圆形区域内的代码
       const centerX = width / 2
       const centerY = height / 2
-      const baseRadius = Math.min(width, height) * 0.15
-      const pulse = 1 + Math.sin(Date.now() * 0.003) * 0.08
-      const radius = baseRadius * pulse
 
-      // 使用圆形裁剪
-      ctx.save()
-      ctx.beginPath()
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
-      ctx.clip()
+      // 更新轨道球位置
+      balls.forEach((ball, index) => {
+        if (!ball.isCenter) {
+          ball.angle += ball.speed
+          ball.x = 0.5 + Math.cos(ball.angle) * ball.orbitRadius
+          ball.y = 0.5 + Math.sin(ball.angle) * ball.orbitRadius
+        }
+      })
 
-      ctx.fillStyle = '#00ff00'
-      ctx.font = `${fontSize}px monospace`
+      // 绘制每个球体的代码雨
+      balls.forEach((ball) => {
+        const ballCenterX = ball.x * width
+        const ballCenterY = ball.y * height
+        const ballRadius = ball.radius * Math.min(width, height)
 
+        // 脉搏效果
+        const pulse = 1 + Math.sin(timeRef.current * 0.05) * 0.05
+        const currentRadius = ballRadius * pulse
+
+        // 使用圆形裁剪
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(ballCenterX, ballCenterY, currentRadius, 0, Math.PI * 2)
+        ctx.clip()
+
+        ctx.font = `${fontSize}px monospace`
+
+        // 绘制代码雨
+        for (let i = 0; i < columns; i++) {
+          const x = i * fontSize
+          const y = (drops[i] * fontSize) % height
+
+          // 检查点是否在球内
+          const dx = x - ballCenterX
+          const dy = y - ballCenterY
+          const dist = Math.sqrt(dx * dx + dy * dy)
+
+          if (dist < currentRadius) {
+            const brightness = 0.6 + Math.random() * 0.4
+            ctx.fillStyle = `rgba(0, 255, ${Math.floor(brightness * 255)}, ${brightness})`
+            const char = chars.charAt(Math.floor(Math.random() * chars.length))
+            ctx.fillText(char, x, y)
+          }
+        }
+
+        ctx.restore()
+
+        // 绘制球体边框光晕
+        ctx.beginPath()
+        ctx.arc(ballCenterX, ballCenterY, currentRadius, 0, Math.PI * 2)
+        ctx.strokeStyle = `rgba(0, 255, 0, ${0.3 + Math.sin(timeRef.current * 0.05) * 0.15})`
+        ctx.lineWidth = 2
+        ctx.shadowColor = '#00ff00'
+        ctx.shadowBlur = 15
+        ctx.stroke()
+        ctx.shadowBlur = 0
+      })
+
+      // 重置或继续下落
       for (let i = 0; i < drops.length; i++) {
-        const x = i * fontSize
-        const y = drops[i] * fontSize
-
-        // 添加亮度变化
-        const brightness = 0.5 + Math.random() * 0.5
-        ctx.fillStyle = `rgba(0, 255, ${Math.floor(brightness * 255)}, ${brightness})`
-
-        const char = chars.charAt(Math.floor(Math.random() * chars.length))
-        ctx.fillText(char, x, y)
-
-        // 重置或继续下落
-        if (y > height && Math.random() > 0.975) {
+        if (drops[i] * fontSize > height && Math.random() > 0.975) {
           drops[i] = 0
         }
         drops[i]++
       }
-
-      ctx.restore()
-
-      // 绘制圆形边框光晕
-      ctx.beginPath()
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
-      ctx.strokeStyle = `rgba(0, 255, 0, ${0.4 + Math.sin(Date.now() * 0.003) * 0.15})`
-      ctx.lineWidth = 2
-      ctx.shadowColor = '#00ff00'
-      ctx.shadowBlur = 20
-      ctx.stroke()
-      ctx.shadowBlur = 0
 
       animationRef.current = requestAnimationFrame(draw)
     }
@@ -118,9 +140,9 @@ export default function Intro({ onComplete }) {
       onClick={handleClick}
     >
       <canvas ref={canvasRef} className="intro-canvas" />
-      <div className="intro-hint">
-        <span className="hint-text">点击进入</span>
-        <span className="hint-cursor">_</span>
+      <div className="intro-title">
+        <h1 className="title-text">汤圆的窝</h1>
+        <div className="title-cursor">_</div>
       </div>
     </div>
   )

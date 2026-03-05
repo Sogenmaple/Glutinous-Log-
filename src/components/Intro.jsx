@@ -26,6 +26,10 @@ export default function Intro({ onComplete }) {
     let width = canvas.width = window.innerWidth
     let height = canvas.height = window.innerHeight
 
+    // 初始填充黑色背景（避免 invert 后颜色不一致）
+    ctx.fillStyle = '#000'
+    ctx.fillRect(0, 0, width, height)
+
     // 代码字符集
     const chars = '01TGXYZWABXY'
     const fontSize = 11
@@ -326,6 +330,9 @@ export default function Intro({ onComplete }) {
     const handleResize = () => {
       width = canvas.width = window.innerWidth
       height = canvas.height = window.innerHeight
+      // resize 后重新填充黑色背景
+      ctx.fillStyle = '#000'
+      ctx.fillRect(0, 0, width, height)
     }
 
     window.addEventListener('resize', handleResize)

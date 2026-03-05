@@ -16,7 +16,7 @@ export default function Intro({ onComplete }) {
 
     // 代码字符集
     const chars = '01TGXYZWABXY'
-    const fontSize = 11
+    const fontSize = 10
 
     // 全屏代码雨
     const columns = Math.floor(width / fontSize)
@@ -53,14 +53,13 @@ export default function Intro({ onComplete }) {
       ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, width, height)
 
+      // 先绘制全屏代码雨（很淡的白色）
       ctx.font = `${fontSize}px monospace`
-
-      // 绘制全屏代码雨（很淡的白色，几乎看不见）
       for (let i = 0; i < columns; i++) {
         const x = i * fontSize
         const y = drops[i] * fontSize
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.02)'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)'
         const char = chars.charAt(Math.floor(Math.random() * chars.length))
         ctx.fillText(char, x, y)
 
@@ -71,7 +70,7 @@ export default function Intro({ onComplete }) {
         drops[i]++
       }
 
-      // 绘制球体区域
+      // 绘制球体（带融球效果）
       balls.forEach((ball) => {
         const ballCenterX = ball.x * width
         const ballCenterY = ball.y * height
@@ -81,24 +80,39 @@ export default function Intro({ onComplete }) {
         const pulse = 1 + Math.sin(timeRef.current * 0.05) * 0.05
         const currentRadius = ballRadius * pulse
 
-        // 在球体内绘制清晰的白色代码（在遮罩之前）
+        // 球体光晕（融球关键：大范围的模糊渐变）
+        const glowGradient = ctx.createRadialGradient(
+          ballCenterX, ballCenterY, currentRadius * 0.5,
+          ballCenterX, ballCenterY, currentRadius * 2.5
+        )
+        glowGradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)')
+        glowGradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.08)')
+        glowGradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.03)')
+        glowGradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+        ctx.fillStyle = glowGradient
+        ctx.beginPath()
+        ctx.arc(ballCenterX, ballCenterY, currentRadius * 2.5, 0, Math.PI * 2)
+        ctx.fill()
+
+        // 球体内清晰代码
         ctx.save()
         ctx.beginPath()
-        ctx.arc(ballCenterX, ballCenterY, currentRadius * 0.95, 0, Math.PI * 2)
+        ctx.arc(ballCenterX, ballCenterY, currentRadius, 0, Math.PI * 2)
         ctx.clip()
 
         ctx.font = `${fontSize}px monospace`
 
-        for (let i = 0; i < columns; i++) {
-          const x = i * fontSize
-          const y = (drops[i] * fontSize) % height
+        // 在球体内绘制更多代码
+        for (let col = 0; col < columns; col++) {
+          const x = col * fontSize
+          const y = (drops[col] * fontSize) % height
 
           const dx = x - ballCenterX
           const dy = y - ballCenterY
           const dist = Math.sqrt(dx * dx + dy * dy)
 
-          if (dist < currentRadius * 0.95) {
-            const brightness = 0.7 + Math.random() * 0.3
+          if (dist < currentRadius) {
+            const brightness = 0.6 + Math.random() * 0.4
             ctx.fillStyle = `rgba(255, 255, 255, ${brightness})`
             const char = chars.charAt(Math.floor(Math.random() * chars.length))
             ctx.fillText(char, x, y)
@@ -107,14 +121,14 @@ export default function Intro({ onComplete }) {
 
         ctx.restore()
 
-        // 球体边框（白色光晕）
+        // 球体边框
         ctx.beginPath()
         ctx.arc(ballCenterX, ballCenterY, currentRadius * 0.95, 0, Math.PI * 2)
-        const pulseOpacity = 0.6 + Math.sin(timeRef.current * 0.05) * 0.3
-        ctx.strokeStyle = `rgba(255, 255, 255, ${pulseOpacity})`
-        ctx.lineWidth = 2.5
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.6)'
-        ctx.shadowBlur = 25
+        const borderOpacity = 0.5 + Math.sin(timeRef.current * 0.05) * 0.25
+        ctx.strokeStyle = `rgba(255, 255, 255, ${borderOpacity})`
+        ctx.lineWidth = 2
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.5)'
+        ctx.shadowBlur = 20
         ctx.stroke()
         ctx.shadowBlur = 0
       })

@@ -148,10 +148,6 @@ export default function Intro({ onComplete }) {
           const baseOffsetX = currentRadius * 0.45
           const baseOffsetY = currentRadius * 0.2
           const maxEyeOffset = currentRadius * 0.3
-          const mouthRadiusX = currentRadius * 0.25
-          const mouthRadiusY = currentRadius * 0.12
-          const mouthBaseY = currentRadius * 0.35
-          const maxMouthOffset = currentRadius * 0.25
 
           // 计算鼠标方向
           const dx = mouseRef.current.x - 0.5
@@ -163,10 +159,6 @@ export default function Intro({ onComplete }) {
           eyes.left.offsetY += (dy * maxEyeOffset - eyes.left.offsetY) * smoothFactor
           eyes.right.offsetX += (dx * maxEyeOffset - eyes.right.offsetX) * smoothFactor
           eyes.right.offsetY += (dy * maxEyeOffset - eyes.right.offsetY) * smoothFactor
-
-          // 平滑插值 - 嘴巴
-          const mouthOffsetX = dx * maxMouthOffset
-          const mouthOffsetY = dy * maxMouthOffset * 0.5
 
           // 绘制左眼（带模糊光晕）
           const leftBaseX = ballCenterX - baseOffsetX
@@ -217,22 +209,6 @@ export default function Intro({ onComplete }) {
           ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2)
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
           ctx.fill()
-
-          // 绘制嘴巴（线条风格，带跟随）
-          const mouthX = ballCenterX + mouthOffsetX
-          const mouthY = ballCenterY + mouthBaseY + mouthOffsetY
-          const mouthWidth = currentRadius * 0.35
-
-          // 嘴巴线条（微笑弧线）
-          ctx.beginPath()
-          ctx.arc(mouthX, mouthY - mouthRadiusY, mouthWidth, 0.1 * Math.PI, 0.9 * Math.PI)
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
-          ctx.lineWidth = 2.5
-          ctx.lineCap = 'round'
-          ctx.shadowColor = 'rgba(255, 255, 255, 0.5)'
-          ctx.shadowBlur = 10
-          ctx.stroke()
-          ctx.shadowBlur = 0
         }
       })
 

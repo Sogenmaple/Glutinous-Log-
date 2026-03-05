@@ -107,33 +107,25 @@ export default function Intro({ onComplete }) {
           const currentRadius1 = ballRadius1 * pulse1
           const currentRadius2 = ballRadius2 * pulse2
 
-          const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-          const maxDistance = Math.min(width, height) * 0.6
-          const distanceRatio = Math.min(distance / maxDistance, 1)
-
-          // 根据距离计算线的数量、粗细和透明度
-          const lineCount = Math.floor(1 + distanceRatio * 2) // 1-3 条线
-          const baseLineWidth = 1 + distanceRatio * 1.2 // 1-2.2px
-          const baseOpacity = 0.2 + distanceRatio * 0.25 // 0.2-0.45
-
           // 计算球体之间的角度
           const angle = Math.atan2(y2 - y1, x2 - x1)
 
-          // 绘制多条激光线，连接点在球体边缘
+          // 绘制 1-2 条激光线，连接点在球体边缘
+          const lineCount = 2
+          const opacity = 0.35
+          const lineWidth = 1.5
+
           for (let line = 0; line < lineCount; line++) {
             // 每条线的偏移角度不同，连接点在边缘不同位置
-            const edgeAngleOffset = (line - (lineCount - 1) / 2) * 0.1
+            const edgeAngleOffset = (line - (lineCount - 1) / 2) * 0.12
             const startEdgeAngle = angle + edgeAngleOffset
             const endEdgeAngle = angle + Math.PI + edgeAngleOffset
 
-            // 连接点在球体边缘（确保连续）
-            const startX = x1 + Math.cos(startEdgeAngle) * currentRadius1 * 0.92
-            const startY = y1 + Math.sin(startEdgeAngle) * currentRadius1 * 0.92
-            const endX = x2 + Math.cos(endEdgeAngle) * currentRadius2 * 0.92
-            const endY = y2 + Math.sin(endEdgeAngle) * currentRadius2 * 0.92
-
-            const opacity = baseOpacity * (1 - Math.abs(line - (lineCount - 1) / 2) / (lineCount + 1))
-            const lineWidth = baseLineWidth * (1 - Math.abs(line - (lineCount - 1) / 2) / (lineCount * 2))
+            // 连接点在球体边缘
+            const startX = x1 + Math.cos(startEdgeAngle) * currentRadius1 * 0.9
+            const startY = y1 + Math.sin(startEdgeAngle) * currentRadius1 * 0.9
+            const endX = x2 + Math.cos(endEdgeAngle) * currentRadius2 * 0.9
+            const endY = y2 + Math.sin(endEdgeAngle) * currentRadius2 * 0.9
 
             ctx.beginPath()
             ctx.moveTo(startX, startY)
@@ -145,7 +137,7 @@ export default function Intro({ onComplete }) {
             ctx.lineJoin = 'round'
             // 黑色光晕，经过 invert(1) 后变成白色光晕
             ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-            ctx.shadowBlur = 10 + distanceRatio * 12
+            ctx.shadowBlur = 15
             ctx.stroke()
             ctx.shadowBlur = 0
           }

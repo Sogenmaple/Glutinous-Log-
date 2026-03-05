@@ -134,7 +134,7 @@ export default function Intro({ onComplete }) {
           let x = centerX + Math.cos(rad) * ringPixelRadius
           let y = centerY + Math.sin(rad) * ringPixelRadius
 
-          // 计算每个轨道球对这个点的引力透镜式扭曲
+          // 计算每个轨道球对这个点的噪点式扰动
           balls.forEach((ball) => {
             if (ball.isCenter) return
 
@@ -145,16 +145,18 @@ export default function Intro({ onComplete }) {
             const dx = x - ballX
             const dy = y - ballY
             const distance = Math.sqrt(dx * dx + dy * dy)
-            const influenceRadius = ballRadius * 5
+            const influenceRadius = ballRadius * 3
 
-            // 引力透镜效果：距离越近弯曲越强，但不推开
-            if (distance < influenceRadius && distance > ballRadius * 0.5) {
-              // 透镜弯曲：垂直于径向的切向偏移
-              const lensStrength = 0.08 * (1 - distance / influenceRadius)
-              const tangentAngle = Math.atan2(dy, dx) + Math.PI / 2
-              const bendDistance = lensStrength * ballRadius * 3
-              x += Math.cos(tangentAngle) * bendDistance
-              y += Math.sin(tangentAngle) * bendDistance
+            // 如果点在影响范围内，添加噪点式扰动
+            if (distance < influenceRadius) {
+              const influence = 1 - distance / influenceRadius
+              // 使用多个频率的噪声叠加，产生不规则扰动
+              const noise1 = Math.sin(distance * 0.1 + timeRef.current * 0.1) * 0.5
+              const noise2 = Math.cos(distance * 0.2 - timeRef.current * 0.15) * 0.3
+              const noise3 = Math.sin((distance + timeRef.current) * 0.05) * 0.2
+              const noise = (noise1 + noise2 + noise3) * influence * 2
+              x += noise
+              y += noise
             }
           })
 

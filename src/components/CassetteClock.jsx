@@ -52,8 +52,13 @@ export default function CassetteClock() {
 
         {/* 磁带窗口 - 时钟表盘 */}
         <div className="cassette-clock-window">
-          {/* 左卷轴 - 时针 */}
-          <div className="cassette-clock-reel left-reel">
+          {/* 左卷轴 - 时针（带变速旋转动画） */}
+          <div
+            className="cassette-clock-reel left-reel"
+            style={{
+              animationDuration: `${3 + (seconds % 10) * 0.3}s`,
+            }}
+          >
             <div className="reel-center">
               <div
                 className="reel-hand hour-hand"
@@ -76,8 +81,14 @@ export default function CassetteClock() {
           {/* 磁带 */}
           <div className="cassette-clock-tape"></div>
 
-          {/* 右卷轴 - 分针 */}
-          <div className="cassette-clock-reel right-reel">
+          {/* 右卷轴 - 分针（反向变速旋转） */}
+          <div
+            className="cassette-clock-reel right-reel"
+            style={{
+              animationDuration: `${2.5 + (minutes % 10) * 0.2}s`,
+              animationDirection: 'reverse',
+            }}
+          >
             <div className="reel-center">
               <div
                 className="reel-hand minute-hand"

@@ -38,7 +38,7 @@ export default function Intro({ onComplete }) {
       timeRef.current += 1
 
       // 半透明黑色背景，形成拖尾效果
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)'
       ctx.fillRect(0, 0, width, height)
 
       const centerX = width / 2
@@ -91,13 +91,25 @@ export default function Intro({ onComplete }) {
 
         ctx.restore()
 
-        // 绘制球体边框光晕
+        // 绘制球体模糊光晕（融球效果关键）
+        const gradient = ctx.createRadialGradient(
+          ballCenterX, ballCenterY, currentRadius * 0.8,
+          ballCenterX, ballCenterY, currentRadius * 1.3
+        )
+        gradient.addColorStop(0, 'rgba(0, 255, 0, 0.15)')
+        gradient.addColorStop(1, 'rgba(0, 255, 0, 0)')
+        ctx.fillStyle = gradient
+        ctx.beginPath()
+        ctx.arc(ballCenterX, ballCenterY, currentRadius * 1.3, 0, Math.PI * 2)
+        ctx.fill()
+
+        // 绘制球体边框光晕（带模糊，用于融球效果）
         ctx.beginPath()
         ctx.arc(ballCenterX, ballCenterY, currentRadius, 0, Math.PI * 2)
-        ctx.strokeStyle = `rgba(0, 255, 0, ${0.3 + Math.sin(timeRef.current * 0.05) * 0.15})`
-        ctx.lineWidth = 2
+        ctx.strokeStyle = `rgba(0, 255, 0, ${0.5 + Math.sin(timeRef.current * 0.05) * 0.2})`
+        ctx.lineWidth = 3
         ctx.shadowColor = '#00ff00'
-        ctx.shadowBlur = 15
+        ctx.shadowBlur = 20
         ctx.stroke()
         ctx.shadowBlur = 0
       })

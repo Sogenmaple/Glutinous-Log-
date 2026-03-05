@@ -40,9 +40,9 @@ export default function Intro({ onComplete }) {
     // 四个球体
     const balls = [
       { x: 0.5, y: 0.5, radius: 0.12, angle: 0, speed: 0, orbitRadius: 0, isCenter: true },
-      { x: 0.5, y: 0.5, radius: 0.08, angle: 0, speed: 0.008, orbitRadius: 0.2, isCenter: false },
-      { x: 0.5, y: 0.5, radius: 0.06, angle: 2, speed: -0.012, orbitRadius: 0.28, isCenter: false },
-      { x: 0.5, y: 0.5, radius: 0.07, angle: 4, speed: 0.006, orbitRadius: 0.35, isCenter: false },
+      { x: 0.5, y: 0.5, radius: 0.08, angle: 0, speed: 0.015, orbitRadius: 0.2, isCenter: false },
+      { x: 0.5, y: 0.5, radius: 0.06, angle: 2, speed: -0.02, orbitRadius: 0.28, isCenter: false },
+      { x: 0.5, y: 0.5, radius: 0.07, angle: 4, speed: 0.012, orbitRadius: 0.35, isCenter: false },
     ]
 
     // 眼睛参数
@@ -107,7 +107,7 @@ export default function Intro({ onComplete }) {
         drops[i]++
       }
 
-      // 绘制激光线（在球体之前）
+      // 第一遍：绘制激光线（最底层）
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
           const ball1 = balls[i]
@@ -169,7 +169,7 @@ export default function Intro({ onComplete }) {
         }
       }
 
-      // 绘制球体区域（第一遍：光晕和边框）
+      // 第二遍：绘制球体光晕和边框（中间层）
       balls.forEach((ball) => {
         const ballCenterX = ball.x * width
         const ballCenterY = ball.y * height
@@ -218,7 +218,7 @@ export default function Intro({ onComplete }) {
         }
       })
 
-      // 绘制中心球（眼睛 + 边框，在所有其他球体之后）
+      // 第三遍：绘制中心球眼睛（最上层，在所有线和球体之上）
       const centerBall = balls.find(b => b.isCenter)
       if (centerBall) {
         const ballCenterX = centerBall.x * width

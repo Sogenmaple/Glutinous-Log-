@@ -51,6 +51,8 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -58,8 +60,21 @@ body {
   background: var(--bg-deep);
   color: var(--text-primary);
   overflow-x: hidden;
-  line-height: 1.6;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.02em;
+}
+
+/* 中英文混排优化 */
+body :not(code):not(pre) {
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* 中文优化 */
+[lang="zh-CN"],
+[lang="zh"] {
+  font-family: var(--font-body), "Noto Sans SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
 }
 
 /* Scrollbar */
@@ -677,32 +692,35 @@ body {
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.8rem;
+  justify-content: inherit;
 }
 
 .timeline-title {
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--amber);
   text-shadow: var(--amber-glow);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   margin: 0;
   transition: all 0.3s ease;
+  line-height: 1.3;
 }
 
 .timeline-card:hover .timeline-title {
   text-shadow: var(--amber-glow-strong);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
 .timeline-status {
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.6rem;
   border-radius: 3px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   white-space: nowrap;
+  line-height: 1.4;
 }
 
 .timeline-status.development {
@@ -719,10 +737,12 @@ body {
 }
 
 .timeline-desc {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-secondary);
-  line-height: 1.7;
+  line-height: 1.8;
   margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+  text-align: inherit;
 }
 
 .timeline-tags {
@@ -1109,11 +1129,12 @@ body {
 
 .hero-label {
   font-family: var(--font-mono);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: var(--cyan);
   text-shadow: var(--cyan-glow);
-  letter-spacing: 0.3em;
-  margin-bottom: 1rem;
+  letter-spacing: 0.35em;
+  margin-bottom: 1.2rem;
+  line-height: 1.4;
 }
 
 .hero-title {
@@ -1122,9 +1143,11 @@ body {
   font-weight: 900;
   color: var(--amber);
   text-shadow: var(--amber-glow-strong);
-  letter-spacing: 0.05em;
-  line-height: 1.1;
-  margin-bottom: 1rem;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+  word-break: keep-all;
+  text-wrap: balance;
 }
 
 .hero-subtitle {
@@ -1133,6 +1156,8 @@ body {
   color: var(--text-secondary);
   margin-bottom: 2.5rem;
   min-height: 2rem;
+  line-height: 1.6;
+  letter-spacing: 0.05em;
 }
 
 .cursor {
@@ -1154,20 +1179,26 @@ body {
 }
 .stat-label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-dim);
-  letter-spacing: 0.2em;
-  margin-bottom: 0.3rem;
+  letter-spacing: 0.25em;
+  margin-bottom: 0.4rem;
+  line-height: 1.3;
 }
+
 .stat-value {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   color: var(--cyan);
   text-shadow: var(--cyan-glow);
+  line-height: 1.2;
+  letter-spacing: 0.05em;
 }
+
 .stat-divider {
   color: var(--text-dim);
   font-size: 1.5rem;
+  line-height: 1;
 }
 
 .hero-cta {
@@ -1371,25 +1402,30 @@ body {
 
 .section-title {
   font-family: var(--font-display);
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: var(--amber);
   text-shadow: var(--amber-glow);
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   white-space: nowrap;
+  line-height: 1.2;
 }
+
 .section-icon {
   color: var(--cyan);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  margin: 0 0.5rem;
 }
 
 .section-subtitle {
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-dim);
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   margin-bottom: 3rem;
+  line-height: 1.6;
+  text-transform: uppercase;
 }
 
 /* ============================================
@@ -1518,21 +1554,26 @@ body {
   font-family: var(--font-mono);
   font-size: 0.85rem;
   color: var(--text-dim);
+  letter-spacing: 0.05em;
 }
 
 .card-title {
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.05em;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.08em;
+  line-height: 1.3;
 }
 
 .card-desc {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.8rem;
+}
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -1610,15 +1651,19 @@ body {
 
 .card-engine {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-dim);
+  letter-spacing: 0.05em;
+  line-height: 1.4;
 }
+
 .card-status {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  padding: 0.2rem 0.6rem;
-  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  letter-spacing: 0.08em;
   border-radius: 3px;
+  line-height: 1.4;
 }
 .card-status--released {
   color: var(--green);
@@ -1711,25 +1756,33 @@ body {
 .terminal-body {
   padding: 1.5rem;
   font-family: var(--font-mono);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  letter-spacing: 0.03em;
 }
 
 .terminal-line {
   color: var(--text-primary);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
 }
+
 .prompt {
   color: var(--amber);
-  margin-right: 0.5rem;
+  margin-right: 0.6rem;
+  font-weight: bold;
 }
 
 .terminal-output {
-  padding: 0.5rem 0 1rem 1.5rem;
+  padding: 0.6rem 0 1.2rem 1.5rem;
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.9;
 }
+
 .terminal-output p {
   font-family: var(--font-mono);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.02em;
 }
 
 /* Skill Bars */
@@ -1742,8 +1795,10 @@ body {
 .skill-name {
   width: 80px;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
 }
 .skill-track {
   flex: 1;
@@ -1815,47 +1870,59 @@ body {
 
 .footer-divider {
   color: var(--text-dim);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   margin-bottom: 1.5rem;
   overflow: hidden;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  line-height: 1.6;
 }
 
 .footer-info {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.2rem;
   margin-bottom: 1.5rem;
   font-family: var(--font-mono);
+  flex-wrap: wrap;
 }
+
 .footer-logo {
   color: var(--amber);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   text-shadow: var(--amber-glow);
+  letter-spacing: 0.1em;
+  line-height: 1.3;
 }
+
 .footer-separator {
   color: var(--text-dim);
+  font-size: 0.9rem;
 }
+
 .footer-text {
   color: var(--text-dim);
-  font-size: 0.85rem;
-  letter-spacing: 0.2em;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  line-height: 1.6;
 }
 
 .footer-links {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 1.8rem;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
+
 .footer-link {
   font-family: var(--font-mono);
   font-size: 0.9rem;
   color: var(--cyan-dim);
   text-decoration: none;
-  transition: all 0.2s;
-  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
 }
 .footer-link:hover {
   color: var(--cyan);
@@ -1973,25 +2040,30 @@ body {
   }
 
   .hero-label {
-    font-size: 0.85rem;
-    letter-spacing: 0.15em;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    line-height: 1.4;
   }
 
   .hero-subtitle {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    line-height: 1.5;
   }
 
   .hero-cta {
     font-size: 1rem;
     padding: 0.6rem 1.5rem;
+    letter-spacing: 0.05em;
   }
 
   .stat-value {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    letter-spacing: 0.03em;
   }
 
   .stat-label {
     font-size: 0.7rem;
+    letter-spacing: 0.15em;
   }
 
   .cassette-body {
@@ -2000,39 +2072,55 @@ body {
   }
 
   .section-title {
-    font-size: 0.9rem;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
   }
 
   .section-subtitle {
     font-size: 0.75rem;
+    letter-spacing: 0.15em;
   }
 
   .timeline-title {
-    font-size: 1.1rem;
+    font-size: 1.15rem;
+    letter-spacing: 0.06em;
   }
 
   .timeline-desc {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
   }
 
   .timeline-tag {
     font-size: 0.7rem;
     padding: 0.15rem 0.5rem;
+    letter-spacing: 0.03em;
   }
 
   .terminal-body {
-    font-size: 0.85rem;
-    padding: 0.8rem;
+    font-size: 0.9rem;
+    padding: 1rem;
+    letter-spacing: 0.02em;
   }
 
   .skill-name {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     width: 70px;
+    letter-spacing: 0.03em;
   }
 
   .skill-percent {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     width: 35px;
+    letter-spacing: 0.03em;
+  }
+
+  .terminal-line {
+    letter-spacing: 0.02em;
+  }
+
+  .terminal-output p {
+    letter-spacing: 0.02em;
   }
 
   .footer-links {

@@ -142,75 +142,74 @@ export default function Intro({ onComplete }) {
         ctx.stroke()
         ctx.shadowBlur = 0
 
-        // 如果是中心球，绘制胶囊型眼睛
+        // 如果是中心球，绘制胶囊型眼睛（单层 + 模糊）
         if (ball.isCenter) {
-          const eyeWidth = currentRadius * 0.35
-          const eyeHeight = currentRadius * 0.18
-          const eyeOffsetX = currentRadius * 0.55
-          const eyeOffsetY = currentRadius * 0.2
+          const eyeWidth = currentRadius * 0.3
+          const eyeHeight = currentRadius * 0.15
+          const baseOffsetX = currentRadius * 0.5
+          const baseOffsetY = currentRadius * 0.2
+          const maxPupilOffset = currentRadius * 0.35
 
           // 计算鼠标方向
           const dx = mouseRef.current.x - 0.5
           const dy = mouseRef.current.y - 0.5
-          const angle = Math.atan2(dy, dx)
-          const dist = Math.min(Math.sqrt(dx * dx + dy * dy), 1) * 0.4
 
           // 平滑插值
-          const smoothFactor = 0.12
-          eyes.left.offsetX += (Math.cos(angle) * dist - eyes.left.offsetX) * smoothFactor
-          eyes.left.offsetY += (Math.sin(angle) * dist - eyes.left.offsetY) * smoothFactor
-          eyes.right.offsetX += (Math.cos(angle) * dist - eyes.right.offsetX) * smoothFactor
-          eyes.right.offsetY += (Math.sin(angle) * dist - eyes.right.offsetY) * smoothFactor
+          const smoothFactor = 0.15
+          eyes.left.offsetX += (dx * maxPupilOffset - eyes.left.offsetX) * smoothFactor
+          eyes.left.offsetY += (dy * maxPupilOffset - eyes.left.offsetY) * smoothFactor
+          eyes.right.offsetX += (dx * maxPupilOffset - eyes.right.offsetX) * smoothFactor
+          eyes.right.offsetY += (dy * maxPupilOffset - eyes.right.offsetY) * smoothFactor
 
-          // 绘制左眼（胶囊型）
-          const leftEyeX = ballCenterX - eyeOffsetX
-          const leftEyeY = ballCenterY - eyeOffsetY
-          ctx.save()
-          ctx.translate(leftEyeX, leftEyeY)
-          ctx.rotate(angle * 0.3)
-          ctx.beginPath()
-          ctx.roundRect(-eyeWidth / 2, -eyeHeight / 2, eyeWidth, eyeHeight, eyeHeight / 2)
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
-          ctx.fill()
-          ctx.restore()
+          // 绘制左眼（带模糊光晕）
+          const leftBaseX = ballCenterX - baseOffsetX
+          const leftBaseY = ballCenterY - baseOffsetY
+          const leftEyeX = leftBaseX + eyes.left.offsetX
+          const leftEyeY = leftBaseY + eyes.left.offsetY
 
-          // 左眼瞳孔（胶囊型）
-          const leftPupilX = leftEyeX + eyes.left.offsetX
-          const leftPupilY = leftEyeY + eyes.left.offsetY
-          const pupilWidth = eyeWidth * 0.5
-          const pupilHeight = eyeHeight * 0.5
-          ctx.save()
-          ctx.translate(leftPupilX, leftPupilY)
-          ctx.rotate(angle * 0.3)
+          // 左眼光晕
+          const leftGlow = ctx.createRadialGradient(
+            leftEyeX, leftEyeY, eyeHeight * 0.5,
+            leftEyeX, leftEyeY, eyeHeight * 2.5
+          )
+          leftGlow.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
+          leftGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)')
+          leftGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
+          ctx.fillStyle = leftGlow
           ctx.beginPath()
-          ctx.roundRect(-pupilWidth / 2, -pupilHeight / 2, pupilWidth, pupilHeight, pupilHeight / 2)
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'
+          ctx.roundRect(leftEyeX - eyeWidth / 2 - eyeHeight, leftEyeY - eyeHeight * 1.5, eyeWidth + eyeHeight * 2, eyeHeight * 3, eyeHeight)
           ctx.fill()
-          ctx.restore()
 
-          // 绘制右眼（胶囊型）
-          const rightEyeX = ballCenterX + eyeOffsetX
-          const rightEyeY = ballCenterY - eyeOffsetY
-          ctx.save()
-          ctx.translate(rightEyeX, rightEyeY)
-          ctx.rotate(angle * 0.3)
+          // 左眼主体（胶囊型）
           ctx.beginPath()
-          ctx.roundRect(-eyeWidth / 2, -eyeHeight / 2, eyeWidth, eyeHeight, eyeHeight / 2)
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+          ctx.roundRect(leftEyeX - eyeWidth / 2, leftEyeY - eyeHeight / 2, eyeWidth, eyeHeight, eyeHeight / 2)
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
           ctx.fill()
-          ctx.restore()
 
-          // 右眼瞳孔（胶囊型）
-          const rightPupilX = rightEyeX + eyes.right.offsetX
-          const rightPupilY = rightEyeY + eyes.right.offsetY
-          ctx.save()
-          ctx.translate(rightPupilX, rightPupilY)
-          ctx.rotate(angle * 0.3)
+          // 绘制右眼（带模糊光晕）
+          const rightBaseX = ballCenterX + baseOffsetX
+          const rightBaseY = ballCenterY - baseOffsetY
+          const rightEyeX = rightBaseX + eyes.right.offsetX
+          const rightEyeY = rightBaseY + eyes.right.offsetY
+
+          // 右眼光晕
+          const rightGlow = ctx.createRadialGradient(
+            rightEyeX, rightEyeY, eyeHeight * 0.5,
+            rightEyeX, rightEyeY, eyeHeight * 2.5
+          )
+          rightGlow.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
+          rightGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)')
+          rightGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
+          ctx.fillStyle = rightGlow
           ctx.beginPath()
-          ctx.roundRect(-pupilWidth / 2, -pupilHeight / 2, pupilWidth, pupilHeight, pupilHeight / 2)
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'
+          ctx.roundRect(rightEyeX - eyeWidth / 2 - eyeHeight, rightEyeY - eyeHeight * 1.5, eyeWidth + eyeHeight * 2, eyeHeight * 3, eyeHeight)
           ctx.fill()
-          ctx.restore()
+
+          // 右眼主体（胶囊型）
+          ctx.beginPath()
+          ctx.roundRect(rightEyeX - eyeWidth / 2, rightEyeY - eyeHeight / 2, eyeWidth, eyeHeight, eyeHeight / 2)
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
+          ctx.fill()
         }
       })
 

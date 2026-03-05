@@ -107,6 +107,55 @@ export default function Intro({ onComplete }) {
         drops[i]++
       }
 
+      // 绘制激光线（在球体之前）
+      const nonCenterBalls = balls.filter(b => !b.isCenter)
+      for (let i = 0; i < nonCenterBalls.length; i++) {
+        for (let j = i + 1; j < nonCenterBalls.length; j++) {
+          const ball1 = nonCenterBalls[i]
+          const ball2 = nonCenterBalls[j]
+
+          const x1 = ball1.x * width
+          const y1 = ball1.y * height
+          const x2 = ball2.x * width
+          const y2 = ball2.y * height
+
+          const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+          const maxDistance = Math.min(width, height) * 0.6
+          const distanceRatio = Math.min(distance / maxDistance, 1)
+
+          // 根据距离计算线的数量、粗细和透明度
+          const lineCount = Math.floor(2 + distanceRatio * 4) // 2-6 条线
+          const baseLineWidth = 1.5 + distanceRatio * 3 // 1.5-4.5px
+          const baseOpacity = 0.15 + distanceRatio * 0.35 // 0.15-0.5
+
+          // 绘制多条激光线
+          for (let line = 0; line < lineCount; line++) {
+            const offset = (line - (lineCount - 1) / 2) * 3
+            const angle = Math.atan2(y2 - y1, x2 - x1)
+            const perpAngle = angle + Math.PI / 2
+
+            const startX = x1 + Math.cos(perpAngle) * offset
+            const startY = y1 + Math.sin(perpAngle) * offset
+            const endX = x2 + Math.cos(perpAngle) * offset
+            const endY = y2 + Math.sin(perpAngle) * offset
+
+            const opacity = baseOpacity * (1 - Math.abs(offset) / (lineCount * 2))
+            const lineWidth = baseLineWidth * (1 - Math.abs(offset) / (lineCount * 3))
+
+            ctx.beginPath()
+            ctx.moveTo(startX, startY)
+            ctx.lineTo(endX, endY)
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`
+            ctx.lineWidth = lineWidth
+            ctx.lineCap = 'round'
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.5)'
+            ctx.shadowBlur = 10 + distanceRatio * 15
+            ctx.stroke()
+            ctx.shadowBlur = 0
+          }
+        }
+      }
+
       // 绘制球体区域（第一遍：光晕和边框）
       balls.forEach((ball) => {
         const ballCenterX = ball.x * width

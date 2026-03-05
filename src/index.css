@@ -1269,24 +1269,302 @@ body :not(code):not(pre) {
   text-shadow: var(--amber-glow);
 }
 
-/* Cassette Tape */
-.hero-decoration {
+/* ============================================
+   CASSETTE CLOCK
+   ============================================ */
+.cassette-clock {
+  position: relative;
   z-index: 1;
   animation: slide-up 1s ease-out 0.3s both;
+  transition: transform 0.3s ease-out;
 }
 
-.cassette-body {
-  width: 280px;
-  height: 180px;
+.cassette-clock-body {
+  width: 320px;
+  height: 200px;
   background: linear-gradient(180deg, #2a2a35 0%, #1a1a25 50%, #2a2a35 100%);
   border: 2px solid #3a3a48;
   border-radius: 12px;
-  padding: 12px;
+  padding: 14px;
   position: relative;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 4px 20px rgba(0, 0, 0, 0.5);
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(255, 149, 0, 0.1);
 }
+
+/* 磁带孔 */
+.cassette-clock-holes {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 24px;
+  margin-bottom: 10px;
+}
+
+.cassette-clock-hole {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  border: 1px solid #3a3a48;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 磁带窗口 - 时钟表盘 */
+.cassette-clock-window {
+  background: linear-gradient(180deg, #0a0a12 0%, #12121a 100%);
+  border: 2px solid #3a3a48;
+  border-radius: 8px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* 卷轴 */
+.cassette-clock-reel {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid var(--amber-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: radial-gradient(circle, #1a1a25 0%, #2a2a35 100%);
+  box-shadow: 0 0 15px rgba(255, 149, 0, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.cassette-clock-reel::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 149, 0, 0.3);
+  animation: reel-spin 8s linear infinite;
+}
+
+@keyframes reel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 卷轴中心 - 指针底座 */
+.cassette-clock-reel .reel-center {
+  width: 14px;
+  height: 14px;
+  background: var(--bg-deep);
+  border: 2px solid var(--amber);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+  z-index: 10;
+}
+
+/* 指针 */
+.reel-hand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hour-hand {
+  width: 2px;
+  height: 18px;
+}
+
+.hour-hand .hand-tip {
+  width: 3px;
+  height: 18px;
+  background: linear-gradient(180deg, var(--amber), var(--amber-dim));
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(255, 149, 0, 0.6);
+  position: absolute;
+  top: -16px;
+}
+
+.minute-hand {
+  width: 2px;
+  height: 22px;
+}
+
+.minute-hand .hand-tip {
+  width: 2px;
+  height: 22px;
+  background: linear-gradient(180deg, var(--cyan), var(--cyan-dim));
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
+  position: absolute;
+  top: -20px;
+}
+
+/* 卷轴齿 */
+.reel-teeth {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.reel-tooth {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 8px;
+  background: var(--amber-dim);
+  border-radius: 2px;
+  transform-origin: center center;
+  margin-left: -2px;
+  margin-top: -28px;
+}
+
+/* 磁带 */
+.cassette-clock-tape {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--amber-dim), transparent, var(--amber-dim));
+  opacity: 0.5;
+}
+
+/* 中心秒数显示 */
+.cassette-clock-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 20;
+}
+
+.seconds-display {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--green);
+  text-shadow: var(--green-glow);
+  letter-spacing: 0.1em;
+  background: rgba(57, 255, 20, 0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+.center-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  margin: 4px auto 0;
+  box-shadow: 0 0 10px var(--green);
+  animation: blink 1s step-end infinite;
+}
+
+/* 标签 - 时间显示 */
+.cassette-clock-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  padding: 6px 16px;
+  background: rgba(255, 149, 0, 0.08);
+  border: 1px solid rgba(255, 149, 0, 0.2);
+  border-radius: 4px;
+  font-family: var(--font-display);
+  letter-spacing: 0.2em;
+  line-height: 1.4;
+}
+
+.time-display {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--amber);
+  text-shadow: var(--amber-glow-strong);
+  letter-spacing: 0.15em;
+  line-height: 1.1;
+}
+
+.clock-brand {
+  font-size: 0.55rem;
+  color: var(--amber-dim);
+  text-shadow: var(--amber-glow);
+  letter-spacing: 0.3em;
+  margin-top: 2px;
+}
+
+/* 底部装饰 */
+.cassette-clock-bottom {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cassette-clock-groove {
+  width: 50px;
+  height: 4px;
+  background: #3a3a48;
+  border-radius: 2px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* 装饰螺丝 */
+.cassette-clock-screw {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #4a4a58 0%, #2a2a35 100%);
+  border: 1px solid #3a3a48;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.cassette-clock-screw::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 1px;
+  background: #1a1a25;
+}
+
+.screw-top-left { top: 6px; left: 6px; }
+.screw-top-right { top: 6px; right: 6px; }
+.screw-bottom-left { bottom: 6px; left: 6px; }
+.screw-bottom-right { bottom: 6px; right: 6px; }
+
+/* 光晕效果 */
+.cassette-clock-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(255, 149, 0, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* ============================================
+   CASSETTE TAPE (LEGACY)
+   ============================================ */
 
 .cassette-holes {
   display: flex;
@@ -2064,6 +2342,64 @@ body :not(code):not(pre) {
   .stat-label {
     font-size: 0.7rem;
     letter-spacing: 0.15em;
+  }
+
+  .cassette-clock-body {
+    width: 220px;
+    height: 145px;
+    padding: 10px;
+  }
+
+  .cassette-clock-window {
+    height: 60px;
+    gap: 25px;
+  }
+
+  .cassette-clock-reel {
+    width: 38px;
+    height: 38px;
+  }
+
+  .cassette-clock-reel .reel-center {
+    width: 10px;
+    height: 10px;
+  }
+
+  .hour-hand .hand-tip {
+    height: 14px;
+    top: -12px;
+  }
+
+  .minute-hand .hand-tip {
+    height: 17px;
+    top: -15px;
+  }
+
+  .reel-tooth {
+    margin-top: -22px;
+  }
+
+  .time-display {
+    font-size: 1.4rem;
+  }
+
+  .seconds-display {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+
+  .cassette-clock-groove {
+    width: 35px;
+  }
+
+  .cassette-clock-label {
+    padding: 4px 12px;
+    margin-top: 8px;
+  }
+
+  .cassette-clock-screw {
+    width: 6px;
+    height: 6px;
   }
 
   .cassette-body {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
+import CassetteClock from './CassetteClock'
 
 export default function Hero() {
   const [text, setText] = useState('')
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const fullText = '游戏创作者 / 独立开发者'
 
   useEffect(() => {
@@ -16,18 +16,6 @@ export default function Hero() {
       }
     }, 80)
     return () => clearInterval(timer)
-  }, [])
-
-  // 鼠标视差效果
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 20
-      const y = (e.clientY / window.innerHeight - 0.5) * 20
-      setMousePos({ x, y })
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
   return (
@@ -62,39 +50,7 @@ export default function Hero() {
           <span className="cta-bracket">]</span>
         </a>
       </div>
-      <div
-        className="hero-decoration"
-        style={{
-          transform: `translate(${mousePos.x * -1}px, ${mousePos.y * -1}px) rotate(${mousePos.x * 0.5}deg)`,
-        }}
-      >
-        <div className="cassette">
-          <div className="cassette-body">
-            <div className="cassette-holes">
-              <div className="cassette-hole"></div>
-              <div className="cassette-hole"></div>
-            </div>
-            <div className="cassette-window">
-              <div className="cassette-reel left-reel">
-                <div className="reel-center"></div>
-              </div>
-              <div className="cassette-tape"></div>
-              <div className="cassette-reel right-reel">
-                <div className="reel-center"></div>
-              </div>
-            </div>
-            <div className="cassette-label">
-              <span>TANGYUAN</span>
-              <span>GAMES VOL.1</span>
-            </div>
-            <div className="cassette-bottom">
-              <div className="cassette-groove"></div>
-              <div className="cassette-groove"></div>
-              <div className="cassette-groove"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CassetteClock />
     </section>
   )
 }

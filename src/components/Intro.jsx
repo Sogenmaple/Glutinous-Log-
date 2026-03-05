@@ -2,6 +2,16 @@ import { useState, useEffect, useRef } from 'react'
 
 export default function Intro({ onComplete }) {
   const [isExpanding, setIsExpanding] = useState(false)
+  const [showDebug, setShowDebug] = useState(false)
+  const [eyeParams, setEyeParams] = useState({
+    eyeRadius: 0.18,
+    baseOffsetX: 0.45,
+    baseOffsetY: 0.2,
+    maxEyeOffset: 0.3,
+    smoothFactor: 0.15,
+    eyeOpacity: 0.95,
+    glowOpacity: 0.4,
+  })
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
   const timeRef = useRef(0)
@@ -154,17 +164,17 @@ export default function Intro({ onComplete }) {
         const pulse = 1 + Math.sin(timeRef.current * 0.05) * 0.05
         const currentRadius = ballRadius * pulse
 
-        const eyeRadius = currentRadius * 0.18
-        const baseOffsetX = currentRadius * 0.45
-        const baseOffsetY = currentRadius * 0.2
-        const maxEyeOffset = currentRadius * 0.3
+        const eyeRadius = currentRadius * eyeParams.eyeRadius
+        const baseOffsetX = currentRadius * eyeParams.baseOffsetX
+        const baseOffsetY = currentRadius * eyeParams.baseOffsetY
+        const maxEyeOffset = currentRadius * eyeParams.maxEyeOffset
 
         // 计算鼠标方向
         const dx = mouseRef.current.x - 0.5
         const dy = mouseRef.current.y - 0.5
 
         // 平滑插值 - 眼睛
-        const smoothFactor = 0.15
+        const smoothFactor = eyeParams.smoothFactor
         eyes.left.offsetX += (dx * maxEyeOffset - eyes.left.offsetX) * smoothFactor
         eyes.left.offsetY += (dy * maxEyeOffset - eyes.left.offsetY) * smoothFactor
         eyes.right.offsetX += (dx * maxEyeOffset - eyes.right.offsetX) * smoothFactor
@@ -181,8 +191,8 @@ export default function Intro({ onComplete }) {
           leftEyeX, leftEyeY, eyeRadius * 0.5,
           leftEyeX, leftEyeY, eyeRadius * 2.5
         )
-        leftGlow.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
-        leftGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)')
+        leftGlow.addColorStop(0, `rgba(255, 255, 255, ${eyeParams.glowOpacity})`)
+        leftGlow.addColorStop(0.5, `rgba(255, 255, 255, ${eyeParams.glowOpacity * 0.375})`)
         leftGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
         ctx.fillStyle = leftGlow
         ctx.beginPath()
@@ -192,7 +202,7 @@ export default function Intro({ onComplete }) {
         // 左眼主体（圆形）
         ctx.beginPath()
         ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+        ctx.fillStyle = `rgba(255, 255, 255, ${eyeParams.eyeOpacity})`
         ctx.fill()
 
         // 绘制右眼（带模糊光晕）
@@ -206,8 +216,8 @@ export default function Intro({ onComplete }) {
           rightEyeX, rightEyeY, eyeRadius * 0.5,
           rightEyeX, rightEyeY, eyeRadius * 2.5
         )
-        rightGlow.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
-        rightGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)')
+        rightGlow.addColorStop(0, `rgba(255, 255, 255, ${eyeParams.glowOpacity})`)
+        rightGlow.addColorStop(0.5, `rgba(255, 255, 255, ${eyeParams.glowOpacity * 0.375})`)
         rightGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
         ctx.fillStyle = rightGlow
         ctx.beginPath()
@@ -217,7 +227,7 @@ export default function Intro({ onComplete }) {
         // 右眼主体（圆形）
         ctx.beginPath()
         ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+        ctx.fillStyle = `rgba(255, 255, 255, ${eyeParams.eyeOpacity})`
         ctx.fill()
       }
 
@@ -253,6 +263,180 @@ export default function Intro({ onComplete }) {
       onClick={handleClick}
     >
       <canvas ref={canvasRef} className="intro-canvas" />
+      
+      {/* 调试面板切换按钮 */}
+      <button
+        onClick={(e) => { e.stopPropagation(); setShowDebug(!showDebug); }}
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          padding: '8px 12px',
+          background: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          border: '1px solid rgba(255,255,255,0.3)',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontSize: '12px',
+        }}
+      >
+        {showDebug ? '隐藏调试' : '调试模式'}
+      </button>
+
+      {/* 调试面板 */}
+      {showDebug && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'fixed',
+            top: '50px',
+            right: '10px',
+            zIndex: 1000,
+            width: '280px',
+            padding: '15px',
+            background: 'rgba(0,0,0,0.85)',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '8px',
+            fontSize: '12px',
+            fontFamily: 'monospace',
+          }}
+        >
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '14px', borderBottom: '1px solid rgba(255,255,255,0.2)', paddingBottom: '8px' }}>
+            👀 眼睛参数
+          </h3>
+          
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', marginBottom: '4px' }}>
+              眼睛半径：{eyeParams.eyeRadius.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="0.05"
+              max="0.35"
+              step="0.01"
+              value={eyeParams.eyeRadius}
+              onChange={(e) => setEyeParams({ ...eyeParams, eyeRadius: parseFloat(e.target.value) })}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', marginBottom: '4px' }}>
+              眼睛间距 X：{eyeParams.baseOffsetX.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="0.2"
+              max="0.7"
+              step="0.01"
+              value={eyeParams.baseOffsetX}
+              onChange={(e) => setEyeParams({ ...eyeParams, baseOffsetX: parseFloat(e.target.value) })}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', marginBottom: '4px' }}>
+              眼睛位置 Y：{eyeParams.baseOffsetY.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="0.05"
+              max="0.4"
+              step="0.01"
+              value={eyeParams.baseOffsetY}
+              onChange={(e) => setEyeParams({ ...eyeParams, baseOffsetY: parseFloat(e.target.value) })}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', marginBottom: '4px' }}>
+              最大偏移：{eyeParams.maxEyeOffset.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="0.1"
+              max="0.5"
+              step="0.01"
+              value={eyeParams.maxEyeOffset}
+              onChange={(e) => setEyeParams({ ...eyeParams, maxEyeOffset: parseFloat(e.target.value) })}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', marginBottom: '4px' }}>
+              平滑因子：{eyeParams.smoothFactor.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="0.02"
+              max="0.3"
+              step="0.01"
+              value={eyeParams.smoothFactor}
+              onChange={(e) => setEyeParams({ ...eyeParams, smoothFactor: parseFloat(e.target.value) })}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', marginBottom: '4px' }}>
+              眼睛不透明度：{eyeParams.eyeOpacity.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="0.5"
+              max="1.0"
+              step="0.01"
+              value={eyeParams.eyeOpacity}
+              onChange={(e) => setEyeParams({ ...eyeParams, eyeOpacity: parseFloat(e.target.value) })}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '10px' }}>
+            <label style={{ display: 'block', marginBottom: '4px' }}>
+              光晕强度：{eyeParams.glowOpacity.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="0.1"
+              max="0.8"
+              step="0.01"
+              value={eyeParams.glowOpacity}
+              onChange={(e) => setEyeParams({ ...eyeParams, glowOpacity: parseFloat(e.target.value) })}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <button
+            onClick={() => setEyeParams({
+              eyeRadius: 0.18,
+              baseOffsetX: 0.45,
+              baseOffsetY: 0.2,
+              maxEyeOffset: 0.3,
+              smoothFactor: 0.15,
+              eyeOpacity: 0.95,
+              glowOpacity: 0.4,
+            })}
+            style={{
+              width: '100%',
+              padding: '6px',
+              background: 'rgba(255,255,255,0.1)',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              marginTop: '10px',
+            }}
+          >
+            重置默认值
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -112,9 +112,9 @@ export default function Intro({ onComplete }) {
           const distanceRatio = Math.min(distance / maxDistance, 1)
 
           // 根据距离计算线的数量、粗细和透明度
-          const lineCount = Math.floor(2 + distanceRatio * 3) // 2-5 条线
-          const baseLineWidth = 1.2 + distanceRatio * 1.5 // 1.2-2.7px
-          const baseOpacity = 0.25 + distanceRatio * 0.3 // 0.25-0.55
+          const lineCount = Math.floor(1 + distanceRatio * 2) // 1-3 条线
+          const baseLineWidth = 1 + distanceRatio * 1.2 // 1-2.2px
+          const baseOpacity = 0.2 + distanceRatio * 0.25 // 0.2-0.45
 
           // 计算球体之间的角度
           const angle = Math.atan2(y2 - y1, x2 - x1)
@@ -152,24 +152,7 @@ export default function Intro({ onComplete }) {
         }
       }
 
-      // 第二遍：绘制代码雨（在激光线之上，球体之下）
-      ctx.font = `${fontSize}px monospace`
-      for (let i = 0; i < columns; i++) {
-        const x = i * fontSize
-        const y = drops[i] * fontSize
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
-        const char = chars.charAt(Math.floor(Math.random() * chars.length))
-        ctx.fillText(char, x, y)
-
-        // 重置或继续下落
-        if (y > height && Math.random() > 0.975) {
-          drops[i] = 0
-        }
-        drops[i]++
-      }
-
-      // 第三遍：绘制球体光晕和边框（中间层）
+      // 第二遍：绘制球体光晕和边框（覆盖激光线）
       balls.forEach((ball) => {
         const ballCenterX = ball.x * width
         const ballCenterY = ball.y * height
@@ -217,6 +200,23 @@ export default function Intro({ onComplete }) {
           ctx.shadowBlur = 0
         }
       })
+
+      // 第三遍：绘制代码雨（在球体之上，眼睛之下）
+      ctx.font = `${fontSize}px monospace`
+      for (let i = 0; i < columns; i++) {
+        const x = i * fontSize
+        const y = drops[i] * fontSize
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
+        const char = chars.charAt(Math.floor(Math.random() * chars.length))
+        ctx.fillText(char, x, y)
+
+        // 重置或继续下落
+        if (y > height && Math.random() > 0.975) {
+          drops[i] = 0
+        }
+        drops[i]++
+      }
 
       // 第四遍：绘制中心球眼睛（最上层，在所有元素之上）
       const centerBall = balls.find(b => b.isCenter)

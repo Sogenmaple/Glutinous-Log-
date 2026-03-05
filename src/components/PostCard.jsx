@@ -18,6 +18,7 @@ export default function PostCard({ post }) {
       <div className="post-content">
         {/* 头部信息 */}
         <div className="post-header">
+          <span className="post-type">{post.type === 'project' ? '🎮' : post.type === 'devlog' ? '📝' : post.type === 'tech' ? '💻' : post.type === 'design' ? '🎨' : '☕'}</span>
           <span className="post-category">{post.category}</span>
           <span className="post-date">{post.date}</span>
         </div>

@@ -15,8 +15,8 @@ export default function Intro({ onComplete }) {
     let height = canvas.height = window.innerHeight
 
     // 代码字符集
-    const chars = '01TGXYWZ'
-    const fontSize = 12
+    const chars = '01TGXYZWABXY'
+    const fontSize = 11
 
     // 四个球体
     const balls = [
@@ -38,7 +38,7 @@ export default function Intro({ onComplete }) {
       timeRef.current += 1
 
       // 半透明黑色背景，形成拖尾效果
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.15)'
+      ctx.fillStyle = 'rgba(0, 5, 0, 0.12)'
       ctx.fillRect(0, 0, width, height)
 
       const centerX = width / 2
@@ -82,8 +82,9 @@ export default function Intro({ onComplete }) {
           const dist = Math.sqrt(dx * dx + dy * dy)
 
           if (dist < currentRadius) {
-            const brightness = 0.6 + Math.random() * 0.4
-            ctx.fillStyle = `rgba(0, 255, ${Math.floor(brightness * 255)}, ${brightness})`
+            const brightness = 0.5 + Math.random() * 0.5
+            const greenVar = Math.floor(180 + brightness * 75)
+            ctx.fillStyle = `rgba(0, ${greenVar}, ${Math.floor(brightness * 200)}, ${brightness})`
             const char = chars.charAt(Math.floor(Math.random() * chars.length))
             ctx.fillText(char, x, y)
           }
@@ -91,25 +92,39 @@ export default function Intro({ onComplete }) {
 
         ctx.restore()
 
-        // 绘制球体模糊光晕（融球效果关键）
-        const gradient = ctx.createRadialGradient(
-          ballCenterX, ballCenterY, currentRadius * 0.8,
-          ballCenterX, ballCenterY, currentRadius * 1.3
+        // 绘制球体模糊光晕（融球效果关键）- 多层渐变
+        const gradient1 = ctx.createRadialGradient(
+          ballCenterX, ballCenterY, currentRadius * 0.5,
+          ballCenterX, ballCenterY, currentRadius * 1.5
         )
-        gradient.addColorStop(0, 'rgba(0, 255, 0, 0.15)')
-        gradient.addColorStop(1, 'rgba(0, 255, 0, 0)')
-        ctx.fillStyle = gradient
+        gradient1.addColorStop(0, 'rgba(0, 255, 100, 0.25)')
+        gradient1.addColorStop(0.5, 'rgba(0, 200, 50, 0.12)')
+        gradient1.addColorStop(1, 'rgba(0, 150, 30, 0)')
+        ctx.fillStyle = gradient1
         ctx.beginPath()
-        ctx.arc(ballCenterX, ballCenterY, currentRadius * 1.3, 0, Math.PI * 2)
+        ctx.arc(ballCenterX, ballCenterY, currentRadius * 1.5, 0, Math.PI * 2)
+        ctx.fill()
+
+        // 第二层更淡的光晕（增强融合）
+        const gradient2 = ctx.createRadialGradient(
+          ballCenterX, ballCenterY, currentRadius * 0.8,
+          ballCenterX, ballCenterY, currentRadius * 2.0
+        )
+        gradient2.addColorStop(0, 'rgba(0, 255, 80, 0.08)')
+        gradient2.addColorStop(1, 'rgba(0, 255, 80, 0)')
+        ctx.fillStyle = gradient2
+        ctx.beginPath()
+        ctx.arc(ballCenterX, ballCenterY, currentRadius * 2.0, 0, Math.PI * 2)
         ctx.fill()
 
         // 绘制球体边框光晕（带模糊，用于融球效果）
         ctx.beginPath()
-        ctx.arc(ballCenterX, ballCenterY, currentRadius, 0, Math.PI * 2)
-        ctx.strokeStyle = `rgba(0, 255, 0, ${0.5 + Math.sin(timeRef.current * 0.05) * 0.2})`
-        ctx.lineWidth = 3
-        ctx.shadowColor = '#00ff00'
-        ctx.shadowBlur = 20
+        ctx.arc(ballCenterX, ballCenterY, currentRadius * 0.95, 0, Math.PI * 2)
+        const pulseOpacity = 0.6 + Math.sin(timeRef.current * 0.05) * 0.25
+        ctx.strokeStyle = `rgba(0, 255, 120, ${pulseOpacity})`
+        ctx.lineWidth = 2.5
+        ctx.shadowColor = '#00ff88'
+        ctx.shadowBlur = 25
         ctx.stroke()
         ctx.shadowBlur = 0
       })

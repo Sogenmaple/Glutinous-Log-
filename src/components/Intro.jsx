@@ -108,39 +108,50 @@ export default function Intro({ onComplete }) {
       }
 
       // 绘制激光线（在球体之前）
-      const nonCenterBalls = balls.filter(b => !b.isCenter)
-      for (let i = 0; i < nonCenterBalls.length; i++) {
-        for (let j = i + 1; j < nonCenterBalls.length; j++) {
-          const ball1 = nonCenterBalls[i]
-          const ball2 = nonCenterBalls[j]
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          const ball1 = balls[i]
+          const ball2 = balls[j]
 
           const x1 = ball1.x * width
           const y1 = ball1.y * height
           const x2 = ball2.x * width
           const y2 = ball2.y * height
 
+          const ballRadius1 = ball1.radius * Math.min(width, height)
+          const ballRadius2 = ball2.radius * Math.min(width, height)
+          const pulse1 = 1 + Math.sin(timeRef.current * 0.05) * 0.05
+          const pulse2 = 1 + Math.sin(timeRef.current * 0.05) * 0.05
+          const currentRadius1 = ballRadius1 * pulse1
+          const currentRadius2 = ballRadius2 * pulse2
+
           const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
           const maxDistance = Math.min(width, height) * 0.6
           const distanceRatio = Math.min(distance / maxDistance, 1)
 
           // 根据距离计算线的数量、粗细和透明度
-          const lineCount = Math.floor(2 + distanceRatio * 4) // 2-6 条线
-          const baseLineWidth = 1.5 + distanceRatio * 3 // 1.5-4.5px
-          const baseOpacity = 0.15 + distanceRatio * 0.35 // 0.15-0.5
+          const lineCount = Math.floor(2 + distanceRatio * 5) // 2-7 条线
+          const baseLineWidth = 1 + distanceRatio * 3 // 1-4px
+          const baseOpacity = 0.2 + distanceRatio * 0.4 // 0.2-0.6
 
-          // 绘制多条激光线
+          // 计算球体之间的角度
+          const angle = Math.atan2(y2 - y1, x2 - x1)
+
+          // 绘制多条激光线，连接点在球体边缘
           for (let line = 0; line < lineCount; line++) {
-            const offset = (line - (lineCount - 1) / 2) * 3
-            const angle = Math.atan2(y2 - y1, x2 - x1)
-            const perpAngle = angle + Math.PI / 2
+            // 每条线的偏移角度不同，连接点在边缘不同位置
+            const edgeAngleOffset = (line - (lineCount - 1) / 2) * 0.15
+            const startEdgeAngle = angle + edgeAngleOffset
+            const endEdgeAngle = angle + Math.PI + edgeAngleOffset
 
-            const startX = x1 + Math.cos(perpAngle) * offset
-            const startY = y1 + Math.sin(perpAngle) * offset
-            const endX = x2 + Math.cos(perpAngle) * offset
-            const endY = y2 + Math.sin(perpAngle) * offset
+            // 连接点在球体边缘
+            const startX = x1 + Math.cos(startEdgeAngle) * currentRadius1 * 0.9
+            const startY = y1 + Math.sin(startEdgeAngle) * currentRadius1 * 0.9
+            const endX = x2 + Math.cos(endEdgeAngle) * currentRadius2 * 0.9
+            const endY = y2 + Math.sin(endEdgeAngle) * currentRadius2 * 0.9
 
-            const opacity = baseOpacity * (1 - Math.abs(offset) / (lineCount * 2))
-            const lineWidth = baseLineWidth * (1 - Math.abs(offset) / (lineCount * 3))
+            const opacity = baseOpacity * (1 - Math.abs(line - (lineCount - 1) / 2) / lineCount)
+            const lineWidth = baseLineWidth * (1 - Math.abs(line - (lineCount - 1) / 2) / (lineCount + 1))
 
             ctx.beginPath()
             ctx.moveTo(startX, startY)
@@ -148,8 +159,8 @@ export default function Intro({ onComplete }) {
             ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`
             ctx.lineWidth = lineWidth
             ctx.lineCap = 'round'
-            ctx.shadowColor = 'rgba(255, 255, 255, 0.5)'
-            ctx.shadowBlur = 10 + distanceRatio * 15
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.6)'
+            ctx.shadowBlur = 12 + distanceRatio * 18
             ctx.stroke()
             ctx.shadowBlur = 0
           }

@@ -145,13 +145,13 @@ export default function Intro({ onComplete }) {
             const dx = x - ballX
             const dy = y - ballY
             const distance = Math.sqrt(dx * dx + dy * dy)
-            const influenceRadius = ballRadius * 2.5
+            const influenceRadius = ballRadius * 4
 
-            // 如果点在影响范围内，产生轻微扭曲
+            // 如果点在影响范围内，产生扭曲
             if (distance < influenceRadius) {
-              const influence = (1 - distance / influenceRadius) * 0.15
+              const influence = (1 - distance / influenceRadius) * 0.35
               const pushAngle = Math.atan2(dy, dx)
-              const pushDistance = influence * ballRadius * 0.8
+              const pushDistance = influence * ballRadius * 2
               x += Math.cos(pushAngle) * pushDistance
               y += Math.sin(pushAngle) * pushDistance
             }

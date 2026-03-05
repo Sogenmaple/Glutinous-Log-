@@ -15,8 +15,8 @@
   cursor: pointer;
   overflow: hidden;
   transition: all 1.5s cubic-bezier(0.7, 0, 0.3, 1);
-  /* 融球效果滤镜 - 高对比度产生融合效果 */
-  filter: contrast(25) brightness(1.15);
+  /* 融球效果滤镜 - 高对比度 + 反相 */
+  filter: contrast(20) brightness(1.1) invert(1);
 }
 
 .intro-overlay.expanding {

@@ -5,6 +5,7 @@ export default function Intro({ onComplete }) {
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
   const timeRef = useRef(0)
+  const mouseRef = useRef({ x: 0.5, y: 0.5 })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -32,6 +33,30 @@ export default function Intro({ onComplete }) {
       { x: 0.5, y: 0.5, radius: 0.06, angle: 2, speed: -0.012, orbitRadius: 0.28, isCenter: false },
       { x: 0.5, y: 0.5, radius: 0.07, angle: 4, speed: 0.006, orbitRadius: 0.35, isCenter: false },
     ]
+
+    // 眼睛参数
+    const eyes = {
+      left: { x: -0.3, y: -0.15, offsetX: 0, offsetY: 0 },
+      right: { x: 0.3, y: -0.15, offsetX: 0, offsetY: 0 },
+    }
+
+    // 鼠标/触摸移动
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect()
+      const x = (e.clientX - rect.left) / width
+      const y = (e.clientY - rect.top) / height
+      mouseRef.current = { x, y }
+    }
+
+    const handleTouchMove = (e) => {
+      const rect = canvas.getBoundingClientRect()
+      const x = (e.touches[0].clientX - rect.left) / width
+      const y = (e.touches[0].clientY - rect.top) / height
+      mouseRef.current = { x, y }
+    }
+
+    canvas.addEventListener('mousemove', handleMouseMove)
+    canvas.addEventListener('touchmove', handleTouchMove)
 
     // 绘制代码雨
     const draw = () => {
@@ -116,6 +141,59 @@ export default function Intro({ onComplete }) {
         ctx.shadowBlur = 20
         ctx.stroke()
         ctx.shadowBlur = 0
+
+        // 如果是中心球，绘制眼睛
+        if (ball.isCenter) {
+          const eyeRadius = currentRadius * 0.25
+          const eyeOffsetX = currentRadius * 0.3
+          const eyeOffsetY = currentRadius * 0.15
+          const pupilRadius = eyeRadius * 0.5
+
+          // 计算鼠标方向
+          const dx = mouseRef.current.x - 0.5
+          const dy = mouseRef.current.y - 0.5
+          const angle = Math.atan2(dy, dx)
+          const dist = Math.min(Math.sqrt(dx * dx + dy * dy), 1) * 0.5
+
+          // 平滑插值
+          const smoothFactor = 0.1
+          eyes.left.offsetX += (Math.cos(angle) * dist - eyes.left.offsetX) * smoothFactor
+          eyes.left.offsetY += (Math.sin(angle) * dist - eyes.left.offsetY) * smoothFactor
+          eyes.right.offsetX += (Math.cos(angle) * dist - eyes.right.offsetX) * smoothFactor
+          eyes.right.offsetY += (Math.sin(angle) * dist - eyes.right.offsetY) * smoothFactor
+
+          // 绘制左眼
+          const leftEyeX = ballCenterX - eyeOffsetX
+          const leftEyeY = ballCenterY - eyeOffsetY
+          ctx.beginPath()
+          ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+          ctx.fill()
+
+          // 左眼瞳孔
+          const leftPupilX = leftEyeX + eyes.left.offsetX * eyeRadius
+          const leftPupilY = leftEyeY + eyes.left.offsetY * eyeRadius
+          ctx.beginPath()
+          ctx.arc(leftPupilX, leftPupilY, pupilRadius, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'
+          ctx.fill()
+
+          // 绘制右眼
+          const rightEyeX = ballCenterX + eyeOffsetX
+          const rightEyeY = ballCenterY - eyeOffsetY
+          ctx.beginPath()
+          ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+          ctx.fill()
+
+          // 右眼瞳孔
+          const rightPupilX = rightEyeX + eyes.right.offsetX * eyeRadius
+          const rightPupilY = rightEyeY + eyes.right.offsetY * eyeRadius
+          ctx.beginPath()
+          ctx.arc(rightPupilX, rightPupilY, pupilRadius, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.9)'
+          ctx.fill()
+        }
       })
 
       animationRef.current = requestAnimationFrame(draw)
@@ -131,6 +209,8 @@ export default function Intro({ onComplete }) {
     window.addEventListener('resize', handleResize)
     return () => {
       window.removeEventListener('resize', handleResize)
+      canvas.removeEventListener('mousemove', handleMouseMove)
+      canvas.removeEventListener('touchmove', handleTouchMove)
       cancelAnimationFrame(animationRef.current)
     }
   }, [])

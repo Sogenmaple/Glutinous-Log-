@@ -134,7 +134,7 @@ export default function Intro({ onComplete }) {
           let x = centerX + Math.cos(rad) * ringPixelRadius
           let y = centerY + Math.sin(rad) * ringPixelRadius
 
-          // 计算每个轨道球对这个点的扭曲影响
+          // 计算每个轨道球对这个点的引力透镜式扭曲
           balls.forEach((ball) => {
             if (ball.isCenter) return
 
@@ -145,15 +145,16 @@ export default function Intro({ onComplete }) {
             const dx = x - ballX
             const dy = y - ballY
             const distance = Math.sqrt(dx * dx + dy * dy)
-            const influenceRadius = ballRadius * 4
+            const influenceRadius = ballRadius * 5
 
-            // 如果点在影响范围内，产生扭曲
-            if (distance < influenceRadius) {
-              const influence = (1 - distance / influenceRadius) * 0.35
-              const pushAngle = Math.atan2(dy, dx)
-              const pushDistance = influence * ballRadius * 2
-              x += Math.cos(pushAngle) * pushDistance
-              y += Math.sin(pushAngle) * pushDistance
+            // 引力透镜效果：距离越近弯曲越强，但不推开
+            if (distance < influenceRadius && distance > ballRadius * 0.5) {
+              // 透镜弯曲：垂直于径向的切向偏移
+              const lensStrength = 0.08 * (1 - distance / influenceRadius)
+              const tangentAngle = Math.atan2(dy, dx) + Math.PI / 2
+              const bendDistance = lensStrength * ballRadius * 3
+              x += Math.cos(tangentAngle) * bendDistance
+              y += Math.sin(tangentAngle) * bendDistance
             }
           })
 

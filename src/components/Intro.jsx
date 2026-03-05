@@ -96,7 +96,7 @@ export default function Intro({ onComplete }) {
         drops[i]++
       }
 
-      // 绘制球体区域
+      // 绘制球体区域（第一遍：光晕和边框）
       balls.forEach((ball) => {
         const ballCenterX = ball.x * width
         const ballCenterY = ball.y * height
@@ -141,76 +141,83 @@ export default function Intro({ onComplete }) {
         ctx.shadowBlur = 20
         ctx.stroke()
         ctx.shadowBlur = 0
-
-        // 如果是中心球，绘制圆形眼睛和嘴巴
-        if (ball.isCenter) {
-          const eyeRadius = currentRadius * 0.18
-          const baseOffsetX = currentRadius * 0.45
-          const baseOffsetY = currentRadius * 0.2
-          const maxEyeOffset = currentRadius * 0.3
-
-          // 计算鼠标方向
-          const dx = mouseRef.current.x - 0.5
-          const dy = mouseRef.current.y - 0.5
-
-          // 平滑插值 - 眼睛
-          const smoothFactor = 0.15
-          eyes.left.offsetX += (dx * maxEyeOffset - eyes.left.offsetX) * smoothFactor
-          eyes.left.offsetY += (dy * maxEyeOffset - eyes.left.offsetY) * smoothFactor
-          eyes.right.offsetX += (dx * maxEyeOffset - eyes.right.offsetX) * smoothFactor
-          eyes.right.offsetY += (dy * maxEyeOffset - eyes.right.offsetY) * smoothFactor
-
-          // 绘制左眼（带模糊光晕）
-          const leftBaseX = ballCenterX - baseOffsetX
-          const leftBaseY = ballCenterY - baseOffsetY
-          const leftEyeX = leftBaseX + eyes.left.offsetX
-          const leftEyeY = leftBaseY + eyes.left.offsetY
-
-          // 左眼光晕
-          const leftGlow = ctx.createRadialGradient(
-            leftEyeX, leftEyeY, eyeRadius * 0.5,
-            leftEyeX, leftEyeY, eyeRadius * 2.5
-          )
-          leftGlow.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
-          leftGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)')
-          leftGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
-          ctx.fillStyle = leftGlow
-          ctx.beginPath()
-          ctx.arc(leftEyeX, leftEyeY, eyeRadius * 2.5, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 左眼主体（圆形）
-          ctx.beginPath()
-          ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2)
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-          ctx.fill()
-
-          // 绘制右眼（带模糊光晕）
-          const rightBaseX = ballCenterX + baseOffsetX
-          const rightBaseY = ballCenterY - baseOffsetY
-          const rightEyeX = rightBaseX + eyes.right.offsetX
-          const rightEyeY = rightBaseY + eyes.right.offsetY
-
-          // 右眼光晕
-          const rightGlow = ctx.createRadialGradient(
-            rightEyeX, rightEyeY, eyeRadius * 0.5,
-            rightEyeX, rightEyeY, eyeRadius * 2.5
-          )
-          rightGlow.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
-          rightGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)')
-          rightGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
-          ctx.fillStyle = rightGlow
-          ctx.beginPath()
-          ctx.arc(rightEyeX, rightEyeY, eyeRadius * 2.5, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 右眼主体（圆形）
-          ctx.beginPath()
-          ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2)
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-          ctx.fill()
-        }
       })
+
+      // 绘制中心球眼睛（最上层，在所有球体之后）
+      const centerBall = balls.find(b => b.isCenter)
+      if (centerBall) {
+        const ballCenterX = centerBall.x * width
+        const ballCenterY = centerBall.y * height
+        const ballRadius = centerBall.radius * Math.min(width, height)
+        const pulse = 1 + Math.sin(timeRef.current * 0.05) * 0.05
+        const currentRadius = ballRadius * pulse
+
+        const eyeRadius = currentRadius * 0.18
+        const baseOffsetX = currentRadius * 0.45
+        const baseOffsetY = currentRadius * 0.2
+        const maxEyeOffset = currentRadius * 0.3
+
+        // 计算鼠标方向
+        const dx = mouseRef.current.x - 0.5
+        const dy = mouseRef.current.y - 0.5
+
+        // 平滑插值 - 眼睛
+        const smoothFactor = 0.15
+        eyes.left.offsetX += (dx * maxEyeOffset - eyes.left.offsetX) * smoothFactor
+        eyes.left.offsetY += (dy * maxEyeOffset - eyes.left.offsetY) * smoothFactor
+        eyes.right.offsetX += (dx * maxEyeOffset - eyes.right.offsetX) * smoothFactor
+        eyes.right.offsetY += (dy * maxEyeOffset - eyes.right.offsetY) * smoothFactor
+
+        // 绘制左眼（带模糊光晕）
+        const leftBaseX = ballCenterX - baseOffsetX
+        const leftBaseY = ballCenterY - baseOffsetY
+        const leftEyeX = leftBaseX + eyes.left.offsetX
+        const leftEyeY = leftBaseY + eyes.left.offsetY
+
+        // 左眼光晕
+        const leftGlow = ctx.createRadialGradient(
+          leftEyeX, leftEyeY, eyeRadius * 0.5,
+          leftEyeX, leftEyeY, eyeRadius * 2.5
+        )
+        leftGlow.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
+        leftGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)')
+        leftGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
+        ctx.fillStyle = leftGlow
+        ctx.beginPath()
+        ctx.arc(leftEyeX, leftEyeY, eyeRadius * 2.5, 0, Math.PI * 2)
+        ctx.fill()
+
+        // 左眼主体（圆形）
+        ctx.beginPath()
+        ctx.arc(leftEyeX, leftEyeY, eyeRadius, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+        ctx.fill()
+
+        // 绘制右眼（带模糊光晕）
+        const rightBaseX = ballCenterX + baseOffsetX
+        const rightBaseY = ballCenterY - baseOffsetY
+        const rightEyeX = rightBaseX + eyes.right.offsetX
+        const rightEyeY = rightBaseY + eyes.right.offsetY
+
+        // 右眼光晕
+        const rightGlow = ctx.createRadialGradient(
+          rightEyeX, rightEyeY, eyeRadius * 0.5,
+          rightEyeX, rightEyeY, eyeRadius * 2.5
+        )
+        rightGlow.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
+        rightGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.15)')
+        rightGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
+        ctx.fillStyle = rightGlow
+        ctx.beginPath()
+        ctx.arc(rightEyeX, rightEyeY, eyeRadius * 2.5, 0, Math.PI * 2)
+        ctx.fill()
+
+        // 右眼主体（圆形）
+        ctx.beginPath()
+        ctx.arc(rightEyeX, rightEyeY, eyeRadius, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'
+        ctx.fill()
+      }
 
       animationRef.current = requestAnimationFrame(draw)
     }

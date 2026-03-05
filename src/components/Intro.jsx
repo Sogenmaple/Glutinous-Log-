@@ -218,28 +218,21 @@ export default function Intro({ onComplete }) {
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
           ctx.fill()
 
-          // 绘制嘴巴（椭圆形，带跟随）
+          // 绘制嘴巴（线条风格，带跟随）
           const mouthX = ballCenterX + mouthOffsetX
           const mouthY = ballCenterY + mouthBaseY + mouthOffsetY
+          const mouthWidth = currentRadius * 0.35
 
-          // 嘴巴光晕
-          const mouthGlow = ctx.createRadialGradient(
-            mouthX, mouthY, mouthRadiusY * 0.5,
-            mouthX, mouthY, mouthRadiusY * 2.5
-          )
-          mouthGlow.addColorStop(0, 'rgba(255, 255, 255, 0.3)')
-          mouthGlow.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)')
-          mouthGlow.addColorStop(1, 'rgba(255, 255, 255, 0)')
-          ctx.fillStyle = mouthGlow
+          // 嘴巴线条（微笑弧线）
           ctx.beginPath()
-          ctx.ellipse(mouthX, mouthY, mouthRadiusX * 2, mouthRadiusY * 2, 0, 0, Math.PI * 2)
-          ctx.fill()
-
-          // 嘴巴主体（椭圆形）
-          ctx.beginPath()
-          ctx.ellipse(mouthX, mouthY, mouthRadiusX, mouthRadiusY, 0, 0, Math.PI * 2)
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'
-          ctx.fill()
+          ctx.arc(mouthX, mouthY - mouthRadiusY, mouthWidth, 0.1 * Math.PI, 0.9 * Math.PI)
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)'
+          ctx.lineWidth = 2.5
+          ctx.lineCap = 'round'
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.5)'
+          ctx.shadowBlur = 10
+          ctx.stroke()
+          ctx.shadowBlur = 0
         }
       })
 

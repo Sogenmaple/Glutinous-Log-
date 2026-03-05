@@ -89,28 +89,29 @@ export default function Intro({ onComplete }) {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'
       ctx.fillRect(0, 0, width, height)
 
-      // 第一遍：绘制激光线（最底层）
-      for (let i = 0; i < balls.length; i++) {
-        for (let j = i + 1; j < balls.length; j++) {
-          const ball1 = balls[i]
-          const ball2 = balls[j]
+      // 第一遍：绘制激光线（最底层）- 只连接中心球和轨道球
+      const laserCenterBall = balls.find(b => b.isCenter)
+      if (laserCenterBall) {
+        const x1 = laserCenterBall.x * width
+        const y1 = laserCenterBall.y * height
+        const ballRadius1 = laserCenterBall.radius * Math.min(width, height)
+        const pulse1 = 1 + Math.sin(timeRef.current * 0.05) * 0.05
+        const currentRadius1 = ballRadius1 * pulse1
 
-          const x1 = ball1.x * width
-          const y1 = ball1.y * height
-          const x2 = ball2.x * width
-          const y2 = ball2.y * height
+        // 遍历所有轨道球，只与中心球连线
+        balls.forEach((orbitalBall) => {
+          if (orbitalBall.isCenter) return // 跳过中心球自己
 
-          const ballRadius1 = ball1.radius * Math.min(width, height)
-          const ballRadius2 = ball2.radius * Math.min(width, height)
-          const pulse1 = 1 + Math.sin(timeRef.current * 0.05) * 0.05
+          const x2 = orbitalBall.x * width
+          const y2 = orbitalBall.y * height
+          const ballRadius2 = orbitalBall.radius * Math.min(width, height)
           const pulse2 = 1 + Math.sin(timeRef.current * 0.05) * 0.05
-          const currentRadius1 = ballRadius1 * pulse1
           const currentRadius2 = ballRadius2 * pulse2
 
           // 计算球体之间的角度
           const angle = Math.atan2(y2 - y1, x2 - x1)
 
-          // 绘制 1-2 条激光线，连接点在球体边缘
+          // 绘制 2 条激光线，连接点在球体边缘
           const lineCount = 2
           const opacity = 0.35
           const lineWidth = 1.5
@@ -141,7 +142,7 @@ export default function Intro({ onComplete }) {
             ctx.stroke()
             ctx.shadowBlur = 0
           }
-        }
+        })
       }
 
       // 第二遍：绘制球体光晕和边框（覆盖激光线）

@@ -47,7 +47,7 @@ export default function Intro({ onComplete }) {
 
     // 中心球扩散圆环（物理水波纹效果）
     const rings = []
-    const ringInterval = 60 // 每 60 帧生成一个圆环
+    const ringInterval = 100 // 每 100 帧生成一个圆环
     const maxRingRadius = 0.7 // 最大半径
 
     // 眼睛参数

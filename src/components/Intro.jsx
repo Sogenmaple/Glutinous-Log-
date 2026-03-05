@@ -156,10 +156,12 @@ export default function Intro({ onComplete }) {
             ctx.beginPath()
             ctx.moveTo(startX, startY)
             ctx.lineTo(endX, endY)
-            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`
+            // 使用黑色，经过 invert(1) 后变成白色
+            ctx.strokeStyle = `rgba(0, 0, 0, ${opacity})`
             ctx.lineWidth = lineWidth
             ctx.lineCap = 'round'
-            ctx.shadowColor = 'rgba(255, 255, 255, 0.6)'
+            // 黑色光晕，经过 invert(1) 后变成白色光晕
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)'
             ctx.shadowBlur = 12 + distanceRatio * 18
             ctx.stroke()
             ctx.shadowBlur = 0

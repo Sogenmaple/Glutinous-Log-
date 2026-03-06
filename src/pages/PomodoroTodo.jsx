@@ -21,7 +21,6 @@ export default function PomodoroTodo() {
       <main className="pomodoro-main">
         <div className="pomodoro-header">
           <h1 className="pomodoro-title">
-            <ClockIcon size={32} color="#ff9500" />
             <span>番茄专注</span>
           </h1>
           <p className="pomodoro-subtitle">POMODORO FOCUS SYSTEM</p>
@@ -139,7 +138,6 @@ function TimerView() {
       <div className="todo-column">
         <div className="column-header">
           <h3>
-            <CheckIcon size={18} />
             <span>待办清单</span>
           </h3>
           <span className="column-count">可拖到右侧开始</span>
@@ -153,7 +151,6 @@ function TimerView() {
       <div className="focus-column">
         <div className="column-header">
           <h3>
-            <ClockIcon size={18} />
             <span>专注中</span>
           </h3>
           {activeTodos.length > 0 && (
@@ -167,8 +164,8 @@ function TimerView() {
         
         {activeTodos.length === 0 ? (
           <div className="empty-focus">
-            <p>💭 从左侧拖拽待办到这里开始专注</p>
-            <p className="empty-hint">或者直接点击待办旁边的 ➤ 按钮</p>
+            <p>从左侧拖拽待办到这里开始专注</p>
+            <p className="empty-hint">或者直接点击待办旁边的按钮</p>
           </div>
         ) : (
           <div className="active-todos-list">
@@ -299,9 +296,9 @@ function TodosList({ onMoveToActive }) {
                   {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
                 </span>
                 {todo.dueDate && (
-                  <span className="due-badge">📅 {new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>
+                  <span className="due-badge">{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>
                 )}
-                <span className="duration-badge">⏱️ {todo.duration}分钟</span>
+                <span className="duration-badge">{todo.duration}分钟</span>
               </div>
               <div className="todo-actions">
                 <button 
@@ -509,10 +506,10 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
       </div>
 
       <div className="active-todo-info">
-        <span className="info-item">🍅 已专注 {((todo.duration || 25) - (todo.remainingTime || 25))} 分钟</span>
-        <span className="info-item">⏱️ 剩余 {todo.remainingTime || 25} 分钟</span>
+        <span className="info-item">已专注：{((todo.duration || 25) - (todo.remainingTime || 25))} 分钟</span>
+        <span className="info-item">剩余：{todo.remainingTime || 25} 分钟</span>
         {todo.dueDate && (
-          <span className="info-item">📅 截止 {new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>
+          <span className="info-item">截止：{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>
         )}
       </div>
     </div>
@@ -696,11 +693,11 @@ function HeatmapTab() {
 
         {hoverData && (
           <div className="heatmap-tooltip">
-            {hoverData.date && <div className="tooltip-date">📅 {hoverData.date}</div>}
-            {hoverData.hour && <div className="tooltip-hour">⏰ {hoverData.hour}</div>}
+            {hoverData.date && <div className="tooltip-date">{hoverData.date}</div>}
+            {hoverData.hour && <div className="tooltip-hour">{hoverData.hour}</div>}
             <div className="tooltip-stats">
-              <div>🍅 {hoverData.count} 个番茄</div>
-              <div>⏱️ {formatDuration(hoverData.totalDuration || 0)}</div>
+              <div>{hoverData.count} 个番茄</div>
+              <div>{formatDuration(hoverData.totalDuration || 0)}</div>
             </div>
           </div>
         )}

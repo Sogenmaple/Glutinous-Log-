@@ -27,6 +27,8 @@ export default function PomodoroTodo() {
   const [todoFocusMode, setTodoFocusMode] = useState('time') // 'time' | 'count'
   const [todoTargetTime, setTodoTargetTime] = useState(25) // 待办目标时间
   const [todoTargetCount, setTodoTargetCount] = useState(1) // 待办目标次数
+  const [todoType, setTodoType] = useState('once') // 'once' | 'daily' | 'long'
+  const [todoTimerMode, setTodoTimerMode] = useState('countdown') // 'countdown' | 'countup'
 
   // 统计数据
   const [stats, setStats] = useState({
@@ -46,6 +48,9 @@ export default function PomodoroTodo() {
 
   // 实时时间
   const [currentTime, setCurrentTime] = useState(new Date())
+
+  // 待办筛选
+  const [todoFilter, setTodoFilter] = useState('all') // 'all' | 'daily' | 'long' | 'once'
 
   const timerRef = useRef(null)
   const audioRef = useRef(null)
@@ -333,6 +338,8 @@ export default function PomodoroTodo() {
       targetTime: todoTargetTime,
       targetCount: todoTargetCount,
       completedCount: 0,
+      type: todoType, // 'once' | 'daily' | 'long'
+      timerMode: todoTimerMode, // 'countdown' | 'countup'
       createdAt: new Date().toISOString()
     }
 
@@ -507,31 +514,59 @@ export default function PomodoroTodo() {
 
               {/* 控制按钮 */}
               <div className="timer-controls">
-                <button
-                  className="control-btn primary"
-                  onClick={() => setIsRunning(!isRunning)}
-                  style={{ borderColor: modes[mode].color }}
-                >
-                  {isRunning ? (
-                    <>
-                      <PauseIcon size={20} color={modes[mode].color} />
-                      <span>暂停</span>
-                    </>
-                  ) : (
-                    <>
-                      <PlayIcon size={20} color={modes[mode].color} />
-                      <span>开始</span>
-                    </>
-                  )}
-                </button>
+                {timerMode === 'count' ? (
+                  <>
+                    <button
+                      className="control-btn primary count-btn"
+                      onClick={() => {
+                        setCurrentCount(prev => prev + 1)
+                        if (currentCount + 1 >= targetCount) {
+                          handleTimerComplete()
+                        }
+                      }}
+                      style={{ borderColor: modes[mode].color }}
+                    >
+                      <PlusIcon size={24} color={modes[mode].color} />
+                      <span>计数 +1</span>
+                    </button>
 
-                <button
-                  className="control-btn"
-                  onClick={resetTimer}
-                >
-                  <ResetIcon size={20} />
-                  <span>重置</span>
-                </button>
+                    <button
+                      className="control-btn"
+                      onClick={resetTimer}
+                    >
+                      <ResetIcon size={20} />
+                      <span>重置</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className="control-btn primary"
+                      onClick={() => setIsRunning(!isRunning)}
+                      style={{ borderColor: modes[mode].color }}
+                    >
+                      {isRunning ? (
+                        <>
+                          <PauseIcon size={20} color={modes[mode].color} />
+                          <span>暂停</span>
+                        </>
+                      ) : (
+                        <>
+                          <PlayIcon size={20} color={modes[mode].color} />
+                          <span>开始</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      className="control-btn"
+                      onClick={resetTimer}
+                    >
+                      <ResetIcon size={20} />
+                      <span>重置</span>
+                    </button>
+                  </>
+                )}
 
                 <button
                   className="control-btn"
@@ -676,12 +711,29 @@ export default function PomodoroTodo() {
                   <option value="high">高</option>
                 </select>
                 <select
+                  className="todo-type-select"
+                  value={todoType}
+                  onChange={(e) => setTodoType(e.target.value)}
+                >
+                  <option value="once">📌 一次性</option>
+                  <option value="daily">📅 每日</option>
+                  <option value="long">🔄 长期</option>
+                </select>
+                <select
                   className="focus-mode-select"
                   value={todoFocusMode}
                   onChange={(e) => setTodoFocusMode(e.target.value)}
                 >
                   <option value="time">⏱️ 时间</option>
                   <option value="count">🔢 次数</option>
+                </select>
+                <select
+                  className="timer-mode-select"
+                  value={todoTimerMode}
+                  onChange={(e) => setTodoTimerMode(e.target.value)}
+                >
+                  <option value="countdown">⏳ 倒计时</option>
+                  <option value="countup">⏱️ 正计时</option>
                 </select>
                 {todoFocusMode === 'time' ? (
                   <input
@@ -722,6 +774,32 @@ export default function PomodoroTodo() {
               {/* 待办列表标题栏 */}
               <div className="todo-list-header">
                 <span className="list-title">待办清单</span>
+                <div className="todo-filters">
+                  <button
+                    className={`filter-btn ${!todoFilter || todoFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setTodoFilter('all')}
+                  >
+                    全部
+                  </button>
+                  <button
+                    className={`filter-btn ${todoFilter === 'daily' ? 'active' : ''}`}
+                    onClick={() => setTodoFilter('daily')}
+                  >
+                    每日
+                  </button>
+                  <button
+                    className={`filter-btn ${todoFilter === 'long' ? 'active' : ''}`}
+                    onClick={() => setTodoFilter('long')}
+                  >
+                    长期
+                  </button>
+                  <button
+                    className={`filter-btn ${todoFilter === 'once' ? 'active' : ''}`}
+                    onClick={() => setTodoFilter('once')}
+                  >
+                    一次
+                  </button>
+                </div>
                 <button
                   className="export-btn"
                   onClick={() => {
@@ -742,13 +820,13 @@ export default function PomodoroTodo() {
 
               {/* 待办列表 */}
               <div className="todo-list">
-                {todos.length === 0 ? (
+                {todos.filter(todo => todoFilter === 'all' || todo.type === todoFilter).length === 0 ? (
                   <div className="empty-state">
                     <p>暂无待办事项</p>
                     <p className="empty-hint">添加一个任务开始专注吧</p>
                   </div>
                 ) : (
-                  todos.map((todo) => (
+                  todos.filter(todo => todoFilter === 'all' || todo.type === todoFilter).map((todo) => (
                     <div
                       key={todo.id}
                       className={`todo-item ${todo.completed ? 'completed' : ''} ${activeTodoId === todo.id ? 'active' : ''} priority-${todo.priority}`}
@@ -768,9 +846,19 @@ export default function PomodoroTodo() {
                                 {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
                               </span>
                             )}
+                            {todo.type && (
+                              <span className={`type-badge type-${todo.type}`}>
+                                {todo.type === 'daily' ? '📅 每日' : todo.type === 'long' ? '🔄 长期' : '📌 一次'}
+                              </span>
+                            )}
                             <span className="focus-mode-badge">
                               {todo.focusMode === 'time' ? `⏱️ ${todo.targetTime}分钟` : `🔢 ${todo.targetCount}次`}
                             </span>
+                            {todo.timerMode && (
+                              <span className="timer-mode-badge">
+                                {todo.timerMode === 'countdown' ? '⏳' : '⏱️'}
+                              </span>
+                            )}
                             {todo.completedCount > 0 && (
                               <span className="completed-count">
                                 ✅ {todo.completedCount}/{todo.focusMode === 'time' ? todo.targetTime : todo.targetCount}

@@ -487,6 +487,15 @@
   box-shadow: 0 0 20px rgba(255,149,0,0.4);
 }
 
+.control-btn.count-btn {
+  font-size: 1rem;
+  padding: 1rem 2rem;
+}
+
+.control-btn.count-btn span {
+  font-size: 0.9rem;
+}
+
 .pomodoro-stats {
   position: relative;
   z-index: 1;
@@ -639,6 +648,8 @@
   margin-bottom: 1rem;
   padding-bottom: 0.8rem;
   border-bottom: 1px solid rgba(6,182,212,0.2);
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .list-title {
@@ -646,6 +657,35 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text);
+}
+
+.todo-filters {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  border-color: rgba(255,255,255,0.3);
+  color: var(--text);
+}
+
+.filter-btn.active {
+  background: rgba(6,182,212,0.2);
+  border-color: var(--cyan);
+  color: var(--cyan);
 }
 
 .export-btn {
@@ -784,6 +824,31 @@
 .todo-target-input:focus {
   border-color: var(--cyan);
   box-shadow: 0 0 10px rgba(6,182,212,0.3);
+}
+
+.todo-type-select,
+.timer-mode-select {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(189,0,255,0.3);
+  border-radius: 6px;
+  padding: 0.5rem;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.todo-type-select:hover,
+.timer-mode-select:hover {
+  border-color: var(--purple);
+}
+
+.todo-type-select:focus,
+.timer-mode-select:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 10px rgba(189,0,255,0.3);
 }
 
 .todo-input:focus {
@@ -984,6 +1049,35 @@
   font-family: var(--font-mono);
   padding: 0.15rem 0.4rem;
   background: rgba(6,182,212,0.1);
+  border-radius: 3px;
+}
+
+.type-badge {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+}
+
+.type-badge.type-once {
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.1);
+}
+
+.type-badge.type-daily {
+  color: #39ff14;
+  background: rgba(57,255,20,0.1);
+}
+
+.type-badge.type-long {
+  color: var(--purple);
+  background: rgba(189,0,255,0.1);
+}
+
+.timer-mode-badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.3rem;
+  background: rgba(255,149,0,0.1);
   border-radius: 3px;
 }
 

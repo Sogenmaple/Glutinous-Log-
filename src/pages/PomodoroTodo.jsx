@@ -14,18 +14,35 @@ export default function PomodoroTodo() {
     cursor.className = 'custom-cursor'
     document.body.appendChild(cursor)
 
-    // 光标跟随鼠标
+    // 使用 requestAnimationFrame 优化光标跟随
+    let mouseX = 0, mouseY = 0
+    let cursorX = 0, cursorY = 0
+    let animationFrameId = null
+
+    const updateCursor = () => {
+      const dx = mouseX - cursorX
+      const dy = mouseY - cursorY
+      cursorX += dx * 0.3
+      cursorY += dy * 0.3
+      cursor.style.left = cursorX + 'px'
+      cursor.style.top = cursorY + 'px'
+      animationFrameId = requestAnimationFrame(updateCursor)
+    }
+
     const handleMouseMove = (e) => {
-      cursor.style.left = e.clientX + 'px'
-      cursor.style.top = e.clientY + 'px'
+      mouseX = e.clientX
+      mouseY = e.clientY
+      if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(updateCursor)
+      }
     }
 
     // 点击效果
     const handleClick = (e) => {
       cursor.classList.add('click')
-      setTimeout(() => cursor.classList.remove('click'), 150)
+      setTimeout(() => cursor.classList.remove('click'), 100)
 
-      // 粒子效果
+      // 粒子效果 - 统一琥珀色
       const particle = document.createElement('div')
       particle.className = 'click-particle'
       particle.style.left = (e.clientX - 4) + 'px'
@@ -61,6 +78,7 @@ export default function PomodoroTodo() {
     document.addEventListener('dragend', handleDragEnd)
 
     return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId)
       document.body.removeChild(cursor)
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('click', handleClick)

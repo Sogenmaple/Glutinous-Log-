@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, SettingsIcon } from '../components/icons/SiteIcons'
+import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon } from '../components/icons/SiteIcons'
 
 /**
  * 番茄钟待办 v4.0
@@ -306,7 +306,7 @@ function TodosList({ onMoveToActive }) {
                   onClick={() => openConfig(todo)}
                   title="配置"
                 >
-                  <SettingsIcon size={14} />
+                  ⚙
                 </button>
                 <button 
                   className="move-btn" 

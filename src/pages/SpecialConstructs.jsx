@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -46,6 +46,36 @@ export default function SpecialConstructs() {
       icon: CalculatorIcon,
       color: 'cyan',
       path: '/special/calculator',
+      status: 'active'
+    },
+    {
+      id: 'tetris',
+      title: '俄罗斯方块',
+      subtitle: 'TETRIS',
+      description: '经典益智俄罗斯方块，消除行来得分',
+      icon: ToolIcon,
+      color: 'purple',
+      path: '/special/tetris',
+      status: 'active'
+    },
+    {
+      id: 'flybird',
+      title: '飞扬的小鸟',
+      subtitle: 'FLAPPY BIRD',
+      description: '经典飞行游戏，躲避管道飞跃障碍',
+      icon: BirdIcon,
+      color: 'amber',
+      path: '/special/flybird',
+      status: 'active'
+    },
+    {
+      id: 'dinosaur',
+      title: '恐龙快跑',
+      subtitle: 'DINO RUN',
+      description: 'Chrome 小恐龙游戏，无尽跑酷挑战',
+      icon: DinosaurIcon,
+      color: 'green',
+      path: '/special/dinosaur',
       status: 'active'
     },
     {

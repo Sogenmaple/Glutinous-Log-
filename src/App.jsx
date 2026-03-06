@@ -21,6 +21,8 @@ import PomodoroTodo from './pages/PomodoroTodo'
 import Minesweeper from './pages/Minesweeper'
 import Calculator from './pages/Calculator'
 import Tetris from './pages/Tetris'
+import FlyBird from './pages/FlyBird'
+import Dinosaur from './pages/Dinosaur'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
@@ -187,6 +189,12 @@ function AppContent() {
           
           {/* 俄罗斯方块 */}
           <Route path="/special/tetris" element={<Tetris />} />
+          
+          {/* 飞扬的小鸟 */}
+          <Route path="/special/flybird" element={<FlyBird />} />
+          
+          {/* 恐龙快跑 */}
+          <Route path="/special/dinosaur" element={<Dinosaur />} />
           
           {/* 文章详情 */}
           <Route path="/post/:id" element={

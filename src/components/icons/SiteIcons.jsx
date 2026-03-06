@@ -117,6 +117,31 @@ export function LightbulbIcon({ size = 24, color = 'currentColor' }) {
   )
 }
 
+// 小鸟图标
+export function BirdIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="12" cy="14" rx="8" ry="6" stroke={color} strokeWidth="2" fill="none"/>
+      <circle cx="16" cy="12" r="2" fill={color}/>
+      <path d="M20 14l3-2-3-2" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M8 10l-3-3M10 8l-2-4" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 恐龙图标
+export function DinosaurIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M18 8h2a2 2 0 012 2v2a2 2 0 01-2 2h-2V8z" stroke={color} strokeWidth="2"/>
+      <path d="M6 16V8a4 4 0 014-4h6v12H6z" stroke={color} strokeWidth="2"/>
+      <circle cx="14" cy="10" r="1" fill={color}/>
+      <path d="M8 16v4M12 16v4M16 16v2" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M18 12l4 2" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 // 游戏手柄图标
 export function GameIcon({ size = 48, color = 'currentColor' }) {
   return (

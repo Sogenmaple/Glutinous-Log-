@@ -45,7 +45,7 @@ export default function Header() {
         {/* Logo */}
         <div className="logo" onClick={() => navigate('/')}>
           <span className="logo-bracket">[</span>
-          <span className="logo-text">汤圆</span>
+          <span className="logo-text">汤圆的小窝</span>
           <span className="logo-bracket">]</span>
         </div>
 

@@ -2489,8 +2489,8 @@
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
-  opacity: 0;
-  transform: translateY(20px);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .post-card.visible {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/Header'
 import Hero from './components/Hero'
@@ -36,6 +36,98 @@ function AppContent() {
   
   // 后台页面跳过 Intro 动画
   const isAdminRoute = location.pathname.startsWith('/admin')
+
+  // 全局自定义光标初始化
+  useEffect(() => {
+    // 创建光标容器
+    const cursor = document.createElement('div')
+    cursor.className = 'custom-cursor'
+    document.body.appendChild(cursor)
+
+    // 创建外环
+    const ring = document.createElement('div')
+    ring.className = 'custom-cursor-ring'
+    cursor.appendChild(ring)
+
+    // 创建中心反相点
+    const dot = document.createElement('div')
+    dot.className = 'custom-cursor-dot'
+    cursor.appendChild(dot)
+
+    // 使用 requestAnimationFrame 优化光标跟随
+    let mouseX = 0, mouseY = 0
+    let cursorX = 0, cursorY = 0
+    let animationFrameId = null
+
+    const updateCursor = () => {
+      const dx = mouseX - cursorX
+      const dy = mouseY - cursorY
+      cursorX += dx * 0.25
+      cursorY += dy * 0.25
+      cursor.style.left = cursorX + 'px'
+      cursor.style.top = cursorY + 'px'
+      animationFrameId = requestAnimationFrame(updateCursor)
+    }
+
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX
+      mouseY = e.clientY
+      if (!animationFrameId) {
+        animationFrameId = requestAnimationFrame(updateCursor)
+      }
+    }
+
+    // 点击效果
+    const handleClick = (e) => {
+      cursor.classList.add('click')
+      setTimeout(() => cursor.classList.remove('click'), 100)
+
+      // 点击粒子 - 单个琥珀色
+      const particle = document.createElement('div')
+      particle.className = 'click-particle'
+      particle.style.left = (e.clientX - 3) + 'px'
+      particle.style.top = (e.clientY - 3) + 'px'
+      document.body.appendChild(particle)
+      setTimeout(() => particle.remove(), 500)
+    }
+
+    // 悬停检测
+    const handleMouseOver = (e) => {
+      const target = e.target
+      if (target.matches('button, .tab-btn, .todo-item, .todo-drag-item, .timeline-block, .bar-item, input, select, a')) {
+        cursor.classList.add('hover')
+      }
+    }
+
+    const handleMouseOut = (e) => {
+      const target = e.target
+      if (target.matches('button, .tab-btn, .todo-item, .todo-drag-item, .timeline-block, .bar-item, input, select, a')) {
+        cursor.classList.remove('hover')
+      }
+    }
+
+    // 拖拽检测
+    const handleDragStart = () => cursor.classList.add('drag')
+    const handleDragEnd = () => cursor.classList.remove('drag')
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('click', handleClick)
+    document.addEventListener('mouseover', handleMouseOver)
+    document.addEventListener('mouseout', handleMouseOut)
+    document.addEventListener('dragstart', handleDragStart)
+    document.addEventListener('dragend', handleDragEnd)
+
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId)
+      document.body.removeChild(cursor)
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('click', handleClick)
+      document.removeEventListener('mouseover', handleMouseOver)
+      document.removeEventListener('mouseout', handleMouseOut)
+      document.removeEventListener('dragstart', handleDragStart)
+      document.removeEventListener('dragend', handleDragEnd)
+    }
+  }, [])
 
   return (
     <div className="app">

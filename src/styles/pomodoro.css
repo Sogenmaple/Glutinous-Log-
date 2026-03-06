@@ -2556,44 +2556,74 @@
   flex-shrink: 0;
 }
 
-/* V8.3 鼠标光标反相效果 */
-.pomodoro-page {
+/* V8.3 全局鼠标光标反相效果 */
+body {
   cursor: none;
 }
 
-/* 自定义光标 - 琥珀色反相圆环 */
+/* 自定义光标 - 琥珀色反相圆环 + 中心反相点 */
 .custom-cursor {
   position: fixed;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--amber);
-  border-radius: 50%;
+  width: 24px;
+  height: 24px;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 99999;
   transform: translate(-50%, -50%);
-  transition: width 0.1s ease, height 0.1s ease;
-  mix-blend-mode: difference;
-  background: transparent;
   will-change: transform, left, top;
 }
 
-.custom-cursor.hover {
+/* 外圈 - 琥珀色圆环 */
+.custom-cursor-ring {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--amber);
+  border-radius: 50%;
+  box-sizing: border-box;
+  transition: width 0.1s ease, height 0.1s ease, border-color 0.15s ease;
+}
+
+.custom-cursor.hover .custom-cursor-ring {
   width: 32px;
   height: 32px;
   border-color: var(--amber);
 }
 
-.custom-cursor.click {
-  width: 12px;
-  height: 12px;
+.custom-cursor.click .custom-cursor-ring {
+  width: 16px;
+  height: 16px;
   border-color: var(--amber);
 }
 
-.custom-cursor.drag {
-  width: 24px;
-  height: 24px;
+.custom-cursor.drag .custom-cursor-ring {
+  width: 28px;
+  height: 28px;
   border: 2px dashed var(--amber);
   animation: cursorRotate 0.8s linear infinite;
+}
+
+/* 中心点 - 反相效果 */
+.custom-cursor-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  mix-blend-mode: difference;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.1s ease, height 0.1s ease;
+}
+
+.custom-cursor.hover .custom-cursor-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-cursor.click .custom-cursor-dot {
+  width: 4px;
+  height: 4px;
 }
 
 @keyframes cursorRotate {
@@ -2601,7 +2631,7 @@
   to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* 点击粒子效果 - 琥珀色 */
+/* 点击粒子效果 - 统一琥珀色 */
 .click-particle {
   position: fixed;
   pointer-events: none;
@@ -2609,19 +2639,19 @@
   height: 6px;
   border-radius: 50%;
   background: var(--amber);
-  opacity: 0.7;
+  opacity: 0.8;
   animation: particleFade 0.5s ease-out forwards;
   z-index: 9998;
 }
 
 @keyframes particleFade {
   0% {
-    opacity: 0.7;
+    opacity: 0.8;
     transform: scale(1);
   }
   100% {
     opacity: 0;
-    transform: scale(2);
+    transform: scale(2.5);
   }
 }
 

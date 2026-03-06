@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
-import { ToolIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, MineIcon, FlagIcon, TimerIcon, TrophyIcon, RefreshIcon } from '../components/icons/SiteIcons'
 import '../styles/Minesweeper.css'
 
 export default function Minesweeper() {
@@ -295,28 +295,34 @@ export default function Minesweeper() {
         {/* 游戏信息栏 */}
         <div className="minesweeper-info">
           <div className="info-panel">
-            <span className="info-label">💣 剩余地雷</span>
+            <span className="info-label">
+              <MineIcon size={16} color="#ff9500" /> 剩余地雷
+            </span>
             <span className="info-value">{MINES - flags}</span>
           </div>
           <div className="info-panel">
-            <span className="info-label">⏱️ 时间</span>
+            <span className="info-label">
+              <TimerIcon size={16} color="#06b6d4" /> 时间
+            </span>
             <span className="info-value">{timer}s</span>
           </div>
           <div className="info-panel">
-            <span className="info-label">🏆 最佳</span>
+            <span className="info-label">
+              <TrophyIcon size={16} color="#fbbf24" /> 最佳
+            </span>
             <span className="info-value best-time">
               {bestTime[difficulty] ? `${bestTime[difficulty]}s` : '--'}
             </span>
           </div>
           <button className="reset-btn" onClick={resetGame}>
-            🔄 重置
+            <RefreshIcon size={16} color="#06b6d4" /> 重置
           </button>
         </div>
 
         {/* 游戏状态 */}
         {(gameOver || gameWon) && (
           <div className={`game-status ${gameWon ? 'won' : 'lost'}`}>
-            {gameWon ? '🎉 恭喜获胜！' : '💥 游戏结束！'}
+            {gameWon ? '🎊 恭喜获胜！' : '💥 游戏结束！'}
           </div>
         )}
 
@@ -331,7 +337,9 @@ export default function Minesweeper() {
               onDoubleClick={() => handleDoubleClick(index)}
             >
               {cell.isFlagged && !cell.isRevealed && (
-                <span className="cell-flag">🚩</span>
+                <span className="cell-flag">
+                  <FlagIcon size={18} color="#bd00ff" />
+                </span>
               )}
               {cell.isRevealed && !cell.isMine && cell.neighborMines > 0 && (
                 <span 
@@ -342,7 +350,9 @@ export default function Minesweeper() {
                 </span>
               )}
               {cell.isRevealed && cell.isMine && (
-                <span className="cell-mine">💣</span>
+                <span className="cell-mine">
+                  <MineIcon size={18} color="#ff2d2d" />
+                </span>
               )}
             </div>
           ))}

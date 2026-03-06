@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
-import { ToolIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ScrollIcon, KeyboardIcon } from '../components/icons/SiteIcons'
 import '../styles/Calculator.css'
 
 export default function Calculator() {
@@ -261,7 +261,7 @@ export default function Calculator() {
           {/* 历史记录 */}
           <div className="calculator-history">
             <div className="history-header">
-              <h3>📜 历史记录</h3>
+              <h3><ScrollIcon size={20} color="#06b6d4" /> 历史记录</h3>
               <button className="clear-history-btn" onClick={clearHistory}>清空</button>
             </div>
             <div className="history-list">
@@ -280,7 +280,7 @@ export default function Calculator() {
 
         {/* 键盘提示 */}
         <div className="keyboard-hints">
-          <p>⌨️ 支持键盘输入：数字 0-9 | + - * / | Enter 计算 | Esc 清除 | Backspace 删除</p>
+          <p><KeyboardIcon size={16} color="#ff9500" /> 支持键盘输入：数字 0-9 | + - * / | Enter 计算 | Esc 清除 | Backspace 删除</p>
         </div>
       </div>
     </div>

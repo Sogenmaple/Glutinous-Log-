@@ -37,6 +37,86 @@ export function CalculatorIcon({ size = 48, color = 'currentColor' }) {
   )
 }
 
+// 旗帜图标
+export function FlagIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 3v18M5 4h10l-2 4 2 4H5" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+// 地雷图标
+export function MineIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="5" stroke={color} strokeWidth="2" fill="none"/>
+      <circle cx="12" cy="12" r="2" fill={color}/>
+      <path d="M12 7V4M12 20v-3M7 12H4M20 12h-3M6.3 6.3l-2-2M19.7 19.7l-2-2M6.3 17.7l-2 2M19.7 4.3l-2 2" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 奖杯图标
+export function TrophyIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 21h8M12 17v4M7 4h10c0 6-2.5 9-5 9S7 10 7 4z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M17 4v4a3 3 0 003-3V4h-3zM7 4v4a3 3 0 01-3-3V4h3z" stroke={color} strokeWidth="1.5"/>
+    </svg>
+  )
+}
+
+// 时钟图标
+export function TimerIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="8" stroke={color} strokeWidth="2"/>
+      <path d="M12 8v5l3 2" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M12 2v2M12 20v2" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 刷新图标
+export function RefreshIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 12a8 8 0 10-2.34 5.66M20 12v-6m0 6h-6" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
+// 卷轴图标
+export function ScrollIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 4h8a4 4 0 014 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V8a4 4 0 014-4z" stroke={color} strokeWidth="2"/>
+      <path d="M8 4v16M8 4h8" stroke={color} strokeWidth="1.5"/>
+    </svg>
+  )
+}
+
+// 键盘图标
+export function KeyboardIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke={color} strokeWidth="2"/>
+      <path d="M7 9h.01M11 9h.01M15 9h.01M7 13h.01M11 13h.01M15 13h.01M7 17h10" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 灯泡图标
+export function LightbulbIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 3a7 7 0 015 12c-1.5 1.5-2 2.5-2 4h-6c0-1.5-.5-2.5-2-4a7 7 0 015-12z" stroke={color} strokeWidth="2"/>
+      <path d="M9 21h6M12 17v2" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 // 游戏手柄图标
 export function GameIcon({ size = 48, color = 'currentColor' }) {
   return (

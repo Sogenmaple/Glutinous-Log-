@@ -20,6 +20,7 @@ import SpecialConstructs from './pages/SpecialConstructs'
 import PomodoroTodo from './pages/PomodoroTodo'
 import Minesweeper from './pages/Minesweeper'
 import Calculator from './pages/Calculator'
+import Tetris from './pages/Tetris'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
@@ -183,6 +184,9 @@ function AppContent() {
           
           {/* 计算器 */}
           <Route path="/special/calculator" element={<Calculator />} />
+          
+          {/* 俄罗斯方块 */}
+          <Route path="/special/tetris" element={<Tetris />} />
           
           {/* 文章详情 */}
           <Route path="/post/:id" element={

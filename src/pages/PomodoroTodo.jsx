@@ -226,6 +226,7 @@ function TodosList({ onMoveToActive }) {
   const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
   const [newTodo, setNewTodo] = useState('')
   const [showConfig, setShowConfig] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
   const [config, setConfig] = useState({ priority: 'medium', dueDate: '', duration: 25, repeat: 'none', unit: '', isHabit: false })
 
   useEffect(() => {
@@ -256,7 +257,12 @@ function TodosList({ onMoveToActive }) {
     setNewTodo('')
   }
 
-  const deleteTodo = (id) => setTodos(todos.filter(todo => todo.id !== id))
+  const deleteTodo = (id) => {
+    setTodos(todos.filter(todo => todo.id !== id))
+    setShowDeleteConfirm(null)
+  }
+
+  const confirmDelete = (id) => setShowDeleteConfirm(id)
 
   const saveConfig = () => {
     if (!showConfig) return
@@ -306,21 +312,21 @@ function TodosList({ onMoveToActive }) {
             <div key={`${todo.id}-${index}`} className="todo-item" draggable onDragStart={(e) => handleDragStart(e, todo)}>
               <div className="todo-content">
                 <span className="todo-text">{todo.text}</span>
-                <span className={`priority-badge priority-${todo.priority}`}>
-                  {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
-                </span>
-                {todo.repeat && todo.repeat !== 'none' && (
-                  <span className="repeat-badge">
-                    {todo.repeat === 'daily' ? '每日' : todo.repeat === 'weekly' ? '每周' : todo.repeat === 'monthly' ? '每月' : ''}
-                  </span>
-                )}
-                {todo.dueDate && <span className="due-badge">{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>}
-                <span className="duration-badge">{todo.duration}分钟</span>
+                <div className="todo-indicators">
+                  <span className={`priority-dot priority-${todo.priority}`} title={`优先级：${todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}`}></span>
+                  {todo.repeat && todo.repeat !== 'none' && (
+                    <span className="repeat-icon-vector" title={`重复：${todo.repeat === 'daily' ? '每日' : todo.repeat === 'weekly' ? '每周' : '每月'}`}>
+                      {todo.repeat === 'daily' && <RepeatDailyIcon size={14} />}
+                      {todo.repeat === 'weekly' && <RepeatWeeklyIcon size={14} />}
+                      {todo.repeat === 'monthly' && <RepeatMonthlyIcon size={14} />}
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className="todo-actions">
-                <button className="config-btn" onClick={() => openConfig(todo)}>⚙</button>
-                <button className="move-btn" onClick={() => onMoveToActive(todo)}>➤</button>
-                <button className="delete-btn" onClick={() => deleteTodo(todo.id)}><TrashIcon size={14} /></button>
+              <div className="todo-actions-hidden">
+                <button className="action-btn-icon" onClick={() => openConfig(todo)} title="配置">⚙</button>
+                <button className="action-btn-icon move" onClick={() => onMoveToActive(todo)} title="移到专注">➤</button>
+                <button className="action-btn-icon delete" onClick={() => confirmDelete(todo.id)} title="删除">×</button>
               </div>
 
               {showConfig === todo.id && (
@@ -370,7 +376,20 @@ function TodosList({ onMoveToActive }) {
                     )}
                     <div className="config-actions">
                       <button className="cancel-btn" onClick={() => setShowConfig(null)}>取消</button>
+                      <button className="delete-btn-config" onClick={() => { setShowConfig(null); confirmDelete(todo.id) }}>删除</button>
                       <button className="save-btn" onClick={saveConfig}>保存</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {showDeleteConfirm === todo.id && (
+                <div className="delete-confirm-overlay" onClick={() => setShowDeleteConfirm(null)}>
+                  <div className="delete-confirm-modal" onClick={(e) => e.stopPropagation()}>
+                    <p>确定要删除这个待办吗？</p>
+                    <div className="delete-confirm-actions">
+                      <button className="cancel-btn" onClick={() => setShowDeleteConfirm(null)}>取消</button>
+                      <button className="delete-confirm-btn" onClick={() => deleteTodo(todo.id)}>删除</button>
                     </div>
                   </div>
                 </div>
@@ -1204,13 +1223,28 @@ function StatsView() {
             {chartType === 'bar' && (
               <div className="bar-chart">
                 {filtered.data.map((value, i) => (
-                  <div key={i} className="bar-item">
+                  <div 
+                    key={i} 
+                    className="bar-item"
+                    onMouseEnter={() => setHoveredHour(i)}
+                    onMouseLeave={() => setHoveredHour(null)}
+                  >
                     <div 
                       className="bar-fill" 
                       style={{ height: `${(value / maxValue) * 100}%` }}
                     ></div>
                     <div className="bar-label">{filtered.labels[i]}</div>
                     <div className="bar-value">{Math.floor(value / 60)}m</div>
+                    {hoveredHour === i && filtered.details && filtered.details[i] && filtered.details[i].length > 0 && (
+                      <div className="bar-tooltip">
+                        {filtered.details[i].map((session, idx) => (
+                          <div key={idx} className="tooltip-item">
+                            <span className="tooltip-text">{session.todoText || '专注'}</span>
+                            <span className="tooltip-duration">{Math.floor((session.duration || 0) / 60)}分钟</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

@@ -2519,6 +2519,7 @@
   max-width: 250px;
   z-index: 100;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  margin-bottom: 0.5rem;
 }
 
 .tooltip-item {
@@ -2528,6 +2529,7 @@
   gap: 1rem;
   padding: 0.4rem 0;
   border-bottom: 1px solid rgba(255,149,0,0.1);
+  font-size: 0.85rem;
 }
 
 .tooltip-item:last-child {
@@ -2535,7 +2537,6 @@
 }
 
 .tooltip-text {
-  font-size: 0.85rem;
   color: var(--text);
   flex: 1;
   white-space: nowrap;
@@ -2544,8 +2545,107 @@
 }
 
 .tooltip-duration {
-  font-size: 0.8rem;
   color: var(--cyan);
   font-family: var(--font-mono);
+  font-size: 0.8rem;
   flex-shrink: 0;
+}
+
+/* V8.2 待办隐藏按钮 */
+.todo-actions-hidden {
+  display: flex;
+  gap: 0.3rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.todo-item:hover .todo-actions-hidden {
+  opacity: 1;
+}
+
+.action-btn-icon {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  color: var(--text-dim);
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.action-btn-icon:hover {
+  border-color: rgba(255,149,0,0.4);
+  color: var(--text);
+  background: rgba(255,149,0,0.1);
+}
+
+.action-btn-icon.move:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(6,182,212,0.1);
+}
+
+.action-btn-icon.delete:hover {
+  border-color: #ff453a;
+  color: #ff453a;
+  background: rgba(255,69,58,0.1);
+}
+
+/* 优先级圆点 */
+.todo-indicators {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.priority-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priority-dot.priority-high { background: #ff453a; }
+.priority-dot.priority-medium { background: #ff9500; }
+.priority-dot.priority-low { background: #06b6d4; }
+
+.repeat-icon-vector {
+  display: flex;
+  align-items: center;
+  color: var(--text-dim);
+}
+
+/* 配置弹窗删除按钮 */
+.delete-btn-config {
+  background: rgba(255,69,58,0.15);
+  border: 1px solid #ff453a;
+  color: #ff453a;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-btn-config:hover {
+  background: rgba(255,69,58,0.25);
+}
+
+/* 删除确认弹窗按钮颜色修正 */
+.delete-confirm-btn {
+  background: rgba(255,69,58,0.15);
+  border: 1px solid #ff453a;
+  color: #ff453a;
+}
+
+.delete-confirm-btn:hover {
+  background: rgba(255,69,58,0.25);
 }

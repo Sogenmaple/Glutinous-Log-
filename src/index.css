@@ -55,70 +55,62 @@
    全局自定义光标 - 琥珀色反相
    ============================================ */
 
-/* 自定义光标 - 琥珀色反相圆环 + 中心反相点 */
-.custom-cursor {
-  position: fixed;
-  width: 24px;
-  height: 24px;
-  pointer-events: none;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  will-change: transform, left, top;
-}
-
-/* 外圈 - 琥珀色圆环 */
+/* 外圈 - 琥珀色圆环（延迟跟随） */
 .custom-cursor-ring {
-  position: absolute;
   width: 24px;
   height: 24px;
   border: 2px solid var(--amber);
   border-radius: 50%;
   box-sizing: border-box;
+  transform: translate(-50%, -50%);
   transition: width 0.1s ease, height 0.1s ease, border-color 0.15s ease;
+  pointer-events: none;
 }
 
-.custom-cursor.hover .custom-cursor-ring {
+.custom-cursor-ring.hover {
   width: 32px;
   height: 32px;
   border-color: var(--amber);
 }
 
-.custom-cursor.click .custom-cursor-ring {
+.custom-cursor-ring.click {
   width: 16px;
   height: 16px;
   border-color: var(--amber);
 }
 
-.custom-cursor.drag .custom-cursor-ring {
+.custom-cursor-ring.drag {
   width: 28px;
   height: 28px;
   border: 2px dashed var(--amber);
   animation: cursorRotate 0.8s linear infinite;
 }
 
-/* 中心点 - 反相效果 */
+/* 中心点 - 反相效果（实时跟随） */
 .custom-cursor-dot {
-  position: absolute;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--amber);
   mix-blend-mode: difference;
-  top: 50%;
-  left: 50%;
   transform: translate(-50%, -50%);
   transition: width 0.1s ease, height 0.1s ease;
   pointer-events: none;
 }
 
-.custom-cursor.hover .custom-cursor-dot {
+.custom-cursor-dot.hover {
   width: 8px;
   height: 8px;
 }
 
-.custom-cursor.click .custom-cursor-dot {
+.custom-cursor-dot.click {
   width: 4px;
   height: 4px;
+}
+
+.custom-cursor-dot.drag {
+  width: 6px;
+  height: 6px;
 }
 
 @keyframes cursorRotate {

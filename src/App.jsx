@@ -37,61 +37,58 @@ function AppContent() {
   // 后台页面跳过 Intro 动画
   const isAdminRoute = location.pathname.startsWith('/admin')
 
-  // 全局自定义光标初始化
+  // 全局自定义光标 - 点实时跟随，圈延迟跟随
   useEffect(() => {
-    // 创建光标容器
-    const cursor = document.createElement('div')
-    cursor.className = 'custom-cursor'
-    cursor.style.position = 'fixed'
-    cursor.style.zIndex = '99999'
-    cursor.style.pointerEvents = 'none'
-    document.body.appendChild(cursor)
-
-    // 创建外环
+    // 创建外圈容器（延迟跟随）
     const ring = document.createElement('div')
     ring.className = 'custom-cursor-ring'
-    ring.style.position = 'absolute'
-    ring.style.top = '50%'
-    ring.style.left = '50%'
-    ring.style.transform = 'translate(-50%, -50%)'
-    cursor.appendChild(ring)
+    ring.style.position = 'fixed'
+    ring.style.zIndex = '99998'
+    ring.style.pointerEvents = 'none'
+    document.body.appendChild(ring)
 
-    // 创建中心反相点
+    // 创建中心点（实时跟随）
     const dot = document.createElement('div')
     dot.className = 'custom-cursor-dot'
-    dot.style.position = 'absolute'
-    dot.style.top = '50%'
-    dot.style.left = '50%'
-    dot.style.transform = 'translate(-50%, -50%)'
-    cursor.appendChild(dot)
+    dot.style.position = 'fixed'
+    dot.style.zIndex = '99999'
+    dot.style.pointerEvents = 'none'
+    document.body.appendChild(dot)
 
-    // 使用 requestAnimationFrame 优化光标跟随
+    // 圈的延迟跟随
     let mouseX = 0, mouseY = 0
-    let cursorX = 0, cursorY = 0
+    let ringX = 0, ringY = 0
     let animationFrameId = null
 
-    const updateCursor = () => {
-      const dx = mouseX - cursorX
-      const dy = mouseY - cursorY
-      cursorX += dx * 0.25
-      cursorY += dy * 0.25
-      cursor.style.left = cursorX + 'px'
-      cursor.style.top = cursorY + 'px'
-      animationFrameId = requestAnimationFrame(updateCursor)
+    const updateRing = () => {
+      const dx = mouseX - ringX
+      const dy = mouseY - ringY
+      ringX += dx * 0.15
+      ringY += dy * 0.15
+      ring.style.left = ringX + 'px'
+      ring.style.top = ringY + 'px'
+      animationFrameId = requestAnimationFrame(updateRing)
     }
 
+    // 点实时跟随鼠标
     const handleMouseMove = (e) => {
       mouseX = e.clientX
       mouseY = e.clientY
+      dot.style.left = e.clientX + 'px'
+      dot.style.top = e.clientY + 'px'
       if (!animationFrameId) {
-        animationFrameId = requestAnimationFrame(updateCursor)
+        animationFrameId = requestAnimationFrame(updateRing)
       }
     }
 
     // 点击效果
     const handleClick = (e) => {
-      cursor.classList.add('click')
-      setTimeout(() => cursor.classList.remove('click'), 100)
+      ring.classList.add('click')
+      dot.classList.add('click')
+      setTimeout(() => {
+        ring.classList.remove('click')
+        dot.classList.remove('click')
+      }, 100)
 
       // 点击粒子 - 单个琥珀色
       const particle = document.createElement('div')
@@ -106,20 +103,28 @@ function AppContent() {
     const handleMouseOver = (e) => {
       const target = e.target
       if (target.matches('button, .tab-btn, .todo-item, .todo-drag-item, .timeline-block, .bar-item, input, select, a')) {
-        cursor.classList.add('hover')
+        ring.classList.add('hover')
+        dot.classList.add('hover')
       }
     }
 
     const handleMouseOut = (e) => {
       const target = e.target
       if (target.matches('button, .tab-btn, .todo-item, .todo-drag-item, .timeline-block, .bar-item, input, select, a')) {
-        cursor.classList.remove('hover')
+        ring.classList.remove('hover')
+        dot.classList.remove('hover')
       }
     }
 
     // 拖拽检测
-    const handleDragStart = () => cursor.classList.add('drag')
-    const handleDragEnd = () => cursor.classList.remove('drag')
+    const handleDragStart = () => {
+      ring.classList.add('drag')
+      dot.classList.add('drag')
+    }
+    const handleDragEnd = () => {
+      ring.classList.remove('drag')
+      dot.classList.remove('drag')
+    }
 
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('click', handleClick)
@@ -130,7 +135,8 @@ function AppContent() {
 
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId)
-      document.body.removeChild(cursor)
+      document.body.removeChild(ring)
+      document.body.removeChild(dot)
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('click', handleClick)
       document.removeEventListener('mouseover', handleMouseOver)

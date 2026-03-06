@@ -55,6 +55,39 @@
   opacity: 0.9;
 }
 
+/* 难度选择 */
+.difficulty-selector {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.difficulty-btn {
+  padding: 0.5rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.difficulty-btn:hover {
+  background: rgba(255,149,0,0.1);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.difficulty-btn.active {
+  background: rgba(255,149,0,0.2);
+  border-color: var(--amber);
+  color: var(--amber);
+  box-shadow: 0 0 20px rgba(255,149,0,0.4);
+}
+
 /* 游戏信息栏 */
 .minesweeper-info {
   display: flex;
@@ -66,6 +99,7 @@
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,149,0,0.15);
   border-radius: 8px;
+  flex-wrap: wrap;
 }
 
 .info-panel {
@@ -88,6 +122,11 @@
   font-weight: 700;
   color: var(--amber);
   text-shadow: 0 0 10px rgba(255,149,0,0.5);
+}
+
+.info-value.best-time {
+  color: var(--cyan);
+  text-shadow: 0 0 10px rgba(6,182,255,0.5);
 }
 
 .reset-btn {
@@ -227,6 +266,7 @@
   border-radius: 8px;
   padding: 1.5rem;
   margin-top: 2rem;
+  animation: slide-up 0.6s ease-out;
 }
 
 .minesweeper-instructions h3 {
@@ -251,6 +291,12 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.minesweeper-instructions li:hover {
+  color: var(--amber);
+  padding-left: 0.5rem;
 }
 
 .minesweeper-instructions li:last-child {
@@ -261,6 +307,47 @@
   content: '▸';
   color: var(--amber);
   font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.minesweeper-instructions li:hover::before {
+  transform: translateX(5px);
+}
+
+/* 高级技巧提示 */
+.pro-tips {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(6,182,212,0.2);
+}
+
+.pro-tips h4 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--amber);
+  margin-bottom: 0.75rem;
+  text-shadow: 0 0 10px rgba(255,149,0,0.4);
+}
+
+.pro-tips ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pro-tips li {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 0.4rem 0;
+  border-bottom: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.pro-tips li::before {
+  content: '💡';
+  font-size: 1rem;
 }
 
 /* 响应式设计 */
@@ -272,11 +359,13 @@
   .minesweeper-grid {
     gap: 1px;
     padding: 2px;
+    overflow-x: auto;
   }
 
   .mine-cell {
     border-radius: 2px;
     font-size: 0.9rem;
+    min-width: 20px;
   }
 
   .cell-flag,
@@ -291,5 +380,43 @@
   .minesweeper-info {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .difficulty-selector {
+    flex-wrap: wrap;
+  }
+
+  .difficulty-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* 困难模式超宽网格 */
+@media (max-width: 1024px) {
+  .minesweeper-grid[style*="30"] {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+}
+
+/* 粒子效果 - 胜利庆祝 */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 9999;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
   }
 }

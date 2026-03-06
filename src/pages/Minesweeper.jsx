@@ -10,10 +10,29 @@ export default function Minesweeper() {
   const [flags, setFlags] = useState(0)
   const [timer, setTimer] = useState(0)
   const [firstClick, setFirstClick] = useState(true)
+  const [difficulty, setDifficulty] = useState('medium')
+  const [bestTime, setBestTime] = useState({ easy: null, medium: null, hard: null })
   
-  const ROWS = 16
-  const COLS = 16
-  const MINES = 40
+  // 难度配置
+  const difficulties = {
+    easy: { rows: 9, cols: 9, mines: 10, label: '简单' },
+    medium: { rows: 16, cols: 16, mines: 40, label: '中等' },
+    hard: { rows: 16, cols: 30, mines: 99, label: '困难' }
+  }
+  
+  const { rows: ROWS, cols: COLS, mines: MINES } = difficulties[difficulty]
+
+  // 加载最佳记录
+  useEffect(() => {
+    const saved = localStorage.getItem('minesweeper_best_times')
+    if (saved) {
+      try {
+        setBestTime(JSON.parse(saved))
+      } catch (e) {
+        console.error('Failed to load best times')
+      }
+    }
+  }, [])
 
   // 计时器
   useEffect(() => {
@@ -21,6 +40,23 @@ export default function Minesweeper() {
     const interval = setInterval(() => setTimer(t => t + 1), 1000)
     return () => clearInterval(interval)
   }, [gameOver, gameWon])
+
+  // 保存最佳记录
+  useEffect(() => {
+    if (gameWon && timer > 0) {
+      const newBest = { ...bestTime }
+      if (!newBest[difficulty] || timer < newBest[difficulty]) {
+        newBest[difficulty] = timer
+        setBestTime(newBest)
+        localStorage.setItem('minesweeper_best_times', JSON.stringify(newBest))
+      }
+    }
+  }, [gameWon])
+
+  // 切换难度时重置游戏
+  useEffect(() => {
+    resetGame()
+  }, [difficulty])
 
   // 初始化游戏
   const initGame = (excludeIndex = -1) => {
@@ -146,6 +182,22 @@ export default function Minesweeper() {
     const unrevealedSafe = grid.filter(c => !c.isMine && !c.isRevealed).length
     if (unrevealedSafe === 0) {
       setGameWon(true)
+      // 胜利彩带效果
+      createConfetti()
+    }
+  }
+
+  // 创建彩带效果
+  const createConfetti = () => {
+    const colors = ['#ff9500', '#06b6d4', '#39ff14', '#bd00ff']
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div')
+      confetti.className = 'confetti'
+      confetti.style.left = Math.random() * 100 + 'vw'
+      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
+      confetti.style.animationDelay = Math.random() * 2 + 's'
+      document.body.appendChild(confetti)
+      setTimeout(() => confetti.remove(), 5000)
     }
   }
 
@@ -153,6 +205,47 @@ export default function Minesweeper() {
   const resetGame = () => {
     setFirstClick(true)
     initGame()
+  }
+
+  // 双击自动揭示
+  const handleDoubleClick = (index) => {
+    if (gameOver || gameWon) return
+    const cell = grid[index]
+    if (!cell.isRevealed || cell.neighborMines === 0) return
+
+    // 检查周围旗帜数量
+    const neighbors = getNeighbors(index)
+    const flaggedCount = neighbors.filter(n => grid[n].isFlagged).length
+    
+    if (flaggedCount === cell.neighborMines) {
+      // 自动揭示周围未标记的格子
+      const newGrid = [...grid]
+      let hitMine = false
+      
+      neighbors.forEach(n => {
+        const neighbor = newGrid[n]
+        if (!neighbor.isRevealed && !neighbor.isFlagged) {
+          if (neighbor.isMine) {
+            hitMine = true
+            neighbor.isRevealed = true
+          } else {
+            revealCell(newGrid, n)
+          }
+        }
+      })
+      
+      setGrid(newGrid)
+      
+      if (hitMine) {
+        setGameOver(true)
+        newGrid.forEach(c => {
+          if (c.isMine) c.isRevealed = true
+        })
+        setGrid([...newGrid])
+      } else {
+        checkWin(newGrid)
+      }
+    }
   }
 
   // 获取数字颜色
@@ -186,15 +279,34 @@ export default function Minesweeper() {
           <p className="minesweeper-subtitle">MINESWEEPER - 经典益智游戏</p>
         </div>
 
+        {/* 难度选择 */}
+        <div className="difficulty-selector">
+          {Object.entries(difficulties).map(([key, config]) => (
+            <button
+              key={key}
+              className={`difficulty-btn ${difficulty === key ? 'active' : ''}`}
+              onClick={() => setDifficulty(key)}
+            >
+              {config.label}
+            </button>
+          ))}
+        </div>
+
         {/* 游戏信息栏 */}
         <div className="minesweeper-info">
           <div className="info-panel">
-            <span className="info-label">💣 地雷</span>
+            <span className="info-label">💣 剩余地雷</span>
             <span className="info-value">{MINES - flags}</span>
           </div>
           <div className="info-panel">
             <span className="info-label">⏱️ 时间</span>
             <span className="info-value">{timer}s</span>
+          </div>
+          <div className="info-panel">
+            <span className="info-label">🏆 最佳</span>
+            <span className="info-value best-time">
+              {bestTime[difficulty] ? `${bestTime[difficulty]}s` : '--'}
+            </span>
           </div>
           <button className="reset-btn" onClick={resetGame}>
             🔄 重置
@@ -216,6 +328,7 @@ export default function Minesweeper() {
               className={`mine-cell ${cell.isRevealed ? 'revealed' : ''} ${cell.isFlagged ? 'flagged' : ''} ${cell.isMine && cell.isRevealed ? 'mine' : ''}`}
               onClick={() => handleClick(index)}
               onContextMenu={(e) => handleRightClick(e, index)}
+              onDoubleClick={() => handleDoubleClick(index)}
             >
               {cell.isFlagged && !cell.isRevealed && (
                 <span className="cell-flag">🚩</span>
@@ -244,6 +357,16 @@ export default function Minesweeper() {
             <li>数字表示周围 8 格的地雷数量</li>
             <li>找出所有非地雷格子即可获胜</li>
           </ul>
+          
+          <div className="pro-tips">
+            <h4>高级技巧</h4>
+            <ul>
+              <li>双击已揭示的数字可快速揭示周围格子（当周围旗帜数等于数字时）</li>
+              <li>从角落开始扫雷通常更安全</li>
+              <li>记住常见模式：1-1 模式、1-2 模式等</li>
+              <li>不要犹豫，逻辑推理可以解决所有局面</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

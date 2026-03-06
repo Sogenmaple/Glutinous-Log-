@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import { ToolIcon } from '../components/icons/SiteIcons'
-import './Minesweeper.css'
+import '../styles/Minesweeper.css'
 
 export default function Minesweeper() {
   const [grid, setGrid] = useState([])

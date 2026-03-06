@@ -43,12 +43,14 @@
   --border-focus: rgba(255, 149, 0, 0.25);
 }
 
-/* 全局隐藏默认光标 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  cursor: none !important;
+/* 全局隐藏默认光标（桌面端） */
+@media (pointer: fine) {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    cursor: none !important;
+  }
 }
 
 /* ============================================

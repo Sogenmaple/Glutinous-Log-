@@ -486,10 +486,20 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
 
 // 时间轴视图 - 完全重构
 function TimelineView() {
-  const [todos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
-  const [tracks, setTracks] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_tracks') || '[{id:1,name:"主轨道"}]'))
-  const [timelineItems, setTimelineItems] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_items') || '[]'))
-  const [presets, setPresets] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_presets') || '[]'))
+  const safeParse = (key, defaultValue) => {
+    try {
+      const item = localStorage.getItem(key)
+      return item ? JSON.parse(item) : defaultValue
+    } catch (e) {
+      console.error(`解析 ${key} 失败:`, e)
+      return defaultValue
+    }
+  }
+
+  const [todos] = useState(() => safeParse('pomodoro_todos', []))
+  const [tracks, setTracks] = useState(() => safeParse('pomodoro_timeline_tracks', [{id:1,name:"主轨道"}]))
+  const [timelineItems, setTimelineItems] = useState(() => safeParse('pomodoro_timeline_items', []))
+  const [presets, setPresets] = useState(() => safeParse('pomodoro_timeline_presets', []))
   const [showPresets, setShowPresets] = useState(false)
   const [draggedTodo, setDraggedTodo] = useState(null)
   const [resizingItem, setResizingItem] = useState(null)
@@ -775,14 +785,24 @@ function TimelineView() {
 
 // 打卡视图
 function CheckinView() {
-  const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('pomodoro_habits') || '[]'))
-  const [checkins, setCheckins] = useState(() => JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]'))
+  const safeParse = (key, defaultValue) => {
+    try {
+      const item = localStorage.getItem(key)
+      return item ? JSON.parse(item) : defaultValue
+    } catch (e) {
+      console.error(`解析 ${key} 失败:`, e)
+      return defaultValue
+    }
+  }
+
+  const [habits, setHabits] = useState(() => safeParse('pomodoro_habits', []))
+  const [checkins, setCheckins] = useState(() => safeParse('pomodoro_checkins', []))
   const [newHabit, setNewHabit] = useState('')
   const [habitConfig, setHabitConfig] = useState({ repeat: 'daily', unit: '', needFocus: true })
 
   useEffect(() => {
-    const handleCheckinsUpdate = () => setCheckins(JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]'))
-    const handleHabitsUpdate = () => setHabits(JSON.parse(localStorage.getItem('pomodoro_habits') || '[]'))
+    const handleCheckinsUpdate = () => setCheckins(safeParse('pomodoro_checkins', []))
+    const handleHabitsUpdate = () => setHabits(safeParse('pomodoro_habits', []))
     window.addEventListener('checkins-updated', handleCheckinsUpdate)
     window.addEventListener('habits-updated', handleHabitsUpdate)
     return () => {

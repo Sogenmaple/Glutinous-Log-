@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GameIcon, BookIcon, UserIcon, TangyuanIcon, ToolIcon } from '../components/icons/SiteIcons'
+import Header from '../components/Header'
 
 /**
  * 汤圆的小窝 - 主导航页面
@@ -60,6 +61,8 @@ export default function Home() {
 
   return (
     <div className="home-page">
+      <Header />
+      
       {/* 背景装饰 */}
       <div className="home-bg-grid"></div>
       <div className="home-bg-glow"></div>

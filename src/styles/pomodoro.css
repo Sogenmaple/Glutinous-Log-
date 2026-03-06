@@ -2561,42 +2561,38 @@
   cursor: none;
 }
 
-/* 自定义光标容器 */
-.cursor-container {
-  position: fixed;
-  z-index: 9999;
-  pointer-events: none;
-  mix-blend-mode: difference;
-}
-
-/* 自定义光标 - 反相圆环 */
+/* 自定义光标 - 琥珀色反相圆环 */
 .custom-cursor {
-  position: absolute;
+  position: fixed;
   width: 20px;
   height: 20px;
-  border: 2px solid #fff;
+  border: 2px solid var(--amber);
   border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
   transform: translate(-50%, -50%);
   transition: width 0.1s ease, height 0.1s ease;
-  background: #fff;
-  box-shadow: 0 0 8px rgba(255,255,255,0.5);
-  will-change: transform;
+  mix-blend-mode: difference;
+  background: transparent;
+  will-change: transform, left, top;
 }
 
 .custom-cursor.hover {
   width: 32px;
   height: 32px;
+  border-color: var(--amber);
 }
 
 .custom-cursor.click {
   width: 12px;
   height: 12px;
+  border-color: var(--amber);
 }
 
 .custom-cursor.drag {
   width: 24px;
   height: 24px;
-  border: 2px dashed #fff;
+  border: 2px dashed var(--amber);
   animation: cursorRotate 0.8s linear infinite;
 }
 
@@ -2605,50 +2601,27 @@
   to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* 点击粒子效果 - 统一琥珀色系 */
+/* 点击粒子效果 - 琥珀色 */
 .click-particle {
   position: fixed;
   pointer-events: none;
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #ff9500;
-  opacity: 0.8;
-  animation: particleFade 0.6s ease-out forwards;
+  background: var(--amber);
+  opacity: 0.7;
+  animation: particleFade 0.5s ease-out forwards;
   z-index: 9998;
 }
 
 @keyframes particleFade {
   0% {
-    opacity: 0.8;
+    opacity: 0.7;
     transform: scale(1);
   }
   100% {
     opacity: 0;
-    transform: scale(3);
-  }
-}
-
-/* 鼠标移动轨迹粒子 - 琥珀色系 */
-.cursor-trail {
-  position: fixed;
-  pointer-events: none;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: rgba(255,149,0,0.6);
-  animation: trailFade 0.4s ease-out forwards;
-  z-index: 9997;
-}
-
-@keyframes trailFade {
-  0% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.5);
+    transform: scale(2);
   }
 }
 

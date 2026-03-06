@@ -2513,10 +2513,10 @@
   transition: all 0.3s;
 }
 
-.card-corner corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
-.card-corner corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
-.card-corner corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
-.card-corner corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+.card-corner.corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+.card-corner.corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+.card-corner.corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+.card-corner.corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
 
 .post-card:hover .card-corner {
   border-color: var(--amber);

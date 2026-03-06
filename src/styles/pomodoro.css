@@ -1,0 +1,541 @@
+/* ============================================
+   POMODORO PAGE - 重构版
+   ============================================ */
+.pomodoro-page {
+  min-height: 100vh;
+  background: var(--bg-deep);
+  padding-top: 80px;
+}
+
+.pomodoro-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.pomodoro-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.pomodoro-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--amber);
+  margin-bottom: 0.5rem;
+}
+
+.pomodoro-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--cyan);
+  letter-spacing: 0.2em;
+}
+
+/* 标签页导航 */
+.pomodoro-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255,149,0,0.1);
+  padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 6px 6px 0 0;
+}
+
+.tab-btn:hover {
+  color: var(--amber);
+  background: rgba(255,149,0,0.05);
+}
+
+.tab-btn.active {
+  color: var(--amber);
+  background: rgba(255,149,0,0.1);
+  border-bottom: 2px solid var(--amber);
+}
+
+/* 内容区域 */
+.pomodoro-content {
+  min-height: 400px;
+}
+
+/* 计时器标签页 */
+.timer-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 1rem;
+}
+
+.mode-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mode-btn:hover {
+  border-color: var(--theme-color);
+  color: var(--theme-color);
+}
+
+.mode-btn.active {
+  background: rgba(255,149,0,0.15);
+  border-color: var(--theme-color);
+  color: var(--theme-color);
+  box-shadow: 0 0 15px rgba(255,149,0,0.2);
+}
+
+/* 计时器显示 */
+.timer-display {
+  margin: 2rem 0;
+}
+
+.digital-timer {
+  text-align: center;
+}
+
+.time-text {
+  font-family: var(--font-mono);
+  font-size: 6rem;
+  font-weight: 700;
+  color: var(--amber);
+  text-shadow: var(--amber-glow-strong);
+  line-height: 1;
+}
+
+.progress-bar {
+  width: 400px;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  margin: 1.5rem auto 0;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber), var(--cyan));
+  transition: width 0.3s ease;
+}
+
+.circular-timer {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.circular-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.circular-time {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+/* 计时器控制 */
+.timer-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text);
+  padding: 1rem 2rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: var(--text);
+}
+
+.control-btn.primary {
+  background: rgba(255,149,0,0.15);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.control-btn.primary:hover {
+  background: rgba(255,149,0,0.25);
+  box-shadow: 0 0 20px rgba(255,149,0,0.4);
+}
+
+.control-btn.count-btn {
+  padding: 1.5rem 3rem;
+  font-size: 1.1rem;
+}
+
+/* 设置选项 */
+.timer-settings {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.1);
+  border-radius: 8px;
+}
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.setting-label {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.setting-btns {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.setting-btns button {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.setting-btns button:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.setting-btns button.active {
+  background: rgba(255,149,0,0.2);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.setting-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  color: var(--text);
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  width: 80px;
+}
+
+/* 待办清单标签页 */
+.todos-section {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.add-todo-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.todo-input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.todo-input:focus {
+  border-color: var(--amber);
+  outline: none;
+}
+
+.priority-select {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.add-btn {
+  background: rgba(255,149,0,0.15);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-btn:hover {
+  background: rgba(255,149,0,0.25);
+  box-shadow: 0 0 15px rgba(255,149,0,0.3);
+}
+
+.todo-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.filter-btn.active {
+  background: rgba(255,149,0,0.15);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.1);
+  border-radius: 6px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.todo-item:hover {
+  border-color: rgba(255,149,0,0.3);
+  background: rgba(255,255,255,0.03);
+}
+
+.todo-item.completed {
+  opacity: 0.5;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+}
+
+.todo-checkbox {
+  width: 24px;
+  height: 24px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber);
+  transition: all 0.3s ease;
+}
+
+.todo-checkbox:hover {
+  background: rgba(255,149,0,0.15);
+}
+
+.todo-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.todo-text {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.priority-badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+.priority-badge.priority-high {
+  background: rgba(255,69,58,0.2);
+  color: #ff453a;
+}
+
+.priority-badge.priority-medium {
+  background: rgba(255,149,0,0.2);
+  color: var(--amber);
+}
+
+.priority-badge.priority-low {
+  background: rgba(6,182,212,0.2);
+  color: var(--cyan);
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+  color: #ff453a;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-dim);
+}
+
+/* 统计数据标签页 */
+.stats-section {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.15);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--amber);
+  box-shadow: 0 0 20px rgba(255,149,0,0.1);
+  transform: translateY(-4px);
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--amber);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.stat-sub {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .pomodoro-main {
+    padding: 1rem;
+  }
+
+  .pomodoro-title {
+    font-size: 1.5rem;
+  }
+
+  .time-text {
+    font-size: 3.5rem;
+  }
+
+  .progress-bar {
+    width: 100%;
+  }
+
+  .timer-settings {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .add-todo-form {
+    flex-wrap: wrap;
+  }
+
+  .todo-input {
+    min-width: 200px;
+  }
+}

@@ -277,6 +277,61 @@ export function CalendarIcon({ size = 24, color = 'currentColor' }) {
   )
 }
 
+// 保存图标
+export function SaveIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M17 21v-8H7v8" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M7 3v5h8" stroke={color} strokeWidth="2" fill="none"/>
+    </svg>
+  )
+}
+
+// 加载图标
+export function LoadIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke={color} strokeWidth="2" fill="none"/>
+      <polyline points="17,8 12,3 7,8" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <line x1="12" y1="3" x2="12" y2="15" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 添加图标
+export function AddIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="12" y1="5" x2="12" y2="19" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <line x1="5" y1="12" x2="19" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 移除图标
+export function RemoveIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="5" y1="12" x2="19" y2="12" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 拖拽图标
+export function DragIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="9" cy="5" r="1.5" fill={color}/>
+      <circle cx="15" cy="5" r="1.5" fill={color}/>
+      <circle cx="9" cy="12" r="1.5" fill={color}/>
+      <circle cx="15" cy="12" r="1.5" fill={color}/>
+      <circle cx="9" cy="19" r="1.5" fill={color}/>
+      <circle cx="15" cy="19" r="1.5" fill={color}/>
+    </svg>
+  )
+}
+
 // 循环图标（长期）
 export function RepeatIcon({ size = 24, color = 'currentColor' }) {
   return (

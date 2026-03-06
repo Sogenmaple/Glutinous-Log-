@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon } from '../components/icons/SiteIcons'
+import { ClockIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon, SaveIcon, LoadIcon, AddIcon, RemoveIcon, DragIcon } from '../components/icons/SiteIcons'
 
 export default function PomodoroTodo() {
   const navigate = useNavigate()
@@ -110,7 +110,6 @@ function TimerView() {
         window.dispatchEvent(new CustomEvent('sessions-updated'))
       }
 
-      // 如果是重复任务，自动打卡并返回待办清单
       if (todo.repeat && todo.repeat !== 'none') {
         const checkins = JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]')
         const today = new Date().toISOString().split('T')[0]
@@ -330,11 +329,13 @@ function TodosList({ onMoveToActive }) {
                     <h4>配置待办</h4>
                     <div className="config-field">
                       <label>优先级</label>
-                      <select value={config.priority} onChange={(e) => setConfig({ ...config, priority: e.target.value })} className="config-select">
-                        <option value="low">低</option>
-                        <option value="medium">中</option>
-                        <option value="high">高</option>
-                      </select>
+                      <div className="custom-select">
+                        <select value={config.priority} onChange={(e) => setConfig({ ...config, priority: e.target.value })}>
+                          <option value="low">低</option>
+                          <option value="medium">中</option>
+                          <option value="high">高</option>
+                        </select>
+                      </div>
                     </div>
                     <div className="config-field">
                       <label>截止日期</label>
@@ -346,12 +347,14 @@ function TodosList({ onMoveToActive }) {
                     </div>
                     <div className="config-field">
                       <label>重复类型</label>
-                      <select value={config.repeat} onChange={(e) => setConfig({ ...config, repeat: e.target.value })} className="config-select">
-                        <option value="none">一次性</option>
-                        <option value="daily">每日</option>
-                        <option value="weekly">每周</option>
-                        <option value="monthly">每月</option>
-                      </select>
+                      <div className="custom-select">
+                        <select value={config.repeat} onChange={(e) => setConfig({ ...config, repeat: e.target.value })}>
+                          <option value="none">一次性</option>
+                          <option value="daily">每日</option>
+                          <option value="weekly">每周</option>
+                          <option value="monthly">每月</option>
+                        </select>
+                      </div>
                     </div>
                     {config.repeat !== 'none' && (
                       <>
@@ -481,18 +484,30 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
   )
 }
 
-// 时间轴视图
+// 时间轴视图 - 完全重构
 function TimelineView() {
   const [todos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
-  const [timelineItems, setTimelineItems] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline') || '[]'))
+  const [tracks, setTracks] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_tracks') || '[{id:1,name:"主轨道"}]'))
+  const [timelineItems, setTimelineItems] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_items') || '[]'))
+  const [presets, setPresets] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_presets') || '[]'))
+  const [showPresets, setShowPresets] = useState(false)
   const [draggedTodo, setDraggedTodo] = useState(null)
+  const [resizingItem, setResizingItem] = useState(null)
+
+  useEffect(() => {
+    localStorage.setItem('pomodoro_timeline_tracks', JSON.stringify(tracks))
+  }, [tracks])
+
+  useEffect(() => {
+    localStorage.setItem('pomodoro_timeline_items', JSON.stringify(timelineItems))
+  }, [timelineItems])
 
   const handleDragStart = (e, todo) => {
     setDraggedTodo(todo)
     e.dataTransfer.setData('todo', JSON.stringify(todo))
   }
 
-  const handleDropOnHour = (e, hour) => {
+  const handleDropOnTrack = (e, trackId, hour) => {
     e.preventDefault()
     const todoData = e.dataTransfer.getData('todo')
     if (todoData) {
@@ -501,12 +516,14 @@ function TimelineView() {
         id: Date.now(),
         todoId: todo.id,
         todoText: todo.text,
+        trackId,
         startHour: hour,
         duration: 2,
         color: todo.priority === 'high' ? '#ff453a' : todo.priority === 'medium' ? '#ff9500' : '#06b6d4'
       }
-      setTimelineItems([...timelineItems, newItem])
-      localStorage.setItem('pomodoro_timeline', JSON.stringify([...timelineItems, newItem]))
+      const updated = [...timelineItems, newItem]
+      setTimelineItems(updated)
+      localStorage.setItem('pomodoro_timeline_items', JSON.stringify(updated))
     }
     setDraggedTodo(null)
   }
@@ -515,22 +532,27 @@ function TimelineView() {
     e.preventDefault()
   }
 
-  const resizeItem = (itemId, newDuration) => {
-    const updated = timelineItems.map(item => 
-      item.id === itemId ? { ...item, duration: Math.max(1, newDuration) } : item
-    )
+  const resizeItem = (itemId, trackId, newStart, newDuration) => {
+    const updated = timelineItems.map(item => {
+      if (item.id === itemId) {
+        return { ...item, startHour: Math.max(0, Math.min(23, newStart)), duration: Math.max(1, Math.min(24 - newStart, newDuration)) }
+      }
+      return item
+    })
     setTimelineItems(updated)
-    localStorage.setItem('pomodoro_timeline', JSON.stringify(updated))
   }
 
   const deleteItem = (itemId) => {
     const updated = timelineItems.filter(item => item.id !== itemId)
     setTimelineItems(updated)
-    localStorage.setItem('pomodoro_timeline', JSON.stringify(updated))
+  }
+
+  const moveItemBack = (item) => {
+    const updated = timelineItems.filter(i => i.id !== item.id)
+    setTimelineItems(updated)
   }
 
   const executeItem = (item) => {
-    // 自动开始专注
     const todo = todos.find(t => t.id === item.todoId)
     if (todo) {
       const activeTodos = JSON.parse(localStorage.getItem('pomodoro_active_todos') || '[]')
@@ -543,14 +565,50 @@ function TimelineView() {
   const savePreset = () => {
     const presetName = prompt('请输入预设名称：')
     if (presetName) {
-      const presets = JSON.parse(localStorage.getItem('pomodoro_timeline_presets') || '[]')
-      presets.push({
+      const newPreset = {
         id: Date.now(),
         name: presetName,
+        tracks: tracks.filter(t => t.id !== 1),
         items: timelineItems
-      })
-      localStorage.setItem('pomodoro_timeline_presets', JSON.stringify(presets))
-      alert('预设已保存！')
+      }
+      const updated = [...presets, newPreset]
+      setPresets(updated)
+      localStorage.setItem('pomodoro_timeline_presets', JSON.stringify(updated))
+    }
+  }
+
+  const loadPreset = (preset) => {
+    if (confirm(`加载预设"${preset.name}"？这将覆盖当前时间轴。`)) {
+      setTracks([{id:1,name:"主轨道"}, ...preset.tracks])
+      setTimelineItems(preset.items)
+      setShowPresets(false)
+    }
+  }
+
+  const deletePreset = (presetId) => {
+    if (confirm('确定删除此预设？')) {
+      const updated = presets.filter(p => p.id !== presetId)
+      setPresets(updated)
+      localStorage.setItem('pomodoro_timeline_presets', JSON.stringify(updated))
+    }
+  }
+
+  const addTrack = () => {
+    const name = prompt('轨道名称：')
+    if (name) {
+      const newTrack = { id: Date.now(), name }
+      setTracks([...tracks, newTrack])
+    }
+  }
+
+  const removeTrack = (trackId) => {
+    if (trackId === 1) {
+      alert('主轨道不能删除')
+      return
+    }
+    if (confirm('删除此轨道将移除其上所有任务，确定？')) {
+      setTracks(tracks.filter(t => t.id !== trackId))
+      setTimelineItems(timelineItems.filter(i => i.trackId !== trackId))
     }
   }
 
@@ -558,12 +616,44 @@ function TimelineView() {
 
   return (
     <div className="timeline-view">
-      <div className="timeline-header">
-        <h3>时间轴规划</h3>
-        <div className="timeline-actions">
-          <button className="save-preset-btn" onClick={savePreset}>保存预设</button>
+      <div className="timeline-toolbar">
+        <div className="timeline-title-group">
+          <h3>时间轴规划</h3>
+        </div>
+        <div className="timeline-toolbar-actions">
+          <button className="toolbar-btn" onClick={addTrack}><AddIcon size={16} /><span>添加轨道</span></button>
+          <button className="toolbar-btn" onClick={() => setShowPresets(!showPresets)}>
+            <LoadIcon size={16} /><span>预设</span>
+          </button>
+          <button className="toolbar-btn primary" onClick={savePreset}>
+            <SaveIcon size={16} /><span>保存预设</span>
+          </button>
         </div>
       </div>
+
+      {showPresets && (
+        <div className="presets-panel">
+          <div className="presets-header">
+            <h4>保存的预设</h4>
+            <button className="close-btn" onClick={() => setShowPresets(false)}>×</button>
+          </div>
+          {presets.length === 0 ? (
+            <div className="empty-presets">暂无保存的预设</div>
+          ) : (
+            <div className="presets-list">
+              {presets.map(preset => (
+                <div key={preset.id} className="preset-item">
+                  <span className="preset-name">{preset.name}</span>
+                  <div className="preset-actions">
+                    <button className="load-preset-btn" onClick={() => loadPreset(preset)}>加载</button>
+                    <button className="delete-preset-btn" onClick={() => deletePreset(preset.id)}>删除</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="timeline-content">
         <div className="todo-sidebar">
@@ -576,6 +666,7 @@ function TimelineView() {
                 draggable
                 onDragStart={(e) => handleDragStart(e, todo)}
               >
+                <DragIcon size={14} />
                 <span className="todo-drag-text">{todo.text}</span>
                 <span className="todo-drag-duration">{todo.duration}分钟</span>
               </div>
@@ -583,65 +674,100 @@ function TimelineView() {
           </div>
         </div>
 
-        <div className="timeline-chart-wrapper">
-          <div className="timeline-chart">
+        <div className="timeline-tracks-container">
+          <div className="timeline-header-row">
+            <div className="track-label-column"></div>
             <div className="hours-header">
               {hours.map(hour => (
-                <div key={hour} className="hour-label">{hour}:00</div>
-              ))}
-            </div>
-            
-            <div className="hours-grid" onDragOver={handleDragOver}>
-              {hours.map(hour => (
-                <div 
-                  key={hour} 
-                  className="hour-slot"
-                  onDrop={(e) => handleDropOnHour(e, hour)}
-                >
-                  {timelineItems.filter(item => item.startHour === hour).map(item => (
-                    <div 
-                      key={item.id}
-                      className="timeline-item"
-                      style={{ 
-                        backgroundColor: item.color + '40',
-                        borderLeftColor: item.color,
-                        gridColumn: `span ${Math.min(item.duration, 24 - hour)}`
-                      }}
-                    >
-                      <div className="timeline-item-content">
-                        <span className="timeline-item-text">{item.todoText}</span>
-                        <span className="timeline-item-duration">{item.duration}小时</span>
-                      </div>
-                      <div className="timeline-item-actions">
-                        <button className="execute-btn" onClick={() => executeItem(item)}>执行</button>
-                        <button className="resize-handle" onMouseDown={(e) => {
-                          e.preventDefault()
-                          const startX = e.clientX
-                          const startDuration = item.duration
-                          const handleMouseMove = (e) => {
-                            const diff = Math.round((e.clientX - startX) / 20)
-                            resizeItem(item.id, startDuration + diff)
-                          }
-                          const handleMouseUp = () => {
-                            document.removeEventListener('mousemove', handleMouseMove)
-                            document.removeEventListener('mouseup', handleMouseUp)
-                          }
-                          document.addEventListener('mousemove', handleMouseMove)
-                          document.addEventListener('mouseup', handleMouseUp)
-                        }}>⋮</button>
-                        <button className="delete-item-btn" onClick={() => deleteItem(item.id)}>×</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <div key={hour} className="hour-label">{hour.toString().padStart(2, '0')}</div>
               ))}
             </div>
           </div>
+
+          {tracks.map(track => (
+            <div key={track.id} className="timeline-track">
+              <div className="track-label">
+                <span className="track-name">{track.name}</span>
+                {track.id !== 1 && (
+                  <button className="remove-track-btn" onClick={() => removeTrack(track.id)}>×</button>
+                )}
+              </div>
+              <div className="track-content" onDragOver={handleDragOver}>
+                {hours.map(hour => (
+                  <div 
+                    key={hour} 
+                    className="hour-cell"
+                    onDrop={(e) => handleDropOnTrack(e, track.id, hour)}
+                  />
+                ))}
+                {timelineItems.filter(item => item.trackId === track.id).map(item => (
+                  <div 
+                    key={item.id}
+                    className="timeline-block"
+                    style={{ 
+                      backgroundColor: item.color + '30',
+                      borderLeft: `3px solid ${item.color}`,
+                      left: `${(item.startHour / 24) * 100}%`,
+                      width: `${(item.duration / 24) * 100}%`
+                    }}
+                  >
+                    <div className="timeline-block-content">
+                      <span className="timeline-block-text">{item.todoText}</span>
+                      <span className="timeline-block-duration">{item.duration}小时</span>
+                    </div>
+                    <div className="timeline-block-resize timeline-block-resize-left"
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        const startX = e.clientX
+                        const originalStart = item.startHour
+                        const handleMouseMove = (moveEvent) => {
+                          const diff = Math.round((moveEvent.clientX - startX) / 30)
+                          const newStart = Math.max(0, Math.min(item.startHour + item.duration - 1, originalStart + diff))
+                          const newDuration = item.duration + (originalStart - newStart)
+                          resizeItem(item.id, track.id, newStart, newDuration)
+                        }
+                        const handleMouseUp = () => {
+                          document.removeEventListener('mousemove', handleMouseMove)
+                          document.removeEventListener('mouseup', handleMouseUp)
+                        }
+                        document.addEventListener('mousemove', handleMouseMove)
+                        document.addEventListener('mouseup', handleMouseUp)
+                      }}
+                    />
+                    <div className="timeline-block-resize timeline-block-resize-right"
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        const startX = e.clientX
+                        const originalDuration = item.duration
+                        const handleMouseMove = (moveEvent) => {
+                          const diff = Math.round((moveEvent.clientX - startX) / 30)
+                          resizeItem(item.id, track.id, item.startHour, Math.max(1, originalDuration + diff))
+                        }
+                        const handleMouseUp = () => {
+                          document.removeEventListener('mousemove', handleMouseMove)
+                          document.removeEventListener('mouseup', handleMouseUp)
+                        }
+                        document.addEventListener('mousemove', handleMouseMove)
+                        document.addEventListener('mouseup', handleMouseUp)
+                      }}
+                    />
+                    <div className="timeline-block-actions">
+                      <button className="execute-block-btn" onClick={() => executeItem(item)}>执行</button>
+                      <button className="move-back-block-btn" onClick={() => moveItemBack(item)}>放回</button>
+                      <button className="delete-block-btn" onClick={() => deleteItem(item.id)}>×</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       <div className="timeline-help">
-        <p>💡 提示：将左侧待办拖到时间轴上，拖动右侧边缘调整时长，点击执行自动开始专注</p>
+        <p>提示：将左侧待办拖到轨道上 · 拖动两端调整时间 · 拖动块切换时间 · 点击执行开始专注</p>
       </div>
     </div>
   )
@@ -732,6 +858,7 @@ function CheckinView() {
         }
       })
       localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
+      window.dispatchEvent(new CustomEvent('habits-updated'))
     }
   }
 
@@ -779,15 +906,16 @@ function CheckinView() {
           value={newHabit} 
           onChange={(e) => setNewHabit(e.target.value)} 
         />
-        <select 
-          className="habit-select"
-          value={habitConfig.repeat}
-          onChange={(e) => setHabitConfig({ ...habitConfig, repeat: e.target.value })}
-        >
-          <option value="daily">每日</option>
-          <option value="weekly">每周</option>
-          <option value="monthly">每月</option>
-        </select>
+        <div className="custom-select">
+          <select 
+            value={habitConfig.repeat}
+            onChange={(e) => setHabitConfig({ ...habitConfig, repeat: e.target.value })}
+          >
+            <option value="daily">每日</option>
+            <option value="weekly">每周</option>
+            <option value="monthly">每月</option>
+          </select>
+        </div>
         <input 
           type="text" 
           className="habit-unit-input" 
@@ -835,10 +963,10 @@ function CheckinView() {
                 </div>
                 <div className="habit-stats">
                   <div className="streak-badge">
-                    🔥 {streak} 天
+                    <FireIcon size={14} /> {streak} 天
                   </div>
                   <div className="total-badge">
-                    ✓ {habit.totalCompletions || 0} 次
+                    <CheckIcon size={14} /> {habit.totalCompletions || 0} 次
                   </div>
                 </div>
                 <div className="habit-actions">
@@ -954,16 +1082,20 @@ function StatsView() {
       <div className="stats-header">
         <h3>数据统计</h3>
         <div className="stats-controls">
-          <select value={viewType} onChange={(e) => setViewType(e.target.value)} className="stats-select">
-            <option value="daily">今日</option>
-            <option value="weekly">本周</option>
-            <option value="monthly">本月</option>
-          </select>
-          <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="stats-select">
-            <option value="bar">柱状图</option>
-            <option value="line">折线图</option>
-            <option value="pie">扇形图</option>
-          </select>
+          <div className="custom-select">
+            <select value={viewType} onChange={(e) => setViewType(e.target.value)}>
+              <option value="daily">今日</option>
+              <option value="weekly">本周</option>
+              <option value="monthly">本月</option>
+            </select>
+          </div>
+          <div className="custom-select">
+            <select value={chartType} onChange={(e) => setChartType(e.target.value)}>
+              <option value="bar">柱状图</option>
+              <option value="line">折线图</option>
+              <option value="pie">扇形图</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -1072,16 +1204,6 @@ function StatsView() {
           </>
         )}
       </div>
-    </div>
-  )
-}
-
-// 热力图组件（简化版）
-function HeatmapTab() {
-  return (
-    <div className="heatmap-placeholder">
-      <h3>热力图功能已移至统计页面</h3>
-      <p>请在统计页面查看详细数据</p>
     </div>
   )
 }

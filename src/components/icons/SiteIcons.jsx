@@ -254,3 +254,69 @@ export function ChartIcon({ size = 24, color = 'currentColor' }) {
     </svg>
   )
 }
+
+// 图钉图标（一次性）
+export function PinIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2l3 6 5 2-5 2-3 10-3-10-5-2 5-2 3-6z" stroke={color} strokeWidth="2" strokeLinejoin="round" fill="none"/>
+      <circle cx="12" cy="10" r="2" fill={color} opacity="0.5"/>
+    </svg>
+  )
+}
+
+// 日历图标（每日）
+export function CalendarIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="16" height="16" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+      <line x1="4" y1="9" x2="20" y2="9" stroke={color} strokeWidth="2"/>
+      <line x1="8" y1="2" x2="8" y2="6" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <line x1="16" y1="2" x2="16" y2="6" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 循环图标（长期）
+export function RepeatIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17 1l4 4-4 4" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3 11V9a4 4 0 014-4h14" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M7 23l-4-4 4-4" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M21 13v2a4 4 0 01-4 4H3" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 用户图标（登录用）
+export function LoginIcon({ size = 48, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="16" r="8" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M10 40c0-7.732 6.268-14 14-14s14 6.268 14 14" stroke={color} strokeWidth="2" fill="none"/>
+      <circle cx="24" cy="16" r="4" fill={color} opacity="0.3"/>
+    </svg>
+  )
+}
+
+// 锁图标
+export function LockIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="11" width="16" height="9" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M8 11V7a4 4 0 118 0v4" stroke={color} strokeWidth="2"/>
+      <circle cx="12" cy="15" r="2" fill={color} opacity="0.5"/>
+    </svg>
+  )
+}
+
+// 邮箱图标
+export function MailIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M3 7l9 6 9-6" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}

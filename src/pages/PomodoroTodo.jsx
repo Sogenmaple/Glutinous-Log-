@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon } from '../components/icons/SiteIcons'
+import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, PinIcon, CalendarIcon, RepeatIcon } from '../components/icons/SiteIcons'
 
 /**
  * 番茄钟待办 - Pomodoro Todo
@@ -715,25 +715,25 @@ export default function PomodoroTodo() {
                   value={todoType}
                   onChange={(e) => setTodoType(e.target.value)}
                 >
-                  <option value="once">📌 一次性</option>
-                  <option value="daily">📅 每日</option>
-                  <option value="long">🔄 长期</option>
+                  <option value="once">一次性</option>
+                  <option value="daily">每日</option>
+                  <option value="long">长期</option>
                 </select>
                 <select
                   className="focus-mode-select"
                   value={todoFocusMode}
                   onChange={(e) => setTodoFocusMode(e.target.value)}
                 >
-                  <option value="time">⏱️ 时间</option>
-                  <option value="count">🔢 次数</option>
+                  <option value="time">时间</option>
+                  <option value="count">次数</option>
                 </select>
                 <select
                   className="timer-mode-select"
                   value={todoTimerMode}
                   onChange={(e) => setTodoTimerMode(e.target.value)}
                 >
-                  <option value="countdown">⏳ 倒计时</option>
-                  <option value="countup">⏱️ 正计时</option>
+                  <option value="countdown">倒计时</option>
+                  <option value="countup">正计时</option>
                 </select>
                 {todoFocusMode === 'time' ? (
                   <input
@@ -848,11 +848,17 @@ export default function PomodoroTodo() {
                             )}
                             {todo.type && (
                               <span className={`type-badge type-${todo.type}`}>
-                                {todo.type === 'daily' ? '📅 每日' : todo.type === 'long' ? '🔄 长期' : '📌 一次'}
+                                {todo.type === 'daily' ? (
+                                  <><CalendarIcon size={12} /> 每日</>
+                                ) : todo.type === 'long' ? (
+                                  <><RepeatIcon size={12} /> 长期</>
+                                ) : (
+                                  <><PinIcon size={12} /> 一次</>
+                                )}
                               </span>
                             )}
                             <span className="focus-mode-badge">
-                              {todo.focusMode === 'time' ? `⏱️ ${todo.targetTime}分钟` : `🔢 ${todo.targetCount}次`}
+                              {todo.focusMode === 'time' ? `${todo.targetTime}分钟` : `${todo.targetCount}次`}
                             </span>
                             {todo.timerMode && (
                               <span className="timer-mode-badge">

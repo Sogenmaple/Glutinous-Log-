@@ -30,6 +30,14 @@ async function initDataFiles() {
     await fs.mkdir(DATA_DIR, { recursive: true })
   }
   
+  // 初始化用户文件
+  try {
+    await fs.access(USERS_FILE)
+  } catch {
+    await fs.writeFile(USERS_FILE, JSON.stringify([], null, 2), 'utf-8')
+  }
+  }
+  
   try {
     await fs.access(USERS_FILE)
   } catch {
@@ -70,6 +78,73 @@ function authenticateToken(req, res, next) {
 }
 
 // ============ 认证路由 ============
+
+// 注册
+app.post('/api/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body
+    
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: '请填写所有必填项' })
+    }
+    
+    if (password.length < 6) {
+      return res.status(400).json({ error: '密码长度至少为 6 位' })
+    }
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    const users = JSON.parse(usersData)
+    
+    // 检查用户名是否已存在
+    const existingUser = users.find(u => u.username === username)
+    if (existingUser) {
+      return res.status(400).json({ error: '用户名已存在' })
+    }
+    
+    // 检查邮箱是否已存在
+    const existingEmail = users.find(u => u.email === email)
+    if (existingEmail) {
+      return res.status(400).json({ error: '邮箱已被注册' })
+    }
+    
+    // 加密密码
+    const hashedPassword = await bcrypt.hash(password, 10)
+    
+    // 创建新用户
+    const newUser = {
+      id: Date.now().toString(),
+      username,
+      email,
+      password: hashedPassword,
+      role: 'user',
+      createdAt: new Date().toISOString()
+    }
+    
+    users.push(newUser)
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    
+    // 生成 token
+    const token = jwt.sign(
+      { id: newUser.id, username: newUser.username, role: newUser.role },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    )
+    
+    res.status(201).json({
+      message: '注册成功',
+      token,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role
+      }
+    })
+  } catch (error) {
+    console.error('注册错误:', error)
+    res.status(500).json({ error: '注册失败' })
+  }
+})
 
 // 登录
 app.post('/api/login', async (req, res) => {

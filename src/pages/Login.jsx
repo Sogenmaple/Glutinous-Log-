@@ -1,0 +1,116 @@
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { LoginIcon, LockIcon, MailIcon, UserIcon } from '../components/icons/SiteIcons'
+
+/**
+ * 登录页面
+ */
+export default function Login() {
+  const navigate = useNavigate()
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      const response = await fetch('http://36.151.149.117:3001/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        navigate('/')
+      } else {
+        setError(data.message || '登录失败')
+      }
+    } catch (err) {
+      setError('网络错误，请稍后重试')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="auth-page">
+      <div className="auth-bg-grid"></div>
+      <div className="auth-bg-glow"></div>
+
+      <div className="auth-container">
+        <div className="auth-card">
+          <div className="auth-header">
+            <div className="auth-icon">
+              <LoginIcon size={64} color="#ff9500" />
+            </div>
+            <h1 className="auth-title">汤圆的小窝</h1>
+            <p className="auth-subtitle">TANGYUAN'S CREATIVE CORNER</p>
+          </div>
+
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label className="form-label">
+                <UserIcon size={18} />
+                <span>用户名</span>
+              </label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="请输入用户名"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                <LockIcon size={18} />
+                <span>密码</span>
+              </label>
+              <input
+                type="password"
+                className="form-input"
+                placeholder="请输入密码"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+              />
+            </div>
+
+            {error && <div className="form-error">{error}</div>}
+
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? '登录中...' : '登录'}
+            </button>
+
+            <div className="auth-footer">
+              <span>还没有账号？</span>
+              <Link to="/register" className="auth-link">立即注册</Link>
+            </div>
+          </form>
+
+          <div className="auth-divider">
+            <span>OR</span>
+          </div>
+
+          <div className="auth-guest">
+            <Link to="/" className="guest-btn">
+              游客模式
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

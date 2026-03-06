@@ -18,12 +18,15 @@ import BlogPage from './pages/BlogPage'
 import AboutPage from './pages/AboutPage'
 import SpecialConstructs from './pages/SpecialConstructs'
 import PomodoroTodo from './pages/PomodoroTodo'
+import Login from './pages/Login'
+import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
 import './App.css'
 import './styles/intro.css'
 import './styles/cursor.css'
 import './styles/home.css'
 import './styles/special.css'
+import './styles/auth.css'
 
 function AppContent() {
   const [showIntro, setShowIntro] = useState(true)
@@ -51,6 +54,10 @@ function AppContent() {
           
           {/* 关于页面 */}
           <Route path="/about" element={<AboutPage />} />
+          
+          {/* 认证页面 */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           
           {/* 特殊构造页面 */}
           <Route path="/special" element={<SpecialConstructs />} />

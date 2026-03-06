@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { ClockIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon, SaveIcon, LoadIcon, AddIcon, DragIcon, CheckIcon, RepeatDailyIcon, RepeatWeeklyIcon, RepeatMonthlyIcon } from '../components/icons/SiteIcons'
+import { ClockIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon, SaveIcon, LoadIcon, AddIcon, RemoveIcon, DragIcon } from '../components/icons/SiteIcons'
 
 export default function PomodoroTodo() {
   const navigate = useNavigate()
@@ -43,26 +43,25 @@ export default function PomodoroTodo() {
   )
 }
 
-// 专注视图 v8.0
+// 专注视图
 function TimerView() {
   const [activeTodos, setActiveTodos] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('pomodoro_active_todos') || '[]') } catch { return [] }
+    const saved = localStorage.getItem('pomodoro_active_todos')
+    return saved ? JSON.parse(saved) : []
   })
   const [todayDuration, setTodayDuration] = useState(0)
-  const [showConfig, setShowConfig] = useState(null)
-  const [config, setConfig] = useState({ priority: 'medium', dueDate: '', duration: 25, repeat: 'none', unit: '', isHabit: false })
 
   useEffect(() => {
     const updateTodayDuration = () => {
-      try {
-        const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')
-        const today = new Date().toISOString().split('T')[0]
-        const todaySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
-        const total = todaySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
-        setTodayDuration(total)
-      } catch { setTodayDuration(0) }
+      const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')
+      const today = new Date().toISOString().split('T')[0]
+      const todaySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
+      const total = todaySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+      setTodayDuration(total)
     }
+    
     updateTodayDuration()
+    
     const handleSessionUpdate = () => updateTodayDuration()
     window.addEventListener('sessions-updated', handleSessionUpdate)
     return () => window.removeEventListener('sessions-updated', handleSessionUpdate)
@@ -73,11 +72,9 @@ function TimerView() {
   }, [activeTodos])
 
   const removeFromTodos = (todoId) => {
-    try {
-      const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-      localStorage.setItem('pomodoro_todos', JSON.stringify(todos.filter(t => t.id !== todoId)))
-      window.dispatchEvent(new CustomEvent('todos-updated'))
-    } catch {}
+    const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+    localStorage.setItem('pomodoro_todos', JSON.stringify(todos.filter(t => t.id !== todoId)))
+    window.dispatchEvent(new CustomEvent('todos-updated'))
   }
 
   const moveToActive = (todo) => {
@@ -89,19 +86,15 @@ function TimerView() {
   }
 
   const moveBackToTodos = (todo) => {
-    try {
-      const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-      localStorage.setItem('pomodoro_todos', JSON.stringify([...todos, { ...todo, duration: todo.remainingTime }]))
-      window.dispatchEvent(new CustomEvent('todos-updated'))
-      setActiveTodos(activeTodos.filter(t => t.id !== todo.id))
-    } catch {}
+    const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+    localStorage.setItem('pomodoro_todos', JSON.stringify([...todos, { ...todo, duration: todo.remainingTime }]))
+    window.dispatchEvent(new CustomEvent('todos-updated'))
+    setActiveTodos(activeTodos.filter(t => t.id !== todo.id))
   }
 
-  const completeActiveTodo = (todoId) => {
+  const completeActiveTodo = (todoId, activeTodos, setActiveTodos) => {
     const todo = activeTodos.find(t => t.id === todoId)
-    if (!todo) return
-    
-    try {
+    if (todo) {
       const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')
       const completedTime = (todo.duration || 25) - (todo.remainingTime || 0)
       if (completedTime > 0) {
@@ -117,12 +110,12 @@ function TimerView() {
         window.dispatchEvent(new CustomEvent('sessions-updated'))
       }
 
-      if (todo.isHabit) {
+      if (todo.repeat && todo.repeat !== 'none') {
         const checkins = JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]')
         const today = new Date().toISOString().split('T')[0]
         const existingCheckin = checkins.find(c => c.habitId === todo.id && c.date === today)
         
-        if (!existingCheckin) {
+        if (!existingCheckin && todo.isHabit) {
           checkins.push({
             id: Date.now(),
             habitId: todo.id,
@@ -146,14 +139,14 @@ function TimerView() {
         localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
         window.dispatchEvent(new CustomEvent('habits-updated'))
 
-        if (todo.repeat && todo.repeat !== 'none') {
+        if (todo.repeat !== 'none') {
           const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
           todos.push({ ...todo, duration: todo.duration || 25, remainingTime: todo.duration || 25 })
           localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
           window.dispatchEvent(new CustomEvent('todos-updated'))
         }
       }
-    } catch {}
+    }
     setActiveTodos(activeTodos.filter(t => t.id !== todoId))
   }
 
@@ -176,44 +169,49 @@ function TimerView() {
   }
 
   return (
-    <div className="timer-view-v8">
-      <div className="todo-column-v8">
-        <div className="column-header-v8">
+    <div className="timer-view">
+      <div className="todo-column">
+        <div className="column-header">
           <h3>待办清单</h3>
-          <span className="column-count-v8">拖到右侧开始专注</span>
+          <span className="column-count">拖到右侧开始专注</span>
         </div>
-        <TodosListV8 onMoveToActive={moveToActive} />
+        <TodosList onMoveToActive={moveToActive} />
       </div>
 
       <div 
-        className={`focus-column-v8 ${activeTodos.length === 0 ? 'drop-zone-v8' : ''}`}
+        className={`focus-column ${activeTodos.length === 0 ? 'drop-zone' : ''}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
       >
-        <div className="column-header-v8">
+        <div className="column-header">
           <h3>专注中</h3>
-          <div className="today-duration-v8">
+          <div className="today-duration">
             <span>今日专注</span>
-            <span className="duration-value-v8">{Math.floor(todayDuration / 60)} 分钟</span>
+            <span className="duration-value">{Math.floor(todayDuration / 60)} 分钟</span>
           </div>
+          {activeTodos.length > 0 && (
+            <button className="clear-all-btn" onClick={() => activeTodos.forEach(todo => moveBackToTodos(todo))}>
+              全部返回
+            </button>
+          )}
         </div>
         
         {activeTodos.length === 0 ? (
-          <div className="empty-focus-v8">
-            <div className="drop-hint-v8">
-              <div className="drop-icon-v8">⬆</div>
+          <div className="empty-focus">
+            <div className="drop-hint">
+              <div className="drop-icon">⬆</div>
               <p>将待办事项拖拽到这里</p>
-              <p className="drop-sub-v8">开始专注计时</p>
+              <p className="drop-sub">开始专注计时</p>
             </div>
           </div>
         ) : (
-          <div className="active-todos-list-v8">
+          <div className="active-todos-list">
             {activeTodos.map(todo => (
-              <ActiveTodoCardV8 
+              <ActiveTodoCard 
                 key={todo.id} 
                 todo={todo}
                 onMoveBack={() => moveBackToTodos(todo)}
-                onComplete={() => completeActiveTodo(todo.id)}
+                onComplete={() => completeActiveTodo(todo.id, activeTodos, setActiveTodos)}
                 onUpdateTime={(newTime) => updateActiveTodoTime(todo.id, newTime)}
               />
             ))}
@@ -224,25 +222,20 @@ function TimerView() {
   )
 }
 
-function TodosListV8({ onMoveToActive }) {
-  const [todos, setTodos] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('pomodoro_todos') || '[]') } catch { return [] }
-  })
+function TodosList({ onMoveToActive }) {
+  const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
   const [newTodo, setNewTodo] = useState('')
   const [showConfig, setShowConfig] = useState(null)
   const [config, setConfig] = useState({ priority: 'medium', dueDate: '', duration: 25, repeat: 'none', unit: '', isHabit: false })
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
 
   useEffect(() => {
-    const handleUpdate = () => {
-      try { setTodos(JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')) } catch {}
-    }
+    const handleUpdate = () => setTodos(JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
     window.addEventListener('todos-updated', handleUpdate)
     return () => window.removeEventListener('todos-updated', handleUpdate)
   }, [])
 
   useEffect(() => {
-    try { localStorage.setItem('pomodoro_todos', JSON.stringify(todos)) } catch {}
+    localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
   }, [todos])
 
   const addTodo = (e) => {
@@ -263,10 +256,7 @@ function TodosListV8({ onMoveToActive }) {
     setNewTodo('')
   }
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id))
-    setShowDeleteConfirm(null)
-  }
+  const deleteTodo = (id) => setTodos(todos.filter(todo => todo.id !== id))
 
   const saveConfig = () => {
     if (!showConfig) return
@@ -299,101 +289,89 @@ function TodosListV8({ onMoveToActive }) {
     e.dataTransfer.effectAllowed = 'move'
   }
 
-  const getRepeatIcon = (repeat) => {
-    if (repeat === 'daily') return <RepeatDailyIcon size={14} />
-    if (repeat === 'weekly') return <RepeatWeeklyIcon size={14} />
-    if (repeat === 'monthly') return <RepeatMonthlyIcon size={14} />
-    return null
-  }
-
   const filteredTodos = todos.filter(t => !t.completed)
 
   return (
-    <div className="todos-list-container-v8">
-      <form className="add-todo-form-v8" onSubmit={addTodo}>
-        <input type="text" className="todo-input-v8" placeholder="添加新任务..." value={newTodo} onChange={(e) => setNewTodo(e.target.value)} />
-        <button type="submit" className="add-btn-v8"><PlusIcon size={18} /></button>
+    <div className="todos-list-container">
+      <form className="add-todo-form" onSubmit={addTodo}>
+        <input type="text" className="todo-input" placeholder="添加新任务..." value={newTodo} onChange={(e) => setNewTodo(e.target.value)} />
+        <button type="submit" className="add-btn"><PlusIcon size={18} /></button>
       </form>
 
-      <div className="todos-list-v8">
+      <div className="todos-list">
         {filteredTodos.length === 0 ? (
-          <div className="empty-state-v8">暂无待办</div>
+          <div className="empty-state">暂无待办</div>
         ) : (
           filteredTodos.map(todo => (
-            <div key={todo.id} className="todo-item-v8" draggable onDragStart={(e) => handleDragStart(e, todo)}>
-              <div className="todo-content-v8">
-                <span className={`priority-dot-v8 priority-${todo.priority}`}></span>
-                <span className="todo-text-v8">{todo.text}</span>
+            <div key={todo.id} className="todo-item" draggable onDragStart={(e) => handleDragStart(e, todo)}>
+              <div className="todo-content">
+                <span className="todo-text">{todo.text}</span>
+                <span className={`priority-badge priority-${todo.priority}`}>
+                  {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
+                </span>
                 {todo.repeat && todo.repeat !== 'none' && (
-                  <span className="repeat-icon-v8">{getRepeatIcon(todo.repeat)}</span>
+                  <span className="repeat-badge">
+                    {todo.repeat === 'daily' ? '每日' : todo.repeat === 'weekly' ? '每周' : todo.repeat === 'monthly' ? '每月' : ''}
+                  </span>
                 )}
+                {todo.dueDate && <span className="due-badge">{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>}
+                <span className="duration-badge">{todo.duration}分钟</span>
               </div>
-              <div className="todo-actions-v8">
-                <button className="config-btn-v8" onClick={() => openConfig(todo)}>⚙</button>
-                <button className="delete-btn-v8" onClick={() => setShowDeleteConfirm(todo.id)}>
-                  <TrashIcon size={14} />
-                </button>
+              <div className="todo-actions">
+                <button className="config-btn" onClick={() => openConfig(todo)}>⚙</button>
+                <button className="move-btn" onClick={() => onMoveToActive(todo)}>➤</button>
+                <button className="delete-btn" onClick={() => deleteTodo(todo.id)}><TrashIcon size={14} /></button>
               </div>
 
               {showConfig === todo.id && (
-                <div className="config-modal-v8" onClick={(e) => e.stopPropagation()}>
-                  <div className="config-content-v8">
+                <div className="config-modal" onClick={(e) => e.stopPropagation()}>
+                  <div className="config-content">
                     <h4>配置待办</h4>
-                    <div className="config-field-v8">
+                    <div className="config-field">
                       <label>优先级</label>
-                      <div className="priority-selector-v8">
-                        {['low', 'medium', 'high'].map(p => (
-                          <button 
-                            key={p}
-                            className={`priority-dot-selector-v8 priority-${p} ${config.priority === p ? 'selected' : ''}`}
-                            onClick={() => setConfig({ ...config, priority: p })}
-                          />
-                        ))}
+                      <div className="custom-select">
+                        <select value={config.priority} onChange={(e) => setConfig({ ...config, priority: e.target.value })}>
+                          <option value="low">低</option>
+                          <option value="medium">中</option>
+                          <option value="high">高</option>
+                        </select>
                       </div>
                     </div>
-                    <div className="config-field-v8">
+                    <div className="config-field">
                       <label>截止日期</label>
-                      <input type="date" value={config.dueDate} onChange={(e) => setConfig({ ...config, dueDate: e.target.value })} className="config-input-v8" />
+                      <input type="date" value={config.dueDate} onChange={(e) => setConfig({ ...config, dueDate: e.target.value })} className="config-input" />
                     </div>
-                    <div className="config-field-v8">
+                    <div className="config-field">
                       <label>持续时间：{config.duration} 分钟</label>
-                      <input type="range" min="5" max="180" step="5" value={config.duration} onChange={(e) => setConfig({ ...config, duration: parseInt(e.target.value) })} className="config-slider-v8" />
+                      <input type="range" min="5" max="180" step="5" value={config.duration} onChange={(e) => setConfig({ ...config, duration: parseInt(e.target.value) })} className="config-slider" />
                     </div>
-                    <div className="config-field-v8">
+                    <div className="config-field">
                       <label>重复类型</label>
-                      <div className="repeat-selector-v8">
-                        <button className={`repeat-option-v8 ${config.repeat === 'none' ? 'selected' : ''}`} onClick={() => setConfig({ ...config, repeat: 'none' })}>无</button>
-                        <button className={`repeat-option-v8 ${config.repeat === 'daily' ? 'selected' : ''}`} onClick={() => setConfig({ ...config, repeat: 'daily' })}><RepeatDailyIcon size={16} /></button>
-                        <button className={`repeat-option-v8 ${config.repeat === 'weekly' ? 'selected' : ''}`} onClick={() => setConfig({ ...config, repeat: 'weekly' })}><RepeatWeeklyIcon size={16} /></button>
-                        <button className={`repeat-option-v8 ${config.repeat === 'monthly' ? 'selected' : ''}`} onClick={() => setConfig({ ...config, repeat: 'monthly' })}><RepeatMonthlyIcon size={16} /></button>
+                      <div className="custom-select">
+                        <select value={config.repeat} onChange={(e) => setConfig({ ...config, repeat: e.target.value })}>
+                          <option value="none">一次性</option>
+                          <option value="daily">每日</option>
+                          <option value="weekly">每周</option>
+                          <option value="monthly">每月</option>
+                        </select>
                       </div>
                     </div>
                     {config.repeat !== 'none' && (
                       <>
-                        <div className="config-field-v8">
+                        <div className="config-field">
                           <label>单位/量词（可选）</label>
-                          <input type="text" placeholder="如：个、次、页、小时" value={config.unit} onChange={(e) => setConfig({ ...config, unit: e.target.value })} className="config-input-v8" />
+                          <input type="text" placeholder="如：个、次、页、小时" value={config.unit} onChange={(e) => setConfig({ ...config, unit: e.target.value })} className="config-input" />
                         </div>
-                        <div className="config-field-v8 checkbox-field-v8">
-                          <input type="checkbox" id="isHabit-v8" checked={config.isHabit} onChange={(e) => setConfig({ ...config, isHabit: e.target.checked })} />
-                          <label htmlFor="isHabit-v8">这是习惯打卡任务</label>
+                        <div className="config-field checkbox-field">
+                          <input type="checkbox" id="isHabit" checked={config.isHabit} onChange={(e) => setConfig({ ...config, isHabit: e.target.checked })} />
+                          <label htmlFor="isHabit">这是习惯打卡任务</label>
                         </div>
                       </>
                     )}
-                    <div className="config-actions-v8">
-                      <button className="cancel-btn-v8" onClick={() => setShowConfig(null)}>取消</button>
-                      <button className="save-btn-v8" onClick={saveConfig}>保存</button>
+                    <div className="config-actions">
+                      <button className="cancel-btn" onClick={() => setShowConfig(null)}>取消</button>
+                      <button className="save-btn" onClick={saveConfig}>保存</button>
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {showDeleteConfirm === todo.id && (
-                <div className="delete-confirm-v8" onClick={(e) => e.stopPropagation()}>
-                  <p>确定删除此待办？</p>
-                  <div className="delete-confirm-actions-v8">
-                    <button className="cancel-btn-v8" onClick={() => setShowDeleteConfirm(null)}>取消</button>
-                    <button className="delete-confirm-btn-v8" onClick={() => deleteTodo(todo.id)}>删除</button>
                   </div>
                 </div>
               )}
@@ -405,11 +383,10 @@ function TodosListV8({ onMoveToActive }) {
   )
 }
 
-function ActiveTodoCardV8({ todo, onMoveBack, onComplete, onUpdateTime }) {
+function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
   const [timeLeft, setTimeLeft] = useState((todo.remainingTime || 25) * 60)
   const [isRunning, setIsRunning] = useState(false)
   const [timerStyle, setTimerStyle] = useState('digital')
-  const [showConfig, setShowConfig] = useState(false)
 
   useEffect(() => {
     setTimeLeft((todo.remainingTime || 25) * 60)
@@ -448,87 +425,81 @@ function ActiveTodoCardV8({ todo, onMoveBack, onComplete, onUpdateTime }) {
   const progress = ((todo.remainingTime || 25) * 60 - timeLeft) / ((todo.remainingTime || 25) * 60) * 100
 
   return (
-    <div className="active-todo-card-v8">
-      <div className="active-todo-header-v8">
-        <div className="active-todo-title-v8">
-          <span className={`priority-dot-v8 priority-${todo.priority}`}></span>
+    <div className="active-todo-card">
+      <div className="active-todo-header">
+        <div className="active-todo-title">
+          <span className={`priority-dot priority-${todo.priority}`}></span>
           <span>{todo.text}</span>
+          {todo.repeat && todo.repeat !== 'none' && (
+            <span className="repeat-tag">{todo.repeat === 'daily' ? '每日' : todo.repeat === 'weekly' ? '每周' : '每月'}</span>
+          )}
         </div>
-        <button className="config-toggle-btn-v8" onClick={() => setShowConfig(!showConfig)}>⚙</button>
+        <div className="header-actions">
+          <button className="move-back-btn" onClick={onMoveBack}>返回</button>
+          <button className="complete-btn" onClick={onComplete}>完成</button>
+        </div>
       </div>
 
-      {showConfig && (
-        <div className="active-todo-config-v8">
-          <button className="move-back-btn-v8" onClick={onMoveBack}>返回待办</button>
-        </div>
-      )}
-
-      <div className="active-todo-timer-v8">
+      <div className="active-todo-timer">
         {timerStyle === 'digital' ? (
-          <div className="digital-timer-compact-v8">
-            <div className="time-display-v8">{formatTime(timeLeft)}</div>
-            <div className="time-slider-wrapper-v8">
-              <input type="range" className="time-slider-v8" min="1" max="120" value={Math.ceil(timeLeft / 60)}
+          <div className="digital-timer-compact">
+            <div className="time-display">{formatTime(timeLeft)}</div>
+            <div className="time-slider-wrapper">
+              <input type="range" className="time-slider" min="1" max="120" value={Math.ceil(timeLeft / 60)}
                 onChange={(e) => { const mins = parseInt(e.target.value); setTimeLeft(mins * 60); onUpdateTime(mins) }}
                 disabled={isRunning} />
-              <span className="slider-value-v8">{Math.ceil(timeLeft / 60)}分钟</span>
+              <span className="slider-value">{Math.ceil(timeLeft / 60)}分钟</span>
             </div>
           </div>
         ) : (
-          <div className="circular-timer-compact-v8">
-            <svg viewBox="0 0 100 100" className="circular-svg-v8">
+          <div className="circular-timer-compact">
+            <svg viewBox="0 0 100 100" className="circular-svg">
               <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,149,0,0.2)" strokeWidth="8" />
               <circle cx="50" cy="50" r="42" fill="none" stroke="#ff9500" strokeWidth="8" strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset={`${2 * Math.PI * 42 * (1 - progress / 100)}`}
                 transform="rotate(-90 50 50)" />
             </svg>
-            <div className="circular-time-display-v8">{formatTime(timeLeft)}</div>
+            <div className="circular-time-display">{formatTime(timeLeft)}</div>
           </div>
         )}
       </div>
 
-      <div className="active-todo-controls-v8">
-        <button className="control-btn-v8 primary" onClick={() => setIsRunning(!isRunning)}>
+      <div className="active-todo-controls">
+        <button className="control-btn primary" onClick={() => setIsRunning(!isRunning)}>
           {isRunning ? <><PauseIcon size={16} /><span>暂停</span></> : <><PlayIcon size={16} /><span>开始</span></>}
         </button>
-        <button className="control-btn-v8" onClick={resetTimer}><ResetIcon size={16} /></button>
-        <button className="style-btn-v8" onClick={() => setTimerStyle(timerStyle === 'digital' ? 'circular' : 'digital')}>
+        <button className="control-btn" onClick={resetTimer}><ResetIcon size={16} /></button>
+        <button className={`style-btn ${timerStyle === 'digital' ? 'active' : ''}`} onClick={() => setTimerStyle(timerStyle === 'digital' ? 'circular' : 'digital')}>
           {timerStyle === 'digital' ? '数字' : '圆形'}
         </button>
-        <button className="complete-btn-v8" onClick={onComplete}>完成</button>
+      </div>
+
+      <div className="active-todo-info">
+        <span className="info-item">已专注：{((todo.duration || 25) - (todo.remainingTime || 25))} 分钟</span>
+        <span className="info-item">剩余：{todo.remainingTime || 25} 分钟</span>
+        {todo.dueDate && <span className="info-item">截止：{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>}
+        {todo.unit && <span className="info-item">单位：{todo.unit}</span>}
       </div>
     </div>
   )
 }
 
-// 时间轴视图 v8.0
+// 时间轴视图 - 完全重构
 function TimelineView() {
-  const safeParse = (key, defaultValue) => {
-    try {
-      const item = localStorage.getItem(key)
-      return item ? JSON.parse(item) : defaultValue
-    } catch (e) {
-      console.error(`解析 ${key} 失败:`, e)
-      return defaultValue
-    }
-  }
-
-  const [todos] = useState(() => safeParse('pomodoro_todos', []))
-  const [tracks, setTracks] = useState(() => safeParse('pomodoro_timeline_tracks', [
-    {id:1,name:""}, {id:2,name:""}, {id:3,name:""}
-  ]))
-  const [timelineItems, setTimelineItems] = useState(() => safeParse('pomodoro_timeline_items', []))
-  const [presets, setPresets] = useState(() => safeParse('pomodoro_timeline_presets', []))
+  const [todos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
+  const [tracks, setTracks] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_tracks') || '[{id:1,name:"主轨道"}]'))
+  const [timelineItems, setTimelineItems] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_items') || '[]'))
+  const [presets, setPresets] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_presets') || '[]'))
   const [showPresets, setShowPresets] = useState(false)
   const [draggedTodo, setDraggedTodo] = useState(null)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
+  const [resizingItem, setResizingItem] = useState(null)
 
   useEffect(() => {
-    try { localStorage.setItem('pomodoro_timeline_tracks', JSON.stringify(tracks)) } catch {}
+    localStorage.setItem('pomodoro_timeline_tracks', JSON.stringify(tracks))
   }, [tracks])
 
   useEffect(() => {
-    try { localStorage.setItem('pomodoro_timeline_items', JSON.stringify(timelineItems)) } catch {}
+    localStorage.setItem('pomodoro_timeline_items', JSON.stringify(timelineItems))
   }, [timelineItems])
 
   const handleDragStart = (e, todo) => {
@@ -552,7 +523,7 @@ function TimelineView() {
       }
       const updated = [...timelineItems, newItem]
       setTimelineItems(updated)
-      try { localStorage.setItem('pomodoro_timeline_items', JSON.stringify(updated)) } catch {}
+      localStorage.setItem('pomodoro_timeline_items', JSON.stringify(updated))
     }
     setDraggedTodo(null)
   }
@@ -572,13 +543,8 @@ function TimelineView() {
   }
 
   const deleteItem = (itemId) => {
-    setShowDeleteConfirm(itemId)
-  }
-
-  const confirmDeleteItem = () => {
-    const updated = timelineItems.filter(item => item.id !== showDeleteConfirm)
+    const updated = timelineItems.filter(item => item.id !== itemId)
     setTimelineItems(updated)
-    setShowDeleteConfirm(null)
   }
 
   const moveItemBack = (item) => {
@@ -587,16 +553,13 @@ function TimelineView() {
   }
 
   const executeItem = (item) => {
-    try {
-      const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-      const todo = todos.find(t => t.id === item.todoId)
-      if (todo) {
-        const activeTodos = JSON.parse(localStorage.getItem('pomodoro_active_todos') || '[]')
-        const activeTodo = { ...todo, startedAt: new Date().toISOString(), remainingTime: item.duration * 60 }
-        localStorage.setItem('pomodoro_active_todos', JSON.stringify([...activeTodos, activeTodo]))
-        window.location.hash = '#/special/pomodoro'
-      }
-    } catch {}
+    const todo = todos.find(t => t.id === item.todoId)
+    if (todo) {
+      const activeTodos = JSON.parse(localStorage.getItem('pomodoro_active_todos') || '[]')
+      const activeTodo = { ...todo, startedAt: new Date().toISOString(), remainingTime: item.duration * 60 }
+      localStorage.setItem('pomodoro_active_todos', JSON.stringify([...activeTodos, activeTodo]))
+      window.location.hash = '#/special/pomodoro'
+    }
   }
 
   const savePreset = () => {
@@ -605,18 +568,18 @@ function TimelineView() {
       const newPreset = {
         id: Date.now(),
         name: presetName,
-        tracks: tracks.filter(t => t.id > 3),
+        tracks: tracks.filter(t => t.id !== 1),
         items: timelineItems
       }
       const updated = [...presets, newPreset]
       setPresets(updated)
-      try { localStorage.setItem('pomodoro_timeline_presets', JSON.stringify(updated)) } catch {}
+      localStorage.setItem('pomodoro_timeline_presets', JSON.stringify(updated))
     }
   }
 
   const loadPreset = (preset) => {
     if (confirm(`加载预设"${preset.name}"？这将覆盖当前时间轴。`)) {
-      setTracks([{id:1,name:""}, {id:2,name:""}, {id:3,name:""}, ...preset.tracks])
+      setTracks([{id:1,name:"主轨道"}, ...preset.tracks])
       setTimelineItems(preset.items)
       setShowPresets(false)
     }
@@ -626,47 +589,64 @@ function TimelineView() {
     if (confirm('确定删除此预设？')) {
       const updated = presets.filter(p => p.id !== presetId)
       setPresets(updated)
-      try { localStorage.setItem('pomodoro_timeline_presets', JSON.stringify(updated)) } catch {}
+      localStorage.setItem('pomodoro_timeline_presets', JSON.stringify(updated))
+    }
+  }
+
+  const addTrack = () => {
+    const name = prompt('轨道名称：')
+    if (name) {
+      const newTrack = { id: Date.now(), name }
+      setTracks([...tracks, newTrack])
+    }
+  }
+
+  const removeTrack = (trackId) => {
+    if (trackId === 1) {
+      alert('主轨道不能删除')
+      return
+    }
+    if (confirm('删除此轨道将移除其上所有任务，确定？')) {
+      setTracks(tracks.filter(t => t.id !== trackId))
+      setTimelineItems(timelineItems.filter(i => i.trackId !== trackId))
     }
   }
 
   const hours = Array.from({ length: 24 }, (_, i) => i)
 
   return (
-    <div className="timeline-view-v8">
-      <div className="timeline-toolbar-v8">
-        <div className="timeline-title-group-v8">
+    <div className="timeline-view">
+      <div className="timeline-toolbar">
+        <div className="timeline-title-group">
           <h3>时间轴规划</h3>
         </div>
-        <div className="timeline-toolbar-actions-v8">
-          <button className="toolbar-btn-v8" onClick={() => setTracks([...tracks, {id:Date.now(),name:""}])}>
-            <AddIcon size={16} />
+        <div className="timeline-toolbar-actions">
+          <button className="toolbar-btn" onClick={addTrack}><AddIcon size={16} /><span>添加轨道</span></button>
+          <button className="toolbar-btn" onClick={() => setShowPresets(!showPresets)}>
+            <LoadIcon size={16} /><span>预设</span>
           </button>
-          <button className="toolbar-btn-v8" onClick={() => setShowPresets(!showPresets)}>
-            <LoadIcon size={16} />
-          </button>
-          <button className="toolbar-btn-v8 primary" onClick={savePreset}>
-            <SaveIcon size={16} />
+          <button className="toolbar-btn primary" onClick={savePreset}>
+            <SaveIcon size={16} /><span>保存预设</span>
           </button>
         </div>
       </div>
 
       {showPresets && (
-        <div className="presets-panel-v8">
-          <div className="presets-header-v8">
+        <div className="presets-panel">
+          <div className="presets-header">
             <h4>保存的预设</h4>
-            <button className="close-btn-v8" onClick={() => setShowPresets(false)}>×</button>
+            <button className="close-btn" onClick={() => setShowPresets(false)}>×</button>
           </div>
           {presets.length === 0 ? (
-            <div className="empty-presets-v8">暂无保存的预设</div>
+            <div className="empty-presets">暂无保存的预设</div>
           ) : (
-            <div className="presets-list-v8">
+            <div className="presets-list">
               {presets.map(preset => (
-                <div key={preset.id} className="preset-item-v8">
-                  <span className="preset-name-v8">{preset.name}</span>
-                  <div className="preset-actions-v8">
-                    <button className="load-preset-btn-v8" onClick={() => loadPreset(preset)}>加载</button>
-                    <button className="delete-preset-btn-v8" onClick={() => deletePreset(preset.id)}>删除</button>
+                <div key={preset.id} className="preset-item">
+                  <span className="preset-name">{preset.name}</span>
+                  <div className="preset-actions">
+                    <button className="load-preset-btn" onClick={() => loadPreset(preset)}>加载</button>
+                    <button className="delete-preset-btn" onClick={() => deletePreset(preset.id)}>删除</button>
                   </div>
                 </div>
               ))}
@@ -675,62 +655,67 @@ function TimelineView() {
         </div>
       )}
 
-      <div className="timeline-content-v8">
-        <div className="todo-sidebar-v8">
+      <div className="timeline-content">
+        <div className="todo-sidebar">
           <h4>待办事项</h4>
-          <div className="todo-drag-list-v8">
+          <div className="todo-drag-list">
             {todos.filter(t => !t.completed).map(todo => (
               <div 
                 key={todo.id} 
-                className="todo-drag-item-v8"
+                className="todo-drag-item"
                 draggable
                 onDragStart={(e) => handleDragStart(e, todo)}
               >
                 <DragIcon size={14} />
-                <span className="todo-drag-text-v8">{todo.text}</span>
+                <span className="todo-drag-text">{todo.text}</span>
+                <span className="todo-drag-duration">{todo.duration}分钟</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="timeline-tracks-container-v8">
-          <div className="timeline-header-row-v8">
-            <div className="track-label-column-v8"></div>
-            <div className="hours-header-v8">
+        <div className="timeline-tracks-container">
+          <div className="timeline-header-row">
+            <div className="track-label-column"></div>
+            <div className="hours-header">
               {hours.map(hour => (
-                <div key={hour} className="hour-label-v8">{hour.toString().padStart(2, '0')}</div>
+                <div key={hour} className="hour-label">{hour.toString().padStart(2, '0')}</div>
               ))}
             </div>
           </div>
 
           {tracks.map(track => (
-            <div key={track.id} className="timeline-track-v8">
-              <div className="track-label-v8">
-                <span className="track-indicator-v8"></span>
+            <div key={track.id} className="timeline-track">
+              <div className="track-label">
+                <span className="track-name">{track.name}</span>
+                {track.id !== 1 && (
+                  <button className="remove-track-btn" onClick={() => removeTrack(track.id)}>×</button>
+                )}
               </div>
-              <div className="track-content-v8" onDragOver={handleDragOver}>
+              <div className="track-content" onDragOver={handleDragOver}>
                 {hours.map(hour => (
                   <div 
                     key={hour} 
-                    className="hour-cell-v8"
+                    className="hour-cell"
                     onDrop={(e) => handleDropOnTrack(e, track.id, hour)}
                   />
                 ))}
                 {timelineItems.filter(item => item.trackId === track.id).map(item => (
                   <div 
                     key={item.id}
-                    className="timeline-block-v8"
+                    className="timeline-block"
                     style={{ 
-                      backgroundColor: item.color + '20',
+                      backgroundColor: item.color + '30',
                       borderLeft: `3px solid ${item.color}`,
                       left: `${(item.startHour / 24) * 100}%`,
                       width: `${(item.duration / 24) * 100}%`
                     }}
                   >
-                    <div className="timeline-block-content-v8">
-                      <span className="timeline-block-text-v8">{item.todoText}</span>
+                    <div className="timeline-block-content">
+                      <span className="timeline-block-text">{item.todoText}</span>
+                      <span className="timeline-block-duration">{item.duration}小时</span>
                     </div>
-                    <div className="timeline-block-resize-v8 timeline-block-resize-left-v8"
+                    <div className="timeline-block-resize timeline-block-resize-left"
                       onMouseDown={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
@@ -750,7 +735,7 @@ function TimelineView() {
                         document.addEventListener('mouseup', handleMouseUp)
                       }}
                     />
-                    <div className="timeline-block-resize-v8 timeline-block-resize-right-v8"
+                    <div className="timeline-block-resize timeline-block-resize-right"
                       onMouseDown={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
@@ -768,10 +753,10 @@ function TimelineView() {
                         document.addEventListener('mouseup', handleMouseUp)
                       }}
                     />
-                    <div className="timeline-block-actions-v8">
-                      <button className="execute-block-btn-v8" onClick={() => executeItem(item)}>执行</button>
-                      <button className="move-back-block-btn-v8" onClick={() => moveItemBack(item)}>放回</button>
-                      <button className="delete-block-btn-v8" onClick={() => deleteItem(item.id)}>×</button>
+                    <div className="timeline-block-actions">
+                      <button className="execute-block-btn" onClick={() => executeItem(item)}>执行</button>
+                      <button className="move-back-block-btn" onClick={() => moveItemBack(item)}>放回</button>
+                      <button className="delete-block-btn" onClick={() => deleteItem(item.id)}>×</button>
                     </div>
                   </div>
                 ))}
@@ -781,45 +766,23 @@ function TimelineView() {
         </div>
       </div>
 
-      {showDeleteConfirm && (
-        <div className="delete-confirm-overlay-v8" onClick={() => setShowDeleteConfirm(null)}>
-          <div className="delete-confirm-modal-v8" onClick={(e) => e.stopPropagation()}>
-            <p>确定删除此时间块？</p>
-            <div className="delete-confirm-actions-v8">
-              <button className="cancel-btn-v8" onClick={() => setShowDeleteConfirm(null)}>取消</button>
-              <button className="delete-confirm-btn-v8" onClick={confirmDeleteItem}>删除</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="timeline-help-v8">
+      <div className="timeline-help">
         <p>提示：将左侧待办拖到轨道上 · 拖动两端调整时间 · 拖动块切换时间 · 点击执行开始专注</p>
       </div>
     </div>
   )
 }
 
-// 打卡视图 v8.0
+// 打卡视图
 function CheckinView() {
-  const safeParse = (key, defaultValue) => {
-    try {
-      const item = localStorage.getItem(key)
-      return item ? JSON.parse(item) : defaultValue
-    } catch (e) {
-      console.error(`解析 ${key} 失败:`, e)
-      return defaultValue
-    }
-  }
-
-  const [habits, setHabits] = useState(() => safeParse('pomodoro_habits', []))
-  const [checkins, setCheckins] = useState(() => safeParse('pomodoro_checkins', []))
+  const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('pomodoro_habits') || '[]'))
+  const [checkins, setCheckins] = useState(() => JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]'))
   const [newHabit, setNewHabit] = useState('')
   const [habitConfig, setHabitConfig] = useState({ repeat: 'daily', unit: '', needFocus: true })
 
   useEffect(() => {
-    const handleCheckinsUpdate = () => setCheckins(safeParse('pomodoro_checkins', []))
-    const handleHabitsUpdate = () => setHabits(safeParse('pomodoro_habits', []))
+    const handleCheckinsUpdate = () => setCheckins(JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]'))
+    const handleHabitsUpdate = () => setHabits(JSON.parse(localStorage.getItem('pomodoro_habits') || '[]'))
     window.addEventListener('checkins-updated', handleCheckinsUpdate)
     window.addEventListener('habits-updated', handleHabitsUpdate)
     return () => {
@@ -845,64 +808,58 @@ function CheckinView() {
     setNewHabit('')
     
     if (habitConfig.needFocus) {
-      try {
-        const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-        todos.push({
-          id: habit.id,
-          text: habit.text,
-          completed: false,
-          priority: 'medium',
-          duration: 25,
-          repeat: habit.repeat,
-          unit: habit.unit,
-          isHabit: true,
-          createdAt: new Date().toISOString()
-        })
-        localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
-        window.dispatchEvent(new CustomEvent('todos-updated'))
-      } catch {}
+      const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+      todos.push({
+        id: habit.id,
+        text: habit.text,
+        completed: false,
+        priority: 'medium',
+        duration: 25,
+        repeat: habit.repeat,
+        unit: habit.unit,
+        isHabit: true,
+        createdAt: new Date().toISOString()
+      })
+      localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
+      window.dispatchEvent(new CustomEvent('todos-updated'))
     }
   }
 
   const deleteHabit = (id) => {
     setHabits(habits.filter(h => h.id !== id))
-    try {
-      const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-      localStorage.setItem('pomodoro_todos', JSON.stringify(todos.filter(t => t.id !== id)))
-      window.dispatchEvent(new CustomEvent('todos-updated'))
-    } catch {}
+    const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+    localStorage.setItem('pomodoro_todos', JSON.stringify(todos.filter(t => t.id !== id)))
+    window.dispatchEvent(new CustomEvent('todos-updated'))
   }
 
   const manualCheckin = (habit) => {
-    try {
-      const checkins = JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]')
-      const today = new Date().toISOString().split('T')[0]
-      const existingCheckin = checkins.find(c => c.habitId === habit.id && c.date === today)
+    const checkins = JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]')
+    const today = new Date().toISOString().split('T')[0]
+    const existingCheckin = checkins.find(c => c.habitId === habit.id && c.date === today)
+    
+    if (!existingCheckin) {
+      checkins.push({
+        id: Date.now(),
+        habitId: habit.id,
+        habitText: habit.text,
+        date: today,
+        completedAt: new Date().toISOString(),
+        duration: 0,
+        type: 'manual'
+      })
+      localStorage.setItem('pomodoro_checkins', JSON.stringify(checkins))
+      window.dispatchEvent(new CustomEvent('checkins-updated'))
       
-      if (!existingCheckin) {
-        checkins.push({
-          id: Date.now(),
-          habitId: habit.id,
-          habitText: habit.text,
-          date: today,
-          completedAt: new Date().toISOString(),
-          duration: 0,
-          type: 'manual'
-        })
-        localStorage.setItem('pomodoro_checkins', JSON.stringify(checkins))
-        window.dispatchEvent(new CustomEvent('checkins-updated'))
-        
-        const habits = JSON.parse(localStorage.getItem('pomodoro_habits') || '[]')
-        habits.forEach(h => {
-          if (h.id === habit.id) {
-            h.lastCompleted = today
-            h.totalCompletions = (h.totalCompletions || 0) + 1
-          }
-        })
-        localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
-        window.dispatchEvent(new CustomEvent('habits-updated'))
-      }
-    } catch {}
+      const habits = JSON.parse(localStorage.getItem('pomodoro_habits') || '[]')
+      habits.forEach(h => {
+        if (h.id === habit.id) {
+          h.lastCompleted = today
+          h.totalCompletions = (h.totalCompletions || 0) + 1
+        }
+      })
+      localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
+      window.dispatchEvent(new CustomEvent('habits-updated'))
+    }
   }
 
   const today = new Date().toISOString().split('T')[0]
@@ -934,94 +891,94 @@ function CheckinView() {
     return checkins.some(c => c.habitId === habitId && c.date === today)
   }
 
-  const getRepeatIcon = (repeat) => {
-    if (repeat === 'daily') return <RepeatDailyIcon size={14} />
-    if (repeat === 'weekly') return <RepeatWeeklyIcon size={14} />
-    if (repeat === 'monthly') return <RepeatMonthlyIcon size={14} />
-    return null
-  }
-
   return (
-    <div className="checkin-view-v8">
-      <div className="checkin-header-v8">
+    <div className="checkin-view">
+      <div className="checkin-header">
         <h3>习惯打卡</h3>
-        <p className="checkin-subtitle-v8">记录每日坚持，培养长期习惯</p>
+        <p className="checkin-subtitle">记录每日坚持，培养长期习惯</p>
       </div>
 
-      <form className="add-habit-form-v8" onSubmit={addHabit}>
+      <form className="add-habit-form" onSubmit={addHabit}>
         <input 
           type="text" 
-          className="habit-input-v8" 
+          className="habit-input" 
           placeholder="添加新习惯（如：背单词、阅读、运动）..." 
           value={newHabit} 
           onChange={(e) => setNewHabit(e.target.value)} 
         />
-        <div className="repeat-selector-v8 compact">
-          <button className={`repeat-option-v8 ${habitConfig.repeat === 'daily' ? 'selected' : ''}`} onClick={() => setHabitConfig({ ...habitConfig, repeat: 'daily' })}><RepeatDailyIcon size={14} /></button>
-          <button className={`repeat-option-v8 ${habitConfig.repeat === 'weekly' ? 'selected' : ''}`} onClick={() => setHabitConfig({ ...habitConfig, repeat: 'weekly' })}><RepeatWeeklyIcon size={14} /></button>
-          <button className={`repeat-option-v8 ${habitConfig.repeat === 'monthly' ? 'selected' : ''}`} onClick={() => setHabitConfig({ ...habitConfig, repeat: 'monthly' })}><RepeatMonthlyIcon size={14} /></button>
+        <div className="custom-select">
+          <select 
+            value={habitConfig.repeat}
+            onChange={(e) => setHabitConfig({ ...habitConfig, repeat: e.target.value })}
+          >
+            <option value="daily">每日</option>
+            <option value="weekly">每周</option>
+            <option value="monthly">每月</option>
+          </select>
         </div>
         <input 
           type="text" 
-          className="habit-unit-input-v8" 
-          placeholder="单位" 
+          className="habit-unit-input" 
+          placeholder="单位（如：个、页）" 
           value={habitConfig.unit}
           onChange={(e) => setHabitConfig({ ...habitConfig, unit: e.target.value })}
         />
-        <label className="habit-checkbox-v8">
+        <label className="habit-checkbox">
           <input 
             type="checkbox"
             checked={habitConfig.needFocus}
             onChange={(e) => setHabitConfig({ ...habitConfig, needFocus: e.target.checked })}
           />
-          <span>需专注</span>
+          <span>需要专注</span>
         </label>
-        <button type="submit" className="add-habit-btn-v8"><PlusIcon size={18} /></button>
+        <button type="submit" className="add-habit-btn"><PlusIcon size={18} /></button>
       </form>
 
-      <div className="today-summary-v8">
+      <div className="today-summary">
         <h4>今日打卡</h4>
         <p>{todayCheckins.length} 项已完成</p>
       </div>
 
-      <div className="habits-list-v8">
+      <div className="habits-list">
         {habits.length === 0 ? (
-          <div className="empty-habits-v8">
+          <div className="empty-habits">
             <p>暂无习惯</p>
-            <p className="empty-habits-hint-v8">添加一个习惯开始打卡</p>
+            <p className="empty-habits-hint">添加一个习惯开始打卡</p>
           </div>
         ) : (
           habits.map(habit => {
             const completedToday = getCompletedToday(habit.id)
             const streak = getStreak(habit.id)
             return (
-              <div key={habit.id} className={`habit-card-v8 ${completedToday ? 'completed' : ''}`}>
-                <div className="habit-info-v8">
-                  <div className="habit-text-v8">{habit.text}</div>
-                  <div className="habit-meta-v8">
-                    <span className="repeat-icon-v8">{getRepeatIcon(habit.repeat)}</span>
-                    {habit.unit && <span className="habit-unit-v8">{habit.unit}</span>}
-                    <span className="habit-type-v8">{habit.needFocus ? '需专注' : '手动'}</span>
+              <div key={habit.id} className={`habit-card ${completedToday ? 'completed' : ''}`}>
+                <div className="habit-info">
+                  <div className="habit-text">{habit.text}</div>
+                  <div className="habit-meta">
+                    <span className="habit-repeat">
+                      {habit.repeat === 'daily' ? '每日' : habit.repeat === 'weekly' ? '每周' : '每月'}
+                    </span>
+                    {habit.unit && <span className="habit-unit">{habit.unit}</span>}
+                    <span className="habit-type">{habit.needFocus ? '需专注' : '手动打卡'}</span>
                   </div>
                 </div>
-                <div className="habit-stats-v8">
-                  <div className="streak-badge-v8">
+                <div className="habit-stats">
+                  <div className="streak-badge">
                     <FireIcon size={14} /> {streak} 天
                   </div>
-                  <div className="total-badge-v8">
+                  <div className="total-badge">
                     <CheckIcon size={14} /> {habit.totalCompletions || 0} 次
                   </div>
                 </div>
-                <div className="habit-actions-v8">
+                <div className="habit-actions">
                   {!completedToday && !habit.needFocus && (
-                    <button className="manual-checkin-btn-v8" onClick={() => manualCheckin(habit)}>打卡</button>
+                    <button className="manual-checkin-btn" onClick={() => manualCheckin(habit)}>打卡</button>
                   )}
                   {completedToday ? (
-                    <span className="completed-tag-v8">已完成</span>
+                    <span className="completed-tag">已完成</span>
                   ) : (
-                    <span className="pending-tag-v8">未完成</span>
+                    <span className="pending-tag">未完成</span>
                   )}
-                  <button className="delete-habit-btn-v8" onClick={() => deleteHabit(habit.id)}>
+                  <button className="delete-habit-btn" onClick={() => deleteHabit(habit.id)}>
                     <TrashIcon size={14} />
                   </button>
                 </div>
@@ -1032,15 +989,15 @@ function CheckinView() {
       </div>
 
       {checkins.length > 0 && (
-        <div className="recent-checkins-v8">
+        <div className="recent-checkins">
           <h4>最近打卡记录</h4>
-          <div className="checkins-list-v8">
+          <div className="checkins-list">
             {checkins.slice(-10).reverse().map(checkin => (
-              <div key={checkin.id} className="checkin-item-v8">
-                <span className="checkin-text-v8">{checkin.habitText}</span>
-                <span className="checkin-date-v8">{new Date(checkin.date).toLocaleDateString('zh-CN')}</span>
-                {checkin.duration && <span className="checkin-duration-v8">{checkin.duration} 分钟</span>}
-                <span className="checkin-type-v8">{checkin.type === 'manual' ? '手动' : '自动'}</span>
+              <div key={checkin.id} className="checkin-item">
+                <span className="checkin-text">{checkin.habitText}</span>
+                <span className="checkin-date">{new Date(checkin.date).toLocaleDateString('zh-CN')}</span>
+                {checkin.duration && <span className="checkin-duration">{checkin.duration} 分钟</span>}
+                <span className="checkin-type">{checkin.type === 'manual' ? '手动' : '自动'}</span>
               </div>
             ))}
           </div>
@@ -1050,19 +1007,14 @@ function CheckinView() {
   )
 }
 
-// 统计视图 v8.0
+// 统计视图
 function StatsView() {
   const [viewType, setViewType] = useState('daily')
   const [chartType, setChartType] = useState('bar')
-  const [sessions, setSessions] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]') } catch { return [] }
-  })
-  const [hoveredHour, setHoveredHour] = useState(null)
+  const [sessions, setSessions] = useState(() => JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
 
   useEffect(() => {
-    const handleUpdate = () => {
-      try { setSessions(JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')) } catch {}
-    }
+    const handleUpdate = () => setSessions(JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
     window.addEventListener('sessions-updated', handleUpdate)
     return () => window.removeEventListener('sessions-updated', handleUpdate)
   }, [])
@@ -1074,17 +1026,14 @@ function StatsView() {
     if (viewType === 'daily') {
       const daySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
       const byHour = {}
-      const byHourDetails = {}
-      for (let h = 0; h < 24; h++) { byHour[h] = 0; byHourDetails[h] = [] }
+      for (let h = 0; h < 24; h++) byHour[h] = 0
       daySessions.forEach(s => {
         const hour = new Date(s.completedAt).getHours()
         byHour[hour] = (byHour[hour] || 0) + (s.duration || 0)
-        byHourDetails[hour].push(s)
       })
       return { 
         data: Object.values(byHour), 
         labels: Object.keys(byHour).map(k => `${k}:00`),
-        details: byHourDetails,
         total: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0),
         count: daySessions.length
       }
@@ -1101,7 +1050,6 @@ function StatsView() {
       return { 
         data: Object.values(byDay), 
         labels: Object.keys(byDay),
-        details: {},
         total: weekSessions.reduce((sum, s) => sum + (s.duration || 0), 0),
         count: weekSessions.length
       }
@@ -1118,7 +1066,6 @@ function StatsView() {
       return { 
         data: Object.values(byDay), 
         labels: Object.keys(byDay).map(k => `${k}日`),
-        details: {},
         total: monthSessions.reduce((sum, s) => sum + (s.duration || 0), 0),
         count: monthSessions.length
       }
@@ -1131,79 +1078,64 @@ function StatsView() {
   const totalCount = filtered.count || 0
 
   return (
-    <div className="stats-view-v8">
-      <div className="stats-header-v8">
+    <div className="stats-view">
+      <div className="stats-header">
         <h3>数据统计</h3>
-        <div className="stats-controls-v8">
-          <div className="custom-select-v8">
+        <div className="stats-controls">
+          <div className="custom-select">
             <select value={viewType} onChange={(e) => setViewType(e.target.value)}>
               <option value="daily">今日</option>
               <option value="weekly">本周</option>
               <option value="monthly">本月</option>
             </select>
           </div>
-          <div className="custom-select-v8">
+          <div className="custom-select">
             <select value={chartType} onChange={(e) => setChartType(e.target.value)}>
               <option value="bar">柱状图</option>
               <option value="line">折线图</option>
+              <option value="pie">扇形图</option>
             </select>
           </div>
         </div>
       </div>
 
-      <div className="stats-summary-v8">
-        <div className="summary-card-v8">
-          <div className="summary-value-v8">{Math.floor(totalDuration / 60)}</div>
-          <div className="summary-label-v8">总专注时长（分钟）</div>
+      <div className="stats-summary">
+        <div className="summary-card">
+          <div className="summary-value">{Math.floor(totalDuration / 60)}</div>
+          <div className="summary-label">总专注时长（分钟）</div>
         </div>
-        <div className="summary-card-v8">
-          <div className="summary-value-v8">{totalCount}</div>
-          <div className="summary-label-v8">专注次数</div>
+        <div className="summary-card">
+          <div className="summary-value">{totalCount}</div>
+          <div className="summary-label">专注次数</div>
         </div>
       </div>
 
-      <div className="stats-chart-container-v8">
+      <div className="stats-chart-container">
         {filtered.data.length === 0 || totalDuration === 0 ? (
-          <div className="empty-chart-v8">
+          <div className="empty-chart">
             <p>暂无数据</p>
-            <p className="empty-chart-hint-v8">开始专注后这里会显示统计图表</p>
+            <p className="empty-chart-hint">开始专注后这里会显示统计图表</p>
           </div>
         ) : (
           <>
             {chartType === 'bar' && (
-              <div className="bar-chart-v8">
+              <div className="bar-chart">
                 {filtered.data.map((value, i) => (
-                  <div 
-                    key={i} 
-                    className="bar-item-v8"
-                    onMouseEnter={() => viewType === 'daily' && filtered.details[i]?.length > 0 && setHoveredHour(i)}
-                    onMouseLeave={() => setHoveredHour(null)}
-                  >
+                  <div key={i} className="bar-item">
                     <div 
-                      className="bar-fill-v8" 
+                      className="bar-fill" 
                       style={{ height: `${(value / maxValue) * 100}%` }}
                     ></div>
-                    <div className="bar-label-v8">{filtered.labels[i]}</div>
-                    <div className="bar-value-v8">{Math.floor(value / 60)}m</div>
-                    
-                    {hoveredHour === i && filtered.details[i]?.length > 0 && (
-                      <div className="bar-tooltip-v8">
-                        {filtered.details[i].map(s => (
-                          <div key={s.id} className="tooltip-item-v8">
-                            <span className="tooltip-text-v8">{s.todoText}</span>
-                            <span className="tooltip-duration-v8">{Math.floor(s.duration / 60)}分钟</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div className="bar-label">{filtered.labels[i]}</div>
+                    <div className="bar-value">{Math.floor(value / 60)}m</div>
                   </div>
                 ))}
               </div>
             )}
 
             {chartType === 'line' && (
-              <div className="line-chart-v8">
-                <svg viewBox="0 0 400 200" className="line-svg-v8">
+              <div className="line-chart">
+                <svg viewBox="0 0 400 200" className="line-svg">
                   <polyline
                     fill="none"
                     stroke="#ff9500"
@@ -1222,10 +1154,50 @@ function StatsView() {
                     )
                   })}
                 </svg>
-                <div className="line-labels-v8">
+                <div className="line-labels">
                   {filtered.labels.map((label, i) => (
-                    <div key={i} className="line-label-v8">{label}</div>
+                    <div key={i} className="line-label">{label}</div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {chartType === 'pie' && totalDuration > 0 && (
+              <div className="pie-chart">
+                <svg viewBox="0 0 100 100" className="pie-svg">
+                  {filtered.data.filter(v => v > 0).map((value, i, arr) => {
+                    const validValues = arr.filter(v => v > 0)
+                    const total = validValues.reduce((sum, v) => sum + v, 0)
+                    const percentage = value / total
+                    const startAngle = validValues.slice(0, i).reduce((sum, v) => sum + (v / total) * 360, 0)
+                    const endAngle = startAngle + percentage * 360
+                    const x1 = 50 + 40 * Math.cos((startAngle - 90) * Math.PI / 180)
+                    const y1 = 50 + 40 * Math.sin((startAngle - 90) * Math.PI / 180)
+                    const x2 = 50 + 40 * Math.cos((endAngle - 90) * Math.PI / 180)
+                    const y2 = 50 + 40 * Math.sin((endAngle - 90) * Math.PI / 180)
+                    const largeArc = percentage > 0.5 ? 1 : 0
+                    const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
+                    const actualIndex = filtered.data.indexOf(value)
+                    return (
+                      <path
+                        key={actualIndex}
+                        d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
+                        fill={colors[actualIndex % colors.length]}
+                      />
+                    )
+                  })}
+                </svg>
+                <div className="pie-legend">
+                  {filtered.data.filter((value, i) => value > 0).map((value, i) => {
+                    const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
+                    const actualIndex = filtered.data.indexOf(value)
+                    return (
+                      <div key={actualIndex} className="legend-item">
+                        <div className="legend-color" style={{ background: colors[actualIndex % colors.length] }}></div>
+                        <span>{filtered.labels[actualIndex]}: {Math.floor(value / 60)}m</span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}

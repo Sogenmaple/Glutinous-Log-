@@ -1009,6 +1009,293 @@
   color: var(--text-secondary);
 }
 
+/* 打卡视图 */
+.checkin-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.checkin-header {
+  text-align: center;
+}
+
+.checkin-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--amber);
+  margin: 0 0 0.5rem 0;
+}
+
+.checkin-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.add-habit-form {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.15);
+  border-radius: 8px;
+}
+
+.habit-input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 4px;
+  padding: 0.7rem 1rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+
+.habit-input:focus {
+  border-color: var(--amber);
+  outline: none;
+}
+
+.habit-select,
+.habit-unit-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 4px;
+  padding: 0.7rem 0.8rem;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.habit-select:focus,
+.habit-unit-input:focus {
+  border-color: var(--amber);
+  outline: none;
+}
+
+.add-habit-btn {
+  background: rgba(255,149,0,0.15);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.add-habit-btn:hover {
+  background: rgba(255,149,0,0.25);
+  box-shadow: 0 0 10px rgba(255,149,0,0.3);
+}
+
+.today-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(6,182,212,0.1);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 6px;
+}
+
+.today-summary h4 {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--cyan);
+  margin: 0;
+}
+
+.today-summary p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.habits-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.habit-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,149,0,0.1);
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.habit-card:hover {
+  border-color: rgba(255,149,0,0.3);
+  background: rgba(255,255,255,0.05);
+}
+
+.habit-card.completed {
+  border-color: rgba(6,182,212,0.3);
+  background: rgba(6,182,212,0.08);
+}
+
+.habit-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.habit-text {
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+
+.habit-meta {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.habit-repeat,
+.habit-unit {
+  font-family: var(--font-mono);
+  padding: 0.15rem 0.4rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+}
+
+.habit-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: #ff6b35;
+  font-weight: 600;
+}
+
+.total-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+.habit-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.completed-tag {
+  font-size: 0.75rem;
+  color: var(--cyan);
+  padding: 0.25rem 0.6rem;
+  background: rgba(6,182,212,0.15);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+.pending-tag {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  padding: 0.25rem 0.6rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+
+.delete-habit-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.delete-habit-btn:hover {
+  color: #ff453a;
+}
+
+.empty-habits {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-dim);
+}
+
+.empty-habits-hint {
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}
+
+.recent-checkins {
+  padding: 1rem 1.5rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.1);
+  border-radius: 8px;
+}
+
+.recent-checkins h4 {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--amber);
+  margin: 0 0 1rem 0;
+}
+
+.checkins-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.checkin-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  background: rgba(255,255,255,0.03);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.checkin-text {
+  color: var(--text);
+  flex: 1;
+}
+
+.checkin-date,
+.checkin-duration {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  margin-left: 1rem;
+}
+
 /* 统计 */
 .stats-section {
   height: 100%;

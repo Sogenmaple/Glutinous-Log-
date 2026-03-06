@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon } from '../components/icons/SiteIcons'
+import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon } from '../components/icons/SiteIcons'
 
 export default function PomodoroTodo() {
   const navigate = useNavigate()
@@ -21,6 +21,9 @@ export default function PomodoroTodo() {
           <button className={`tab-btn ${activeTab === 'timer' ? 'active' : ''}`} onClick={() => setActiveTab('timer')}>
             <ClockIcon size={18} /><span>专注</span>
           </button>
+          <button className={`tab-btn ${activeTab === 'checkin' ? 'active' : ''}`} onClick={() => setActiveTab('checkin')}>
+            <FireIcon size={18} /><span>打卡</span>
+          </button>
           <button className={`tab-btn ${activeTab === 'heatmap' ? 'active' : ''}`} onClick={() => setActiveTab('heatmap')}>
             <CalendarIcon size={18} /><span>热力图</span>
           </button>
@@ -31,6 +34,7 @@ export default function PomodoroTodo() {
 
         <div className="pomodoro-content">
           {activeTab === 'timer' && <TimerView />}
+          {activeTab === 'checkin' && <CheckinView />}
           {activeTab === 'heatmap' && <HeatmapTab />}
           {activeTab === 'stats' && <StatsTab />}
         </div>
@@ -39,7 +43,7 @@ export default function PomodoroTodo() {
   )
 }
 
-// 专注视图 - 支持拖拽
+// 专注视图
 function TimerView() {
   const [activeTodos, setActiveTodos] = useState(() => {
     const saved = localStorage.getItem('pomodoro_active_todos')
@@ -71,7 +75,7 @@ function TimerView() {
     setActiveTodos(activeTodos.filter(t => t.id !== todo.id))
   }
 
-  const completeTodo = (todoId) => {
+  const completeActiveTodo = (todoId, activeTodos, setActiveTodos) => {
     const todo = activeTodos.find(t => t.id === todoId)
     if (todo) {
       const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')
@@ -86,6 +90,42 @@ function TimerView() {
           mode: 'work'
         })
         localStorage.setItem('pomodoro_sessions', JSON.stringify(sessions))
+      }
+
+      // 如果是重复任务，自动打卡并返回待办清单
+      if (todo.repeat && todo.repeat !== 'none') {
+        // 记录打卡
+        const checkins = JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]')
+        const today = new Date().toISOString().split('T')[0]
+        const existingCheckin = checkins.find(c => c.habitId === todo.id && c.date === today)
+        
+        if (!existingCheckin) {
+          checkins.push({
+            id: Date.now(),
+            habitId: todo.id,
+            habitText: todo.text,
+            date: today,
+            completedAt: new Date().toISOString(),
+            duration: completedTime
+          })
+          localStorage.setItem('pomodoro_checkins', JSON.stringify(checkins))
+        }
+
+        // 更新打卡习惯的最后完成时间
+        const habits = JSON.parse(localStorage.getItem('pomodoro_habits') || '[]')
+        habits.forEach(habit => {
+          if (habit.id === todo.id) {
+            habit.lastCompleted = today
+            habit.totalCompletions = (habit.totalCompletions || 0) + 1
+          }
+        })
+        localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
+
+        // 任务回到待办清单（长期任务）
+        const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+        todos.push({ ...todo, duration: todo.duration || 25, remainingTime: todo.duration || 25 })
+        localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
+        window.dispatchEvent(new CustomEvent('todos-updated'))
       }
     }
     setActiveTodos(activeTodos.filter(t => t.id !== todoId))
@@ -116,7 +156,7 @@ function TimerView() {
           <h3>待办清单</h3>
           <span className="column-count">拖到右侧开始专注</span>
         </div>
-        <TodosList onMoveToActive={moveToActive} />
+        <TodosList onMoveToActive={moveToActive} onCompleteActive={(id) => completeActiveTodo(id, activeTodos, setActiveTodos)} />
       </div>
 
       <div 
@@ -148,7 +188,7 @@ function TimerView() {
                 key={todo.id} 
                 todo={todo}
                 onMoveBack={() => moveBackToTodos(todo)}
-                onComplete={() => completeTodo(todo.id)}
+                onComplete={() => completeActiveTodo(todo.id, activeTodos, setActiveTodos)}
                 onUpdateTime={(newTime) => updateActiveTodoTime(todo.id, newTime)}
               />
             ))}
@@ -163,7 +203,7 @@ function TodosList({ onMoveToActive }) {
   const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
   const [newTodo, setNewTodo] = useState('')
   const [showConfig, setShowConfig] = useState(null)
-  const [config, setConfig] = useState({ priority: 'medium', dueDate: '', duration: 25 })
+  const [config, setConfig] = useState({ priority: 'medium', dueDate: '', duration: 25, repeat: 'none', unit: '' })
 
   useEffect(() => {
     const handleUpdate = () => setTodos(JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
@@ -185,6 +225,8 @@ function TodosList({ onMoveToActive }) {
       priority: 'medium',
       dueDate: null,
       duration: 25,
+      repeat: 'none',
+      unit: '',
       createdAt: new Date().toISOString()
     }])
     setNewTodo('')
@@ -198,13 +240,21 @@ function TodosList({ onMoveToActive }) {
       ...todo,
       priority: config.priority,
       dueDate: config.dueDate || null,
-      duration: config.duration
+      duration: config.duration,
+      repeat: config.repeat,
+      unit: config.unit || null
     } : todo))
     setShowConfig(null)
   }
 
   const openConfig = (todo) => {
-    setConfig({ priority: todo.priority || 'medium', dueDate: todo.dueDate || '', duration: todo.duration || 25 })
+    setConfig({ 
+      priority: todo.priority || 'medium', 
+      dueDate: todo.dueDate || '', 
+      duration: todo.duration || 25,
+      repeat: todo.repeat || 'none',
+      unit: todo.unit || ''
+    })
     setShowConfig(todo.id)
   }
 
@@ -233,6 +283,11 @@ function TodosList({ onMoveToActive }) {
                 <span className={`priority-badge priority-${todo.priority}`}>
                   {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
                 </span>
+                {todo.repeat && todo.repeat !== 'none' && (
+                  <span className="repeat-badge">
+                    {todo.repeat === 'daily' ? '每日' : todo.repeat === 'weekly' ? '每周' : todo.repeat === 'monthly' ? '每月' : ''}
+                  </span>
+                )}
                 {todo.dueDate && <span className="due-badge">{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>}
                 <span className="duration-badge">{todo.duration}分钟</span>
               </div>
@@ -262,6 +317,21 @@ function TodosList({ onMoveToActive }) {
                       <label>持续时间：{config.duration} 分钟</label>
                       <input type="range" min="5" max="180" step="5" value={config.duration} onChange={(e) => setConfig({ ...config, duration: parseInt(e.target.value) })} className="config-slider" />
                     </div>
+                    <div className="config-field">
+                      <label>重复类型</label>
+                      <select value={config.repeat} onChange={(e) => setConfig({ ...config, repeat: e.target.value })} className="config-select">
+                        <option value="none">一次性</option>
+                        <option value="daily">每日</option>
+                        <option value="weekly">每周</option>
+                        <option value="monthly">每月</option>
+                      </select>
+                    </div>
+                    {config.repeat !== 'none' && (
+                      <div className="config-field">
+                        <label>单位/量词（可选）</label>
+                        <input type="text" placeholder="如：个、次、页、小时" value={config.unit} onChange={(e) => setConfig({ ...config, unit: e.target.value })} className="config-input" />
+                      </div>
+                    )}
                     <div className="config-actions">
                       <button className="cancel-btn" onClick={() => setShowConfig(null)}>取消</button>
                       <button className="save-btn" onClick={saveConfig}>保存</button>
@@ -320,6 +390,9 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
         <div className="active-todo-title">
           <span className={`priority-dot priority-${todo.priority}`}></span>
           <span>{todo.text}</span>
+          {todo.repeat && todo.repeat !== 'none' && (
+            <span className="repeat-tag">{todo.repeat === 'daily' ? '每日' : todo.repeat === 'weekly' ? '每周' : '每月'}</span>
+          )}
         </div>
         <div className="header-actions">
           <button className="move-back-btn" onClick={onMoveBack}>返回</button>
@@ -365,12 +438,191 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
         <span className="info-item">已专注：{((todo.duration || 25) - (todo.remainingTime || 25))} 分钟</span>
         <span className="info-item">剩余：{todo.remainingTime || 25} 分钟</span>
         {todo.dueDate && <span className="info-item">截止：{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>}
+        {todo.unit && <span className="info-item">单位：{todo.unit}</span>}
       </div>
     </div>
   )
 }
 
-// 热力图 - 简洁规整设计
+// 打卡视图
+function CheckinView() {
+  const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('pomodoro_habits') || '[]'))
+  const [checkins, setCheckins] = useState(() => JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]'))
+  const [newHabit, setNewHabit] = useState('')
+  const [habitConfig, setHabitConfig] = useState({ repeat: 'daily', unit: '' })
+
+  useEffect(() => {
+    localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
+  }, [habits])
+
+  const addHabit = (e) => {
+    e.preventDefault()
+    if (!newHabit.trim()) return
+    const habit = {
+      id: Date.now(),
+      text: newHabit.trim(),
+      repeat: habitConfig.repeat,
+      unit: habitConfig.unit || '',
+      createdAt: new Date().toISOString(),
+      totalCompletions: 0,
+      lastCompleted: null
+    }
+    setHabits([...habits, habit])
+    setNewHabit('')
+    
+    // 同时添加到待办清单
+    const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+    todos.push({
+      id: habit.id,
+      text: habit.text,
+      completed: false,
+      priority: 'medium',
+      duration: 25,
+      repeat: habit.repeat,
+      unit: habit.unit,
+      createdAt: new Date().toISOString()
+    })
+    localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
+    window.dispatchEvent(new CustomEvent('todos-updated'))
+  }
+
+  const deleteHabit = (id) => {
+    setHabits(habits.filter(h => h.id !== id))
+    // 也从待办清单删除
+    const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+    localStorage.setItem('pomodoro_todos', JSON.stringify(todos.filter(t => t.id !== id)))
+    window.dispatchEvent(new CustomEvent('todos-updated'))
+  }
+
+  const today = new Date().toISOString().split('T')[0]
+  const todayCheckins = checkins.filter(c => c.date === today)
+
+  // 计算连续打卡天数
+  const getStreak = (habitId) => {
+    const habitCheckins = checkins.filter(c => c.habitId === habitId).sort((a, b) => new Date(b.date) - new Date(a.date))
+    if (habitCheckins.length === 0) return 0
+    
+    let streak = 1
+    let currentDate = new Date(habitCheckins[0].date)
+    
+    for (let i = 1; i < habitCheckins.length; i++) {
+      const prevDate = new Date(habitCheckins[i].date)
+      const diffDays = Math.floor((currentDate - prevDate) / (1000 * 60 * 60 * 24))
+      
+      if (diffDays === 1) {
+        streak++
+        currentDate = prevDate
+      } else if (diffDays > 1) {
+        break
+      }
+    }
+    
+    return streak
+  }
+
+  return (
+    <div className="checkin-view">
+      <div className="checkin-header">
+        <h3>习惯打卡</h3>
+        <p className="checkin-subtitle">记录每日坚持，培养长期习惯</p>
+      </div>
+
+      <form className="add-habit-form" onSubmit={addHabit}>
+        <input 
+          type="text" 
+          className="habit-input" 
+          placeholder="添加新习惯（如：背单词、阅读、运动）..." 
+          value={newHabit} 
+          onChange={(e) => setNewHabit(e.target.value)} 
+        />
+        <select 
+          className="habit-select"
+          value={habitConfig.repeat}
+          onChange={(e) => setHabitConfig({ ...habitConfig, repeat: e.target.value })}
+        >
+          <option value="daily">每日</option>
+          <option value="weekly">每周</option>
+          <option value="monthly">每月</option>
+        </select>
+        <input 
+          type="text" 
+          className="habit-unit-input" 
+          placeholder="单位（如：个、页）" 
+          value={habitConfig.unit}
+          onChange={(e) => setHabitConfig({ ...habitConfig, unit: e.target.value })}
+        />
+        <button type="submit" className="add-habit-btn"><PlusIcon size={18} /></button>
+      </form>
+
+      <div className="today-summary">
+        <h4>今日打卡</h4>
+        <p>{todayCheckins.length} 项已完成</p>
+      </div>
+
+      <div className="habits-list">
+        {habits.length === 0 ? (
+          <div className="empty-habits">
+            <p>暂无习惯</p>
+            <p className="empty-habits-hint">添加一个习惯开始打卡</p>
+          </div>
+        ) : (
+          habits.map(habit => {
+            const completedToday = checkins.some(c => c.habitId === habit.id && c.date === today)
+            const streak = getStreak(habit.id)
+            return (
+              <div key={habit.id} className={`habit-card ${completedToday ? 'completed' : ''}`}>
+                <div className="habit-info">
+                  <div className="habit-text">{habit.text}</div>
+                  <div className="habit-meta">
+                    <span className="habit-repeat">
+                      {habit.repeat === 'daily' ? '每日' : habit.repeat === 'weekly' ? '每周' : '每月'}
+                    </span>
+                    {habit.unit && <span className="habit-unit">{habit.unit}</span>}
+                  </div>
+                </div>
+                <div className="habit-stats">
+                  <div className="streak-badge">
+                    🔥 {streak} 天
+                  </div>
+                  <div className="total-badge">
+                    ✓ {habit.totalCompletions || 0} 次
+                  </div>
+                </div>
+                <div className="habit-actions">
+                  {completedToday ? (
+                    <span className="completed-tag">已完成</span>
+                  ) : (
+                    <span className="pending-tag">未完成</span>
+                  )}
+                  <button className="delete-habit-btn" onClick={() => deleteHabit(habit.id)}>
+                    <TrashIcon size={14} />
+                  </button>
+                </div>
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      {checkins.length > 0 && (
+        <div className="recent-checkins">
+          <h4>最近打卡记录</h4>
+          <div className="checkins-list">
+            {checkins.slice(-10).reverse().map(checkin => (
+              <div key={checkin.id} className="checkin-item">
+                <span className="checkin-text">{checkin.habitText}</span>
+                <span className="checkin-date">{new Date(checkin.date).toLocaleDateString('zh-CN')}</span>
+                {checkin.duration && <span className="checkin-duration">{checkin.duration} 分钟</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// 热力图组件
 function HeatmapTab() {
   const [viewMode, setViewMode] = useState('year')
   const [sessions] = useState(() => JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))

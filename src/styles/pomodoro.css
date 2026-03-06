@@ -82,7 +82,7 @@
 .timer-view {
   display: flex;
   gap: 2rem;
-  height: 700px;
+  height: 750px;
 }
 
 .column-header {
@@ -228,6 +228,7 @@
 }
 
 .todo-item {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -236,11 +237,22 @@
   border-radius: 4px;
   padding: 0.8rem;
   transition: all 0.3s ease;
+  cursor: grab;
+}
+
+.todo-item:active {
+  cursor: grabbing;
 }
 
 .todo-item:hover {
   border-color: rgba(255,149,0,0.3);
   background: rgba(255,255,255,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.todo-item[draggable="true"]:dragging {
+  opacity: 0.5;
+  transform: scale(1.02);
 }
 
 .todo-item.active {
@@ -255,6 +267,7 @@
   align-items: center;
   gap: 0.5rem;
   min-width: 0;
+  flex-wrap: wrap;
 }
 
 .todo-text {
@@ -263,9 +276,12 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
-.priority-badge {
+.priority-badge,
+.due-badge,
+.duration-badge {
   font-size: 0.65rem;
   padding: 0.15rem 0.4rem;
   border-radius: 2px;
@@ -288,10 +304,41 @@
   color: var(--cyan);
 }
 
+.due-badge {
+  background: rgba(139,92,246,0.2);
+  color: #8b5cf6;
+}
+
+.duration-badge {
+  background: rgba(34,197,94,0.2);
+  color: #22c55e;
+}
+
 .todo-actions {
   display: flex;
   gap: 0.4rem;
   align-items: center;
+  flex-shrink: 0;
+}
+
+.config-btn {
+  background: rgba(139,92,246,0.15);
+  border: 1px solid rgba(139,92,246,0.3);
+  color: #8b5cf6;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.config-btn:hover {
+  background: rgba(139,92,246,0.3);
+  box-shadow: 0 0 8px rgba(139,92,246,0.4);
 }
 
 .active-tag {
@@ -345,6 +392,126 @@
   font-size: 0.85rem;
 }
 
+/* 配置弹窗 */
+.config-modal {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1000;
+  margin-top: 0.5rem;
+  animation: config-slide 0.2s ease;
+}
+
+@keyframes config-slide {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.config-content {
+  background: rgba(10,10,15,0.98);
+  border: 1px solid rgba(255,149,0,0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-width: 280px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  backdrop-filter: blur(12px);
+}
+
+.config-content h4 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--amber);
+  margin: 0 0 1rem 0;
+}
+
+.config-field {
+  margin-bottom: 1rem;
+}
+
+.config-field label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.config-select,
+.config-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 4px;
+  padding: 0.6rem 0.8rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+}
+
+.config-select:focus,
+.config-input:focus {
+  border-color: var(--amber);
+  outline: none;
+}
+
+.config-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.1);
+  outline: none;
+  cursor: pointer;
+}
+
+.config-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--amber);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--amber);
+}
+
+.config-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.cancel-btn,
+.save-btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text-secondary);
+}
+
+.cancel-btn:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.save-btn {
+  background: rgba(255,149,0,0.15);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+}
+
+.save-btn:hover {
+  background: rgba(255,149,0,0.25);
+  box-shadow: 0 0 10px rgba(255,149,0,0.3);
+}
+
 /* 专注中的待办卡片 */
 .active-todos-list {
   flex: 1;
@@ -373,6 +540,27 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.move-back-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--text-secondary);
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.move-back-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: var(--text);
 }
 
 .active-todo-title {
@@ -441,14 +629,29 @@
   margin-bottom: 1rem;
 }
 
+.time-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
 .time-slider {
+  flex: 1;
   -webkit-appearance: none;
-  width: 100%;
   height: 6px;
   border-radius: 3px;
   background: rgba(255,255,255,0.1);
   outline: none;
   cursor: pointer;
+}
+
+.slider-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--amber);
+  min-width: 60px;
+  text-align: right;
 }
 
 .time-slider::-webkit-slider-thumb {
@@ -557,7 +760,7 @@
 }
 
 /* 统计信息 */
-.active-todo-stats {
+.active-todo-info {
   display: flex;
   justify-content: center;
   gap: 1.5rem;
@@ -565,6 +768,13 @@
   border-top: 1px solid rgba(255,149,0,0.1);
   font-size: 0.8rem;
   color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 /* 热力图 */
@@ -645,60 +855,74 @@
 
 .heatmap-grid {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
 }
 
 .year-grid {
-  flex-direction: column;
+  gap: 0.3rem;
 }
 
-.month-grid,
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+}
+
 .day-grid {
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
   gap: 0.3rem;
 }
 
-.heatmap-month {
+.heatmap-month-row {
   display: flex;
-  gap: 0.3rem;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .month-label {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-dim);
-  writing-mode: vertical-rl;
+  min-width: 30px;
   text-align: right;
 }
 
-.heatmap-days {
+.heatmap-days-row {
   display: flex;
   gap: 2px;
+  flex: 1;
 }
 
 .heatmap-cell {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 3px;
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: pointer;
   border: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
 }
 
-.heatmap-cell:hover {
-  transform: scale(1.4);
+.heatmap-cell.future {
+  cursor: default;
+}
+
+.heatmap-cell:hover:not(.future) {
+  transform: scale(1.5);
   z-index: 10;
   box-shadow: 0 0 12px rgba(255,149,0,0.6);
   border-color: rgba(255,149,0,0.5);
 }
 
-.heatmap-cell.has-data:hover {
+.heatmap-cell.has-data:hover:not(.future) {
   box-shadow: 0 0 15px rgba(255,149,0,0.8);
 }
 
 .heatmap-cell.large {
-  width: 45px;
-  height: 45px;
+  width: 50px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -706,8 +930,8 @@
 }
 
 .heatmap-cell.hour-cell {
-  width: 70px;
-  height: 45px;
+  width: 80px;
+  height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -204,6 +204,8 @@ function TimerTab({ selectedTodoId, onSelectTodo }) {
   const [isRunning, setIsRunning] = useState(false)
   const [mode, setMode] = useState('work')
   const [timerStyle, setTimerStyle] = useState('digital')
+  const [customTime, setCustomTime] = useState(25) // 分钟
+  const [isCustomMode, setIsCustomMode] = useState(false)
   const [pomodoros, setPomodoros] = useState(() => {
     const saved = localStorage.getItem('pomodoro_sessions')
     return saved ? JSON.parse(saved) : []
@@ -226,13 +228,13 @@ function TimerTab({ selectedTodoId, onSelectTodo }) {
         setTimeLeft(prev => {
           if (prev <= 1) {
             setIsRunning(false)
-            if (mode === 'work') {
+            if (mode === 'work' || isCustomMode) {
               const session = {
                 id: Date.now(),
                 todoId: selectedTodoId,
                 completedAt: new Date().toISOString(),
-                duration: 25 * 60,
-                mode: 'work'
+                duration: isCustomMode ? customTime * 60 : modes[mode].time,
+                mode: isCustomMode ? 'custom' : 'work'
               }
               setPomodoros([...pomodoros, session])
             }
@@ -243,7 +245,7 @@ function TimerTab({ selectedTodoId, onSelectTodo }) {
       }, 1000)
     }
     return () => clearInterval(timer)
-  }, [isRunning, mode, selectedTodoId])
+  }, [isRunning, mode, selectedTodoId, isCustomMode, customTime])
 
   const formatTime = (seconds) => {
     const h = Math.floor(seconds / 3600)
@@ -254,8 +256,31 @@ function TimerTab({ selectedTodoId, onSelectTodo }) {
   }
 
   const resetTimer = () => {
-    setTimeLeft(modes[mode].time)
+    if (isCustomMode) {
+      setTimeLeft(customTime * 60)
+    } else {
+      setTimeLeft(modes[mode].time)
+    }
     setIsRunning(false)
+  }
+
+  const handleModeChange = (key) => {
+    setMode(key)
+    setTimeLeft(modes[key].time)
+    setIsRunning(false)
+    setIsCustomMode(false)
+  }
+
+  const handleCustomMode = () => {
+    setIsCustomMode(true)
+    setTimeLeft(customTime * 60)
+    setIsRunning(false)
+  }
+
+  const handleTimeChange = (e) => {
+    const minutes = parseInt(e.target.value)
+    setCustomTime(minutes)
+    setTimeLeft(minutes * 60)
   }
 
   const progress = ((modes[mode].time - timeLeft) / modes[mode].time) * 100
@@ -268,23 +293,48 @@ function TimerTab({ selectedTodoId, onSelectTodo }) {
             {Object.entries(modes).map(([key, value]) => (
               <button
                 key={key}
-                className={`mode-btn ${mode === key ? 'active' : ''}`}
-                onClick={() => {
-                  setMode(key)
-                  setTimeLeft(value.time)
-                  setIsRunning(false)
-                }}
+                className={`mode-btn ${mode === key && !isCustomMode ? 'active' : ''}`}
+                onClick={() => handleModeChange(key)}
                 style={{ '--theme-color': value.color }}
               >
                 {value.label}
               </button>
             ))}
+            <button
+              className={`mode-btn ${isCustomMode ? 'active' : ''}`}
+              onClick={handleCustomMode}
+              style={{ '--theme-color': '#a855f7' }}
+            >
+              自定义
+            </button>
           </div>
 
           <div className="timer-display">
             {timerStyle === 'digital' ? (
               <div className="digital-timer">
                 <div className="time-text">{formatTime(timeLeft)}</div>
+                
+                {/* 可拖拽的时间设置滑块 */}
+                <div className="time-slider-container">
+                  <input
+                    type="range"
+                    className="time-slider"
+                    min="1"
+                    max="120"
+                    value={isCustomMode ? customTime : Math.round(timeLeft / 60)}
+                    onChange={handleTimeChange}
+                    disabled={isRunning}
+                    style={{
+                      '--slider-color': isCustomMode ? '#a855f7' : modes[mode].color
+                    }}
+                  />
+                  <div className="slider-labels">
+                    <span>1 分钟</span>
+                    <span>{isCustomMode ? `${customTime} 分钟` : `${Math.round(timeLeft / 60)} 分钟`}</span>
+                    <span>120 分钟</span>
+                  </div>
+                </div>
+
                 <div className="progress-bar">
                   <div className="progress-fill" style={{ width: `${progress}%` }}></div>
                 </div>
@@ -295,7 +345,7 @@ function TimerTab({ selectedTodoId, onSelectTodo }) {
                   <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4" />
                   <circle
                     cx="50" cy="50" r="45" fill="none"
-                    stroke={modes[mode].color} strokeWidth="4"
+                    stroke={isCustomMode ? '#a855f7' : modes[mode].color} strokeWidth="4"
                     strokeLinecap="round"
                     strokeDasharray={`${2 * Math.PI * 45}`}
                     strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}

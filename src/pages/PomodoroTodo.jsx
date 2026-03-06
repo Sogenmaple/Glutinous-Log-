@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, PinIcon, CalendarIcon } from '../components/icons/SiteIcons'
+import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon } from '../components/icons/SiteIcons'
 
 /**
- * 番茄钟待办 v2.0
- * - 侧栏选择待办
- * - 年度/月/日热力图
- * - 数据持久化（localStorage，后续接数据库）
- * - 悬浮查看详情
+ * 番茄钟待办 v3.0
+ * 左右分栏布局：
+ * - 左侧：待办清单（可拖拽到右侧）
+ * - 右侧：专注中（当前正在进行的任务）
  */
 export default function PomodoroTodo() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('timer')
-  const [selectedTodoId, setSelectedTodoId] = useState(null)
 
   return (
     <div className="pomodoro-page">
@@ -28,66 +26,117 @@ export default function PomodoroTodo() {
           <p className="pomodoro-subtitle">POMODORO FOCUS SYSTEM</p>
         </div>
 
-        <div className="pomodoro-layout">
-          {/* 侧栏：待办清单 */}
-          <aside className="pomodoro-sidebar">
-            <div className="sidebar-header">
-              <h3>
-                <CheckIcon size={18} />
-                <span>待办清单</span>
-              </h3>
-            </div>
-            <TodosList 
-              selectedTodoId={selectedTodoId} 
-              onSelectTodo={setSelectedTodoId} 
-            />
-          </aside>
+        {/* 标签页导航 */}
+        <div className="pomodoro-tabs">
+          <button 
+            className={`tab-btn ${activeTab === 'timer' ? 'active' : ''}`}
+            onClick={() => setActiveTab('timer')}
+          >
+            <ClockIcon size={18} />
+            <span>专注</span>
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'heatmap' ? 'active' : ''}`}
+            onClick={() => setActiveTab('heatmap')}
+          >
+            <CalendarIcon size={18} />
+            <span>热力图</span>
+          </button>
+          <button 
+            className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`}
+            onClick={() => setActiveTab('stats')}
+          >
+            <ChartIcon size={18} />
+            <span>统计</span>
+          </button>
+        </div>
 
-          {/* 主内容区 */}
-          <div className="pomodoro-content-area">
-            <div className="pomodoro-tabs">
-              <button 
-                className={`tab-btn ${activeTab === 'timer' ? 'active' : ''}`}
-                onClick={() => setActiveTab('timer')}
-              >
-                <ClockIcon size={18} />
-                <span>计时器</span>
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'heatmap' ? 'active' : ''}`}
-                onClick={() => setActiveTab('heatmap')}
-              >
-                <CalendarIcon size={18} />
-                <span>热力图</span>
-              </button>
-              <button 
-                className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`}
-                onClick={() => setActiveTab('stats')}
-              >
-                <ChartIcon size={18} />
-                <span>统计</span>
-              </button>
-            </div>
-
-            <div className="pomodoro-content">
-              {activeTab === 'timer' && (
-                <TimerTab 
-                  selectedTodoId={selectedTodoId}
-                  onSelectTodo={setSelectedTodoId}
-                />
-              )}
-              {activeTab === 'heatmap' && <HeatmapTab />}
-              {activeTab === 'stats' && <StatsTab />}
-            </div>
-          </div>
+        {/* 内容区域 */}
+        <div className="pomodoro-content">
+          {activeTab === 'timer' && <TimerView />}
+          {activeTab === 'heatmap' && <HeatmapTab />}
+          {activeTab === 'stats' && <StatsTab />}
         </div>
       </main>
     </div>
   )
 }
 
+// 专注视图 - 左右分栏
+function TimerView() {
+  const [activeTodos, setActiveTodos] = useState(() => {
+    const saved = localStorage.getItem('pomodoro_active_todos')
+    return saved ? JSON.parse(saved) : []
+  })
+
+  useEffect(() => {
+    localStorage.setItem('pomodoro_active_todos', JSON.stringify(activeTodos))
+  }, [activeTodos])
+
+  const moveToActive = (todo) => {
+    if (!activeTodos.find(t => t.id === todo.id)) {
+      setActiveTodos([...activeTodos, { ...todo, startedAt: new Date().toISOString() }])
+    }
+  }
+
+  const removeFromActive = (todoId) => {
+    setActiveTodos(activeTodos.filter(t => t.id !== todoId))
+  }
+
+  return (
+    <div className="timer-view">
+      {/* 左侧：待办清单 */}
+      <div className="todo-column">
+        <div className="column-header">
+          <h3>
+            <CheckIcon size={18} />
+            <span>待办清单</span>
+          </h3>
+          <span className="column-count">{activeTodos.length} 个进行中</span>
+        </div>
+        <TodosList 
+          activeTodos={activeTodos}
+          onMoveToActive={moveToActive}
+        />
+      </div>
+
+      {/* 右侧：专注中 */}
+      <div className="focus-column">
+        <div className="column-header">
+          <h3>
+            <ClockIcon size={18} />
+            <span>专注中</span>
+          </h3>
+          {activeTodos.length > 0 && (
+            <button className="clear-all-btn" onClick={() => setActiveTodos([])}>
+              全部完成
+            </button>
+          )}
+        </div>
+        
+        {activeTodos.length === 0 ? (
+          <div className="empty-focus">
+            <p>💭 从左侧拖拽待办到这里开始专注</p>
+            <p className="empty-hint">或者点击待办旁边的 ➤ 按钮</p>
+          </div>
+        ) : (
+          <div className="active-todos-list">
+            {activeTodos.map(todo => (
+              <ActiveTodoCard 
+                key={todo.id} 
+                todo={todo} 
+                onRemove={() => removeFromActive(todo.id)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // 待办列表组件
-function TodosList({ selectedTodoId, onSelectTodo }) {
+function TodosList({ activeTodos, onMoveToActive }) {
   const [todos, setTodos] = useState(() => {
     const saved = localStorage.getItem('pomodoro_todos')
     return saved ? JSON.parse(saved) : []
@@ -109,7 +158,6 @@ function TodosList({ selectedTodoId, onSelectTodo }) {
       completed: false,
       priority,
       pomodoros: 0,
-      completedAt: null,
       createdAt: new Date().toISOString()
     }
     
@@ -119,18 +167,15 @@ function TodosList({ selectedTodoId, onSelectTodo }) {
 
   const toggleTodo = (id) => {
     setTodos(todos.map(todo =>
-      todo.id === id ? { 
-        ...todo, 
-        completed: !todo.completed,
-        completedAt: !todo.completed ? new Date().toISOString() : null
-      } : todo
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
     ))
   }
 
   const deleteTodo = (id) => {
     setTodos(todos.filter(todo => todo.id !== id))
-    if (selectedTodoId === id) onSelectTodo(null)
   }
+
+  const filteredTodos = todos.filter(t => !t.completed)
 
   return (
     <div className="todos-list-container">
@@ -138,7 +183,7 @@ function TodosList({ selectedTodoId, onSelectTodo }) {
         <input
           type="text"
           className="todo-input"
-          placeholder="添加任务..."
+          placeholder="添加新任务..."
           value={newTodo}
           onChange={(e) => setNewTodo(e.target.value)}
         />
@@ -157,69 +202,56 @@ function TodosList({ selectedTodoId, onSelectTodo }) {
       </form>
 
       <div className="todos-list">
-        {todos.length === 0 ? (
+        {filteredTodos.length === 0 ? (
           <div className="empty-state">暂无待办</div>
         ) : (
-          todos.map(todo => (
-            <div 
-              key={todo.id} 
-              className={`todo-item ${todo.completed ? 'completed' : ''} ${selectedTodoId === todo.id ? 'selected' : ''}`}
-              onClick={() => onSelectTodo(todo.id)}
-            >
-              <button 
-                className="todo-checkbox" 
-                onClick={(e) => {
-                  e.stopPropagation()
-                  toggleTodo(todo.id)
-                }}
+          filteredTodos.map(todo => {
+            const isActive = activeTodos.find(t => t.id === todo.id)
+            return (
+              <div 
+                key={todo.id} 
+                className={`todo-item ${isActive ? 'active' : ''}`}
               >
-                {todo.completed && <CheckIcon size={14} />}
-              </button>
-              <div className="todo-content">
-                <span className="todo-text">{todo.text}</span>
-                <span className={`priority-badge priority-${todo.priority}`}>
-                  {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
-                </span>
+                <div className="todo-content">
+                  <span className="todo-text">{todo.text}</span>
+                  <span className={`priority-badge priority-${todo.priority}`}>
+                    {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
+                  </span>
+                </div>
+                <div className="todo-actions">
+                  {isActive ? (
+                    <span className="active-tag">专注中</span>
+                  ) : (
+                    <button 
+                      className="move-btn" 
+                      onClick={() => onMoveToActive(todo)}
+                      title="开始专注"
+                    >
+                      ➤
+                    </button>
+                  )}
+                  <button 
+                    className="delete-btn" 
+                    onClick={() => deleteTodo(todo.id)}
+                  >
+                    <TrashIcon size={14} />
+                  </button>
+                </div>
               </div>
-              <button 
-                className="delete-btn" 
-                onClick={(e) => {
-                  e.stopPropagation()
-                  deleteTodo(todo.id)
-                }}
-              >
-                <TrashIcon size={14} />
-              </button>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
     </div>
   )
 }
 
-// 计时器组件
-function TimerTab({ selectedTodoId, onSelectTodo }) {
+// 专注中的待办卡片
+function ActiveTodoCard({ todo, onRemove }) {
   const [timeLeft, setTimeLeft] = useState(25 * 60)
   const [isRunning, setIsRunning] = useState(false)
-  const [mode, setMode] = useState('work')
   const [timerStyle, setTimerStyle] = useState('digital')
-  const [customTime, setCustomTime] = useState(25) // 分钟
-  const [isCustomMode, setIsCustomMode] = useState(false)
-  const [pomodoros, setPomodoros] = useState(() => {
-    const saved = localStorage.getItem('pomodoro_sessions')
-    return saved ? JSON.parse(saved) : []
-  })
-
-  const modes = {
-    work: { time: 25 * 60, label: '专注', color: '#ff9500' },
-    shortBreak: { time: 5 * 60, label: '短休息', color: '#06b6d4' },
-    longBreak: { time: 15 * 60, label: '长休息', color: '#39ff14' }
-  }
-
-  useEffect(() => {
-    localStorage.setItem('pomodoro_sessions', JSON.stringify(pomodoros))
-  }, [pomodoros])
+  const [customTime, setCustomTime] = useState(25)
 
   useEffect(() => {
     let timer
@@ -228,16 +260,6 @@ function TimerTab({ selectedTodoId, onSelectTodo }) {
         setTimeLeft(prev => {
           if (prev <= 1) {
             setIsRunning(false)
-            if (mode === 'work' || isCustomMode) {
-              const session = {
-                id: Date.now(),
-                todoId: selectedTodoId,
-                completedAt: new Date().toISOString(),
-                duration: isCustomMode ? customTime * 60 : modes[mode].time,
-                mode: isCustomMode ? 'custom' : 'work'
-              }
-              setPomodoros([...pomodoros, session])
-            }
             return 0
           }
           return prev - 1
@@ -245,151 +267,102 @@ function TimerTab({ selectedTodoId, onSelectTodo }) {
       }, 1000)
     }
     return () => clearInterval(timer)
-  }, [isRunning, mode, selectedTodoId, isCustomMode, customTime])
+  }, [isRunning, timeLeft])
 
   const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600)
-    const m = Math.floor((seconds % 3600) / 60)
+    const m = Math.floor(seconds / 60)
     const s = seconds % 60
-    if (h > 0) return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
   }
 
   const resetTimer = () => {
-    if (isCustomMode) {
-      setTimeLeft(customTime * 60)
-    } else {
-      setTimeLeft(modes[mode].time)
-    }
-    setIsRunning(false)
-  }
-
-  const handleModeChange = (key) => {
-    setMode(key)
-    setTimeLeft(modes[key].time)
-    setIsRunning(false)
-    setIsCustomMode(false)
-  }
-
-  const handleCustomMode = () => {
-    setIsCustomMode(true)
     setTimeLeft(customTime * 60)
     setIsRunning(false)
   }
 
-  const handleTimeChange = (e) => {
-    const minutes = parseInt(e.target.value)
-    setCustomTime(minutes)
-    setTimeLeft(minutes * 60)
-  }
-
-  const progress = ((modes[mode].time - timeLeft) / modes[mode].time) * 100
+  const progress = ((customTime * 60 - timeLeft) / (customTime * 60)) * 100
 
   return (
-    <div className="timer-section">
-      <div className="timer-with-sidebar">
-        <div className="timer-main">
-          <div className="mode-selector">
-            {Object.entries(modes).map(([key, value]) => (
-              <button
-                key={key}
-                className={`mode-btn ${mode === key && !isCustomMode ? 'active' : ''}`}
-                onClick={() => handleModeChange(key)}
-                style={{ '--theme-color': value.color }}
-              >
-                {value.label}
-              </button>
-            ))}
-            <button
-              className={`mode-btn ${isCustomMode ? 'active' : ''}`}
-              onClick={handleCustomMode}
-              style={{ '--theme-color': '#a855f7' }}
-            >
-              自定义
-            </button>
-          </div>
-
-          <div className="timer-display">
-            {timerStyle === 'digital' ? (
-              <div className="digital-timer">
-                <div className="time-text">{formatTime(timeLeft)}</div>
-                
-                {/* 可拖拽的时间设置滑块 */}
-                <div className="time-slider-container">
-                  <input
-                    type="range"
-                    className="time-slider"
-                    min="1"
-                    max="120"
-                    value={isCustomMode ? customTime : Math.round(timeLeft / 60)}
-                    onChange={handleTimeChange}
-                    disabled={isRunning}
-                    style={{
-                      '--slider-color': isCustomMode ? '#a855f7' : modes[mode].color
-                    }}
-                  />
-                  <div className="slider-labels">
-                    <span>1 分钟</span>
-                    <span>{isCustomMode ? `${customTime} 分钟` : `${Math.round(timeLeft / 60)} 分钟`}</span>
-                    <span>120 分钟</span>
-                  </div>
-                </div>
-
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${progress}%` }}></div>
-                </div>
-              </div>
-            ) : (
-              <div className="circular-timer">
-                <svg viewBox="0 0 100 100" className="circular-svg">
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="4" />
-                  <circle
-                    cx="50" cy="50" r="45" fill="none"
-                    stroke={isCustomMode ? '#a855f7' : modes[mode].color} strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeDasharray={`${2 * Math.PI * 45}`}
-                    strokeDashoffset={`${2 * Math.PI * 45 * (1 - progress / 100)}`}
-                    transform="rotate(-90 50 50)"
-                  />
-                </svg>
-                <div className="circular-time">{formatTime(timeLeft)}</div>
-              </div>
-            )}
-          </div>
-
-          <div className="timer-controls">
-            <button className="control-btn primary" onClick={() => setIsRunning(!isRunning)}>
-              {isRunning ? <><PauseIcon size={20} /><span>暂停</span></> : <><PlayIcon size={20} /><span>开始</span></>}
-            </button>
-            <button className="control-btn" onClick={resetTimer}>
-              <ResetIcon size={20} /><span>重置</span>
-            </button>
-          </div>
-
-          <div className="timer-settings">
-            <div className="setting-group">
-              <span className="setting-label">样式</span>
-              <div className="setting-btns">
-                <button className={timerStyle === 'digital' ? 'active' : ''} onClick={() => setTimerStyle('digital')}>数字</button>
-                <button className={timerStyle === 'circular' ? 'active' : ''} onClick={() => setTimerStyle('circular')}>圆形</button>
-              </div>
-            </div>
-          </div>
+    <div className="active-todo-card">
+      <div className="active-todo-header">
+        <div className="active-todo-title">
+          <span className={`priority-dot priority-${todo.priority}`}></span>
+          <span>{todo.text}</span>
         </div>
+        <button className="complete-btn" onClick={onRemove}>
+          ✓ 完成
+        </button>
+      </div>
 
-        <div className="timer-sidebar">
-          <h4 className="sidebar-title">专注的待办</h4>
-          {selectedTodoId ? (
-            <div className="selected-todo-info">
-              <p>已选择待办 ID: {selectedTodoId}</p>
-              <button className="clear-selection-btn" onClick={() => onSelectTodo(null)}>
-                清除选择
-              </button>
-            </div>
-          ) : (
-            <p className="no-selection">请在左侧选择一个待办事项</p>
-          )}
-        </div>
+      <div className="active-todo-timer">
+        {timerStyle === 'digital' ? (
+          <div className="digital-timer-compact">
+            <div className="time-display">{formatTime(timeLeft)}</div>
+            <input
+              type="range"
+              className="time-slider"
+              min="1"
+              max="120"
+              value={customTime}
+              onChange={(e) => {
+                const mins = parseInt(e.target.value)
+                setCustomTime(mins)
+                setTimeLeft(mins * 60)
+              }}
+              disabled={isRunning}
+              style={{ '--slider-color': '#ff9500' }}
+            />
+          </div>
+        ) : (
+          <div className="circular-timer-compact">
+            <svg viewBox="0 0 100 100" className="circular-svg">
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="rgba(255,149,0,0.2)"
+                strokeWidth="8"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                stroke="#ff9500"
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 42}`}
+                strokeDashoffset={`${2 * Math.PI * 42 * (1 - progress / 100)}`}
+                transform="rotate(-90 50 50)"
+              />
+            </svg>
+            <div className="circular-time-display">{formatTime(timeLeft)}</div>
+          </div>
+        )}
+      </div>
+
+      <div className="active-todo-controls">
+        <button
+          className="control-btn primary"
+          onClick={() => setIsRunning(!isRunning)}
+        >
+          {isRunning ? <><PauseIcon size={16} /><span>暂停</span></> : <><PlayIcon size={16} /><span>开始</span></>}
+        </button>
+        <button className="control-btn" onClick={resetTimer}>
+          <ResetIcon size={16} />
+        </button>
+        <button
+          className={`style-btn ${timerStyle === 'digital' ? 'active' : ''}`}
+          onClick={() => setTimerStyle(timerStyle === 'digital' ? 'circular' : 'digital')}
+        >
+          {timerStyle === 'digital' ? '数字' : '圆形'}
+        </button>
+      </div>
+
+      <div className="active-todo-stats">
+        <span>🍅 {todo.pomodoros} 个番茄</span>
+        <span>⏱️ 总计 {Math.floor((todo.pomodoros * 25))} 分钟</span>
       </div>
     </div>
   )
@@ -403,24 +376,26 @@ function HeatmapTab() {
     return saved ? JSON.parse(saved) : []
   })
   const [hoverData, setHoverData] = useState(null)
-  const [selectedDate, setSelectedDate] = useState(null)
 
   const generateHeatmapData = () => {
     const data = {}
     const now = new Date()
     
     if (viewMode === 'year') {
-      const yearStart = new Date(now.getFullYear(), 0, 1)
-      for (let d = new Date(yearStart); d <= now; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split('T')[0]
-        const daySessions = sessions.filter(s => {
-          const sDate = new Date(s.completedAt).toISOString().split('T')[0]
-          return sDate === dateStr
-        })
-        data[dateStr] = {
-          count: daySessions.length,
-          sessions: daySessions,
-          totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+      for (let m = 0; m < 12; m++) {
+        for (let d = 1; d <= 31; d++) {
+          const date = new Date(now.getFullYear(), m, d)
+          if (date.getMonth() === m && date <= now) {
+            const dateStr = date.toISOString().split('T')[0]
+            const daySessions = sessions.filter(s => {
+              const sDate = new Date(s.completedAt).toISOString().split('T')[0]
+              return sDate === dateStr && s.mode === 'work'
+            })
+            data[dateStr] = {
+              count: daySessions.length,
+              totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+            }
+          }
         }
       }
     } else if (viewMode === 'month') {
@@ -430,27 +405,24 @@ function HeatmapTab() {
         const dateStr = d.toISOString().split('T')[0]
         const daySessions = sessions.filter(s => {
           const sDate = new Date(s.completedAt).toISOString().split('T')[0]
-          return sDate === dateStr
+          return sDate === dateStr && s.mode === 'work'
         })
         data[dateStr] = {
           count: daySessions.length,
-          sessions: daySessions,
           totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
         }
       }
     } else if (viewMode === 'day') {
       const today = now.toISOString().split('T')[0]
       for (let h = 0; h < 24; h++) {
-        const hourKey = `${today} ${h.toString().padStart(2, '0')}`
+        const hourKey = `${today}-${h.toString().padStart(2, '0')}`
         const hourSessions = sessions.filter(s => {
           const sDate = new Date(s.completedAt)
-          const sHour = sDate.getHours()
           const sDateStr = sDate.toISOString().split('T')[0]
-          return sDateStr === today && sHour === h
+          return sDateStr === today && sDate.getHours() === h && s.mode === 'work'
         })
         data[hourKey] = {
           count: hourSessions.length,
-          sessions: hourSessions,
           totalDuration: hourSessions.reduce((sum, s) => sum + (s.duration || 0), 0)
         }
       }
@@ -466,58 +438,36 @@ function HeatmapTab() {
     if (count === 0) return 'rgba(255,255,255,0.03)'
     const intensity = count / maxCount
     if (intensity > 0.75) return 'rgba(255,149,0,0.9)'
-    if (intensity > 0.5) return 'rgba(255,149,0,0.7)'
-    if (intensity > 0.25) return 'rgba(255,149,0,0.5)'
-    return 'rgba(255,149,0,0.3)'
+    if (intensity > 0.5) return 'rgba(255,149,0,0.6)'
+    if (intensity > 0.25) return 'rgba(255,149,0,0.4)'
+    return 'rgba(255,149,0,0.2)'
   }
 
   const formatDuration = (seconds) => {
-    const h = Math.floor(seconds / 3600)
-    const m = Math.floor((seconds % 3600) / 60)
-    if (h > 0) return `${h}小时${m}分钟`
-    return `${m}分钟`
-  }
-
-  const getMonthName = (month) => {
-    const months = ['1 月', '2 月', '3 月', '4 月', '5 月', '6 月', 
-                    '7 月', '8 月', '9 月', '10 月', '11 月', '12 月']
-    return months[month]
-  }
-
-  const getWeekdayName = (day) => {
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
-    return weekdays[day]
+    const m = Math.floor(seconds / 60)
+    return m > 0 ? `${m}分钟` : '< 1 分钟'
   }
 
   return (
     <div className="heatmap-section">
       <div className="heatmap-header">
-        <h3 className="heatmap-title">专注热力图</h3>
+        <h3>专注热力图</h3>
         <div className="heatmap-legend">
-          <span className="legend-label">少</span>
-          <div className="legend-colors">
-            <div className="legend-box" style={{ background: 'rgba(255,149,0,0.2)' }}></div>
-            <div className="legend-box" style={{ background: 'rgba(255,149,0,0.4)' }}></div>
-            <div className="legend-box" style={{ background: 'rgba(255,149,0,0.7)' }}></div>
-            <div className="legend-box" style={{ background: 'rgba(255,149,0,0.9)' }}></div>
+          <span>少</span>
+          <div className="legend-boxes">
+            <div className="legend-cell" style={{ background: 'rgba(255,149,0,0.2)' }}></div>
+            <div className="legend-cell" style={{ background: 'rgba(255,149,0,0.4)' }}></div>
+            <div className="legend-cell" style={{ background: 'rgba(255,149,0,0.6)' }}></div>
+            <div className="legend-cell" style={{ background: 'rgba(255,149,0,0.9)' }}></div>
           </div>
-          <span className="legend-label">多</span>
+          <span>多</span>
         </div>
       </div>
 
       <div className="heatmap-controls">
-        <button className={`view-btn ${viewMode === 'year' ? 'active' : ''}`} onClick={() => setViewMode('year')}>
-          <CalendarIcon size={16} />
-          <span>年度</span>
-        </button>
-        <button className={`view-btn ${viewMode === 'month' ? 'active' : ''}`} onClick={() => setViewMode('month')}>
-          <CalendarIcon size={16} />
-          <span>月度</span>
-        </button>
-        <button className={`view-btn ${viewMode === 'day' ? 'active' : ''}`} onClick={() => setViewMode('day')}>
-          <ClockIcon size={16} />
-          <span>每日</span>
-        </button>
+        <button className={`view-btn ${viewMode === 'year' ? 'active' : ''}`} onClick={() => setViewMode('year')}>年</button>
+        <button className={`view-btn ${viewMode === 'month' ? 'active' : ''}`} onClick={() => setViewMode('month')}>月</button>
+        <button className={`view-btn ${viewMode === 'day' ? 'active' : ''}`} onClick={() => setViewMode('day')}>日</button>
       </div>
 
       <div className="heatmap-container">
@@ -525,25 +475,19 @@ function HeatmapTab() {
           <div className="heatmap-grid year-grid">
             {Array.from({ length: 12 }).map((_, month) => (
               <div key={month} className="heatmap-month">
-                <div className="month-label">{getMonthName(month)}</div>
+                <div className="month-label">{month + 1}月</div>
                 <div className="heatmap-days">
                   {Array.from({ length: 31 }).map((_, day) => {
                     const date = new Date(new Date().getFullYear(), month, day + 1)
                     const dateStr = date.toISOString().split('T')[0]
-                    const cellData = heatmapData[dateStr] || { count: 0, sessions: [] }
-                    const weekday = date.getDay()
+                    const cellData = heatmapData[dateStr] || { count: 0 }
                     return (
                       <div
                         key={day}
                         className={`heatmap-cell ${cellData.count > 0 ? 'has-data' : ''}`}
                         style={{ background: getColor(cellData.count) }}
-                        onMouseEnter={() => setHoverData({ 
-                          date: dateStr, 
-                          count: cellData.count,
-                          duration: cellData.totalDuration
-                        })}
+                        onMouseEnter={() => setHoverData({ date: dateStr, ...cellData })}
                         onMouseLeave={() => setHoverData(null)}
-                        onClick={() => setSelectedDate(cellData.count > 0 ? { date: dateStr, ...cellData } : null)}
                       />
                     )
                   })}
@@ -558,19 +502,14 @@ function HeatmapTab() {
             {Array.from({ length: 31 }).map((_, day) => {
               const date = new Date(new Date().getFullYear(), new Date().getMonth(), day + 1)
               const dateStr = date.toISOString().split('T')[0]
-              const cellData = heatmapData[dateStr] || { count: 0, sessions: [] }
+              const cellData = heatmapData[dateStr] || { count: 0 }
               return (
                 <div
                   key={day}
                   className={`heatmap-cell large ${cellData.count > 0 ? 'has-data' : ''}`}
                   style={{ background: getColor(cellData.count) }}
-                  onMouseEnter={() => setHoverData({ 
-                    date: dateStr, 
-                    count: cellData.count,
-                    duration: cellData.totalDuration
-                  })}
+                  onMouseEnter={() => setHoverData({ date: dateStr, ...cellData })}
                   onMouseLeave={() => setHoverData(null)}
-                  onClick={() => setSelectedDate(cellData.count > 0 ? { date: dateStr, ...cellData } : null)}
                 >
                   <span className="cell-day">{day + 1}</span>
                 </div>
@@ -583,18 +522,14 @@ function HeatmapTab() {
           <div className="heatmap-grid day-grid">
             {Array.from({ length: 24 }).map((_, hour) => {
               const today = new Date().toISOString().split('T')[0]
-              const hourKey = `${today} ${hour.toString().padStart(2, '0')}`
-              const cellData = heatmapData[hourKey] || { count: 0, sessions: [] }
+              const hourKey = `${today}-${hour.toString().padStart(2, '0')}`
+              const cellData = heatmapData[hourKey] || { count: 0 }
               return (
                 <div
                   key={hour}
                   className={`heatmap-cell hour-cell ${cellData.count > 0 ? 'has-data' : ''}`}
                   style={{ background: getColor(cellData.count) }}
-                  onMouseEnter={() => setHoverData({ 
-                    hour: `${hour}:00-${hour + 1}:00`, 
-                    count: cellData.count,
-                    duration: cellData.totalDuration
-                  })}
+                  onMouseEnter={() => setHoverData({ hour: `${hour}:00`, ...cellData })}
                   onMouseLeave={() => setHoverData(null)}
                 >
                   <span className="cell-hour">{hour}</span>
@@ -605,51 +540,13 @@ function HeatmapTab() {
         )}
 
         {hoverData && (
-          <div className="heatmap-tooltip hover-tooltip">
+          <div className="heatmap-tooltip">
             {hoverData.date && <div className="tooltip-date">📅 {hoverData.date}</div>}
             {hoverData.hour && <div className="tooltip-hour">⏰ {hoverData.hour}</div>}
             <div className="tooltip-stats">
-              <div>🍅 完成：{hoverData.count} 个番茄</div>
-              <div>⏱️ 专注：{formatDuration(hoverData.duration || 0)}</div>
+              <div>🍅 {hoverData.count} 个番茄</div>
+              <div>⏱️ {formatDuration(hoverData.totalDuration || 0)}</div>
             </div>
-          </div>
-        )}
-
-        {selectedDate && (
-          <div className="heatmap-detail-panel">
-            <div className="detail-header">
-              <h4>📅 {selectedDate.date}</h4>
-              <button className="close-btn" onClick={() => setSelectedDate(null)}>×</button>
-            </div>
-            <div className="detail-stats">
-              <div className="detail-stat">
-                <span className="stat-icon">🍅</span>
-                <span className="stat-value">{selectedDate.count}</span>
-                <span className="stat-label">个番茄</span>
-              </div>
-              <div className="detail-stat">
-                <span className="stat-icon">⏱️</span>
-                <span className="stat-value">{formatDuration(selectedDate.totalDuration)}</span>
-                <span className="stat-label">总专注</span>
-              </div>
-            </div>
-            {selectedDate.sessions && selectedDate.sessions.length > 0 && (
-              <div className="detail-sessions">
-                <h5>专注记录</h5>
-                <div className="sessions-list">
-                  {selectedDate.sessions.slice(0, 10).map((session, i) => (
-                    <div key={i} className="session-item">
-                      <span className="session-time">
-                        {new Date(session.completedAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                      <span className="session-duration">
-                        {Math.floor((session.duration || 0) / 60)}分钟
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>

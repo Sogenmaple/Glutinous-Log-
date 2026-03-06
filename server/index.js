@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename)
 
 const app = express()
 const PORT = 3001
-const JWT_SECRET = 'tangyuan-blog_secret_key_2026' // 生产环境应该用环境变量
+const JWT_SECRET = 'tangyuan-blog_secret_key_2026'
 
 // 中间件
 app.use(cors())
@@ -30,35 +30,20 @@ async function initDataFiles() {
     await fs.mkdir(DATA_DIR, { recursive: true })
   }
   
-  // 初始化用户文件（带默认管理员）
   try {
     await fs.access(USERS_FILE)
   } catch {
+    const hashedPassword = await bcrypt.hash('admin123', 10)
     const defaultAdmin = {
       id: 'admin',
       username: 'admin',
       email: 'admin@tangyuan.com',
-      password: await bcrypt.hash('admin123', 10),
+      password: hashedPassword,
       role: 'admin',
       createdAt: new Date().toISOString()
     }
     await fs.writeFile(USERS_FILE, JSON.stringify([defaultAdmin], null, 2), 'utf-8')
     console.log('✓ 默认管理员账户已创建 (admin/admin123)')
-  }
-  }
-  
-  try {
-    await fs.access(USERS_FILE)
-  } catch {
-    // 创建默认管理员账户
-    const hashedPassword = await bcrypt.hash('admin123', 10)
-    await fs.writeFile(USERS_FILE, JSON.stringify([{
-      id: 1,
-      username: 'admin',
-      password: hashedPassword,
-      role: 'admin'
-    }], null, 2))
-    console.log('默认管理员账户已创建：admin / admin123')
   }
   
   try {
@@ -104,22 +89,18 @@ app.post('/api/register', async (req, res) => {
     const usersData = await fs.readFile(USERS_FILE, 'utf-8')
     const users = JSON.parse(usersData)
     
-    // 检查用户名是否已存在
     const existingUser = users.find(u => u.username === username)
     if (existingUser) {
       return res.status(400).json({ error: '用户名已存在' })
     }
     
-    // 检查邮箱是否已存在
     const existingEmail = users.find(u => u.email === email)
     if (existingEmail) {
       return res.status(400).json({ error: '邮箱已被注册' })
     }
     
-    // 加密密码
     const hashedPassword = await bcrypt.hash(password, 10)
     
-    // 创建新用户
     const newUser = {
       id: Date.now().toString(),
       username,
@@ -132,7 +113,6 @@ app.post('/api/register', async (req, res) => {
     users.push(newUser)
     await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
     
-    // 生成 token
     const token = jwt.sign(
       { id: newUser.id, username: newUser.username, role: newUser.role },
       JWT_SECRET,
@@ -183,37 +163,33 @@ app.post('/api/login', async (req, res) => {
       { expiresIn: '24h' }
     )
     
-    res.json({ token, user: { id: user.id, username: user.username, role: user.role } })
+    res.json({
+      message: '登录成功',
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    })
   } catch (error) {
     console.error('登录错误:', error)
-    res.status(500).json({ error: '服务器错误' })
+    res.status(500).json({ error: '登录失败' })
   }
 })
 
 // ============ 文章路由 ============
 
-// 获取所有文章（公开）
+// 获取所有文章
 app.get('/api/posts', async (req, res) => {
   try {
     const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
     const posts = JSON.parse(postsData)
-    
-    // 只返回已发布的文章（非管理员可以看到草稿）
-    const token = req.headers.authorization?.split(' ')[1]
-    let isAdmin = false
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET)
-        isAdmin = decoded.role === 'admin'
-      } catch {}
-    }
-    
-    const visiblePosts = isAdmin ? posts : posts.filter(p => p.status === 'published')
-    
-    res.json(visiblePosts)
+    res.json(posts)
   } catch (error) {
     console.error('获取文章错误:', error)
-    res.status(500).json({ error: '服务器错误' })
+    res.status(500).json({ error: '获取文章失败' })
   }
 })
 
@@ -222,7 +198,7 @@ app.get('/api/posts/:id', async (req, res) => {
   try {
     const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
     const posts = JSON.parse(postsData)
-    const post = posts.find(p => p.id === parseInt(req.params.id))
+    const post = posts.find(p => p.id === req.params.id)
     
     if (!post) {
       return res.status(404).json({ error: '文章不存在' })
@@ -231,7 +207,7 @@ app.get('/api/posts/:id', async (req, res) => {
     res.json(post)
   } catch (error) {
     console.error('获取文章错误:', error)
-    res.status(500).json({ error: '服务器错误' })
+    res.status(500).json({ error: '获取文章失败' })
   }
 })
 
@@ -242,20 +218,19 @@ app.post('/api/posts', authenticateToken, async (req, res) => {
     const posts = JSON.parse(postsData)
     
     const newPost = {
+      id: Date.now().toString(),
       ...req.body,
-      id: Date.now(),
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      author: req.user.username
+      updatedAt: new Date().toISOString()
     }
     
-    posts.unshift(newPost)
+    posts.push(newPost)
     await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 2))
     
     res.status(201).json(newPost)
   } catch (error) {
     console.error('创建文章错误:', error)
-    res.status(500).json({ error: '服务器错误' })
+    res.status(500).json({ error: '创建文章失败' })
   }
 })
 
@@ -264,7 +239,7 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
   try {
     const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
     let posts = JSON.parse(postsData)
-    const index = posts.findIndex(p => p.id === parseInt(req.params.id))
+    const index = posts.findIndex(p => p.id === req.params.id)
     
     if (index === -1) {
       return res.status(404).json({ error: '文章不存在' })
@@ -280,7 +255,7 @@ app.put('/api/posts/:id', authenticateToken, async (req, res) => {
     res.json(posts[index])
   } catch (error) {
     console.error('更新文章错误:', error)
-    res.status(500).json({ error: '服务器错误' })
+    res.status(500).json({ error: '更新文章失败' })
   }
 })
 
@@ -289,13 +264,18 @@ app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
   try {
     const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
     let posts = JSON.parse(postsData)
-    posts = posts.filter(p => p.id !== parseInt(req.params.id))
+    const index = posts.findIndex(p => p.id === req.params.id)
     
+    if (index === -1) {
+      return res.status(404).json({ error: '文章不存在' })
+    }
+    
+    posts.splice(index, 1)
     await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 2))
     res.json({ message: '删除成功' })
   } catch (error) {
     console.error('删除文章错误:', error)
-    res.status(500).json({ error: '服务器错误' })
+    res.status(500).json({ error: '删除文章失败' })
   }
 })
 
@@ -303,7 +283,5 @@ app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
 initDataFiles().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 服务器运行在 http://localhost:${PORT}`)
-    console.log(`📝 后台管理：http://localhost:5173/admin`)
-    console.log(`🌐 前台网站：http://localhost:5173`)
   })
 })

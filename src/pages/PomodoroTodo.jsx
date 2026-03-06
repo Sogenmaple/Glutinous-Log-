@@ -7,25 +7,39 @@ export default function PomodoroTodo() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('timer')
 
-  // 自定义光标 + 点击粒子效果
+  // 自定义光标 + 粒子效果
   useEffect(() => {
+    // 创建光标容器（用于反相混合）
+    const container = document.createElement('div')
+    container.className = 'cursor-container'
+    document.body.appendChild(container)
+
     // 创建自定义光标
     const cursor = document.createElement('div')
     cursor.className = 'custom-cursor'
-    document.body.appendChild(cursor)
+    container.appendChild(cursor)
 
     // 使用 requestAnimationFrame 优化光标跟随
     let mouseX = 0, mouseY = 0
-    let cursorX = 0, cursorY = 0
     let animationFrameId = null
+    let lastTrailTime = 0
 
     const updateCursor = () => {
-      const dx = mouseX - cursorX
-      const dy = mouseY - cursorY
-      cursorX += dx * 0.3
-      cursorY += dy * 0.3
-      cursor.style.left = cursorX + 'px'
-      cursor.style.top = cursorY + 'px'
+      container.style.left = mouseX + 'px'
+      container.style.top = mouseY + 'px'
+      
+      // 移动时产生轨迹粒子（每 50ms 一个）
+      const now = Date.now()
+      if (now - lastTrailTime > 50) {
+        const trail = document.createElement('div')
+        trail.className = 'cursor-trail'
+        trail.style.left = (mouseX - 2) + 'px'
+        trail.style.top = (mouseY - 2) + 'px'
+        document.body.appendChild(trail)
+        setTimeout(() => trail.remove(), 400)
+        lastTrailTime = now
+      }
+      
       animationFrameId = requestAnimationFrame(updateCursor)
     }
 
@@ -42,13 +56,17 @@ export default function PomodoroTodo() {
       cursor.classList.add('click')
       setTimeout(() => cursor.classList.remove('click'), 100)
 
-      // 粒子效果 - 统一琥珀色
-      const particle = document.createElement('div')
-      particle.className = 'click-particle'
-      particle.style.left = (e.clientX - 4) + 'px'
-      particle.style.top = (e.clientY - 4) + 'px'
-      document.body.appendChild(particle)
-      setTimeout(() => particle.remove(), 600)
+      // 点击粒子 - 统一琥珀色
+      for (let i = 0; i < 6; i++) {
+        const particle = document.createElement('div')
+        particle.className = 'click-particle'
+        const angle = (i / 6) * Math.PI * 2
+        const radius = 10
+        particle.style.left = (e.clientX + Math.cos(angle) * radius - 4) + 'px'
+        particle.style.top = (e.clientY + Math.sin(angle) * radius - 4) + 'px'
+        document.body.appendChild(particle)
+        setTimeout(() => particle.remove(), 600)
+      }
     }
 
     // 悬停检测
@@ -79,7 +97,7 @@ export default function PomodoroTodo() {
 
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId)
-      document.body.removeChild(cursor)
+      document.body.removeChild(container)
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('click', handleClick)
       document.removeEventListener('mouseover', handleMouseOver)

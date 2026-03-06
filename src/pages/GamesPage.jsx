@@ -14,9 +14,9 @@ export default function GamesPage() {
             <span className="title-icon">
               <GameIcon size={40} color="#ff9500" />
             </span>
-            <span className="title-text">游戏宇宙</span>
+            <span className="title-text">汤圆的游戏</span>
           </h1>
-          <p className="page-subtitle">GAMES UNIVERSE - 穿越时空的互动体验</p>
+          <p className="page-subtitle">汤圆的游戏宇宙 · 穿越时空的互动体验</p>
         </div>
         <GameTimeline />
         <GameShowcase />

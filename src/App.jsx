@@ -42,16 +42,27 @@ function AppContent() {
     // 创建光标容器
     const cursor = document.createElement('div')
     cursor.className = 'custom-cursor'
+    cursor.style.position = 'fixed'
+    cursor.style.zIndex = '99999'
+    cursor.style.pointerEvents = 'none'
     document.body.appendChild(cursor)
 
     // 创建外环
     const ring = document.createElement('div')
     ring.className = 'custom-cursor-ring'
+    ring.style.position = 'absolute'
+    ring.style.top = '50%'
+    ring.style.left = '50%'
+    ring.style.transform = 'translate(-50%, -50%)'
     cursor.appendChild(ring)
 
     // 创建中心反相点
     const dot = document.createElement('div')
     dot.className = 'custom-cursor-dot'
+    dot.style.position = 'absolute'
+    dot.style.top = '50%'
+    dot.style.left = '50%'
+    dot.style.transform = 'translate(-50%, -50%)'
     cursor.appendChild(dot)
 
     // 使用 requestAnimationFrame 优化光标跟随

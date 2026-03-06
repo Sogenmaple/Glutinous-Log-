@@ -108,6 +108,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   transition: width 0.1s ease, height 0.1s ease;
+  pointer-events: none;
 }
 
 .custom-cursor.hover .custom-cursor-dot {

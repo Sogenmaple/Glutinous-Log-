@@ -228,20 +228,46 @@
   margin-bottom: 1rem;
 }
 
-.todo-input {
-  flex: 1;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,149,0,0.2);
-  border-radius: 4px;
-  padding: 0.6rem 0.8rem;
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 0.85rem;
+/* 统一输入框风格 */
+.todo-input,
+.config-input,
+.habit-input,
+.habit-unit-input,
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,149,0,0.2) !important;
+  border-radius: 4px !important;
+  padding: 0.6rem 0.8rem !important;
+  color: var(--text) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important;
+  transition: all 0.3s ease !important;
 }
 
-.todo-input:focus {
-  border-color: var(--amber);
-  outline: none;
+.todo-input:focus,
+.config-input:focus,
+.habit-input:focus,
+.habit-unit-input:focus,
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: var(--amber) !important;
+  outline: none !important;
+  box-shadow: 0 0 10px rgba(255,149,0,0.2) !important;
+}
+
+select {
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ff9500' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.8rem center !important;
+  padding-right: 2.5rem !important;
 }
 
 .priority-select {
@@ -253,6 +279,42 @@
   font-family: var(--font-mono);
   font-size: 0.75rem;
   cursor: pointer;
+}
+
+/* 统一按钮风格 */
+.add-btn,
+.add-habit-btn,
+.add-track-btn,
+.toolbar-btn-icon,
+.control-btn,
+.complete-btn,
+.style-btn,
+.manual-checkin-btn,
+.save-btn,
+.execute-btn,
+.primary {
+  background: rgba(255,149,0,0.15) !important;
+  border: 1px solid var(--amber) !important;
+  color: var(--amber) !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important;
+}
+
+.add-btn:hover,
+.add-habit-btn:hover,
+.toolbar-btn-icon:hover,
+.control-btn:hover,
+.complete-btn:hover,
+.style-btn:hover,
+.manual-checkin-btn:hover,
+.save-btn:hover,
+.execute-btn:hover,
+.primary:hover {
+  background: rgba(255,149,0,0.25) !important;
+  box-shadow: 0 0 15px rgba(255,149,0,0.3) !important;
 }
 
 .add-btn {
@@ -2298,6 +2360,58 @@
 /* ============================================
    V8.0 风格统一优化
    ============================================ */
+
+/* 全局鼠标状态统一 */
+.pomodoro-page {
+  cursor: default;
+}
+
+.pomodoro-page * {
+  cursor: inherit;
+}
+
+/* 可点击元素统一手型 */
+button,
+.tab-btn,
+.toolbar-btn-icon,
+.control-btn,
+.complete-btn,
+.style-btn,
+.add-btn,
+.config-btn,
+.delete-btn,
+.move-btn,
+.execute-block-btn-hidden,
+.move-back-block-btn-hidden,
+.delete-block-btn-hidden,
+.manual-checkin-btn,
+.delete-habit-btn,
+.cancel-btn,
+.delete-confirm-btn,
+.load-preset-btn,
+.delete-preset-btn {
+  cursor: pointer !important;
+}
+
+/* 可拖拽元素统一抓取手型 */
+.todo-item,
+.todo-drag-item,
+.timeline-block {
+  cursor: grab !important;
+}
+
+.todo-item:active,
+.todo-drag-item:active,
+.timeline-block:active {
+  cursor: grabbing !important;
+}
+
+/* 输入框统一文本光标 */
+input,
+textarea,
+select {
+  cursor: text !important;
+}
 
 /* 工具栏图标按钮 */
 .toolbar-btn-icon {

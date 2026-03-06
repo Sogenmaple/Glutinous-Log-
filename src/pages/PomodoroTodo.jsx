@@ -505,36 +505,77 @@ function TimelineView() {
     localStorage.setItem('pomodoro_timeline_items', JSON.stringify(timelineItems))
   }, [timelineItems])
 
+  const [draggedBlock, setDraggedBlock] = useState(null)
+
   const handleDragStart = (e, todo) => {
     setDraggedTodo(todo)
     e.dataTransfer.setData('todo', JSON.stringify(todo))
+    e.dataTransfer.setData('type', 'todo')
+  }
+
+  const handleBlockDragStart = (e, item) => {
+    setDraggedBlock(item)
+    e.dataTransfer.setData('block', JSON.stringify(item))
+    e.dataTransfer.setData('type', 'block')
   }
 
   const handleDropOnTrack = (e, trackId, hour) => {
     e.preventDefault()
-    const todoData = e.dataTransfer.getData('todo')
-    if (todoData) {
-      const todo = JSON.parse(todoData)
-      const newItem = {
-        id: Date.now(),
-        todoId: todo.id,
-        todoText: todo.text,
-        trackId,
-        startHour: hour,
-        duration: 2,
-        color: todo.priority === 'high' ? '#ff453a' : todo.priority === 'medium' ? '#ff9500' : '#06b6d4',
-        priority: todo.priority || 'medium',
-        repeat: todo.repeat || 'none'
+    const type = e.dataTransfer.getData('type')
+    
+    if (type === 'todo') {
+      const todoData = e.dataTransfer.getData('todo')
+      if (todoData) {
+        const todo = JSON.parse(todoData)
+        const newItem = {
+          id: Date.now(),
+          todoId: todo.id,
+          todoText: todo.text,
+          trackId,
+          startHour: hour,
+          duration: 2,
+          color: todo.priority === 'high' ? '#ff453a' : todo.priority === 'medium' ? '#ff9500' : '#06b6d4',
+          priority: todo.priority || 'medium',
+          repeat: todo.repeat || 'none'
+        }
+        const updated = [...timelineItems, newItem]
+        setTimelineItems(updated)
+        localStorage.setItem('pomodoro_timeline_items', JSON.stringify(updated))
       }
-      const updated = [...timelineItems, newItem]
-      setTimelineItems(updated)
-      localStorage.setItem('pomodoro_timeline_items', JSON.stringify(updated))
+    } else if (type === 'block') {
+      const blockData = e.dataTransfer.getData('block')
+      if (blockData) {
+        const block = JSON.parse(blockData)
+        if (block.id !== draggedBlock?.id) return
+        const updated = timelineItems.map(item => 
+          item.id === block.id ? { ...item, trackId, startHour: hour } : item
+        )
+        setTimelineItems(updated)
+        localStorage.setItem('pomodoro_timeline_items', JSON.stringify(updated))
+      }
     }
     setDraggedTodo(null)
+    setDraggedBlock(null)
   }
 
   const handleDragOver = (e) => {
     e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+  }
+
+  const handleDropOnSidebar = (e) => {
+    e.preventDefault()
+    const type = e.dataTransfer.getData('type')
+    if (type === 'block') {
+      const blockData = e.dataTransfer.getData('block')
+      if (blockData) {
+        const block = JSON.parse(blockData)
+        const updated = timelineItems.filter(item => item.id !== block.id)
+        setTimelineItems(updated)
+        localStorage.setItem('pomodoro_timeline_items', JSON.stringify(updated))
+      }
+      setDraggedBlock(null)
+    }
   }
 
   const resizeItem = (itemId, trackId, newStart, newDuration) => {
@@ -669,7 +710,7 @@ function TimelineView() {
       )}
 
       <div className="timeline-content">
-        <div className="todo-sidebar">
+        <div className="todo-sidebar" onDragOver={handleDragOver} onDrop={(e) => handleDropOnSidebar(e)}>
           <h4>待办事项</h4>
           <div className="todo-drag-list">
             {todos.filter(t => !t.completed).map((todo, index) => (
@@ -715,6 +756,8 @@ function TimelineView() {
                   <div 
                     key={item.id}
                     className="timeline-block"
+                    draggable
+                    onDragStart={(e) => handleBlockDragStart(e, item)}
                     style={{ 
                       backgroundColor: item.color + '30',
                       borderLeft: `3px solid ${item.color}`,

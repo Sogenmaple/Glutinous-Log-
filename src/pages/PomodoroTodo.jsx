@@ -26,8 +26,19 @@ export default function PomodoroTodo() {
     today: 0,
     week: 0,
     total: 0,
-    bestDay: { date: '', count: 0 }
+    bestDay: { date: '', count: 0 },
+    dailyHistory: {} // 每日记录 { '2026-03-06': 8 }
   })
+
+  // 倒计时
+  const [countdown, setCountdown] = useState({
+    year: 0,
+    month: 0,
+    day: 0
+  })
+
+  // 实时时间
+  const [currentTime, setCurrentTime] = useState(new Date())
 
   const timerRef = useRef(null)
   const audioRef = useRef(null)
@@ -52,6 +63,27 @@ export default function PomodoroTodo() {
     if (savedTime) setTimeLeft(parseInt(savedTime))
     if (savedMode) setMode(savedMode)
     if (savedPomodoros) setCompletedPomodoros(parseInt(savedPomodoros))
+  }, [])
+
+  // 实时时间更新
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+      
+      // 计算倒计时
+      const now = new Date()
+      const yearEnd = new Date(now.getFullYear() + 1, 0, 1)
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+      const dayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+      
+      setCountdown({
+        year: Math.floor((yearEnd - now) / 1000),
+        month: Math.floor((monthEnd - now) / 1000),
+        day: Math.floor((dayEnd - now) / 1000)
+      })
+    }, 1000)
+    
+    return () => clearInterval(timer)
   }, [])
 
   // 保存本地存储
@@ -110,7 +142,11 @@ export default function PomodoroTodo() {
           ...prev,
           today: prev.today + 1,
           week: prev.week + 1,
-          total: prev.total + 1
+          total: prev.total + 1,
+          dailyHistory: {
+            ...prev.dailyHistory,
+            [today]: (prev.dailyHistory[today] || 0) + 1
+          }
         }
         
         // 检查是否是最好的一天
@@ -140,6 +176,42 @@ export default function PomodoroTodo() {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // 格式化倒计时
+  const formatCountdown = (seconds) => {
+    const days = Math.floor(seconds / 86400)
+    const hours = Math.floor((seconds % 86400) / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    const secs = seconds % 60
+    return `${days}天 ${hours.toString().padStart(2, '0')}时 ${mins.toString().padStart(2, '0')}分 ${secs.toString().padStart(2, '0')}秒`
+  }
+
+  // 获取热力图数据（最近 42 天，6 周）
+  const getHeatmapData = () => {
+    const today = new Date()
+    const days = []
+    for (let i = 41; i >= 0; i--) {
+      const date = new Date(today)
+      date.setDate(date.getDate() - i)
+      const dateStr = date.toISOString().split('T')[0]
+      days.push({
+        date: dateStr,
+        count: stats.dailyHistory[dateStr] || 0,
+        day: date.getDate(),
+        month: date.getMonth() + 1
+      })
+    }
+    return days
+  }
+
+  // 获取颜色强度
+  const getHeatmapColor = (count) => {
+    if (count === 0) return 'rgba(255,255,255,0.05)'
+    if (count <= 2) return 'rgba(255,149,0,0.3)'
+    if (count <= 4) return 'rgba(255,149,0,0.5)'
+    if (count <= 6) return 'rgba(255,149,0,0.7)'
+    return 'rgba(255,149,0,0.9)'
   }
 
   // 进度百分比
@@ -303,29 +375,94 @@ export default function PomodoroTodo() {
                 </button>
               </div>
 
-              {/* 完成统计 */}
-              <div className="pomodoro-stats">
-                <div className="stats-grid">
-                  <div className="stat-item">
-                    <span className="stat-label">今日</span>
-                    <span className="stat-value">{stats.today}</span>
-                    <span className="stat-unit">个番茄钟</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">本周</span>
-                    <span className="stat-value">{stats.week}</span>
-                    <span className="stat-unit">个番茄钟</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">总计</span>
-                    <span className="stat-value">{stats.total}</span>
-                    <span className="stat-unit">个番茄钟</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">最佳记录</span>
-                    <span className="stat-value">{stats.bestDay.count}</span>
-                    <span className="stat-unit">{stats.bestDay.date || '-'}</span>
-                  </div>
+              {/* 实时统计 */}
+              <div className="realtime-stats">
+                <div className="stat-row">
+                  <span className="stat-label">今日专注</span>
+                  <span className="stat-value-sm">{stats.today}</span>
+                  <span className="stat-unit-sm">个番茄钟</span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">本周专注</span>
+                  <span className="stat-value-sm">{stats.week}</span>
+                  <span className="stat-unit-sm">个番茄钟</span>
+                </div>
+                <div className="stat-row">
+                  <span className="stat-label">总计专注</span>
+                  <span className="stat-value-sm">{stats.total}</span>
+                  <span className="stat-unit-sm">个番茄钟</span>
+                </div>
+              </div>
+
+              {/* 倒计时区域 */}
+              <div className="countdown-section">
+                <div className="countdown-item">
+                  <span className="countdown-label">距离新年</span>
+                  <span className="countdown-value">{formatCountdown(countdown.year)}</span>
+                </div>
+                <div className="countdown-item">
+                  <span className="countdown-label">距离下月</span>
+                  <span className="countdown-value">{formatCountdown(countdown.month)}</span>
+                </div>
+                <div className="countdown-item">
+                  <span className="countdown-label">距离明天</span>
+                  <span className="countdown-value">{formatCountdown(countdown.day)}</span>
+                </div>
+              </div>
+
+              {/* 热力图 */}
+              <div className="heatmap-section">
+                <div className="heatmap-header">
+                  <span className="heatmap-title">专注热力图</span>
+                  <span className="heatmap-legend">
+                    <span className="legend-item">
+                      <span className="legend-color" style={{ background: 'rgba(255,255,255,0.05)' }}></span>
+                      <span>0</span>
+                    </span>
+                    <span className="legend-item">
+                      <span className="legend-color" style={{ background: 'rgba(255,149,0,0.3)' }}></span>
+                      <span>1-2</span>
+                    </span>
+                    <span className="legend-item">
+                      <span className="legend-color" style={{ background: 'rgba(255,149,0,0.5)' }}></span>
+                      <span>3-4</span>
+                    </span>
+                    <span className="legend-item">
+                      <span className="legend-color" style={{ background: 'rgba(255,149,0,0.7)' }}></span>
+                      <span>5-6</span>
+                    </span>
+                    <span className="legend-item">
+                      <span className="legend-color" style={{ background: 'rgba(255,149,0,0.9)' }}></span>
+                      <span>7+</span>
+                    </span>
+                  </span>
+                </div>
+                <div className="heatmap-grid">
+                  {getHeatmapData().map((day, index) => (
+                    <div
+                      key={day.date}
+                      className="heatmap-cell"
+                      style={{
+                        backgroundColor: getHeatmapColor(day.count),
+                        border: '1px solid rgba(255,149,0,0.1)'
+                      }}
+                      title={`${day.date}: ${day.count}个番茄钟`}
+                    ></div>
+                  ))}
+                </div>
+                <div className="heatmap-months">
+                  <span>1 月</span>
+                  <span>2 月</span>
+                  <span>3 月</span>
+                  <span>4 月</span>
+                  <span>5 月</span>
+                  <span>6 月</span>
+                  <span>7 月</span>
+                  <span>8 月</span>
+                  <span>9 月</span>
+                  <span>10 月</span>
+                  <span>11 月</span>
+                  <span>12 月</span>
                 </div>
               </div>
             </div>

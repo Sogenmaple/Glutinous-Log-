@@ -403,6 +403,7 @@ function HeatmapTab() {
     return saved ? JSON.parse(saved) : []
   })
   const [hoverData, setHoverData] = useState(null)
+  const [selectedDate, setSelectedDate] = useState(null)
 
   const generateHeatmapData = () => {
     const data = {}
@@ -412,31 +413,46 @@ function HeatmapTab() {
       const yearStart = new Date(now.getFullYear(), 0, 1)
       for (let d = new Date(yearStart); d <= now; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0]
-        data[dateStr] = sessions.filter(s => {
+        const daySessions = sessions.filter(s => {
           const sDate = new Date(s.completedAt).toISOString().split('T')[0]
           return sDate === dateStr
-        }).length
+        })
+        data[dateStr] = {
+          count: daySessions.length,
+          sessions: daySessions,
+          totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+        }
       }
     } else if (viewMode === 'month') {
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
       const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
       for (let d = new Date(monthStart); d <= monthEnd; d.setDate(d.getDate() + 1)) {
         const dateStr = d.toISOString().split('T')[0]
-        data[dateStr] = sessions.filter(s => {
+        const daySessions = sessions.filter(s => {
           const sDate = new Date(s.completedAt).toISOString().split('T')[0]
           return sDate === dateStr
-        }).length
+        })
+        data[dateStr] = {
+          count: daySessions.length,
+          sessions: daySessions,
+          totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+        }
       }
     } else if (viewMode === 'day') {
       const today = now.toISOString().split('T')[0]
       for (let h = 0; h < 24; h++) {
         const hourKey = `${today} ${h.toString().padStart(2, '0')}`
-        data[hourKey] = sessions.filter(s => {
+        const hourSessions = sessions.filter(s => {
           const sDate = new Date(s.completedAt)
           const sHour = sDate.getHours()
           const sDateStr = sDate.toISOString().split('T')[0]
           return sDateStr === today && sHour === h
-        }).length
+        })
+        data[hourKey] = {
+          count: hourSessions.length,
+          sessions: hourSessions,
+          totalDuration: hourSessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+        }
       }
     }
     
@@ -444,23 +460,64 @@ function HeatmapTab() {
   }
 
   const heatmapData = generateHeatmapData()
-  const maxCount = Math.max(...Object.values(heatmapData), 1)
+  const maxCount = Math.max(...Object.values(heatmapData).map(d => d.count), 1)
 
   const getColor = (count) => {
-    if (count === 0) return 'rgba(255,255,255,0.05)'
+    if (count === 0) return 'rgba(255,255,255,0.03)'
     const intensity = count / maxCount
-    if (intensity > 0.75) return 'rgba(255,149,0,1)'
+    if (intensity > 0.75) return 'rgba(255,149,0,0.9)'
     if (intensity > 0.5) return 'rgba(255,149,0,0.7)'
-    if (intensity > 0.25) return 'rgba(255,149,0,0.4)'
-    return 'rgba(255,149,0,0.2)'
+    if (intensity > 0.25) return 'rgba(255,149,0,0.5)'
+    return 'rgba(255,149,0,0.3)'
+  }
+
+  const formatDuration = (seconds) => {
+    const h = Math.floor(seconds / 3600)
+    const m = Math.floor((seconds % 3600) / 60)
+    if (h > 0) return `${h}小时${m}分钟`
+    return `${m}分钟`
+  }
+
+  const getMonthName = (month) => {
+    const months = ['1 月', '2 月', '3 月', '4 月', '5 月', '6 月', 
+                    '7 月', '8 月', '9 月', '10 月', '11 月', '12 月']
+    return months[month]
+  }
+
+  const getWeekdayName = (day) => {
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+    return weekdays[day]
   }
 
   return (
     <div className="heatmap-section">
+      <div className="heatmap-header">
+        <h3 className="heatmap-title">专注热力图</h3>
+        <div className="heatmap-legend">
+          <span className="legend-label">少</span>
+          <div className="legend-colors">
+            <div className="legend-box" style={{ background: 'rgba(255,149,0,0.2)' }}></div>
+            <div className="legend-box" style={{ background: 'rgba(255,149,0,0.4)' }}></div>
+            <div className="legend-box" style={{ background: 'rgba(255,149,0,0.7)' }}></div>
+            <div className="legend-box" style={{ background: 'rgba(255,149,0,0.9)' }}></div>
+          </div>
+          <span className="legend-label">多</span>
+        </div>
+      </div>
+
       <div className="heatmap-controls">
-        <button className={`view-btn ${viewMode === 'year' ? 'active' : ''}`} onClick={() => setViewMode('year')}>年</button>
-        <button className={`view-btn ${viewMode === 'month' ? 'active' : ''}`} onClick={() => setViewMode('month')}>月</button>
-        <button className={`view-btn ${viewMode === 'day' ? 'active' : ''}`} onClick={() => setViewMode('day')}>日</button>
+        <button className={`view-btn ${viewMode === 'year' ? 'active' : ''}`} onClick={() => setViewMode('year')}>
+          <CalendarIcon size={16} />
+          <span>年度</span>
+        </button>
+        <button className={`view-btn ${viewMode === 'month' ? 'active' : ''}`} onClick={() => setViewMode('month')}>
+          <CalendarIcon size={16} />
+          <span>月度</span>
+        </button>
+        <button className={`view-btn ${viewMode === 'day' ? 'active' : ''}`} onClick={() => setViewMode('day')}>
+          <ClockIcon size={16} />
+          <span>每日</span>
+        </button>
       </div>
 
       <div className="heatmap-container">
@@ -468,19 +525,25 @@ function HeatmapTab() {
           <div className="heatmap-grid year-grid">
             {Array.from({ length: 12 }).map((_, month) => (
               <div key={month} className="heatmap-month">
-                <div className="month-label">{month + 1}月</div>
+                <div className="month-label">{getMonthName(month)}</div>
                 <div className="heatmap-days">
                   {Array.from({ length: 31 }).map((_, day) => {
                     const date = new Date(new Date().getFullYear(), month, day + 1)
                     const dateStr = date.toISOString().split('T')[0]
-                    const count = heatmapData[dateStr] || 0
+                    const cellData = heatmapData[dateStr] || { count: 0, sessions: [] }
+                    const weekday = date.getDay()
                     return (
                       <div
                         key={day}
-                        className="heatmap-cell"
-                        style={{ background: getColor(count) }}
-                        onMouseEnter={() => setHoverData({ date: dateStr, count })}
+                        className={`heatmap-cell ${cellData.count > 0 ? 'has-data' : ''}`}
+                        style={{ background: getColor(cellData.count) }}
+                        onMouseEnter={() => setHoverData({ 
+                          date: dateStr, 
+                          count: cellData.count,
+                          duration: cellData.totalDuration
+                        })}
                         onMouseLeave={() => setHoverData(null)}
+                        onClick={() => setSelectedDate(cellData.count > 0 ? { date: dateStr, ...cellData } : null)}
                       />
                     )
                   })}
@@ -495,14 +558,19 @@ function HeatmapTab() {
             {Array.from({ length: 31 }).map((_, day) => {
               const date = new Date(new Date().getFullYear(), new Date().getMonth(), day + 1)
               const dateStr = date.toISOString().split('T')[0]
-              const count = heatmapData[dateStr] || 0
+              const cellData = heatmapData[dateStr] || { count: 0, sessions: [] }
               return (
                 <div
                   key={day}
-                  className="heatmap-cell large"
-                  style={{ background: getColor(count) }}
-                  onMouseEnter={() => setHoverData({ date: dateStr, count })}
+                  className={`heatmap-cell large ${cellData.count > 0 ? 'has-data' : ''}`}
+                  style={{ background: getColor(cellData.count) }}
+                  onMouseEnter={() => setHoverData({ 
+                    date: dateStr, 
+                    count: cellData.count,
+                    duration: cellData.totalDuration
+                  })}
                   onMouseLeave={() => setHoverData(null)}
+                  onClick={() => setSelectedDate(cellData.count > 0 ? { date: dateStr, ...cellData } : null)}
                 >
                   <span className="cell-day">{day + 1}</span>
                 </div>
@@ -516,13 +584,17 @@ function HeatmapTab() {
             {Array.from({ length: 24 }).map((_, hour) => {
               const today = new Date().toISOString().split('T')[0]
               const hourKey = `${today} ${hour.toString().padStart(2, '0')}`
-              const count = heatmapData[hourKey] || 0
+              const cellData = heatmapData[hourKey] || { count: 0, sessions: [] }
               return (
                 <div
                   key={hour}
-                  className="heatmap-cell hour-cell"
-                  style={{ background: getColor(count) }}
-                  onMouseEnter={() => setHoverData({ hour: `${hour}:00`, count })}
+                  className={`heatmap-cell hour-cell ${cellData.count > 0 ? 'has-data' : ''}`}
+                  style={{ background: getColor(cellData.count) }}
+                  onMouseEnter={() => setHoverData({ 
+                    hour: `${hour}:00-${hour + 1}:00`, 
+                    count: cellData.count,
+                    duration: cellData.totalDuration
+                  })}
                   onMouseLeave={() => setHoverData(null)}
                 >
                   <span className="cell-hour">{hour}</span>
@@ -533,10 +605,51 @@ function HeatmapTab() {
         )}
 
         {hoverData && (
-          <div className="heatmap-tooltip">
-            {hoverData.date && <div>日期：{hoverData.date}</div>}
-            {hoverData.hour && <div>时间：{hoverData.hour}</div>}
-            <div>完成：{hoverData.count} 个番茄</div>
+          <div className="heatmap-tooltip hover-tooltip">
+            {hoverData.date && <div className="tooltip-date">📅 {hoverData.date}</div>}
+            {hoverData.hour && <div className="tooltip-hour">⏰ {hoverData.hour}</div>}
+            <div className="tooltip-stats">
+              <div>🍅 完成：{hoverData.count} 个番茄</div>
+              <div>⏱️ 专注：{formatDuration(hoverData.duration || 0)}</div>
+            </div>
+          </div>
+        )}
+
+        {selectedDate && (
+          <div className="heatmap-detail-panel">
+            <div className="detail-header">
+              <h4>📅 {selectedDate.date}</h4>
+              <button className="close-btn" onClick={() => setSelectedDate(null)}>×</button>
+            </div>
+            <div className="detail-stats">
+              <div className="detail-stat">
+                <span className="stat-icon">🍅</span>
+                <span className="stat-value">{selectedDate.count}</span>
+                <span className="stat-label">个番茄</span>
+              </div>
+              <div className="detail-stat">
+                <span className="stat-icon">⏱️</span>
+                <span className="stat-value">{formatDuration(selectedDate.totalDuration)}</span>
+                <span className="stat-label">总专注</span>
+              </div>
+            </div>
+            {selectedDate.sessions && selectedDate.sessions.length > 0 && (
+              <div className="detail-sessions">
+                <h5>专注记录</h5>
+                <div className="sessions-list">
+                  {selectedDate.sessions.slice(0, 10).map((session, i) => (
+                    <div key={i} className="session-item">
+                      <span className="session-time">
+                        {new Date(session.completedAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <span className="session-duration">
+                        {Math.floor((session.duration || 0) / 60)}分钟
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

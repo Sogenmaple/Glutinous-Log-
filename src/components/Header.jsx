@@ -7,6 +7,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [user, setUser] = useState(null)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -20,7 +21,9 @@ export default function Header() {
   useEffect(() => {
     const userData = localStorage.getItem('user')
     if (userData) {
-      setUser(JSON.parse(userData))
+      const parsedUser = JSON.parse(userData)
+      setUser(parsedUser)
+      setIsAdmin(parsedUser.role === 'admin')
     }
   }, [])
 
@@ -79,8 +82,24 @@ export default function Header() {
                     navigate('/special/pomodoro')
                     setShowUserMenu(false)
                   }}>
-                    我的待办
+                    🍅 番茄钟
                   </div>
+                  {isAdmin && (
+                    <>
+                      <div className="dropdown-item" onClick={() => {
+                        navigate('/admin/dashboard')
+                        setShowUserMenu(false)
+                      }}>
+                        🔧 后台管理
+                      </div>
+                      <div className="dropdown-item" onClick={() => {
+                        navigate('/')
+                        setShowUserMenu(false)
+                      }}>
+                        🏠 返回前端
+                      </div>
+                    </>
+                  )}
                   <div className="dropdown-item" onClick={handleLogout}>
                     退出登录
                   </div>

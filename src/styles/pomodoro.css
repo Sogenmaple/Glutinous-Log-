@@ -1377,12 +1377,17 @@
 }
 
 .timeline-block-text {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text);
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: absolute;
+  left: 2.5rem;
+  right: 3rem;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .timeline-block-duration {
@@ -2549,6 +2554,34 @@
   font-family: var(--font-mono);
   font-size: 0.8rem;
   flex-shrink: 0;
+}
+
+/* V8.2 鼠标光标反相效果 */
+.pomodoro-page {
+  cursor: default;
+}
+
+/* 点击粒子效果 */
+.click-particle {
+  position: fixed;
+  pointer-events: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: particleFade 0.6s ease-out forwards;
+  z-index: 9999;
+}
+
+@keyframes particleFade {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
 }
 
 /* V8.2 待办隐藏按钮 */

@@ -7,6 +7,20 @@ export default function PomodoroTodo() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('timer')
 
+  // 点击粒子效果
+  useEffect(() => {
+    const handleClick = (e) => {
+      const particle = document.createElement('div')
+      particle.className = 'click-particle'
+      particle.style.left = (e.clientX - 4) + 'px'
+      particle.style.top = (e.clientY - 4) + 'px'
+      document.body.appendChild(particle)
+      setTimeout(() => particle.remove(), 600)
+    }
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [])
+
   return (
     <div className="pomodoro-page">
       <Header />
@@ -794,6 +808,7 @@ function TimelineView() {
                         </span>
                       )}
                     </div>
+                    <div className="timeline-block-text">{item.todoText}</div>
                     <div className="timeline-block-resize timeline-block-resize-left"
                       onMouseDown={(e) => {
                         e.preventDefault()

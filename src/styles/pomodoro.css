@@ -1080,8 +1080,9 @@
 .timeline-view {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  height: 750px;
+  gap: 1rem;
+  min-height: 600px;
+  max-height: 800px;
 }
 
 .timeline-toolbar {
@@ -1838,19 +1839,37 @@
 
 .timeline-chart-wrapper {
   flex: 1;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 300px;
 }
 
 .timeline-chart {
   flex: 1;
+  min-width: 800px;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,149,0,0.15);
   border-radius: 6px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.timeline-chart::-webkit-scrollbar {
+  height: 8px;
+}
+
+.timeline-chart::-webkit-scrollbar-track {
+  background: rgba(255,149,0,0.05);
+  border-radius: 4px;
+}
+
+.timeline-chart::-webkit-scrollbar-thumb {
+  background: var(--amber);
+  border-radius: 4px;
 }
 
 .heatmap-placeholder {

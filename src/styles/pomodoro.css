@@ -76,6 +76,7 @@
 /* 内容区域 */
 .pomodoro-content {
   min-height: 600px;
+  height: 750px;
 }
 
 /* 专注视图 - 左右分栏 */

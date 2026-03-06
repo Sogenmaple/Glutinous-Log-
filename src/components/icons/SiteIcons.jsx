@@ -3,6 +3,21 @@
  * 统一风格：简洁几何 + 像素感
  */
 
+// 炸弹/地雷图标
+export function BombIcon({ size = 48, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="26" r="12" stroke={color} strokeWidth="2" fill="none"/>
+      <circle cx="24" cy="26" r="4" fill={color} opacity="0.5"/>
+      <path d="M24 14V6" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M24 6l-3 3M24 6l3 3" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+      <circle cx="28" cy="22" r="1.5" fill={color}/>
+      <circle cx="20" cy="22" r="1.5" fill={color}/>
+      <circle cx="24" cy="30" r="1.5" fill={color}/>
+    </svg>
+  )
+}
+
 // 游戏手柄图标
 export function GameIcon({ size = 48, color = 'currentColor' }) {
   return (

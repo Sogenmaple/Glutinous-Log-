@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -26,6 +26,16 @@ export default function SpecialConstructs() {
       icon: ClockIcon,
       color: 'red',
       path: '/special/pomodoro',
+      status: 'active'
+    },
+    {
+      id: 'minesweeper',
+      title: '扫雷游戏',
+      subtitle: 'MINESWEEPER',
+      description: '经典益智扫雷游戏，找出所有非地雷格子',
+      icon: BombIcon,
+      color: 'amber',
+      path: '/special/minesweeper',
       status: 'active'
     },
     {

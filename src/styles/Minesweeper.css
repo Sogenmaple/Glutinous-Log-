@@ -1,0 +1,295 @@
+/* ============================================
+   扫雷游戏 - MINESWEEPER
+   ============================================ */
+
+.minesweeper-page {
+  min-height: 100vh;
+  background: var(--bg-deep);
+  padding-top: 100px;
+}
+
+.minesweeper-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 标题区域 */
+.minesweeper-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.minesweeper-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  animation: slide-up 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 15px currentColor);
+}
+
+.title-text {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 900;
+  color: var(--amber);
+  text-shadow: var(--amber-glow-strong);
+  letter-spacing: 0.08em;
+}
+
+.minesweeper-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--cyan);
+  text-shadow: var(--cyan-glow);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/* 游戏信息栏 */
+.minesweeper-info {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.15);
+  border-radius: 8px;
+}
+
+.info-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+}
+
+.info-value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--amber);
+  text-shadow: 0 0 10px rgba(255,149,0,0.5);
+}
+
+.reset-btn {
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--cyan);
+  background: rgba(6,182,212,0.1);
+  border: 1px solid var(--cyan);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+  background: rgba(6,182,212,0.2);
+  box-shadow: 0 0 20px rgba(6,182,212,0.4);
+  transform: translateY(-2px);
+}
+
+/* 游戏状态 */
+.game-status {
+  text-align: center;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  animation: slide-up 0.5s ease-out;
+}
+
+.game-status.won {
+  background: rgba(57,255,20,0.1);
+  border: 2px solid var(--green);
+  color: var(--green);
+  text-shadow: 0 0 20px rgba(57,255,20,0.6);
+}
+
+.game-status.lost {
+  background: rgba(255,45,45,0.1);
+  border: 2px solid var(--red);
+  color: var(--red);
+  text-shadow: 0 0 20px rgba(255,45,45,0.6);
+}
+
+/* 游戏网格 */
+.minesweeper-grid {
+  display: grid;
+  gap: 2px;
+  background: rgba(255,149,0,0.1);
+  padding: 4px;
+  border-radius: 8px;
+  border: 2px solid rgba(255,149,0,0.3);
+  margin-bottom: 2rem;
+  box-shadow: 0 0 30px rgba(255,149,0,0.1);
+}
+
+/* 格子样式 */
+.mine-cell {
+  aspect-ratio: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.2rem;
+  font-weight: 700;
+  user-select: none;
+}
+
+.mine-cell:hover:not(.revealed):not(.flagged) {
+  background: rgba(255,149,0,0.15);
+  border-color: var(--amber);
+  box-shadow: 0 0 15px rgba(255,149,0,0.3);
+  transform: scale(1.05);
+}
+
+.mine-cell.revealed {
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,149,0,0.1);
+  cursor: default;
+}
+
+.mine-cell.flagged {
+  background: rgba(189,0,255,0.1);
+  border-color: var(--purple);
+}
+
+.mine-cell.mine {
+  background: rgba(255,45,45,0.3);
+  border-color: var(--red);
+  animation: mine-explode 0.5s ease-out;
+}
+
+@keyframes mine-explode {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* 格子内容 */
+.cell-flag {
+  font-size: 1.2rem;
+  animation: flag-place 0.3s ease-out;
+}
+
+@keyframes flag-place {
+  0% { transform: scale(0) rotate(-180deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.cell-number {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-shadow: 0 0 10px currentColor;
+}
+
+.cell-mine {
+  font-size: 1.3rem;
+  animation: mine-pulse 1s ease-in-out infinite;
+}
+
+@keyframes mine-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* 游戏说明 */
+.minesweeper-instructions {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.minesweeper-instructions h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(6,182,255,0.4);
+}
+
+.minesweeper-instructions ul {
+  list-style: none;
+  padding: 0;
+}
+
+.minesweeper-instructions li {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255,149,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.minesweeper-instructions li:last-child {
+  border-bottom: none;
+}
+
+.minesweeper-instructions li::before {
+  content: '▸';
+  color: var(--amber);
+  font-size: 1.2rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .minesweeper-container {
+    padding: 1rem;
+  }
+
+  .minesweeper-grid {
+    gap: 1px;
+    padding: 2px;
+  }
+
+  .mine-cell {
+    border-radius: 2px;
+    font-size: 0.9rem;
+  }
+
+  .cell-flag,
+  .cell-mine {
+    font-size: 0.9rem;
+  }
+
+  .cell-number {
+    font-size: 1rem;
+  }
+
+  .minesweeper-info {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

@@ -18,6 +18,7 @@ import BlogPage from './pages/BlogPage'
 import AboutPage from './pages/AboutPage'
 import SpecialConstructs from './pages/SpecialConstructs'
 import PomodoroTodo from './pages/PomodoroTodo'
+import Minesweeper from './pages/Minesweeper'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
@@ -175,6 +176,9 @@ function AppContent() {
           
           {/* 番茄钟待办 */}
           <Route path="/special/pomodoro" element={<PomodoroTodo />} />
+          
+          {/* 扫雷游戏 */}
+          <Route path="/special/minesweeper" element={<Minesweeper />} />
           
           {/* 文章详情 */}
           <Route path="/post/:id" element={

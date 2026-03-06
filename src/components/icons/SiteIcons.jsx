@@ -242,3 +242,15 @@ export function TrashIcon({ size = 24, color = 'currentColor' }) {
     </svg>
   )
 }
+
+// 统计图表图标
+export function ChartIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="4" y1="20" x2="20" y2="20" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <rect x="6" y="14" width="3" height="6" fill={color} opacity="0.5"/>
+      <rect x="11" y="10" width="3" height="10" fill={color} opacity="0.7"/>
+      <rect x="16" y="6" width="3" height="14" fill={color}/>
+    </svg>
+  )
+}

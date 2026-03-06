@@ -385,3 +385,41 @@ export function FireIcon({ size = 24, color = 'currentColor' }) {
     </svg>
   )
 }
+
+// 每日重复图标
+export function RepeatDailyIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="9" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M12 7v5l3 3" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M8 12h8" stroke={color} strokeWidth="1.5" strokeDasharray="2 2" opacity="0.5"/>
+    </svg>
+  )
+}
+
+// 每周重复图标
+export function RepeatWeeklyIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="4" width="18" height="16" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M3 9h18" stroke={color} strokeWidth="2"/>
+      <circle cx="8" cy="7" r="1" fill={color}/>
+      <circle cx="12" cy="7" r="1" fill={color}/>
+      <circle cx="16" cy="7" r="1" fill={color}/>
+      <path d="M12 14v4" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M10 16h4" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
+// 每月重复图标
+export function RepeatMonthlyIcon({ size = 24, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="4" width="18" height="16" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M3 9h18" stroke={color} strokeWidth="2"/>
+      <circle cx="12" cy="15" r="3" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M12 13v4M10 15h4" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  )
+}

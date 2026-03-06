@@ -3,13 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import { ClockIcon, CheckIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon } from '../components/icons/SiteIcons'
 
-/**
- * 番茄钟待办 v4.0
- * - 拖拽待办到右侧专注区
- * - 待办配置：优先级、截止日期、持续时间
- * - 专注时消耗待办持续时间
- * - 矩形规整热力图
- */
 export default function PomodoroTodo() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('timer')
@@ -20,38 +13,22 @@ export default function PomodoroTodo() {
       
       <main className="pomodoro-main">
         <div className="pomodoro-header">
-          <h1 className="pomodoro-title">
-            <span>番茄专注</span>
-          </h1>
+          <h1 className="pomodoro-title">番茄专注</h1>
           <p className="pomodoro-subtitle">POMODORO FOCUS SYSTEM</p>
         </div>
 
-        {/* 标签页导航 */}
         <div className="pomodoro-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'timer' ? 'active' : ''}`}
-            onClick={() => setActiveTab('timer')}
-          >
-            <ClockIcon size={18} />
-            <span>专注</span>
+          <button className={`tab-btn ${activeTab === 'timer' ? 'active' : ''}`} onClick={() => setActiveTab('timer')}>
+            <ClockIcon size={18} /><span>专注</span>
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'heatmap' ? 'active' : ''}`}
-            onClick={() => setActiveTab('heatmap')}
-          >
-            <CalendarIcon size={18} />
-            <span>热力图</span>
+          <button className={`tab-btn ${activeTab === 'heatmap' ? 'active' : ''}`} onClick={() => setActiveTab('heatmap')}>
+            <CalendarIcon size={18} /><span>热力图</span>
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`}
-            onClick={() => setActiveTab('stats')}
-          >
-            <ChartIcon size={18} />
-            <span>统计</span>
+          <button className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`} onClick={() => setActiveTab('stats')}>
+            <ChartIcon size={18} /><span>统计</span>
           </button>
         </div>
 
-        {/* 内容区域 */}
         <div className="pomodoro-content">
           {activeTab === 'timer' && <TimerView />}
           {activeTab === 'heatmap' && <HeatmapTab />}
@@ -62,7 +39,7 @@ export default function PomodoroTodo() {
   )
 }
 
-// 专注视图 - 左右分栏（支持拖拽）
+// 专注视图 - 支持拖拽
 function TimerView() {
   const [activeTodos, setActiveTodos] = useState(() => {
     const saved = localStorage.getItem('pomodoro_active_todos')
@@ -73,22 +50,15 @@ function TimerView() {
     localStorage.setItem('pomodoro_active_todos', JSON.stringify(activeTodos))
   }, [activeTodos])
 
-  // 从待办清单移除（当拖到右侧时）
   const removeFromTodos = (todoId) => {
     const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-    const filtered = todos.filter(t => t.id !== todoId)
-    localStorage.setItem('pomodoro_todos', JSON.stringify(filtered))
-    // 触发自定义事件通知待办列表更新
+    localStorage.setItem('pomodoro_todos', JSON.stringify(todos.filter(t => t.id !== todoId)))
     window.dispatchEvent(new CustomEvent('todos-updated'))
   }
 
   const moveToActive = (todo) => {
     if (!activeTodos.find(t => t.id === todo.id)) {
-      const activeTodo = {
-        ...todo,
-        startedAt: new Date().toISOString(),
-        remainingTime: todo.duration || 25 // 使用配置的持续时间
-      }
+      const activeTodo = { ...todo, startedAt: new Date().toISOString(), remainingTime: todo.duration || 25 }
       setActiveTodos([...activeTodos, activeTodo])
       removeFromTodos(todo.id)
     }
@@ -96,17 +66,12 @@ function TimerView() {
 
   const moveBackToTodos = (todo) => {
     const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-    const todoBack = {
-      ...todo,
-      duration: todo.remainingTime // 保存剩余时间
-    }
-    localStorage.setItem('pomodoro_todos', JSON.stringify([...todos, todoBack]))
+    localStorage.setItem('pomodoro_todos', JSON.stringify([...todos, { ...todo, duration: todo.remainingTime }]))
     window.dispatchEvent(new CustomEvent('todos-updated'))
     setActiveTodos(activeTodos.filter(t => t.id !== todo.id))
   }
 
   const completeTodo = (todoId) => {
-    // 记录专注会话
     const todo = activeTodos.find(t => t.id === todoId)
     if (todo) {
       const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')
@@ -116,7 +81,7 @@ function TimerView() {
           id: Date.now(),
           todoId: todo.id,
           todoText: todo.text,
-          duration: completedTime * 60, // 转换为秒
+          duration: completedTime * 60,
           completedAt: new Date().toISOString(),
           mode: 'work'
         })
@@ -127,36 +92,42 @@ function TimerView() {
   }
 
   const updateActiveTodoTime = (todoId, newRemainingTime) => {
-    setActiveTodos(activeTodos.map(t => 
-      t.id === todoId ? { ...t, remainingTime: newRemainingTime } : t
-    ))
+    setActiveTodos(activeTodos.map(t => t.id === todoId ? { ...t, remainingTime: newRemainingTime } : t))
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    const todoData = e.dataTransfer.getData('todo')
+    if (todoData) {
+      const todo = JSON.parse(todoData)
+      moveToActive(todo)
+    }
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
   }
 
   return (
     <div className="timer-view">
-      {/* 左侧：待办清单 */}
       <div className="todo-column">
         <div className="column-header">
-          <h3>
-            <span>待办清单</span>
-          </h3>
-          <span className="column-count">可拖到右侧开始</span>
+          <h3>待办清单</h3>
+          <span className="column-count">拖到右侧开始专注</span>
         </div>
-        <TodosList 
-          onMoveToActive={moveToActive}
-        />
+        <TodosList onMoveToActive={moveToActive} />
       </div>
 
-      {/* 右侧：专注中 */}
-      <div className="focus-column">
+      <div 
+        className={`focus-column ${activeTodos.length === 0 ? 'drop-zone' : ''}`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+      >
         <div className="column-header">
-          <h3>
-            <span>专注中</span>
-          </h3>
+          <h3>专注中</h3>
           {activeTodos.length > 0 && (
-            <button className="clear-all-btn" onClick={() => {
-              activeTodos.forEach(todo => moveBackToTodos(todo))
-            }}>
+            <button className="clear-all-btn" onClick={() => activeTodos.forEach(todo => moveBackToTodos(todo))}>
               全部返回
             </button>
           )}
@@ -164,8 +135,11 @@ function TimerView() {
         
         {activeTodos.length === 0 ? (
           <div className="empty-focus">
-            <p>从左侧拖拽待办到这里开始专注</p>
-            <p className="empty-hint">或者直接点击待办旁边的按钮</p>
+            <div className="drop-hint">
+              <div className="drop-icon">⬆</div>
+              <p>将待办事项拖拽到这里</p>
+              <p className="drop-sub">开始专注计时</p>
+            </div>
           </div>
         ) : (
           <div className="active-todos-list">
@@ -185,26 +159,14 @@ function TimerView() {
   )
 }
 
-// 待办列表组件（支持拖拽）
 function TodosList({ onMoveToActive }) {
-  const [todos, setTodos] = useState(() => {
-    const saved = localStorage.getItem('pomodoro_todos')
-    return saved ? JSON.parse(saved) : []
-  })
+  const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
   const [newTodo, setNewTodo] = useState('')
-  const [showConfig, setShowConfig] = useState(null) // 显示配置的待办 ID
-  const [config, setConfig] = useState({
-    priority: 'medium',
-    dueDate: '',
-    duration: 25
-  })
+  const [showConfig, setShowConfig] = useState(null)
+  const [config, setConfig] = useState({ priority: 'medium', dueDate: '', duration: 25 })
 
   useEffect(() => {
-    const handleUpdate = () => {
-      const saved = localStorage.getItem('pomodoro_todos')
-      setTodos(saved ? JSON.parse(saved) : [])
-    }
-    
+    const handleUpdate = () => setTodos(JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
     window.addEventListener('todos-updated', handleUpdate)
     return () => window.removeEventListener('todos-updated', handleUpdate)
   }, [])
@@ -216,8 +178,7 @@ function TodosList({ onMoveToActive }) {
   const addTodo = (e) => {
     e.preventDefault()
     if (!newTodo.trim()) return
-    
-    const todo = {
+    setTodos([...todos, {
       id: Date.now(),
       text: newTodo.trim(),
       completed: false,
@@ -225,35 +186,25 @@ function TodosList({ onMoveToActive }) {
       dueDate: null,
       duration: 25,
       createdAt: new Date().toISOString()
-    }
-    
-    setTodos([...todos, todo])
+    }])
     setNewTodo('')
   }
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter(todo => todo.id !== id))
-  }
+  const deleteTodo = (id) => setTodos(todos.filter(todo => todo.id !== id))
 
   const saveConfig = () => {
     if (!showConfig) return
-    setTodos(todos.map(todo =>
-      todo.id === showConfig ? {
-        ...todo,
-        priority: config.priority,
-        dueDate: config.dueDate || null,
-        duration: config.duration
-      } : todo
-    ))
+    setTodos(todos.map(todo => todo.id === showConfig ? {
+      ...todo,
+      priority: config.priority,
+      dueDate: config.dueDate || null,
+      duration: config.duration
+    } : todo))
     setShowConfig(null)
   }
 
   const openConfig = (todo) => {
-    setConfig({
-      priority: todo.priority || 'medium',
-      dueDate: todo.dueDate || '',
-      duration: todo.duration || 25
-    })
+    setConfig({ priority: todo.priority || 'medium', dueDate: todo.dueDate || '', duration: todo.duration || 25 })
     setShowConfig(todo.id)
   }
 
@@ -267,16 +218,8 @@ function TodosList({ onMoveToActive }) {
   return (
     <div className="todos-list-container">
       <form className="add-todo-form" onSubmit={addTodo}>
-        <input
-          type="text"
-          className="todo-input"
-          placeholder="添加新任务..."
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-        />
-        <button type="submit" className="add-btn">
-          <PlusIcon size={18} />
-        </button>
+        <input type="text" className="todo-input" placeholder="添加新任务..." value={newTodo} onChange={(e) => setNewTodo(e.target.value)} />
+        <button type="submit" className="add-btn"><PlusIcon size={18} /></button>
       </form>
 
       <div className="todos-list">
@@ -284,87 +227,41 @@ function TodosList({ onMoveToActive }) {
           <div className="empty-state">暂无待办</div>
         ) : (
           filteredTodos.map(todo => (
-            <div 
-              key={todo.id} 
-              className="todo-item"
-              draggable
-              onDragStart={(e) => handleDragStart(e, todo)}
-            >
+            <div key={todo.id} className="todo-item" draggable onDragStart={(e) => handleDragStart(e, todo)}>
               <div className="todo-content">
                 <span className="todo-text">{todo.text}</span>
                 <span className={`priority-badge priority-${todo.priority}`}>
                   {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
                 </span>
-                {todo.dueDate && (
-                  <span className="due-badge">{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>
-                )}
+                {todo.dueDate && <span className="due-badge">{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>}
                 <span className="duration-badge">{todo.duration}分钟</span>
               </div>
               <div className="todo-actions">
-                <button 
-                  className="config-btn" 
-                  onClick={() => openConfig(todo)}
-                  title="配置"
-                >
-                  ⚙
-                </button>
-                <button 
-                  className="move-btn" 
-                  onClick={() => onMoveToActive(todo)}
-                  title="开始专注"
-                >
-                  ➤
-                </button>
-                <button 
-                  className="delete-btn" 
-                  onClick={() => deleteTodo(todo.id)}
-                >
-                  <TrashIcon size={14} />
-                </button>
+                <button className="config-btn" onClick={() => openConfig(todo)}>⚙</button>
+                <button className="move-btn" onClick={() => onMoveToActive(todo)}>➤</button>
+                <button className="delete-btn" onClick={() => deleteTodo(todo.id)}><TrashIcon size={14} /></button>
               </div>
 
-              {/* 配置弹窗 */}
               {showConfig === todo.id && (
                 <div className="config-modal" onClick={(e) => e.stopPropagation()}>
                   <div className="config-content">
                     <h4>配置待办</h4>
-                    
                     <div className="config-field">
                       <label>优先级</label>
-                      <select
-                        value={config.priority}
-                        onChange={(e) => setConfig({ ...config, priority: e.target.value })}
-                        className="config-select"
-                      >
+                      <select value={config.priority} onChange={(e) => setConfig({ ...config, priority: e.target.value })} className="config-select">
                         <option value="low">低</option>
                         <option value="medium">中</option>
                         <option value="high">高</option>
                       </select>
                     </div>
-
                     <div className="config-field">
                       <label>截止日期</label>
-                      <input
-                        type="date"
-                        value={config.dueDate}
-                        onChange={(e) => setConfig({ ...config, dueDate: e.target.value })}
-                        className="config-input"
-                      />
+                      <input type="date" value={config.dueDate} onChange={(e) => setConfig({ ...config, dueDate: e.target.value })} className="config-input" />
                     </div>
-
                     <div className="config-field">
                       <label>持续时间：{config.duration} 分钟</label>
-                      <input
-                        type="range"
-                        min="5"
-                        max="180"
-                        step="5"
-                        value={config.duration}
-                        onChange={(e) => setConfig({ ...config, duration: parseInt(e.target.value) })}
-                        className="config-slider"
-                      />
+                      <input type="range" min="5" max="180" step="5" value={config.duration} onChange={(e) => setConfig({ ...config, duration: parseInt(e.target.value) })} className="config-slider" />
                     </div>
-
                     <div className="config-actions">
                       <button className="cancel-btn" onClick={() => setShowConfig(null)}>取消</button>
                       <button className="save-btn" onClick={saveConfig}>保存</button>
@@ -380,7 +277,6 @@ function TodosList({ onMoveToActive }) {
   )
 }
 
-// 专注中的待办卡片
 function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
   const [timeLeft, setTimeLeft] = useState((todo.remainingTime || 25) * 60)
   const [isRunning, setIsRunning] = useState(false)
@@ -397,7 +293,6 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
             return 0
           }
           const newTime = prev - 1
-          // 更新剩余时间（分钟）
           onUpdateTime(Math.ceil(newTime / 60))
           return newTime
         })
@@ -427,12 +322,8 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
           <span>{todo.text}</span>
         </div>
         <div className="header-actions">
-          <button className="move-back-btn" onClick={onMoveBack} title="返回待办">
-            ← 返回
-          </button>
-          <button className="complete-btn" onClick={onComplete}>
-            ✓ 完成
-          </button>
+          <button className="move-back-btn" onClick={onMoveBack}>返回</button>
+          <button className="complete-btn" onClick={onComplete}>完成</button>
         </div>
       </div>
 
@@ -441,46 +332,19 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
           <div className="digital-timer-compact">
             <div className="time-display">{formatTime(timeLeft)}</div>
             <div className="time-slider-wrapper">
-              <input
-                type="range"
-                className="time-slider"
-                min="1"
-                max="120"
-                value={Math.ceil(timeLeft / 60)}
-                onChange={(e) => {
-                  const mins = parseInt(e.target.value)
-                  setTimeLeft(mins * 60)
-                  onUpdateTime(mins)
-                }}
-                disabled={isRunning}
-                style={{ '--slider-color': '#ff9500' }}
-              />
+              <input type="range" className="time-slider" min="1" max="120" value={Math.ceil(timeLeft / 60)}
+                onChange={(e) => { const mins = parseInt(e.target.value); setTimeLeft(mins * 60); onUpdateTime(mins) }}
+                disabled={isRunning} />
               <span className="slider-value">{Math.ceil(timeLeft / 60)}分钟</span>
             </div>
           </div>
         ) : (
           <div className="circular-timer-compact">
             <svg viewBox="0 0 100 100" className="circular-svg">
-              <circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="rgba(255,149,0,0.2)"
-                strokeWidth="8"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="42"
-                fill="none"
-                stroke="#ff9500"
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={`${2 * Math.PI * 42}`}
-                strokeDashoffset={`${2 * Math.PI * 42 * (1 - progress / 100)}`}
-                transform="rotate(-90 50 50)"
-              />
+              <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,149,0,0.2)" strokeWidth="8" />
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#ff9500" strokeWidth="8" strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset={`${2 * Math.PI * 42 * (1 - progress / 100)}`}
+                transform="rotate(-90 50 50)" />
             </svg>
             <div className="circular-time-display">{formatTime(timeLeft)}</div>
           </div>
@@ -488,19 +352,11 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
       </div>
 
       <div className="active-todo-controls">
-        <button
-          className="control-btn primary"
-          onClick={() => setIsRunning(!isRunning)}
-        >
+        <button className="control-btn primary" onClick={() => setIsRunning(!isRunning)}>
           {isRunning ? <><PauseIcon size={16} /><span>暂停</span></> : <><PlayIcon size={16} /><span>开始</span></>}
         </button>
-        <button className="control-btn" onClick={resetTimer}>
-          <ResetIcon size={16} />
-        </button>
-        <button
-          className={`style-btn ${timerStyle === 'digital' ? 'active' : ''}`}
-          onClick={() => setTimerStyle(timerStyle === 'digital' ? 'circular' : 'digital')}
-        >
+        <button className="control-btn" onClick={resetTimer}><ResetIcon size={16} /></button>
+        <button className={`style-btn ${timerStyle === 'digital' ? 'active' : ''}`} onClick={() => setTimerStyle(timerStyle === 'digital' ? 'circular' : 'digital')}>
           {timerStyle === 'digital' ? '数字' : '圆形'}
         </button>
       </div>
@@ -508,21 +364,16 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
       <div className="active-todo-info">
         <span className="info-item">已专注：{((todo.duration || 25) - (todo.remainingTime || 25))} 分钟</span>
         <span className="info-item">剩余：{todo.remainingTime || 25} 分钟</span>
-        {todo.dueDate && (
-          <span className="info-item">截止：{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>
-        )}
+        {todo.dueDate && <span className="info-item">截止：{new Date(todo.dueDate).toLocaleDateString('zh-CN')}</span>}
       </div>
     </div>
   )
 }
 
-// 热力图组件 - 规整矩形
+// 热力图 - 简洁规整设计
 function HeatmapTab() {
   const [viewMode, setViewMode] = useState('year')
-  const [sessions] = useState(() => {
-    const saved = localStorage.getItem('pomodoro_sessions')
-    return saved ? JSON.parse(saved) : []
-  })
+  const [sessions] = useState(() => JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
   const [hoverData, setHoverData] = useState(null)
 
   const generateHeatmapData = () => {
@@ -530,7 +381,6 @@ function HeatmapTab() {
     const now = new Date()
     
     if (viewMode === 'year') {
-      // 生成全年数据（12 个月 x 31 天 = 规整矩形）
       for (let m = 0; m < 12; m++) {
         for (let d = 0; d < 31; d++) {
           const date = new Date(now.getFullYear(), m, d + 1)
@@ -540,10 +390,7 @@ function HeatmapTab() {
               const sDate = new Date(s.completedAt).toISOString().split('T')[0]
               return sDate === dateStr && s.mode === 'work'
             })
-            data[dateStr] = {
-              count: daySessions.length,
-              totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
-            }
+            data[dateStr] = { count: daySessions.length, totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0) }
           }
         }
       }
@@ -556,10 +403,7 @@ function HeatmapTab() {
           const sDate = new Date(s.completedAt).toISOString().split('T')[0]
           return sDate === dateStr && s.mode === 'work'
         })
-        data[dateStr] = {
-          count: daySessions.length,
-          totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
-        }
+        data[dateStr] = { count: daySessions.length, totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0) }
       }
     } else if (viewMode === 'day') {
       const today = now.toISOString().split('T')[0]
@@ -570,13 +414,9 @@ function HeatmapTab() {
           const sDateStr = sDate.toISOString().split('T')[0]
           return sDateStr === today && sDate.getHours() === h && s.mode === 'work'
         })
-        data[hourKey] = {
-          count: hourSessions.length,
-          totalDuration: hourSessions.reduce((sum, s) => sum + (s.duration || 0), 0)
-        }
+        data[hourKey] = { count: hourSessions.length, totalDuration: hourSessions.reduce((sum, s) => sum + (s.duration || 0), 0) }
       }
     }
-    
     return data
   }
 
@@ -614,9 +454,9 @@ function HeatmapTab() {
       </div>
 
       <div className="heatmap-controls">
-        <button className={`view-btn ${viewMode === 'year' ? 'active' : ''}`} onClick={() => setViewMode('year')}>年视图</button>
-        <button className={`view-btn ${viewMode === 'month' ? 'active' : ''}`} onClick={() => setViewMode('month')}>月视图</button>
-        <button className={`view-btn ${viewMode === 'day' ? 'active' : ''}`} onClick={() => setViewMode('day')}>日视图</button>
+        <button className={`view-btn ${viewMode === 'year' ? 'active' : ''}`} onClick={() => setViewMode('year')}>年</button>
+        <button className={`view-btn ${viewMode === 'month' ? 'active' : ''}`} onClick={() => setViewMode('month')}>月</button>
+        <button className={`view-btn ${viewMode === 'day' ? 'active' : ''}`} onClick={() => setViewMode('day')}>日</button>
       </div>
 
       <div className="heatmap-container">
@@ -632,14 +472,10 @@ function HeatmapTab() {
                     const cellData = heatmapData[dateStr] || { count: 0 }
                     const isFuture = date > new Date()
                     return (
-                      <div
-                        key={day}
-                        className={`heatmap-cell ${cellData.count > 0 ? 'has-data' : ''} ${isFuture ? 'future' : ''}`}
+                      <div key={day} className={`heatmap-cell ${cellData.count > 0 ? 'has-data' : ''} ${isFuture ? 'future' : ''}`}
                         style={{ background: isFuture ? 'rgba(255,255,255,0.02)' : getColor(cellData.count) }}
                         onMouseEnter={() => !isFuture && setHoverData({ date: dateStr, ...cellData })}
-                        onMouseLeave={() => setHoverData(null)}
-                        title={isFuture ? '未来日期' : dateStr}
-                      />
+                        onMouseLeave={() => setHoverData(null)} />
                     )
                   })}
                 </div>
@@ -656,13 +492,10 @@ function HeatmapTab() {
               const cellData = heatmapData[dateStr] || { count: 0 }
               const isFuture = date > new Date()
               return (
-                <div
-                  key={day}
-                  className={`heatmap-cell large ${cellData.count > 0 ? 'has-data' : ''} ${isFuture ? 'future' : ''}`}
+                <div key={day} className={`heatmap-cell large ${cellData.count > 0 ? 'has-data' : ''} ${isFuture ? 'future' : ''}`}
                   style={{ background: isFuture ? 'rgba(255,255,255,0.02)' : getColor(cellData.count) }}
                   onMouseEnter={() => !isFuture && setHoverData({ date: dateStr, ...cellData })}
-                  onMouseLeave={() => setHoverData(null)}
-                >
+                  onMouseLeave={() => setHoverData(null)}>
                   <span className="cell-day">{day + 1}</span>
                 </div>
               )
@@ -677,13 +510,10 @@ function HeatmapTab() {
               const hourKey = `${today}-${hour.toString().padStart(2, '0')}`
               const cellData = heatmapData[hourKey] || { count: 0 }
               return (
-                <div
-                  key={hour}
-                  className={`heatmap-cell hour-cell ${cellData.count > 0 ? 'has-data' : ''}`}
+                <div key={hour} className={`heatmap-cell hour-cell ${cellData.count > 0 ? 'has-data' : ''}`}
                   style={{ background: getColor(cellData.count) }}
                   onMouseEnter={() => setHoverData({ hour: `${hour}:00`, ...cellData })}
-                  onMouseLeave={() => setHoverData(null)}
-                >
+                  onMouseLeave={() => setHoverData(null)}>
                   <span className="cell-hour">{hour}</span>
                 </div>
               )
@@ -706,13 +536,8 @@ function HeatmapTab() {
   )
 }
 
-// 统计组件
 function StatsTab() {
-  const [sessions] = useState(() => {
-    const saved = localStorage.getItem('pomodoro_sessions')
-    return saved ? JSON.parse(saved) : []
-  })
-
+  const [sessions] = useState(() => JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
   const today = new Date().toISOString().split('T')[0]
   const todayCount = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work').length
   const weekCount = sessions.filter(s => {

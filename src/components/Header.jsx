@@ -85,85 +85,113 @@ export default function Header() {
 
   return (
     <header className={`header ${scrolled ? 'header--scrolled' : ''}`}>
-      <div className="header-content">
-        {/* Logo - 点击返回首页 */}
-        <div className="logo" onClick={() => goTo('/')}>
-          <span className="logo-bracket">[</span>
-          <span className="logo-text">汤圆</span>
-          <span className="logo-bracket">]</span>
-          <div className="logo-glow"></div>
+      <div className="header-top">
+        <div className="header-content">
+          {/* Logo - 点击返回首页 */}
+          <div className="logo" onClick={() => goTo('/')}>
+            <span className="logo-bracket">[</span>
+            <span className="logo-text">汤圆</span>
+            <span className="logo-bracket">]</span>
+            <div className="logo-glow"></div>
+          </div>
+
+          {/* 导航菜单 - 桌面端 */}
+          <nav className="nav nav-desktop">
+            {navItems.map((item, index) => (
+              <button
+                key={item.id}
+                className={`nav-item ${active === item.id ? 'active' : ''}`}
+                onClick={() => goTo(item.path)}
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <span className="nav-label">{item.label}</span>
+                <span className="nav-label-en">{item.labelEn}</span>
+                <span className="nav-indicator"></span>
+              </button>
+            ))}
+          </nav>
+
+          {/* 用户区域 */}
+          <div className="header-user">
+            {user ? (
+              <div className="user-menu-container">
+                <button 
+                  className="user-btn"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                >
+                  <UserIcon size={18} />
+                  <span className="user-name">{user.username}</span>
+                </button>
+                
+                {showUserMenu && (
+                  <div className="user-dropdown">
+                    <div className="dropdown-item" onClick={() => {
+                      goTo('/special/pomodoro')
+                      setShowUserMenu(false)
+                    }}>
+                      <span>我的待办</span>
+                    </div>
+                    <div className="dropdown-item" onClick={handleLogout}>
+                      <span>退出登录</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button 
+                className="login-btn"
+                onClick={() => goTo('/login')}
+              >
+                <LoginIcon size={18} />
+                <span>登录</span>
+              </button>
+            )}
+          </div>
+
+          {/* 移动端菜单按钮 */}
+          <button className="mobile-menu-btn" onClick={() => setActive(active === 'mobile' ? 'home' : 'mobile')}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
 
-        {/* 导航菜单 */}
-        <nav className="nav">
+        {/* 移动端导航菜单 */}
+        <nav className={`nav nav-mobile ${active === 'mobile' ? 'active' : ''}`}>
           {navItems.map((item, index) => (
             <button
               key={item.id}
               className={`nav-item ${active === item.id ? 'active' : ''}`}
-              onClick={() => goTo(item.path)}
-              style={{ animationDelay: `${index * 0.05}s` }}
+              onClick={() => {
+                goTo(item.path)
+                setActive('home')
+              }}
             >
               <span className="nav-label">{item.label}</span>
               <span className="nav-label-en">{item.labelEn}</span>
-              <span className="nav-indicator"></span>
             </button>
           ))}
         </nav>
-
-        {/* 用户区域 */}
-        <div className="header-user">
-          {user ? (
-            <div className="user-menu-container">
-              <button 
-                className="user-btn"
-                onClick={() => setShowUserMenu(!showUserMenu)}
-              >
-                <UserIcon size={20} />
-                <span className="user-name">{user.username}</span>
-              </button>
-              
-              {showUserMenu && (
-                <div className="user-dropdown">
-                  <div className="dropdown-item" onClick={() => {
-                    goTo('/special/pomodoro')
-                    setShowUserMenu(false)
-                  }}>
-                    <span>📋 我的待办</span>
-                  </div>
-                  <div className="dropdown-item" onClick={handleLogout}>
-                    <span>🚪 退出登录</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <button 
-              className="login-btn"
-              onClick={() => goTo('/login')}
-            >
-              <LoginIcon size={20} />
-              <span>登录</span>
-            </button>
-          )}
-        </div>
       </div>
 
       {/* 面包屑导航 */}
-      <div className="breadcrumb-bar">
-        <div className="breadcrumb-content">
-          {breadcrumbs.map((crumb, index) => (
-            <div key={crumb.path} className="breadcrumb-item">
-              {index > 0 && <span className="breadcrumb-separator">/</span>}
-              <button 
-                className={`breadcrumb-link ${index === breadcrumbs.length - 1 ? 'active' : ''}`}
-                onClick={() => goTo(crumb.path)}
-              >
-                {crumb.label}
-              </button>
-            </div>
-          ))}
+      {breadcrumbs.length > 1 && (
+        <div className="breadcrumb-bar">
+          <div className="breadcrumb-content">
+            {breadcrumbs.map((crumb, index) => (
+              <div key={crumb.path} className="breadcrumb-item">
+                {index > 0 && <span className="breadcrumb-separator">/</span>}
+                <button 
+                  className={`breadcrumb-link ${index === breadcrumbs.length - 1 ? 'active' : ''}`}
+                  onClick={() => goTo(crumb.path)}
+                >
+                  {crumb.label}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </header>
   )
 }

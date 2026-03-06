@@ -137,6 +137,36 @@
   color: var(--text-dim);
 }
 
+.captcha-wrapper {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.captcha-input {
+  flex: 1;
+}
+
+.captcha-canvas {
+  cursor: pointer;
+  border: 1px solid rgba(255,149,0,0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.captcha-canvas:hover {
+  border-color: var(--amber);
+  box-shadow: 0 0 10px rgba(255,149,0,0.3);
+  transform: scale(1.05);
+}
+
+.captcha-canvas canvas {
+  display: block;
+  background: rgba(255,255,255,0.05);
+}
+
 .form-error {
   background: rgba(255,69,58,0.1);
   border: 1px solid rgba(255,69,58,0.3);

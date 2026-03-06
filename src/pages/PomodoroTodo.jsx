@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { ClockIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon, SaveIcon, LoadIcon, AddIcon, RemoveIcon, DragIcon, RepeatDailyIcon, RepeatWeeklyIcon, RepeatMonthlyIcon } from '../components/icons/SiteIcons'
+import { ClockIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon, SaveIcon, LoadIcon, AddIcon, RemoveIcon, DragIcon, RepeatDailyIcon, RepeatWeeklyIcon, RepeatMonthlyIcon, CheckIcon } from '../components/icons/SiteIcons'
 
 export default function PomodoroTodo() {
   const navigate = useNavigate()
@@ -302,8 +302,8 @@ function TodosList({ onMoveToActive }) {
         {filteredTodos.length === 0 ? (
           <div className="empty-state">暂无待办</div>
         ) : (
-          filteredTodos.map(todo => (
-            <div key={todo.id} className="todo-item" draggable onDragStart={(e) => handleDragStart(e, todo)}>
+          filteredTodos.map((todo, index) => (
+            <div key={`${todo.id}-${index}`} className="todo-item" draggable onDragStart={(e) => handleDragStart(e, todo)}>
               <div className="todo-content">
                 <span className="todo-text">{todo.text}</span>
                 <span className={`priority-badge priority-${todo.priority}`}>
@@ -672,9 +672,9 @@ function TimelineView() {
         <div className="todo-sidebar">
           <h4>待办事项</h4>
           <div className="todo-drag-list">
-            {todos.filter(t => !t.completed).map(todo => (
+            {todos.filter(t => !t.completed).map((todo, index) => (
               <div 
-                key={todo.id} 
+                key={`${todo.id}-${index}`} 
                 className="todo-drag-item"
                 draggable
                 onDragStart={(e) => handleDragStart(e, todo)}
@@ -975,11 +975,11 @@ function CheckinView() {
             <p className="empty-habits-hint">添加一个习惯开始打卡</p>
           </div>
         ) : (
-          habits.map(habit => {
+          habits.map((habit, index) => {
             const completedToday = getCompletedToday(habit.id)
             const streak = getStreak(habit.id)
             return (
-              <div key={habit.id} className={`habit-card ${completedToday ? 'completed' : ''}`}>
+              <div key={`${habit.id}-${index}`} className={`habit-card ${completedToday ? 'completed' : ''}`}>
                 <div className="habit-info">
                   <div className="habit-text">{habit.text}</div>
                   <div className="habit-meta">

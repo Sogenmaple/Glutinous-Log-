@@ -21,11 +21,11 @@ export default function PomodoroTodo() {
           <button className={`tab-btn ${activeTab === 'timer' ? 'active' : ''}`} onClick={() => setActiveTab('timer')}>
             <ClockIcon size={18} /><span>专注</span>
           </button>
+          <button className={`tab-btn ${activeTab === 'timeline' ? 'active' : ''}`} onClick={() => setActiveTab('timeline')}>
+            <CalendarIcon size={18} /><span>时间轴</span>
+          </button>
           <button className={`tab-btn ${activeTab === 'checkin' ? 'active' : ''}`} onClick={() => setActiveTab('checkin')}>
             <FireIcon size={18} /><span>打卡</span>
-          </button>
-          <button className={`tab-btn ${activeTab === 'heatmap' ? 'active' : ''}`} onClick={() => setActiveTab('heatmap')}>
-            <CalendarIcon size={18} /><span>热力图</span>
           </button>
           <button className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`} onClick={() => setActiveTab('stats')}>
             <ChartIcon size={18} /><span>统计</span>
@@ -34,9 +34,9 @@ export default function PomodoroTodo() {
 
         <div className="pomodoro-content">
           {activeTab === 'timer' && <TimerView />}
+          {activeTab === 'timeline' && <TimelineView />}
           {activeTab === 'checkin' && <CheckinView />}
-          {activeTab === 'heatmap' && <HeatmapTab />}
-          {activeTab === 'stats' && <StatsTab />}
+          {activeTab === 'stats' && <StatsView />}
         </div>
       </main>
     </div>
@@ -49,6 +49,15 @@ function TimerView() {
     const saved = localStorage.getItem('pomodoro_active_todos')
     return saved ? JSON.parse(saved) : []
   })
+  const [todayDuration, setTodayDuration] = useState(0)
+
+  useEffect(() => {
+    const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')
+    const today = new Date().toISOString().split('T')[0]
+    const todaySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
+    const total = todaySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+    setTodayDuration(total)
+  }, [])
 
   useEffect(() => {
     localStorage.setItem('pomodoro_active_todos', JSON.stringify(activeTodos))
@@ -90,28 +99,33 @@ function TimerView() {
           mode: 'work'
         })
         localStorage.setItem('pomodoro_sessions', JSON.stringify(sessions))
+        
+        // 更新今日专注时长
+        const today = new Date().toISOString().split('T')[0]
+        const todaySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
+        const total = todaySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+        setTodayDuration(total)
       }
 
       // 如果是重复任务，自动打卡并返回待办清单
       if (todo.repeat && todo.repeat !== 'none') {
-        // 记录打卡
         const checkins = JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]')
         const today = new Date().toISOString().split('T')[0]
         const existingCheckin = checkins.find(c => c.habitId === todo.id && c.date === today)
         
-        if (!existingCheckin) {
+        if (!existingCheckin && todo.isHabit) {
           checkins.push({
             id: Date.now(),
             habitId: todo.id,
             habitText: todo.text,
             date: today,
             completedAt: new Date().toISOString(),
-            duration: completedTime
+            duration: completedTime,
+            type: 'auto'
           })
           localStorage.setItem('pomodoro_checkins', JSON.stringify(checkins))
         }
 
-        // 更新打卡习惯的最后完成时间
         const habits = JSON.parse(localStorage.getItem('pomodoro_habits') || '[]')
         habits.forEach(habit => {
           if (habit.id === todo.id) {
@@ -121,11 +135,12 @@ function TimerView() {
         })
         localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
 
-        // 任务回到待办清单（长期任务）
-        const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-        todos.push({ ...todo, duration: todo.duration || 25, remainingTime: todo.duration || 25 })
-        localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
-        window.dispatchEvent(new CustomEvent('todos-updated'))
+        if (todo.repeat !== 'none') {
+          const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+          todos.push({ ...todo, duration: todo.duration || 25, remainingTime: todo.duration || 25 })
+          localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
+          window.dispatchEvent(new CustomEvent('todos-updated'))
+        }
       }
     }
     setActiveTodos(activeTodos.filter(t => t.id !== todoId))
@@ -156,7 +171,7 @@ function TimerView() {
           <h3>待办清单</h3>
           <span className="column-count">拖到右侧开始专注</span>
         </div>
-        <TodosList onMoveToActive={moveToActive} onCompleteActive={(id) => completeActiveTodo(id, activeTodos, setActiveTodos)} />
+        <TodosList onMoveToActive={moveToActive} />
       </div>
 
       <div 
@@ -166,6 +181,10 @@ function TimerView() {
       >
         <div className="column-header">
           <h3>专注中</h3>
+          <div className="today-duration">
+            <span>今日专注</span>
+            <span className="duration-value">{Math.floor(todayDuration / 60)} 分钟</span>
+          </div>
           {activeTodos.length > 0 && (
             <button className="clear-all-btn" onClick={() => activeTodos.forEach(todo => moveBackToTodos(todo))}>
               全部返回
@@ -203,7 +222,7 @@ function TodosList({ onMoveToActive }) {
   const [todos, setTodos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
   const [newTodo, setNewTodo] = useState('')
   const [showConfig, setShowConfig] = useState(null)
-  const [config, setConfig] = useState({ priority: 'medium', dueDate: '', duration: 25, repeat: 'none', unit: '' })
+  const [config, setConfig] = useState({ priority: 'medium', dueDate: '', duration: 25, repeat: 'none', unit: '', isHabit: false })
 
   useEffect(() => {
     const handleUpdate = () => setTodos(JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
@@ -227,6 +246,7 @@ function TodosList({ onMoveToActive }) {
       duration: 25,
       repeat: 'none',
       unit: '',
+      isHabit: false,
       createdAt: new Date().toISOString()
     }])
     setNewTodo('')
@@ -242,7 +262,8 @@ function TodosList({ onMoveToActive }) {
       dueDate: config.dueDate || null,
       duration: config.duration,
       repeat: config.repeat,
-      unit: config.unit || null
+      unit: config.unit || null,
+      isHabit: config.isHabit
     } : todo))
     setShowConfig(null)
   }
@@ -253,7 +274,8 @@ function TodosList({ onMoveToActive }) {
       dueDate: todo.dueDate || '', 
       duration: todo.duration || 25,
       repeat: todo.repeat || 'none',
-      unit: todo.unit || ''
+      unit: todo.unit || '',
+      isHabit: todo.isHabit || false
     })
     setShowConfig(todo.id)
   }
@@ -327,10 +349,16 @@ function TodosList({ onMoveToActive }) {
                       </select>
                     </div>
                     {config.repeat !== 'none' && (
-                      <div className="config-field">
-                        <label>单位/量词（可选）</label>
-                        <input type="text" placeholder="如：个、次、页、小时" value={config.unit} onChange={(e) => setConfig({ ...config, unit: e.target.value })} className="config-input" />
-                      </div>
+                      <>
+                        <div className="config-field">
+                          <label>单位/量词（可选）</label>
+                          <input type="text" placeholder="如：个、次、页、小时" value={config.unit} onChange={(e) => setConfig({ ...config, unit: e.target.value })} className="config-input" />
+                        </div>
+                        <div className="config-field checkbox-field">
+                          <input type="checkbox" id="isHabit" checked={config.isHabit} onChange={(e) => setConfig({ ...config, isHabit: e.target.checked })} />
+                          <label htmlFor="isHabit">这是习惯打卡任务</label>
+                        </div>
+                      </>
                     )}
                     <div className="config-actions">
                       <button className="cancel-btn" onClick={() => setShowConfig(null)}>取消</button>
@@ -444,12 +472,176 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
   )
 }
 
+// 时间轴视图
+function TimelineView() {
+  const [todos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
+  const [timelineItems, setTimelineItems] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline') || '[]'))
+  const [draggedTodo, setDraggedTodo] = useState(null)
+
+  const handleDragStart = (e, todo) => {
+    setDraggedTodo(todo)
+    e.dataTransfer.setData('todo', JSON.stringify(todo))
+  }
+
+  const handleDropOnHour = (e, hour) => {
+    e.preventDefault()
+    const todoData = e.dataTransfer.getData('todo')
+    if (todoData) {
+      const todo = JSON.parse(todoData)
+      const newItem = {
+        id: Date.now(),
+        todoId: todo.id,
+        todoText: todo.text,
+        startHour: hour,
+        duration: 2,
+        color: todo.priority === 'high' ? '#ff453a' : todo.priority === 'medium' ? '#ff9500' : '#06b6d4'
+      }
+      setTimelineItems([...timelineItems, newItem])
+      localStorage.setItem('pomodoro_timeline', JSON.stringify([...timelineItems, newItem]))
+    }
+    setDraggedTodo(null)
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+  }
+
+  const resizeItem = (itemId, newDuration) => {
+    const updated = timelineItems.map(item => 
+      item.id === itemId ? { ...item, duration: Math.max(1, newDuration) } : item
+    )
+    setTimelineItems(updated)
+    localStorage.setItem('pomodoro_timeline', JSON.stringify(updated))
+  }
+
+  const deleteItem = (itemId) => {
+    const updated = timelineItems.filter(item => item.id !== itemId)
+    setTimelineItems(updated)
+    localStorage.setItem('pomodoro_timeline', JSON.stringify(updated))
+  }
+
+  const executeItem = (item) => {
+    // 自动开始专注
+    const todo = todos.find(t => t.id === item.todoId)
+    if (todo) {
+      const activeTodos = JSON.parse(localStorage.getItem('pomodoro_active_todos') || '[]')
+      const activeTodo = { ...todo, startedAt: new Date().toISOString(), remainingTime: item.duration * 60 }
+      localStorage.setItem('pomodoro_active_todos', JSON.stringify([...activeTodos, activeTodo]))
+      window.location.hash = '#/special/pomodoro'
+    }
+  }
+
+  const savePreset = () => {
+    const presetName = prompt('请输入预设名称：')
+    if (presetName) {
+      const presets = JSON.parse(localStorage.getItem('pomodoro_timeline_presets') || '[]')
+      presets.push({
+        id: Date.now(),
+        name: presetName,
+        items: timelineItems
+      })
+      localStorage.setItem('pomodoro_timeline_presets', JSON.stringify(presets))
+      alert('预设已保存！')
+    }
+  }
+
+  const hours = Array.from({ length: 24 }, (_, i) => i)
+
+  return (
+    <div className="timeline-view">
+      <div className="timeline-header">
+        <h3>时间轴规划</h3>
+        <div className="timeline-actions">
+          <button className="save-preset-btn" onClick={savePreset}>保存预设</button>
+        </div>
+      </div>
+
+      <div className="timeline-content">
+        <div className="todo-sidebar">
+          <h4>待办事项</h4>
+          <div className="todo-drag-list">
+            {todos.filter(t => !t.completed).map(todo => (
+              <div 
+                key={todo.id} 
+                className="todo-drag-item"
+                draggable
+                onDragStart={(e) => handleDragStart(e, todo)}
+              >
+                <span className="todo-drag-text">{todo.text}</span>
+                <span className="todo-drag-duration">{todo.duration}分钟</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="timeline-chart">
+          <div className="hours-header">
+            {hours.map(hour => (
+              <div key={hour} className="hour-label">{hour}:00</div>
+            ))}
+          </div>
+          
+          <div className="hours-grid" onDragOver={handleDragOver}>
+            {hours.map(hour => (
+              <div 
+                key={hour} 
+                className="hour-slot"
+                onDrop={(e) => handleDropOnHour(e, hour)}
+              >
+                {timelineItems.filter(item => item.startHour === hour).map(item => (
+                  <div 
+                    key={item.id}
+                    className="timeline-item"
+                    style={{ 
+                      backgroundColor: item.color + '40',
+                      borderLeftColor: item.color,
+                      gridColumn: `span ${item.duration}`
+                    }}
+                  >
+                    <div className="timeline-item-content">
+                      <span className="timeline-item-text">{item.todoText}</span>
+                      <span className="timeline-item-duration">{item.duration}小时</span>
+                    </div>
+                    <div className="timeline-item-actions">
+                      <button className="execute-btn" onClick={() => executeItem(item)}>执行</button>
+                      <button className="resize-handle" onMouseDown={(e) => {
+                        e.preventDefault()
+                        const startX = e.clientX
+                        const startDuration = item.duration
+                        const handleMouseMove = (e) => {
+                          const diff = Math.round((e.clientX - startX) / 20)
+                          resizeItem(item.id, startDuration + diff)
+                        }
+                        const handleMouseUp = () => {
+                          document.removeEventListener('mousemove', handleMouseMove)
+                          document.removeEventListener('mouseup', handleMouseUp)
+                        }
+                        document.addEventListener('mousemove', handleMouseMove)
+                        document.addEventListener('mouseup', handleMouseUp)
+                      }}>⋮</button>
+                      <button className="delete-item-btn" onClick={() => deleteItem(item.id)}>×</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="timeline-help">
+        <p>💡 提示：将左侧待办拖到时间轴上，拖动右侧边缘调整时长，点击执行自动开始专注</p>
+      </div>
+    </div>
+  )
+}
+
 // 打卡视图
 function CheckinView() {
   const [habits, setHabits] = useState(() => JSON.parse(localStorage.getItem('pomodoro_habits') || '[]'))
   const [checkins, setCheckins] = useState(() => JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]'))
   const [newHabit, setNewHabit] = useState('')
-  const [habitConfig, setHabitConfig] = useState({ repeat: 'daily', unit: '' })
+  const [habitConfig, setHabitConfig] = useState({ repeat: 'daily', unit: '', needFocus: true })
 
   useEffect(() => {
     localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
@@ -463,6 +655,7 @@ function CheckinView() {
       text: newHabit.trim(),
       repeat: habitConfig.repeat,
       unit: habitConfig.unit || '',
+      needFocus: habitConfig.needFocus,
       createdAt: new Date().toISOString(),
       totalCompletions: 0,
       lastCompleted: null
@@ -470,34 +663,63 @@ function CheckinView() {
     setHabits([...habits, habit])
     setNewHabit('')
     
-    // 同时添加到待办清单
-    const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
-    todos.push({
-      id: habit.id,
-      text: habit.text,
-      completed: false,
-      priority: 'medium',
-      duration: 25,
-      repeat: habit.repeat,
-      unit: habit.unit,
-      createdAt: new Date().toISOString()
-    })
-    localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
-    window.dispatchEvent(new CustomEvent('todos-updated'))
+    if (habitConfig.needFocus) {
+      const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
+      todos.push({
+        id: habit.id,
+        text: habit.text,
+        completed: false,
+        priority: 'medium',
+        duration: 25,
+        repeat: habit.repeat,
+        unit: habit.unit,
+        isHabit: true,
+        createdAt: new Date().toISOString()
+      })
+      localStorage.setItem('pomodoro_todos', JSON.stringify(todos))
+      window.dispatchEvent(new CustomEvent('todos-updated'))
+    }
   }
 
   const deleteHabit = (id) => {
     setHabits(habits.filter(h => h.id !== id))
-    // 也从待办清单删除
     const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
     localStorage.setItem('pomodoro_todos', JSON.stringify(todos.filter(t => t.id !== id)))
     window.dispatchEvent(new CustomEvent('todos-updated'))
   }
 
+  const manualCheckin = (habit) => {
+    const checkins = JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]')
+    const today = new Date().toISOString().split('T')[0]
+    const existingCheckin = checkins.find(c => c.habitId === habit.id && c.date === today)
+    
+    if (!existingCheckin) {
+      checkins.push({
+        id: Date.now(),
+        habitId: habit.id,
+        habitText: habit.text,
+        date: today,
+        completedAt: new Date().toISOString(),
+        duration: 0,
+        type: 'manual'
+      })
+      localStorage.setItem('pomodoro_checkins', JSON.stringify(checkins))
+      
+      const habits = JSON.parse(localStorage.getItem('pomodoro_habits') || '[]')
+      habits.forEach(h => {
+        if (h.id === habit.id) {
+          h.lastCompleted = today
+          h.totalCompletions = (h.totalCompletions || 0) + 1
+        }
+      })
+      localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
+      setCheckins(checkins)
+    }
+  }
+
   const today = new Date().toISOString().split('T')[0]
   const todayCheckins = checkins.filter(c => c.date === today)
 
-  // 计算连续打卡天数
   const getStreak = (habitId) => {
     const habitCheckins = checkins.filter(c => c.habitId === habitId).sort((a, b) => new Date(b.date) - new Date(a.date))
     if (habitCheckins.length === 0) return 0
@@ -551,6 +773,14 @@ function CheckinView() {
           value={habitConfig.unit}
           onChange={(e) => setHabitConfig({ ...habitConfig, unit: e.target.value })}
         />
+        <label className="habit-checkbox">
+          <input 
+            type="checkbox"
+            checked={habitConfig.needFocus}
+            onChange={(e) => setHabitConfig({ ...habitConfig, needFocus: e.target.checked })}
+          />
+          <span>需要专注</span>
+        </label>
         <button type="submit" className="add-habit-btn"><PlusIcon size={18} /></button>
       </form>
 
@@ -578,6 +808,7 @@ function CheckinView() {
                       {habit.repeat === 'daily' ? '每日' : habit.repeat === 'weekly' ? '每周' : '每月'}
                     </span>
                     {habit.unit && <span className="habit-unit">{habit.unit}</span>}
+                    <span className="habit-type">{habit.needFocus ? '需专注' : '手动打卡'}</span>
                   </div>
                 </div>
                 <div className="habit-stats">
@@ -589,6 +820,9 @@ function CheckinView() {
                   </div>
                 </div>
                 <div className="habit-actions">
+                  {!completedToday && !habit.needFocus && (
+                    <button className="manual-checkin-btn" onClick={() => manualCheckin(habit)}>打卡</button>
+                  )}
                   {completedToday ? (
                     <span className="completed-tag">已完成</span>
                   ) : (
@@ -613,6 +847,7 @@ function CheckinView() {
                 <span className="checkin-text">{checkin.habitText}</span>
                 <span className="checkin-date">{new Date(checkin.date).toLocaleDateString('zh-CN')}</span>
                 {checkin.duration && <span className="checkin-duration">{checkin.duration} 分钟</span>}
+                <span className="checkin-type">{checkin.type === 'manual' ? '手动' : '自动'}</span>
               </div>
             ))}
           </div>
@@ -622,164 +857,155 @@ function CheckinView() {
   )
 }
 
-// 热力图组件
-function HeatmapTab() {
-  const [viewMode, setViewMode] = useState('year')
+// 统计视图
+function StatsView() {
+  const [viewType, setViewType] = useState('daily')
+  const [chartType, setChartType] = useState('pie')
   const [sessions] = useState(() => JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
-  const [hoverData, setHoverData] = useState(null)
 
-  const generateHeatmapData = () => {
-    const data = {}
+  const getFilteredData = () => {
     const now = new Date()
+    const today = now.toISOString().split('T')[0]
     
-    if (viewMode === 'year') {
-      for (let m = 0; m < 12; m++) {
-        for (let d = 0; d < 31; d++) {
-          const date = new Date(now.getFullYear(), m, d + 1)
-          const dateStr = date.toISOString().split('T')[0]
-          if (date <= now) {
-            const daySessions = sessions.filter(s => {
-              const sDate = new Date(s.completedAt).toISOString().split('T')[0]
-              return sDate === dateStr && s.mode === 'work'
-            })
-            data[dateStr] = { count: daySessions.length, totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0) }
-          }
-        }
-      }
-    } else if (viewMode === 'month') {
+    if (viewType === 'daily') {
+      const daySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
+      const byHour = {}
+      daySessions.forEach(s => {
+        const hour = new Date(s.completedAt).getHours()
+        byHour[hour] = (byHour[hour] || 0) + (s.duration || 0)
+      })
+      return { data: Object.values(byHour), labels: Object.keys(byHour) }
+    } else if (viewType === 'weekly') {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      const weekSessions = sessions.filter(s => new Date(s.completedAt) >= weekAgo && s.mode === 'work')
+      const byDay = {}
+      weekSessions.forEach(s => {
+        const day = new Date(s.completedAt).toLocaleDateString('zh-CN', { weekday: 'short' })
+        byDay[day] = (byDay[day] || 0) + (s.duration || 0)
+      })
+      return { data: Object.values(byDay), labels: Object.keys(byDay) }
+    } else {
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-      for (let d = new Date(monthStart); d <= monthEnd; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split('T')[0]
-        const daySessions = sessions.filter(s => {
-          const sDate = new Date(s.completedAt).toISOString().split('T')[0]
-          return sDate === dateStr && s.mode === 'work'
-        })
-        data[dateStr] = { count: daySessions.length, totalDuration: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0) }
-      }
-    } else if (viewMode === 'day') {
-      const today = now.toISOString().split('T')[0]
-      for (let h = 0; h < 24; h++) {
-        const hourKey = `${today}-${h.toString().padStart(2, '0')}`
-        const hourSessions = sessions.filter(s => {
-          const sDate = new Date(s.completedAt)
-          const sDateStr = sDate.toISOString().split('T')[0]
-          return sDateStr === today && sDate.getHours() === h && s.mode === 'work'
-        })
-        data[hourKey] = { count: hourSessions.length, totalDuration: hourSessions.reduce((sum, s) => sum + (s.duration || 0), 0) }
-      }
+      const monthSessions = sessions.filter(s => new Date(s.completedAt) >= monthStart && s.mode === 'work')
+      const byDay = {}
+      monthSessions.forEach(s => {
+        const day = new Date(s.completedAt).getDate()
+        byDay[day] = (byDay[day] || 0) + (s.duration || 0)
+      })
+      return { data: Object.values(byDay), labels: Object.keys(byDay) }
     }
-    return data
   }
 
-  const heatmapData = generateHeatmapData()
-  const maxCount = Math.max(...Object.values(heatmapData).map(d => d.count), 1)
-
-  const getColor = (count) => {
-    if (count === 0) return 'rgba(255,255,255,0.03)'
-    const intensity = count / maxCount
-    if (intensity > 0.75) return 'rgba(255,149,0,0.9)'
-    if (intensity > 0.5) return 'rgba(255,149,0,0.6)'
-    if (intensity > 0.25) return 'rgba(255,149,0,0.4)'
-    return 'rgba(255,149,0,0.2)'
-  }
-
-  const formatDuration = (seconds) => {
-    const m = Math.floor(seconds / 60)
-    return m > 0 ? `${m}分钟` : '< 1 分钟'
-  }
+  const filtered = getFilteredData()
+  const maxValue = Math.max(...filtered.data, 1)
+  const totalDuration = filtered.data.reduce((sum, v) => sum + v, 0)
 
   return (
-    <div className="heatmap-section">
-      <div className="heatmap-header">
-        <h3>专注热力图</h3>
-        <div className="heatmap-legend">
-          <span>少</span>
-          <div className="legend-boxes">
-            <div className="legend-cell" style={{ background: 'rgba(255,149,0,0.2)' }}></div>
-            <div className="legend-cell" style={{ background: 'rgba(255,149,0,0.4)' }}></div>
-            <div className="legend-cell" style={{ background: 'rgba(255,149,0,0.6)' }}></div>
-            <div className="legend-cell" style={{ background: 'rgba(255,149,0,0.9)' }}></div>
-          </div>
-          <span>多</span>
+    <div className="stats-view">
+      <div className="stats-header">
+        <h3>数据统计</h3>
+        <div className="stats-controls">
+          <select value={viewType} onChange={(e) => setViewType(e.target.value)} className="stats-select">
+            <option value="daily">今日</option>
+            <option value="weekly">本周</option>
+            <option value="monthly">本月</option>
+          </select>
+          <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="stats-select">
+            <option value="pie">扇形图</option>
+            <option value="bar">柱状图</option>
+            <option value="line">折线图</option>
+          </select>
         </div>
       </div>
 
-      <div className="heatmap-controls">
-        <button className={`view-btn ${viewMode === 'year' ? 'active' : ''}`} onClick={() => setViewMode('year')}>年</button>
-        <button className={`view-btn ${viewMode === 'month' ? 'active' : ''}`} onClick={() => setViewMode('month')}>月</button>
-        <button className={`view-btn ${viewMode === 'day' ? 'active' : ''}`} onClick={() => setViewMode('day')}>日</button>
+      <div className="stats-summary">
+        <div className="summary-card">
+          <div className="summary-value">{Math.floor(totalDuration / 60)}</div>
+          <div className="summary-label">总专注时长（分钟）</div>
+        </div>
+        <div className="summary-card">
+          <div className="summary-value">{filtered.data.length}</div>
+          <div className="summary-label">专注次数</div>
+        </div>
       </div>
 
-      <div className="heatmap-container">
-        {viewMode === 'year' && (
-          <div className="heatmap-grid year-grid">
-            {Array.from({ length: 12 }).map((_, month) => (
-              <div key={month} className="heatmap-month-row">
-                <div className="month-label">{month + 1}月</div>
-                <div className="heatmap-days-row">
-                  {Array.from({ length: 31 }).map((_, day) => {
-                    const date = new Date(new Date().getFullYear(), month, day + 1)
-                    const dateStr = date.toISOString().split('T')[0]
-                    const cellData = heatmapData[dateStr] || { count: 0 }
-                    const isFuture = date > new Date()
-                    return (
-                      <div key={day} className={`heatmap-cell ${cellData.count > 0 ? 'has-data' : ''} ${isFuture ? 'future' : ''}`}
-                        style={{ background: isFuture ? 'rgba(255,255,255,0.02)' : getColor(cellData.count) }}
-                        onMouseEnter={() => !isFuture && setHoverData({ date: dateStr, ...cellData })}
-                        onMouseLeave={() => setHoverData(null)} />
-                    )
-                  })}
-                </div>
+      <div className="stats-chart-container">
+        {chartType === 'bar' && (
+          <div className="bar-chart">
+            {filtered.data.map((value, i) => (
+              <div key={i} className="bar-item">
+                <div 
+                  className="bar-fill" 
+                  style={{ height: `${(value / maxValue) * 100}%` }}
+                ></div>
+                <div className="bar-label">{filtered.labels[i]}</div>
+                <div className="bar-value">{Math.floor(value / 60)}m</div>
               </div>
             ))}
           </div>
         )}
 
-        {viewMode === 'month' && (
-          <div className="heatmap-grid month-grid">
-            {Array.from({ length: 31 }).map((_, day) => {
-              const date = new Date(new Date().getFullYear(), new Date().getMonth(), day + 1)
-              const dateStr = date.toISOString().split('T')[0]
-              const cellData = heatmapData[dateStr] || { count: 0 }
-              const isFuture = date > new Date()
-              return (
-                <div key={day} className={`heatmap-cell large ${cellData.count > 0 ? 'has-data' : ''} ${isFuture ? 'future' : ''}`}
-                  style={{ background: isFuture ? 'rgba(255,255,255,0.02)' : getColor(cellData.count) }}
-                  onMouseEnter={() => !isFuture && setHoverData({ date: dateStr, ...cellData })}
-                  onMouseLeave={() => setHoverData(null)}>
-                  <span className="cell-day">{day + 1}</span>
-                </div>
-              )
-            })}
+        {chartType === 'line' && (
+          <div className="line-chart">
+            <svg viewBox="0 0 400 200" className="line-svg">
+              <polyline
+                fill="none"
+                stroke="#ff9500"
+                strokeWidth="2"
+                points={filtered.data.map((value, i) => {
+                  const x = (i / (filtered.data.length - 1 || 1)) * 380 + 10
+                  const y = 190 - (value / maxValue) * 160
+                  return `${x},${y}`
+                }).join(' ')}
+              />
+              {filtered.data.map((value, i) => {
+                const x = (i / (filtered.data.length - 1 || 1)) * 380 + 10
+                const y = 190 - (value / maxValue) * 160
+                return (
+                  <circle key={i} cx={x} cy={y} r="4" fill="#ff9500" />
+                )
+              })}
+            </svg>
+            <div className="line-labels">
+              {filtered.labels.map((label, i) => (
+                <div key={i} className="line-label">{label}</div>
+              ))}
+            </div>
           </div>
         )}
 
-        {viewMode === 'day' && (
-          <div className="heatmap-grid day-grid">
-            {Array.from({ length: 24 }).map((_, hour) => {
-              const today = new Date().toISOString().split('T')[0]
-              const hourKey = `${today}-${hour.toString().padStart(2, '0')}`
-              const cellData = heatmapData[hourKey] || { count: 0 }
-              return (
-                <div key={hour} className={`heatmap-cell hour-cell ${cellData.count > 0 ? 'has-data' : ''}`}
-                  style={{ background: getColor(cellData.count) }}
-                  onMouseEnter={() => setHoverData({ hour: `${hour}:00`, ...cellData })}
-                  onMouseLeave={() => setHoverData(null)}>
-                  <span className="cell-hour">{hour}</span>
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        {hoverData && (
-          <div className="heatmap-tooltip">
-            {hoverData.date && <div className="tooltip-date">{hoverData.date}</div>}
-            {hoverData.hour && <div className="tooltip-hour">{hoverData.hour}</div>}
-            <div className="tooltip-stats">
-              <div>{hoverData.count} 个番茄</div>
-              <div>{formatDuration(hoverData.totalDuration || 0)}</div>
+        {chartType === 'pie' && (
+          <div className="pie-chart">
+            <svg viewBox="0 0 100 100" className="pie-svg">
+              {filtered.data.map((value, i) => {
+                const percentage = value / totalDuration
+                const startAngle = filtered.data.slice(0, i).reduce((sum, v) => sum + (v / totalDuration) * 360, 0)
+                const endAngle = startAngle + percentage * 360
+                const x1 = 50 + 40 * Math.cos((startAngle - 90) * Math.PI / 180)
+                const y1 = 50 + 40 * Math.sin((startAngle - 90) * Math.PI / 180)
+                const x2 = 50 + 40 * Math.cos((endAngle - 90) * Math.PI / 180)
+                const y2 = 50 + 40 * Math.sin((endAngle - 90) * Math.PI / 180)
+                const largeArc = percentage > 0.5 ? 1 : 0
+                const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
+                return (
+                  <path
+                    key={i}
+                    d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
+                    fill={colors[i % colors.length]}
+                  />
+                )
+              })}
+            </svg>
+            <div className="pie-legend">
+              {filtered.data.map((value, i) => {
+                const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
+                return (
+                  <div key={i} className="legend-item">
+                    <div className="legend-color" style={{ background: colors[i % colors.length] }}></div>
+                    <span>{filtered.labels[i]}: {Math.floor(value / 60)}m</span>
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
@@ -788,34 +1014,12 @@ function HeatmapTab() {
   )
 }
 
-function StatsTab() {
-  const [sessions] = useState(() => JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
-  const today = new Date().toISOString().split('T')[0]
-  const todayCount = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work').length
-  const weekCount = sessions.filter(s => {
-    const date = new Date(s.completedAt)
-    const now = new Date()
-    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-    return date >= weekAgo && s.mode === 'work'
-  }).length
-  const totalCount = sessions.filter(s => s.mode === 'work').length
-
+// 热力图组件（简化版）
+function HeatmapTab() {
   return (
-    <div className="stats-section">
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-value">{todayCount}</div>
-          <div className="stat-label">今日专注</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value">{weekCount}</div>
-          <div className="stat-label">本周专注</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value">{totalCount}</div>
-          <div className="stat-label">总计专注</div>
-        </div>
-      </div>
+    <div className="heatmap-placeholder">
+      <h3>热力图功能已移至统计页面</h3>
+      <p>请在统计页面查看详细数据</p>
     </div>
   )
 }

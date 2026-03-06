@@ -14,12 +14,19 @@ export default function PomodoroTodo() {
   const [mode, setMode] = useState('work') // 'work' | 'shortBreak' | 'longBreak'
   const [completedPomodoros, setCompletedPomodoros] = useState(0)
   const [totalFocusTime, setTotalFocusTime] = useState(0) // 总专注时间（秒）
+  const [timerStyle, setTimerStyle] = useState('digital') // 'digital' | 'circular'
+  const [timerMode, setTimerMode] = useState('countdown') // 'countdown' | 'countup' | 'count'
+  const [targetCount, setTargetCount] = useState(25) // 目标计数（分钟或次数）
+  const [currentCount, setCurrentCount] = useState(0) // 当前计数
 
   // 待办事项
   const [todos, setTodos] = useState([])
   const [newTodo, setNewTodo] = useState('')
   const [activeTodoId, setActiveTodoId] = useState(null)
   const [priority, setPriority] = useState('medium') // 'low' | 'medium' | 'high'
+  const [todoFocusMode, setTodoFocusMode] = useState('time') // 'time' | 'count'
+  const [todoTargetTime, setTodoTargetTime] = useState(25) // 待办目标时间
+  const [todoTargetCount, setTodoTargetCount] = useState(1) // 待办目标次数
 
   // 统计数据
   const [stats, setStats] = useState({
@@ -57,12 +64,18 @@ export default function PomodoroTodo() {
     const savedTime = localStorage.getItem('pomodoro_timeLeft')
     const savedMode = localStorage.getItem('pomodoro_mode')
     const savedPomodoros = localStorage.getItem('pomodoro_completed')
+    const savedTimerStyle = localStorage.getItem('pomodoro_timerStyle')
+    const savedTimerMode = localStorage.getItem('pomodoro_timerMode')
+    const savedTargetCount = localStorage.getItem('pomodoro_targetCount')
 
     if (savedTodos) setTodos(JSON.parse(savedTodos))
     if (savedStats) setStats(JSON.parse(savedStats))
     if (savedTime) setTimeLeft(parseInt(savedTime))
     if (savedMode) setMode(savedMode)
     if (savedPomodoros) setCompletedPomodoros(parseInt(savedPomodoros))
+    if (savedTimerStyle) setTimerStyle(savedTimerStyle)
+    if (savedTimerMode) setTimerMode(savedTimerMode)
+    if (savedTargetCount) setTargetCount(parseInt(savedTargetCount))
   }, [])
 
   // 实时时间更新
@@ -107,18 +120,47 @@ export default function PomodoroTodo() {
     localStorage.setItem('pomodoro_completed', completedPomodoros.toString())
   }, [completedPomodoros])
 
+  useEffect(() => {
+    localStorage.setItem('pomodoro_timerStyle', timerStyle)
+  }, [timerStyle])
+
+  useEffect(() => {
+    localStorage.setItem('pomodoro_timerMode', timerMode)
+  }, [timerMode])
+
+  useEffect(() => {
+    localStorage.setItem('pomodoro_targetCount', targetCount.toString())
+  }, [targetCount])
+
   // 计时器
   useEffect(() => {
-    if (isRunning && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft(prev => prev - 1)
-      }, 1000)
-    } else if (timeLeft === 0) {
-      handleTimerComplete()
-    }
+    if (!isRunning) return
+
+    timerRef.current = setInterval(() => {
+      if (timerMode === 'countdown') {
+        // 倒计时模式
+        if (timeLeft > 0) {
+          setTimeLeft(prev => prev - 1)
+        } else {
+          handleTimerComplete()
+        }
+      } else if (timerMode === 'countup') {
+        // 正计时模式
+        setTimeLeft(prev => prev + 1)
+      } else if (timerMode === 'count') {
+        // 计数模式（次数）
+        setCurrentCount(prev => {
+          if (prev >= targetCount) {
+            handleTimerComplete()
+            return prev
+          }
+          return prev + 1
+        })
+      }
+    }, 1000)
 
     return () => clearInterval(timerRef.current)
-  }, [isRunning, timeLeft])
+  }, [isRunning, timerMode, timeLeft, currentCount, targetCount])
 
   const handleTimerComplete = () => {
     setIsRunning(false)
@@ -133,7 +175,8 @@ export default function PomodoroTodo() {
       setCompletedPomodoros(newCompleted)
       
       // 更新专注时间
-      setTotalFocusTime(prev => prev + 25 * 60)
+      const focusTime = timerMode === 'countup' ? timeLeft : 25 * 60
+      setTotalFocusTime(prev => prev + focusTime)
       
       // 更新统计数据
       const today = new Date().toISOString().split('T')[0]
@@ -157,6 +200,28 @@ export default function PomodoroTodo() {
         return updated
       })
       
+      // 更新待办专注进度
+      if (activeTodoId) {
+        setTodos(prevTodos => prevTodos.map(todo => {
+          if (todo.id === activeTodoId) {
+            const newCompletedCount = todo.completedCount + 1
+            return {
+              ...todo,
+              completedCount: newCompletedCount,
+              completed: todo.focusMode === 'count' 
+                ? newCompletedCount >= todo.targetCount 
+                : todo.completed
+            }
+          }
+          return todo
+        }))
+      }
+      
+      // 重置计数模式
+      if (timerMode === 'count') {
+        setCurrentCount(0)
+      }
+      
       // 每 4 个番茄钟后长休息
       if (newCompleted % 4 === 0) {
         setMode('longBreak')
@@ -168,6 +233,7 @@ export default function PomodoroTodo() {
     } else {
       setMode('work')
       setTimeLeft(modes.work.time)
+      setCurrentCount(0)
     }
   }
 
@@ -176,6 +242,32 @@ export default function PomodoroTodo() {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // 切换计时模式
+  const switchTimerMode = (newMode) => {
+    setTimerMode(newMode)
+    setIsRunning(false)
+    setCurrentCount(0)
+    if (newMode === 'countdown') {
+      setTimeLeft(targetCount * 60)
+    } else if (newMode === 'countup') {
+      setTimeLeft(0)
+    } else if (newMode === 'count') {
+      setCurrentCount(0)
+    }
+  }
+
+  // 重置计时器
+  const resetTimer = () => {
+    if (timerMode === 'countdown') {
+      setTimeLeft(targetCount * 60)
+    } else if (timerMode === 'countup') {
+      setTimeLeft(0)
+    } else if (timerMode === 'count') {
+      setCurrentCount(0)
+    }
+    setIsRunning(false)
   }
 
   // 格式化倒计时
@@ -237,6 +329,10 @@ export default function PomodoroTodo() {
       text: newTodo.trim(),
       completed: false,
       priority: priority,
+      focusMode: todoFocusMode,
+      targetTime: todoTargetTime,
+      targetCount: todoTargetCount,
+      completedCount: 0,
       createdAt: new Date().toISOString()
     }
 
@@ -284,44 +380,130 @@ export default function PomodoroTodo() {
           {/* 左侧：番茄钟 */}
           <div className="pomodoro-section">
             <div className="timer-display">
-              {/* 模式选择 */}
+              {/* 计时样式选择 */}
               <div className="mode-selector">
                 <button
-                  className={`mode-btn ${mode === 'work' ? 'active' : ''}`}
-                  onClick={() => switchMode('work')}
+                  className={`mode-btn ${timerStyle === 'digital' ? 'active' : ''}`}
+                  onClick={() => setTimerStyle('digital')}
                 >
-                  专注
+                  数字
                 </button>
                 <button
-                  className={`mode-btn ${mode === 'shortBreak' ? 'active' : ''}`}
-                  onClick={() => switchMode('shortBreak')}
+                  className={`mode-btn ${timerStyle === 'circular' ? 'active' : ''}`}
+                  onClick={() => setTimerStyle('circular')}
                 >
-                  短休息
-                </button>
-                <button
-                  className={`mode-btn ${mode === 'longBreak' ? 'active' : ''}`}
-                  onClick={() => switchMode('longBreak')}
-                >
-                  长休息
+                  圆形
                 </button>
               </div>
+
+              {/* 计时模式选择 */}
+              <div className="mode-selector">
+                <button
+                  className={`mode-btn ${timerMode === 'countdown' ? 'active' : ''}`}
+                  onClick={() => switchTimerMode('countdown')}
+                >
+                  倒计时
+                </button>
+                <button
+                  className={`mode-btn ${timerMode === 'countup' ? 'active' : ''}`}
+                  onClick={() => switchTimerMode('countup')}
+                >
+                  正计时
+                </button>
+                <button
+                  className={`mode-btn ${timerMode === 'count' ? 'active' : ''}`}
+                  onClick={() => switchTimerMode('count')}
+                >
+                  计数
+                </button>
+              </div>
+
+              {/* 目标设置 */}
+              {(timerMode === 'countdown' || timerMode === 'count') && (
+                <div className="target-setting">
+                  <label className="target-label">
+                    {timerMode === 'countdown' ? '目标分钟' : '目标次数'}
+                  </label>
+                  <input
+                    type="number"
+                    className="target-input"
+                    value={targetCount}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 1
+                      setTargetCount(val)
+                      if (timerMode === 'countdown' && !isRunning) {
+                        setTimeLeft(val * 60)
+                      }
+                    }}
+                    min="1"
+                    max="180"
+                  />
+                </div>
+              )}
 
               {/* 时间显示 */}
-              <div className="time-display" style={{ color: modes[mode].color }}>
-                <span className="time-value">{formatTime(timeLeft)}</span>
-              </div>
+              {timerStyle === 'digital' ? (
+                <>
+                  <div className="time-display" style={{ color: modes[mode].color }}>
+                    <span className="time-value">
+                      {timerMode === 'count' ? currentCount : formatTime(timeLeft)}
+                    </span>
+                    {timerMode === 'count' && <span className="count-unit">/ {targetCount}</span>}
+                  </div>
 
-              {/* 进度条 */}
-              <div className="progress-container">
-                <div
-                  className="progress-bar"
-                  style={{
-                    width: `${getProgress()}%`,
-                    backgroundColor: modes[mode].color,
-                    boxShadow: `0 0 20px ${modes[mode].color}`
-                  }}
-                ></div>
-              </div>
+                  {timerMode !== 'count' && (
+                    <div className="progress-container">
+                      <div
+                        className="progress-bar"
+                        style={{
+                          width: `${getProgress()}%`,
+                          backgroundColor: modes[mode].color,
+                          boxShadow: `0 0 20px ${modes[mode].color}`
+                        }}
+                      ></div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="circular-timer">
+                  <svg viewBox="0 0 100 100" className="circular-svg">
+                    {/* 背景圆环 */}
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="none"
+                      stroke="rgba(255,255,255,0.1)"
+                      strokeWidth="4"
+                    />
+                    {/* 进度圆环 */}
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="45"
+                      fill="none"
+                      stroke={modes[mode].color}
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                      strokeDasharray={283}
+                      strokeDashoffset={283 * (1 - (timerMode === 'count' ? currentCount / targetCount : getProgress() / 100))}
+                      transform="rotate(-90 50 50)"
+                      style={{
+                        transition: 'stroke-dashoffset 0.3s ease',
+                        filter: `drop-shadow(0 0 8px ${modes[mode].color})`
+                      }}
+                    />
+                  </svg>
+                  <div className="circular-display">
+                    <span className="circular-time" style={{ color: modes[mode].color }}>
+                      {timerMode === 'count' ? currentCount : formatTime(timeLeft)}
+                    </span>
+                    {timerMode === 'count' && (
+                      <span className="circular-count">/ {targetCount}</span>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* 控制按钮 */}
               <div className="timer-controls">
@@ -345,10 +527,7 @@ export default function PomodoroTodo() {
 
                 <button
                   className="control-btn"
-                  onClick={() => {
-                    setTimeLeft(modes[mode].time)
-                    setIsRunning(false)
-                  }}
+                  onClick={resetTimer}
                 >
                   <ResetIcon size={20} />
                   <span>重置</span>
@@ -496,6 +675,37 @@ export default function PomodoroTodo() {
                   <option value="medium">中</option>
                   <option value="high">高</option>
                 </select>
+                <select
+                  className="focus-mode-select"
+                  value={todoFocusMode}
+                  onChange={(e) => setTodoFocusMode(e.target.value)}
+                >
+                  <option value="time">⏱️ 时间</option>
+                  <option value="count">🔢 次数</option>
+                </select>
+                {todoFocusMode === 'time' ? (
+                  <input
+                    type="number"
+                    className="todo-target-input"
+                    value={todoTargetTime}
+                    onChange={(e) => setTodoTargetTime(parseInt(e.target.value) || 25)}
+                    min="1"
+                    max="180"
+                    placeholder="分钟"
+                    title="目标专注时间（分钟）"
+                  />
+                ) : (
+                  <input
+                    type="number"
+                    className="todo-target-input"
+                    value={todoTargetCount}
+                    onChange={(e) => setTodoTargetCount(parseInt(e.target.value) || 1)}
+                    min="1"
+                    max="100"
+                    placeholder="次数"
+                    title="目标专注次数"
+                  />
+                )}
                 <button type="submit" className="add-btn">
                   <PlusIcon size={20} />
                 </button>
@@ -550,12 +760,24 @@ export default function PomodoroTodo() {
                         >
                           {todo.completed && <CheckIcon size={16} />}
                         </button>
-                        <span className="todo-text">{todo.text}</span>
-                        {todo.priority && (
-                          <span className={`priority-badge priority-${todo.priority}`}>
-                            {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
-                          </span>
-                        )}
+                        <div className="todo-text-wrapper">
+                          <span className="todo-text">{todo.text}</span>
+                          <div className="todo-meta">
+                            {todo.priority && (
+                              <span className={`priority-badge priority-${todo.priority}`}>
+                                {todo.priority === 'high' ? '高' : todo.priority === 'medium' ? '中' : '低'}
+                              </span>
+                            )}
+                            <span className="focus-mode-badge">
+                              {todo.focusMode === 'time' ? `⏱️ ${todo.targetTime}分钟` : `🔢 ${todo.targetCount}次`}
+                            </span>
+                            {todo.completedCount > 0 && (
+                              <span className="completed-count">
+                                ✅ {todo.completedCount}/{todo.focusMode === 'time' ? todo.targetTime : todo.targetCount}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                       <div className="todo-actions">
                         <button

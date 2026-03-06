@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { UserIcon, LoginIcon } from './icons/SiteIcons'
 
 export default function Header() {
-  const [active, setActive] = useState('home')
+  const [expanded, setExpanded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [user, setUser] = useState(null)
   const [showUserMenu, setShowUserMenu] = useState(false)
@@ -24,27 +24,12 @@ export default function Header() {
     }
   }, [])
 
-  // 根据当前路由设置激活状态
-  useEffect(() => {
-    const path = location.pathname
-    if (path === '/' || path === '') setActive('home')
-    else if (path === '/games') setActive('games')
-    else if (path === '/blog') setActive('blog')
-    else if (path === '/about') setActive('about')
-    else if (path === '/login' || path === '/register') setActive('auth')
-    else if (path.startsWith('/special')) setActive('special')
-  }, [location])
-
   const navItems = [
-    { id: 'home', label: '小窝', labelEn: 'HOME', path: '/' },
-    { id: 'games', label: '游戏', labelEn: 'GAMES', path: '/games' },
-    { id: 'blog', label: '博客', labelEn: 'BLOG', path: '/blog' },
-    { id: 'about', label: '关于', labelEn: 'ABOUT', path: '/about' },
+    { id: 'home', label: '小窝', path: '/' },
+    { id: 'games', label: '游戏', path: '/games' },
+    { id: 'blog', label: '博客', path: '/blog' },
+    { id: 'about', label: '关于', path: '/about' },
   ]
-
-  const goTo = (path) => {
-    navigate(path)
-  }
 
   const handleLogout = () => {
     localStorage.removeItem('token')
@@ -54,144 +39,121 @@ export default function Header() {
     navigate('/')
   }
 
-  // 获取面包屑导航
-  const getBreadcrumbs = () => {
-    const path = location.pathname
-    const crumbs = [{ label: '首页', path: '/' }]
-    
-    if (path === '/' || path === '') return crumbs
-    
-    const segments = path.split('/').filter(Boolean)
-    let currentPath = ''
-    
-    segments.forEach(segment => {
-      currentPath += '/' + segment
-      const navItem = navItems.find(item => item.path === currentPath)
-      if (navItem) {
-        crumbs.push({ label: navItem.label, path: currentPath })
-      } else if (segment === 'pomodoro') {
-        crumbs.push({ label: '番茄钟', path: currentPath })
-      } else if (segment === 'login') {
-        crumbs.push({ label: '登录', path: currentPath })
-      } else if (segment === 'register') {
-        crumbs.push({ label: '注册', path: currentPath })
-      }
-    })
-    
-    return crumbs
-  }
-
-  const breadcrumbs = getBreadcrumbs()
-
   return (
-    <header className={`header ${scrolled ? 'header--scrolled' : ''}`}>
-      <div className="header-top">
-        <div className="header-content">
-          {/* Logo - 点击返回首页 */}
-          <div className="logo" onClick={() => goTo('/')}>
-            <span className="logo-bracket">[</span>
-            <span className="logo-text">汤圆</span>
-            <span className="logo-bracket">]</span>
-            <div className="logo-glow"></div>
-          </div>
-
-          {/* 导航菜单 - 桌面端 */}
-          <nav className="nav nav-desktop">
-            {navItems.map((item, index) => (
-              <button
-                key={item.id}
-                className={`nav-item ${active === item.id ? 'active' : ''}`}
-                onClick={() => goTo(item.path)}
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <span className="nav-label">{item.label}</span>
-                <span className="nav-label-en">{item.labelEn}</span>
-                <span className="nav-indicator"></span>
-              </button>
-            ))}
-          </nav>
-
-          {/* 用户区域 */}
-          <div className="header-user">
-            {user ? (
-              <div className="user-menu-container">
-                <button 
-                  className="user-btn"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                >
-                  <UserIcon size={18} />
-                  <span className="user-name">{user.username}</span>
-                </button>
-                
-                {showUserMenu && (
-                  <div className="user-dropdown">
-                    <div className="dropdown-item" onClick={() => {
-                      goTo('/special/pomodoro')
-                      setShowUserMenu(false)
-                    }}>
-                      <span>我的待办</span>
-                    </div>
-                    <div className="dropdown-item" onClick={handleLogout}>
-                      <span>退出登录</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button 
-                className="login-btn"
-                onClick={() => goTo('/login')}
-              >
-                <LoginIcon size={18} />
-                <span>登录</span>
-              </button>
-            )}
-          </div>
-
-          {/* 移动端菜单按钮 */}
-          <button className="mobile-menu-btn" onClick={() => setActive(active === 'mobile' ? 'home' : 'mobile')}>
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+    <header className={`header ${scrolled ? 'scrolled' : ''} ${expanded ? 'expanded' : ''}`}>
+      <div className="header-main">
+        {/* Logo */}
+        <div className="logo" onClick={() => navigate('/')}>
+          <span className="logo-bracket">[</span>
+          <span className="logo-text">汤圆</span>
+          <span className="logo-bracket">]</span>
         </div>
 
-        {/* 移动端导航菜单 */}
-        <nav className={`nav nav-mobile ${active === 'mobile' ? 'active' : ''}`}>
-          {navItems.map((item, index) => (
+        {/* 导航菜单 */}
+        <nav className="nav">
+          {navItems.map((item) => (
             <button
               key={item.id}
-              className={`nav-item ${active === item.id ? 'active' : ''}`}
-              onClick={() => {
-                goTo(item.path)
-                setActive('home')
-              }}
+              className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+              onClick={() => navigate(item.path)}
             >
-              <span className="nav-label">{item.label}</span>
-              <span className="nav-label-en">{item.labelEn}</span>
+              {item.label}
             </button>
           ))}
         </nav>
+
+        {/* 用户区域 */}
+        <div className="header-user">
+          {user ? (
+            <div className="user-menu-container">
+              <button 
+                className="user-btn"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+              >
+                <UserIcon size={16} />
+              </button>
+              
+              {showUserMenu && (
+                <div className="user-dropdown">
+                  <div className="dropdown-item" onClick={() => {
+                    navigate('/special/pomodoro')
+                    setShowUserMenu(false)
+                  }}>
+                    我的待办
+                  </div>
+                  <div className="dropdown-item" onClick={handleLogout}>
+                    退出登录
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button 
+              className="login-btn"
+              onClick={() => navigate('/login')}
+            >
+              <LoginIcon size={16} />
+            </button>
+          )}
+        </div>
+
+        {/* 展开/收起按钮 */}
+        <button 
+          className={`expand-btn ${expanded ? 'active' : ''}`}
+          onClick={() => setExpanded(!expanded)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </div>
 
-      {/* 面包屑导航 */}
-      {breadcrumbs.length > 1 && (
-        <div className="breadcrumb-bar">
-          <div className="breadcrumb-content">
-            {breadcrumbs.map((crumb, index) => (
-              <div key={crumb.path} className="breadcrumb-item">
-                {index > 0 && <span className="breadcrumb-separator">/</span>}
-                <button 
-                  className={`breadcrumb-link ${index === breadcrumbs.length - 1 ? 'active' : ''}`}
-                  onClick={() => goTo(crumb.path)}
-                >
-                  {crumb.label}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* 面包屑 */}
+      <Breadcrumb location={location} navigate={navigate} />
     </header>
+  )
+}
+
+// 面包屑组件
+function Breadcrumb({ location, navigate }) {
+  const path = location.pathname
+  if (path === '/' || path === '/login' || path === '/register') return null
+
+  const crumbs = [{ label: '首页', path: '/' }]
+  const segments = path.split('/').filter(Boolean)
+  let currentPath = ''
+  
+  const nameMap = {
+    games: '游戏',
+    blog: '博客',
+    about: '关于',
+    special: '特殊',
+    pomodoro: '番茄钟'
+  }
+
+  segments.forEach(segment => {
+    currentPath += '/' + segment
+    crumbs.push({ 
+      label: nameMap[segment] || segment, 
+      path: currentPath 
+    })
+  })
+
+  return (
+    <div className="breadcrumb-bar">
+      <div className="breadcrumb-content">
+        {crumbs.map((crumb, index) => (
+          <div key={crumb.path} className="breadcrumb-item">
+            {index > 0 && <span className="breadcrumb-separator">/</span>}
+            <button 
+              className={`breadcrumb-link ${index === crumbs.length - 1 ? 'active' : ''}`}
+              onClick={() => navigate(crumb.path)}
+            >
+              {crumb.label}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

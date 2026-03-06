@@ -27,6 +27,7 @@ import './styles/cursor.css'
 import './styles/home.css'
 import './styles/special.css'
 import './styles/auth.css'
+import './styles/header.css'
 
 function AppContent() {
   const [showIntro, setShowIntro] = useState(true)

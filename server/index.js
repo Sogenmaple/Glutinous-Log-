@@ -30,11 +30,20 @@ async function initDataFiles() {
     await fs.mkdir(DATA_DIR, { recursive: true })
   }
   
-  // 初始化用户文件
+  // 初始化用户文件（带默认管理员）
   try {
     await fs.access(USERS_FILE)
   } catch {
-    await fs.writeFile(USERS_FILE, JSON.stringify([], null, 2), 'utf-8')
+    const defaultAdmin = {
+      id: 'admin',
+      username: 'admin',
+      email: 'admin@tangyuan.com',
+      password: await bcrypt.hash('admin123', 10),
+      role: 'admin',
+      createdAt: new Date().toISOString()
+    }
+    await fs.writeFile(USERS_FILE, JSON.stringify([defaultAdmin], null, 2), 'utf-8')
+    console.log('✓ 默认管理员账户已创建 (admin/admin123)')
   }
   }
   

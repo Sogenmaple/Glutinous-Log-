@@ -20,23 +20,32 @@ export default function Login() {
     setLoading(true)
 
     try {
+      console.log('尝试登录:', formData.username)
       const response = await fetch('http://36.151.149.117:3001/api/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include',
         body: JSON.stringify(formData)
       })
 
+      console.log('响应状态:', response.status)
       const data = await response.json()
+      console.log('响应数据:', data)
 
       if (response.ok) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
+        console.log('登录成功:', data.user.username)
         navigate('/')
       } else {
-        setError(data.message || '登录失败')
+        setError(data.error || data.message || '登录失败')
       }
     } catch (err) {
-      setError('网络错误，请稍后重试')
+      console.error('登录错误:', err)
+      setError('网络错误：' + err.message)
     } finally {
       setLoading(false)
     }

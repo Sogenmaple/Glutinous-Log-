@@ -52,11 +52,19 @@ function TimerView() {
   const [todayDuration, setTodayDuration] = useState(0)
 
   useEffect(() => {
-    const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')
-    const today = new Date().toISOString().split('T')[0]
-    const todaySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
-    const total = todaySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
-    setTodayDuration(total)
+    const updateTodayDuration = () => {
+      const sessions = JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]')
+      const today = new Date().toISOString().split('T')[0]
+      const todaySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
+      const total = todaySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
+      setTodayDuration(total)
+    }
+    
+    updateTodayDuration()
+    
+    const handleSessionUpdate = () => updateTodayDuration()
+    window.addEventListener('sessions-updated', handleSessionUpdate)
+    return () => window.removeEventListener('sessions-updated', handleSessionUpdate)
   }, [])
 
   useEffect(() => {
@@ -99,12 +107,7 @@ function TimerView() {
           mode: 'work'
         })
         localStorage.setItem('pomodoro_sessions', JSON.stringify(sessions))
-        
-        // 更新今日专注时长
-        const today = new Date().toISOString().split('T')[0]
-        const todaySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
-        const total = todaySessions.reduce((sum, s) => sum + (s.duration || 0), 0)
-        setTodayDuration(total)
+        window.dispatchEvent(new CustomEvent('sessions-updated'))
       }
 
       // 如果是重复任务，自动打卡并返回待办清单
@@ -124,6 +127,7 @@ function TimerView() {
             type: 'auto'
           })
           localStorage.setItem('pomodoro_checkins', JSON.stringify(checkins))
+          window.dispatchEvent(new CustomEvent('checkins-updated'))
         }
 
         const habits = JSON.parse(localStorage.getItem('pomodoro_habits') || '[]')
@@ -134,6 +138,7 @@ function TimerView() {
           }
         })
         localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
+        window.dispatchEvent(new CustomEvent('habits-updated'))
 
         if (todo.repeat !== 'none') {
           const todos = JSON.parse(localStorage.getItem('pomodoro_todos') || '[]')
@@ -381,6 +386,10 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
   const [timerStyle, setTimerStyle] = useState('digital')
 
   useEffect(() => {
+    setTimeLeft((todo.remainingTime || 25) * 60)
+  }, [todo.remainingTime])
+
+  useEffect(() => {
     let timer
     if (isRunning && timeLeft > 0) {
       timer = setInterval(() => {
@@ -397,7 +406,7 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
       }, 1000)
     }
     return () => clearInterval(timer)
-  }, [isRunning, timeLeft, onUpdateTime, onComplete])
+  }, [isRunning, onUpdateTime, onComplete])
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60)
@@ -574,57 +583,59 @@ function TimelineView() {
           </div>
         </div>
 
-        <div className="timeline-chart">
-          <div className="hours-header">
-            {hours.map(hour => (
-              <div key={hour} className="hour-label">{hour}:00</div>
-            ))}
-          </div>
-          
-          <div className="hours-grid" onDragOver={handleDragOver}>
-            {hours.map(hour => (
-              <div 
-                key={hour} 
-                className="hour-slot"
-                onDrop={(e) => handleDropOnHour(e, hour)}
-              >
-                {timelineItems.filter(item => item.startHour === hour).map(item => (
-                  <div 
-                    key={item.id}
-                    className="timeline-item"
-                    style={{ 
-                      backgroundColor: item.color + '40',
-                      borderLeftColor: item.color,
-                      gridColumn: `span ${item.duration}`
-                    }}
-                  >
-                    <div className="timeline-item-content">
-                      <span className="timeline-item-text">{item.todoText}</span>
-                      <span className="timeline-item-duration">{item.duration}小时</span>
+        <div className="timeline-chart-wrapper">
+          <div className="timeline-chart">
+            <div className="hours-header">
+              {hours.map(hour => (
+                <div key={hour} className="hour-label">{hour}:00</div>
+              ))}
+            </div>
+            
+            <div className="hours-grid" onDragOver={handleDragOver}>
+              {hours.map(hour => (
+                <div 
+                  key={hour} 
+                  className="hour-slot"
+                  onDrop={(e) => handleDropOnHour(e, hour)}
+                >
+                  {timelineItems.filter(item => item.startHour === hour).map(item => (
+                    <div 
+                      key={item.id}
+                      className="timeline-item"
+                      style={{ 
+                        backgroundColor: item.color + '40',
+                        borderLeftColor: item.color,
+                        gridColumn: `span ${Math.min(item.duration, 24 - hour)}`
+                      }}
+                    >
+                      <div className="timeline-item-content">
+                        <span className="timeline-item-text">{item.todoText}</span>
+                        <span className="timeline-item-duration">{item.duration}小时</span>
+                      </div>
+                      <div className="timeline-item-actions">
+                        <button className="execute-btn" onClick={() => executeItem(item)}>执行</button>
+                        <button className="resize-handle" onMouseDown={(e) => {
+                          e.preventDefault()
+                          const startX = e.clientX
+                          const startDuration = item.duration
+                          const handleMouseMove = (e) => {
+                            const diff = Math.round((e.clientX - startX) / 20)
+                            resizeItem(item.id, startDuration + diff)
+                          }
+                          const handleMouseUp = () => {
+                            document.removeEventListener('mousemove', handleMouseMove)
+                            document.removeEventListener('mouseup', handleMouseUp)
+                          }
+                          document.addEventListener('mousemove', handleMouseMove)
+                          document.addEventListener('mouseup', handleMouseUp)
+                        }}>⋮</button>
+                        <button className="delete-item-btn" onClick={() => deleteItem(item.id)}>×</button>
+                      </div>
                     </div>
-                    <div className="timeline-item-actions">
-                      <button className="execute-btn" onClick={() => executeItem(item)}>执行</button>
-                      <button className="resize-handle" onMouseDown={(e) => {
-                        e.preventDefault()
-                        const startX = e.clientX
-                        const startDuration = item.duration
-                        const handleMouseMove = (e) => {
-                          const diff = Math.round((e.clientX - startX) / 20)
-                          resizeItem(item.id, startDuration + diff)
-                        }
-                        const handleMouseUp = () => {
-                          document.removeEventListener('mousemove', handleMouseMove)
-                          document.removeEventListener('mouseup', handleMouseUp)
-                        }
-                        document.addEventListener('mousemove', handleMouseMove)
-                        document.addEventListener('mouseup', handleMouseUp)
-                      }}>⋮</button>
-                      <button className="delete-item-btn" onClick={() => deleteItem(item.id)}>×</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -644,8 +655,15 @@ function CheckinView() {
   const [habitConfig, setHabitConfig] = useState({ repeat: 'daily', unit: '', needFocus: true })
 
   useEffect(() => {
-    localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
-  }, [habits])
+    const handleCheckinsUpdate = () => setCheckins(JSON.parse(localStorage.getItem('pomodoro_checkins') || '[]'))
+    const handleHabitsUpdate = () => setHabits(JSON.parse(localStorage.getItem('pomodoro_habits') || '[]'))
+    window.addEventListener('checkins-updated', handleCheckinsUpdate)
+    window.addEventListener('habits-updated', handleHabitsUpdate)
+    return () => {
+      window.removeEventListener('checkins-updated', handleCheckinsUpdate)
+      window.removeEventListener('habits-updated', handleHabitsUpdate)
+    }
+  }, [])
 
   const addHabit = (e) => {
     e.preventDefault()
@@ -704,6 +722,7 @@ function CheckinView() {
         type: 'manual'
       })
       localStorage.setItem('pomodoro_checkins', JSON.stringify(checkins))
+      window.dispatchEvent(new CustomEvent('checkins-updated'))
       
       const habits = JSON.parse(localStorage.getItem('pomodoro_habits') || '[]')
       habits.forEach(h => {
@@ -713,7 +732,6 @@ function CheckinView() {
         }
       })
       localStorage.setItem('pomodoro_habits', JSON.stringify(habits))
-      setCheckins(checkins)
     }
   }
 
@@ -740,6 +758,10 @@ function CheckinView() {
     }
     
     return streak
+  }
+
+  const getCompletedToday = (habitId) => {
+    return checkins.some(c => c.habitId === habitId && c.date === today)
   }
 
   return (
@@ -797,7 +819,7 @@ function CheckinView() {
           </div>
         ) : (
           habits.map(habit => {
-            const completedToday = checkins.some(c => c.habitId === habit.id && c.date === today)
+            const completedToday = getCompletedToday(habit.id)
             const streak = getStreak(habit.id)
             return (
               <div key={habit.id} className={`habit-card ${completedToday ? 'completed' : ''}`}>
@@ -860,8 +882,14 @@ function CheckinView() {
 // 统计视图
 function StatsView() {
   const [viewType, setViewType] = useState('daily')
-  const [chartType, setChartType] = useState('pie')
-  const [sessions] = useState(() => JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
+  const [chartType, setChartType] = useState('bar')
+  const [sessions, setSessions] = useState(() => JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
+
+  useEffect(() => {
+    const handleUpdate = () => setSessions(JSON.parse(localStorage.getItem('pomodoro_sessions') || '[]'))
+    window.addEventListener('sessions-updated', handleUpdate)
+    return () => window.removeEventListener('sessions-updated', handleUpdate)
+  }, [])
 
   const getFilteredData = () => {
     const now = new Date()
@@ -870,35 +898,56 @@ function StatsView() {
     if (viewType === 'daily') {
       const daySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
       const byHour = {}
+      for (let h = 0; h < 24; h++) byHour[h] = 0
       daySessions.forEach(s => {
         const hour = new Date(s.completedAt).getHours()
         byHour[hour] = (byHour[hour] || 0) + (s.duration || 0)
       })
-      return { data: Object.values(byHour), labels: Object.keys(byHour) }
+      return { 
+        data: Object.values(byHour), 
+        labels: Object.keys(byHour).map(k => `${k}:00`),
+        total: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0),
+        count: daySessions.length
+      }
     } else if (viewType === 'weekly') {
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
       const weekSessions = sessions.filter(s => new Date(s.completedAt) >= weekAgo && s.mode === 'work')
       const byDay = {}
+      const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+      for (let i = 0; i < 7; i++) byDay[dayNames[i]] = 0
       weekSessions.forEach(s => {
-        const day = new Date(s.completedAt).toLocaleDateString('zh-CN', { weekday: 'short' })
+        const day = dayNames[new Date(s.completedAt).getDay()]
         byDay[day] = (byDay[day] || 0) + (s.duration || 0)
       })
-      return { data: Object.values(byDay), labels: Object.keys(byDay) }
+      return { 
+        data: Object.values(byDay), 
+        labels: Object.keys(byDay),
+        total: weekSessions.reduce((sum, s) => sum + (s.duration || 0), 0),
+        count: weekSessions.length
+      }
     } else {
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
       const monthSessions = sessions.filter(s => new Date(s.completedAt) >= monthStart && s.mode === 'work')
       const byDay = {}
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+      for (let d = 1; d <= daysInMonth; d++) byDay[d] = 0
       monthSessions.forEach(s => {
         const day = new Date(s.completedAt).getDate()
         byDay[day] = (byDay[day] || 0) + (s.duration || 0)
       })
-      return { data: Object.values(byDay), labels: Object.keys(byDay) }
+      return { 
+        data: Object.values(byDay), 
+        labels: Object.keys(byDay).map(k => `${k}日`),
+        total: monthSessions.reduce((sum, s) => sum + (s.duration || 0), 0),
+        count: monthSessions.length
+      }
     }
   }
 
   const filtered = getFilteredData()
   const maxValue = Math.max(...filtered.data, 1)
-  const totalDuration = filtered.data.reduce((sum, v) => sum + v, 0)
+  const totalDuration = filtered.total || 0
+  const totalCount = filtered.count || 0
 
   return (
     <div className="stats-view">
@@ -911,9 +960,9 @@ function StatsView() {
             <option value="monthly">本月</option>
           </select>
           <select value={chartType} onChange={(e) => setChartType(e.target.value)} className="stats-select">
-            <option value="pie">扇形图</option>
             <option value="bar">柱状图</option>
             <option value="line">折线图</option>
+            <option value="pie">扇形图</option>
           </select>
         </div>
       </div>
@@ -924,90 +973,103 @@ function StatsView() {
           <div className="summary-label">总专注时长（分钟）</div>
         </div>
         <div className="summary-card">
-          <div className="summary-value">{filtered.data.length}</div>
+          <div className="summary-value">{totalCount}</div>
           <div className="summary-label">专注次数</div>
         </div>
       </div>
 
       <div className="stats-chart-container">
-        {chartType === 'bar' && (
-          <div className="bar-chart">
-            {filtered.data.map((value, i) => (
-              <div key={i} className="bar-item">
-                <div 
-                  className="bar-fill" 
-                  style={{ height: `${(value / maxValue) * 100}%` }}
-                ></div>
-                <div className="bar-label">{filtered.labels[i]}</div>
-                <div className="bar-value">{Math.floor(value / 60)}m</div>
-              </div>
-            ))}
+        {filtered.data.length === 0 || totalDuration === 0 ? (
+          <div className="empty-chart">
+            <p>暂无数据</p>
+            <p className="empty-chart-hint">开始专注后这里会显示统计图表</p>
           </div>
-        )}
-
-        {chartType === 'line' && (
-          <div className="line-chart">
-            <svg viewBox="0 0 400 200" className="line-svg">
-              <polyline
-                fill="none"
-                stroke="#ff9500"
-                strokeWidth="2"
-                points={filtered.data.map((value, i) => {
-                  const x = (i / (filtered.data.length - 1 || 1)) * 380 + 10
-                  const y = 190 - (value / maxValue) * 160
-                  return `${x},${y}`
-                }).join(' ')}
-              />
-              {filtered.data.map((value, i) => {
-                const x = (i / (filtered.data.length - 1 || 1)) * 380 + 10
-                const y = 190 - (value / maxValue) * 160
-                return (
-                  <circle key={i} cx={x} cy={y} r="4" fill="#ff9500" />
-                )
-              })}
-            </svg>
-            <div className="line-labels">
-              {filtered.labels.map((label, i) => (
-                <div key={i} className="line-label">{label}</div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {chartType === 'pie' && (
-          <div className="pie-chart">
-            <svg viewBox="0 0 100 100" className="pie-svg">
-              {filtered.data.map((value, i) => {
-                const percentage = value / totalDuration
-                const startAngle = filtered.data.slice(0, i).reduce((sum, v) => sum + (v / totalDuration) * 360, 0)
-                const endAngle = startAngle + percentage * 360
-                const x1 = 50 + 40 * Math.cos((startAngle - 90) * Math.PI / 180)
-                const y1 = 50 + 40 * Math.sin((startAngle - 90) * Math.PI / 180)
-                const x2 = 50 + 40 * Math.cos((endAngle - 90) * Math.PI / 180)
-                const y2 = 50 + 40 * Math.sin((endAngle - 90) * Math.PI / 180)
-                const largeArc = percentage > 0.5 ? 1 : 0
-                const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
-                return (
-                  <path
-                    key={i}
-                    d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
-                    fill={colors[i % colors.length]}
-                  />
-                )
-              })}
-            </svg>
-            <div className="pie-legend">
-              {filtered.data.map((value, i) => {
-                const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
-                return (
-                  <div key={i} className="legend-item">
-                    <div className="legend-color" style={{ background: colors[i % colors.length] }}></div>
-                    <span>{filtered.labels[i]}: {Math.floor(value / 60)}m</span>
+        ) : (
+          <>
+            {chartType === 'bar' && (
+              <div className="bar-chart">
+                {filtered.data.map((value, i) => (
+                  <div key={i} className="bar-item">
+                    <div 
+                      className="bar-fill" 
+                      style={{ height: `${(value / maxValue) * 100}%` }}
+                    ></div>
+                    <div className="bar-label">{filtered.labels[i]}</div>
+                    <div className="bar-value">{Math.floor(value / 60)}m</div>
                   </div>
-                )
-              })}
-            </div>
-          </div>
+                ))}
+              </div>
+            )}
+
+            {chartType === 'line' && (
+              <div className="line-chart">
+                <svg viewBox="0 0 400 200" className="line-svg">
+                  <polyline
+                    fill="none"
+                    stroke="#ff9500"
+                    strokeWidth="2"
+                    points={filtered.data.map((value, i) => {
+                      const x = (i / (filtered.data.length - 1 || 1)) * 380 + 10
+                      const y = 190 - (value / maxValue) * 160
+                      return `${x},${y}`
+                    }).join(' ')}
+                  />
+                  {filtered.data.map((value, i) => {
+                    const x = (i / (filtered.data.length - 1 || 1)) * 380 + 10
+                    const y = 190 - (value / maxValue) * 160
+                    return (
+                      <circle key={i} cx={x} cy={y} r="4" fill="#ff9500" />
+                    )
+                  })}
+                </svg>
+                <div className="line-labels">
+                  {filtered.labels.map((label, i) => (
+                    <div key={i} className="line-label">{label}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {chartType === 'pie' && totalDuration > 0 && (
+              <div className="pie-chart">
+                <svg viewBox="0 0 100 100" className="pie-svg">
+                  {filtered.data.filter(v => v > 0).map((value, i, arr) => {
+                    const validValues = arr.filter(v => v > 0)
+                    const total = validValues.reduce((sum, v) => sum + v, 0)
+                    const percentage = value / total
+                    const startAngle = validValues.slice(0, i).reduce((sum, v) => sum + (v / total) * 360, 0)
+                    const endAngle = startAngle + percentage * 360
+                    const x1 = 50 + 40 * Math.cos((startAngle - 90) * Math.PI / 180)
+                    const y1 = 50 + 40 * Math.sin((startAngle - 90) * Math.PI / 180)
+                    const x2 = 50 + 40 * Math.cos((endAngle - 90) * Math.PI / 180)
+                    const y2 = 50 + 40 * Math.sin((endAngle - 90) * Math.PI / 180)
+                    const largeArc = percentage > 0.5 ? 1 : 0
+                    const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
+                    const actualIndex = filtered.data.indexOf(value)
+                    return (
+                      <path
+                        key={actualIndex}
+                        d={`M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`}
+                        fill={colors[actualIndex % colors.length]}
+                      />
+                    )
+                  })}
+                </svg>
+                <div className="pie-legend">
+                  {filtered.data.filter((value, i) => value > 0).map((value, i) => {
+                    const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
+                    const actualIndex = filtered.data.indexOf(value)
+                    return (
+                      <div key={actualIndex} className="legend-item">
+                        <div className="legend-color" style={{ background: colors[actualIndex % colors.length] }}></div>
+                        <span>{filtered.labels[actualIndex]}: {Math.floor(value / 60)}m</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

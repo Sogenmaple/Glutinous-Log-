@@ -1444,6 +1444,38 @@
   border-radius: 2px;
 }
 
+.empty-chart {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+
+.empty-chart p {
+  margin: 0.5rem 0;
+}
+
+.empty-chart-hint {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.timeline-chart-wrapper {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-chart {
+  flex: 1;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.15);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 .heatmap-placeholder {
   text-align: center;
   padding: 4rem 2rem;

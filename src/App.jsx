@@ -19,6 +19,7 @@ import AboutPage from './pages/AboutPage'
 import SpecialConstructs from './pages/SpecialConstructs'
 import PomodoroTodo from './pages/PomodoroTodo'
 import Minesweeper from './pages/Minesweeper'
+import Calculator from './pages/Calculator'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
@@ -179,6 +180,9 @@ function AppContent() {
           
           {/* 扫雷游戏 */}
           <Route path="/special/minesweeper" element={<Minesweeper />} />
+          
+          {/* 计算器 */}
+          <Route path="/special/calculator" element={<Calculator />} />
           
           {/* 文章详情 */}
           <Route path="/post/:id" element={

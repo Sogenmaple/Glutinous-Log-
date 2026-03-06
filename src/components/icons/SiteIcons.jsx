@@ -18,6 +18,25 @@ export function BombIcon({ size = 48, color = 'currentColor' }) {
   )
 }
 
+// 计算器图标
+export function CalculatorIcon({ size = 48, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="6" width="28" height="36" rx="3" stroke={color} strokeWidth="2" fill="none"/>
+      <rect x="14" y="10" width="20" height="8" rx="1" stroke={color} strokeWidth="1.5" fill="none"/>
+      <circle cx="17" cy="24" r="1.5" fill={color}/>
+      <circle cx="24" cy="24" r="1.5" fill={color}/>
+      <circle cx="31" cy="24" r="1.5" fill={color}/>
+      <circle cx="17" cy="30" r="1.5" fill={color}/>
+      <circle cx="24" cy="30" r="1.5" fill={color}/>
+      <circle cx="31" cy="30" r="1.5" fill={color}/>
+      <circle cx="17" cy="36" r="1.5" fill={color}/>
+      <circle cx="24" cy="36" r="1.5" fill={color}/>
+      <circle cx="31" cy="36" r="1.5" fill={color}/>
+    </svg>
+  )
+}
+
 // 游戏手柄图标
 export function GameIcon({ size = 48, color = 'currentColor' }) {
   return (

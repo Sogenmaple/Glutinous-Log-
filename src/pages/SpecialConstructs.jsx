@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -36,6 +36,16 @@ export default function SpecialConstructs() {
       icon: BombIcon,
       color: 'amber',
       path: '/special/minesweeper',
+      status: 'active'
+    },
+    {
+      id: 'calculator',
+      title: '科学计算器',
+      subtitle: 'CALCULATOR',
+      description: '功能齐全的科学计算器，支持历史记录和键盘输入',
+      icon: CalculatorIcon,
+      color: 'cyan',
+      path: '/special/calculator',
       status: 'active'
     },
     {

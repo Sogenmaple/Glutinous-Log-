@@ -7,9 +7,25 @@ export default function PomodoroTodo() {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('timer')
 
-  // 点击粒子效果
+  // 自定义光标 + 点击粒子效果
   useEffect(() => {
+    // 创建自定义光标
+    const cursor = document.createElement('div')
+    cursor.className = 'custom-cursor'
+    document.body.appendChild(cursor)
+
+    // 光标跟随鼠标
+    const handleMouseMove = (e) => {
+      cursor.style.left = e.clientX + 'px'
+      cursor.style.top = e.clientY + 'px'
+    }
+
+    // 点击效果
     const handleClick = (e) => {
+      cursor.classList.add('click')
+      setTimeout(() => cursor.classList.remove('click'), 150)
+
+      // 粒子效果
       const particle = document.createElement('div')
       particle.className = 'click-particle'
       particle.style.left = (e.clientX - 4) + 'px'
@@ -17,8 +33,42 @@ export default function PomodoroTodo() {
       document.body.appendChild(particle)
       setTimeout(() => particle.remove(), 600)
     }
+
+    // 悬停检测
+    const handleMouseOver = (e) => {
+      const target = e.target
+      if (target.matches('button, .tab-btn, .todo-item, .todo-drag-item, .timeline-block, .bar-item, input, select')) {
+        cursor.classList.add('hover')
+      }
+    }
+
+    const handleMouseOut = (e) => {
+      const target = e.target
+      if (target.matches('button, .tab-btn, .todo-item, .todo-drag-item, .timeline-block, .bar-item, input, select')) {
+        cursor.classList.remove('hover')
+      }
+    }
+
+    // 拖拽检测
+    const handleDragStart = () => cursor.classList.add('drag')
+    const handleDragEnd = () => cursor.classList.remove('drag')
+
+    document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('click', handleClick)
-    return () => document.removeEventListener('click', handleClick)
+    document.addEventListener('mouseover', handleMouseOver)
+    document.addEventListener('mouseout', handleMouseOut)
+    document.addEventListener('dragstart', handleDragStart)
+    document.addEventListener('dragend', handleDragEnd)
+
+    return () => {
+      document.body.removeChild(cursor)
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('click', handleClick)
+      document.removeEventListener('mouseover', handleMouseOver)
+      document.removeEventListener('mouseout', handleMouseOut)
+      document.removeEventListener('dragstart', handleDragStart)
+      document.removeEventListener('dragend', handleDragEnd)
+    }
   }, [])
 
   return (

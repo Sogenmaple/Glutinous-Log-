@@ -2294,3 +2294,274 @@
     font-size: 1.8rem;
   }
 }
+
+/* ============================================
+   V8.0 风格统一优化
+   ============================================ */
+
+/* 工具栏图标按钮 */
+.toolbar-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  color: var(--text-dim);
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toolbar-btn-icon:hover {
+  border-color: rgba(255,149,0,0.4);
+  color: var(--text);
+  background: rgba(255,149,0,0.1);
+}
+
+.toolbar-btn-icon.primary {
+  background: rgba(255,149,0,0.15);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.toolbar-btn-icon.primary:hover {
+  background: rgba(255,149,0,0.25);
+}
+
+/* 轨道标签简化 */
+.track-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amber);
+  opacity: 0.5;
+}
+
+.remove-track-btn-hidden {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  padding: 0.2rem;
+  line-height: 1;
+}
+
+.timeline-track:hover .remove-track-btn-hidden {
+  opacity: 1;
+}
+
+.remove-track-btn-hidden:hover {
+  color: #ff453a;
+}
+
+/* 时间块简化 */
+.timeline-block-indicators {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.priority-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.priority-dot.priority-high { background: #ff453a; }
+.priority-dot.priority-medium { background: #ff9500; }
+.priority-dot.priority-low { background: #06b6d4; }
+
+.repeat-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-dim);
+}
+
+.timeline-block-content {
+  display: none;
+}
+
+.timeline-block-actions-hidden {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  display: flex;
+  gap: 0.3rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.timeline-block:hover .timeline-block-actions-hidden {
+  opacity: 1;
+}
+
+.execute-block-btn-hidden,
+.move-back-block-btn-hidden {
+  background: rgba(6,182,212,0.2);
+  border: 1px solid rgba(6,182,212,0.3);
+  color: var(--cyan);
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.execute-block-btn-hidden:hover,
+.move-back-block-btn-hidden:hover {
+  background: rgba(6,182,212,0.3);
+}
+
+.delete-block-btn-hidden {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.2rem;
+  font-size: 1rem;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.delete-block-btn-hidden:hover {
+  color: #ff453a;
+}
+
+/* 删除确认弹窗 */
+.delete-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-confirm-modal {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255,149,0,0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  min-width: 300px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(255,149,0,0.15), 0 0 40px rgba(255,149,0,0.1);
+  animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.delete-confirm-modal p {
+  font-size: 1rem;
+  color: var(--text);
+  margin: 0 0 1.5rem 0;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cancel-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  color: var(--text);
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+  border-color: rgba(255,149,0,0.3);
+}
+
+.delete-confirm-btn {
+  flex: 1;
+  background: rgba(255,149,0,0.15);
+  border: 1px solid var(--amber);
+  color: var(--amber);
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-confirm-btn:hover {
+  background: rgba(255,149,0,0.25);
+}
+
+/* 轨道高度优化 */
+.timeline-track {
+  height: 50px;
+}
+
+.track-content {
+  height: 50px;
+}
+
+/* 统计图表悬浮详情 */
+.bar-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-secondary);
+  border: 1px solid rgba(255,149,0,0.3);
+  border-radius: 6px;
+  padding: 0.8rem;
+  min-width: 150px;
+  max-width: 250px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.tooltip-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255,149,0,0.1);
+}
+
+.tooltip-item:last-child {
+  border-bottom: none;
+}
+
+.tooltip-text {
+  font-size: 0.85rem;
+  color: var(--text);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tooltip-duration {
+  font-size: 0.8rem;
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}

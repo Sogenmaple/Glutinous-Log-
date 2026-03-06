@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { ClockIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon, SaveIcon, LoadIcon, AddIcon, RemoveIcon, DragIcon } from '../components/icons/SiteIcons'
+import { ClockIcon, PlusIcon, TrashIcon, PlayIcon, PauseIcon, ResetIcon, ChartIcon, CalendarIcon, FireIcon, SaveIcon, LoadIcon, AddIcon, RemoveIcon, DragIcon, RepeatDailyIcon, RepeatWeeklyIcon, RepeatMonthlyIcon } from '../components/icons/SiteIcons'
 
 export default function PomodoroTodo() {
   const navigate = useNavigate()
@@ -484,15 +484,18 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
   )
 }
 
-// 时间轴视图 - 完全重构
+// 时间轴视图 - v8.0 风格统一
 function TimelineView() {
   const [todos] = useState(() => JSON.parse(localStorage.getItem('pomodoro_todos') || '[]'))
-  const [tracks, setTracks] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_tracks') || '[{id:1,name:"主轨道"}]'))
+  const [tracks, setTracks] = useState(() => {
+    const saved = localStorage.getItem('pomodoro_timeline_tracks')
+    return saved ? JSON.parse(saved) : [{id:1,name:""}, {id:2,name:""}, {id:3,name:""}]
+  })
   const [timelineItems, setTimelineItems] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_items') || '[]'))
   const [presets, setPresets] = useState(() => JSON.parse(localStorage.getItem('pomodoro_timeline_presets') || '[]'))
   const [showPresets, setShowPresets] = useState(false)
   const [draggedTodo, setDraggedTodo] = useState(null)
-  const [resizingItem, setResizingItem] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(null)
 
   useEffect(() => {
     localStorage.setItem('pomodoro_timeline_tracks', JSON.stringify(tracks))
@@ -519,7 +522,9 @@ function TimelineView() {
         trackId,
         startHour: hour,
         duration: 2,
-        color: todo.priority === 'high' ? '#ff453a' : todo.priority === 'medium' ? '#ff9500' : '#06b6d4'
+        color: todo.priority === 'high' ? '#ff453a' : todo.priority === 'medium' ? '#ff9500' : '#06b6d4',
+        priority: todo.priority || 'medium',
+        repeat: todo.repeat || 'none'
       }
       const updated = [...timelineItems, newItem]
       setTimelineItems(updated)
@@ -539,11 +544,6 @@ function TimelineView() {
       }
       return item
     })
-    setTimelineItems(updated)
-  }
-
-  const deleteItem = (itemId) => {
-    const updated = timelineItems.filter(item => item.id !== itemId)
     setTimelineItems(updated)
   }
 
@@ -579,7 +579,7 @@ function TimelineView() {
 
   const loadPreset = (preset) => {
     if (confirm(`加载预设"${preset.name}"？这将覆盖当前时间轴。`)) {
-      setTracks([{id:1,name:"主轨道"}, ...preset.tracks])
+      setTracks([{id:1,name:""}, {id:2,name:""}, {id:3,name:""}, ...preset.tracks])
       setTimelineItems(preset.items)
       setShowPresets(false)
     }
@@ -594,22 +594,35 @@ function TimelineView() {
   }
 
   const addTrack = () => {
-    const name = prompt('轨道名称：')
-    if (name) {
-      const newTrack = { id: Date.now(), name }
-      setTracks([...tracks, newTrack])
-    }
+    setTracks([...tracks, {id:Date.now(),name:""}])
   }
 
   const removeTrack = (trackId) => {
-    if (trackId === 1) {
-      alert('主轨道不能删除')
+    setShowDeleteConfirm({type:'track', id:trackId})
+  }
+
+  const confirmRemoveTrack = () => {
+    if (!showDeleteConfirm) return
+    const trackId = showDeleteConfirm.id
+    if (tracks.length <= 3) {
+      alert('至少保留 3 条轨道')
       return
     }
-    if (confirm('删除此轨道将移除其上所有任务，确定？')) {
-      setTracks(tracks.filter(t => t.id !== trackId))
-      setTimelineItems(timelineItems.filter(i => i.trackId !== trackId))
-    }
+    setTracks(tracks.filter(t => t.id !== trackId))
+    setTimelineItems(timelineItems.filter(i => i.trackId !== trackId))
+    setShowDeleteConfirm(null)
+  }
+
+  const deleteItem = (itemId) => {
+    setShowDeleteConfirm({type:'item', id:itemId})
+  }
+
+  const confirmDeleteItem = () => {
+    if (!showDeleteConfirm) return
+    const itemId = showDeleteConfirm.id
+    const updated = timelineItems.filter(item => item.id !== itemId)
+    setTimelineItems(updated)
+    setShowDeleteConfirm(null)
   }
 
   const hours = Array.from({ length: 24 }, (_, i) => i)
@@ -621,12 +634,12 @@ function TimelineView() {
           <h3>时间轴规划</h3>
         </div>
         <div className="timeline-toolbar-actions">
-          <button className="toolbar-btn" onClick={addTrack}><AddIcon size={16} /><span>添加轨道</span></button>
-          <button className="toolbar-btn" onClick={() => setShowPresets(!showPresets)}>
-            <LoadIcon size={16} /><span>预设</span>
+          <button className="toolbar-btn-icon" onClick={addTrack} title="添加轨道"><AddIcon size={16} /></button>
+          <button className="toolbar-btn-icon" onClick={() => setShowPresets(!showPresets)} title="预设">
+            <LoadIcon size={16} />
           </button>
-          <button className="toolbar-btn primary" onClick={savePreset}>
-            <SaveIcon size={16} /><span>保存预设</span>
+          <button className="toolbar-btn-icon primary" onClick={savePreset} title="保存预设">
+            <SaveIcon size={16} />
           </button>
         </div>
       </div>
@@ -687,10 +700,8 @@ function TimelineView() {
           {tracks.map(track => (
             <div key={track.id} className="timeline-track">
               <div className="track-label">
-                <span className="track-name">{track.name}</span>
-                {track.id !== 1 && (
-                  <button className="remove-track-btn" onClick={() => removeTrack(track.id)}>×</button>
-                )}
+                <span className="track-indicator"></span>
+                <button className="remove-track-btn-hidden" onClick={() => removeTrack(track.id)}>×</button>
               </div>
               <div className="track-content" onDragOver={handleDragOver}>
                 {hours.map(hour => (
@@ -711,9 +722,15 @@ function TimelineView() {
                       width: `${(item.duration / 24) * 100}%`
                     }}
                   >
-                    <div className="timeline-block-content">
-                      <span className="timeline-block-text">{item.todoText}</span>
-                      <span className="timeline-block-duration">{item.duration}小时</span>
+                    <div className="timeline-block-indicators">
+                      <span className={`priority-dot priority-${item.priority}`}></span>
+                      {item.repeat && item.repeat !== 'none' && (
+                        <span className="repeat-icon">
+                          {item.repeat === 'daily' && <RepeatDailyIcon size={12} />}
+                          {item.repeat === 'weekly' && <RepeatWeeklyIcon size={12} />}
+                          {item.repeat === 'monthly' && <RepeatMonthlyIcon size={12} />}
+                        </span>
+                      )}
                     </div>
                     <div className="timeline-block-resize timeline-block-resize-left"
                       onMouseDown={(e) => {
@@ -753,10 +770,10 @@ function TimelineView() {
                         document.addEventListener('mouseup', handleMouseUp)
                       }}
                     />
-                    <div className="timeline-block-actions">
-                      <button className="execute-block-btn" onClick={() => executeItem(item)}>执行</button>
-                      <button className="move-back-block-btn" onClick={() => moveItemBack(item)}>放回</button>
-                      <button className="delete-block-btn" onClick={() => deleteItem(item.id)}>×</button>
+                    <div className="timeline-block-actions-hidden">
+                      <button className="execute-block-btn-hidden" onClick={() => executeItem(item)}>执行</button>
+                      <button className="move-back-block-btn-hidden" onClick={() => moveItemBack(item)}>放回</button>
+                      <button className="delete-block-btn-hidden" onClick={() => deleteItem(item.id)}>×</button>
                     </div>
                   </div>
                 ))}
@@ -769,6 +786,18 @@ function TimelineView() {
       <div className="timeline-help">
         <p>提示：将左侧待办拖到轨道上 · 拖动两端调整时间 · 拖动块切换时间 · 点击执行开始专注</p>
       </div>
+
+      {showDeleteConfirm && (
+        <div className="delete-confirm-overlay" onClick={() => setShowDeleteConfirm(null)}>
+          <div className="delete-confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <p>{showDeleteConfirm.type === 'track' ? '确定删除此轨道？' : '确定删除此时间块？'}</p>
+            <div className="delete-confirm-actions">
+              <button className="cancel-btn" onClick={() => setShowDeleteConfirm(null)}>取消</button>
+              <button className="delete-confirm-btn" onClick={showDeleteConfirm.type === 'track' ? confirmRemoveTrack : confirmDeleteItem}>删除</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -1019,6 +1048,8 @@ function StatsView() {
     return () => window.removeEventListener('sessions-updated', handleUpdate)
   }, [])
 
+  const [hoveredHour, setHoveredHour] = useState(null)
+
   const getFilteredData = () => {
     const now = new Date()
     const today = now.toISOString().split('T')[0]
@@ -1026,14 +1057,17 @@ function StatsView() {
     if (viewType === 'daily') {
       const daySessions = sessions.filter(s => s.completedAt.startsWith(today) && s.mode === 'work')
       const byHour = {}
-      for (let h = 0; h < 24; h++) byHour[h] = 0
+      const byHourDetails = {}
+      for (let h = 0; h < 24; h++) { byHour[h] = 0; byHourDetails[h] = [] }
       daySessions.forEach(s => {
         const hour = new Date(s.completedAt).getHours()
         byHour[hour] = (byHour[hour] || 0) + (s.duration || 0)
+        byHourDetails[hour].push(s)
       })
       return { 
         data: Object.values(byHour), 
         labels: Object.keys(byHour).map(k => `${k}:00`),
+        details: byHourDetails,
         total: daySessions.reduce((sum, s) => sum + (s.duration || 0), 0),
         count: daySessions.length
       }
@@ -1041,15 +1075,18 @@ function StatsView() {
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
       const weekSessions = sessions.filter(s => new Date(s.completedAt) >= weekAgo && s.mode === 'work')
       const byDay = {}
+      const byDayDetails = {}
       const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-      for (let i = 0; i < 7; i++) byDay[dayNames[i]] = 0
+      for (let i = 0; i < 7; i++) { byDay[dayNames[i]] = 0; byDayDetails[dayNames[i]] = [] }
       weekSessions.forEach(s => {
         const day = dayNames[new Date(s.completedAt).getDay()]
         byDay[day] = (byDay[day] || 0) + (s.duration || 0)
+        byDayDetails[day].push(s)
       })
       return { 
         data: Object.values(byDay), 
         labels: Object.keys(byDay),
+        details: byDayDetails,
         total: weekSessions.reduce((sum, s) => sum + (s.duration || 0), 0),
         count: weekSessions.length
       }
@@ -1057,15 +1094,18 @@ function StatsView() {
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
       const monthSessions = sessions.filter(s => new Date(s.completedAt) >= monthStart && s.mode === 'work')
       const byDay = {}
+      const byDayDetails = {}
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-      for (let d = 1; d <= daysInMonth; d++) byDay[d] = 0
+      for (let d = 1; d <= daysInMonth; d++) { byDay[d] = 0; byDayDetails[d] = [] }
       monthSessions.forEach(s => {
         const day = new Date(s.completedAt).getDate()
         byDay[day] = (byDay[day] || 0) + (s.duration || 0)
+        byDayDetails[day].push(s)
       })
       return { 
         data: Object.values(byDay), 
         labels: Object.keys(byDay).map(k => `${k}日`),
+        details: byDayDetails,
         total: monthSessions.reduce((sum, s) => sum + (s.duration || 0), 0),
         count: monthSessions.length
       }

@@ -1,0 +1,689 @@
+/* ============================================
+   SPECIAL CONSTRUCTS PAGE
+   ============================================ */
+
+.special-constructs-page {
+  min-height: 100vh;
+  background: var(--bg-deep);
+  padding-top: 2rem;
+}
+
+.special-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.special-card {
+  position: relative;
+  min-height: 320px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+}
+
+.special-card.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.special-card:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.special-card.amber {
+  border-color: rgba(255,149,0,0.3);
+}
+
+.special-card.amber:hover {
+  border-color: var(--amber);
+  box-shadow: 0 0 40px rgba(255,149,0,0.3);
+}
+
+.special-card.cyan {
+  border-color: rgba(6,182,212,0.3);
+}
+
+.special-card.cyan:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 40px rgba(6,182,212,0.3);
+}
+
+.special-card.purple {
+  border-color: rgba(189,0,255,0.3);
+}
+
+.special-card.purple:hover {
+  border-color: var(--purple);
+  box-shadow: 0 0 40px rgba(189,0,255,0.3);
+}
+
+.special-card.red {
+  border-color: rgba(255,69,58,0.3);
+}
+
+.special-card.red:hover {
+  border-color: #ff453a;
+  box-shadow: 0 0 40px rgba(255,69,58,0.3);
+}
+
+/* 卡片内容复用 home.css 的样式 */
+.special-card .card-content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.special-card .card-icon {
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 10px currentColor);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.special-card:hover .card-icon {
+  transform: scale(1.15) rotate(3deg);
+}
+
+.special-card.amber .card-icon { color: var(--amber); }
+.special-card.cyan .card-icon { color: var(--cyan); }
+.special-card.purple .card-icon { color: var(--purple); }
+.special-card.red .card-icon { color: #ff453a; }
+
+.special-card .card-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.05em;
+}
+
+.special-card .card-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.special-card .card-description {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
+}
+
+/* 状态徽章 */
+.card-status {
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.status-badge.active {
+  background: rgba(57,255,20,0.1);
+  border: 1px solid rgba(57,255,20,0.3);
+  color: var(--green);
+}
+
+.status-badge .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.status-badge.coming-soon {
+  background: rgba(255,149,0,0.1);
+  border: 1px solid rgba(255,149,0,0.3);
+  color: var(--amber);
+}
+
+.special-card .card-arrow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s ease;
+}
+
+.special-card:hover .card-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.special-card .card-arrow .arrow-symbol {
+  transition: transform 0.3s ease;
+}
+
+.special-card:hover .card-arrow .arrow-symbol {
+  transform: translateX(4px);
+}
+
+/* 边角装饰 */
+.special-card .card-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid;
+  transition: all 0.3s ease;
+  z-index: 3;
+}
+
+.special-card .card-corner.tl {
+  top: 12px;
+  left: 12px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.special-card .card-corner.tr {
+  top: 12px;
+  right: 12px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.special-card .card-corner.bl {
+  bottom: 12px;
+  left: 12px;
+  border-right: none;
+  border-top: none;
+}
+
+.special-card .card-corner.br {
+  bottom: 12px;
+  right: 12px;
+  border-left: none;
+  border-top: none;
+}
+
+.special-card.amber .card-corner { border-color: rgba(255,149,0,0.4); }
+.special-card.cyan .card-corner { border-color: rgba(6,182,212,0.4); }
+.special-card.purple .card-corner { border-color: rgba(189,0,255,0.4); }
+.special-card.red .card-corner { border-color: rgba(255,69,58,0.4); }
+
+.special-card:hover .card-corner {
+  width: 20px;
+  height: 20px;
+  border-color: currentColor;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.special-card.amber:hover .card-corner { color: var(--amber); }
+.special-card.cyan:hover .card-corner { color: var(--cyan); }
+.special-card.purple:hover .card-corner { color: var(--purple); }
+.special-card.red:hover .card-corner { color: #ff453a; }
+
+/* ============================================
+   POMODORO TODO PAGE
+   ============================================ */
+
+.pomodoro-todo-page {
+  min-height: 100vh;
+  background: var(--bg-deep);
+  padding-top: 2rem;
+}
+
+.pomodoro-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* 番茄钟区域 */
+.pomodoro-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.timer-display {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.timer-display::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,149,0,0.05) 0%, transparent 70%);
+  animation: rotate-bg 20s linear infinite;
+}
+
+@keyframes rotate-bg {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.mode-selector {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.mode-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,149,0,0.2);
+  color: var(--text-secondary);
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mode-btn:hover {
+  border-color: rgba(255,149,0,0.4);
+  color: var(--text);
+}
+
+.mode-btn.active {
+  background: rgba(255,149,0,0.15);
+  border-color: var(--amber);
+  color: var(--amber);
+  box-shadow: 0 0 15px rgba(255,149,0,0.3);
+}
+
+.time-display {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 2rem;
+}
+
+.time-value {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 900;
+  text-shadow: 0 0 30px currentColor;
+  letter-spacing: 0.1em;
+}
+
+.progress-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.progress-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 20px currentColor;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.control-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid;
+  color: var(--text);
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-btn:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+}
+
+.control-btn.primary {
+  background: rgba(255,149,0,0.15);
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.control-btn.primary:hover {
+  background: rgba(255,149,0,0.25);
+  box-shadow: 0 0 20px rgba(255,149,0,0.4);
+}
+
+.pomodoro-stats {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--amber);
+  text-shadow: var(--amber-glow);
+}
+
+.stat-unit {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* 待办区域 */
+.todo-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-container {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 12px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.todo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.todo-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.todo-count {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--cyan);
+}
+
+.add-todo-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.todo-input {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.todo-input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px rgba(6,182,212,0.2);
+}
+
+.todo-input::placeholder {
+  color: var(--text-dim);
+}
+
+.add-btn {
+  background: rgba(6,182,212,0.15);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  width: 44px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-btn:hover {
+  background: rgba(6,182,212,0.25);
+  box-shadow: 0 0 15px rgba(6,182,212,0.4);
+  transform: translateY(-2px);
+}
+
+/* 当前专注横幅 */
+.active-todo-banner {
+  background: linear-gradient(135deg, rgba(255,149,0,0.1) 0%, rgba(255,149,0,0.05) 100%);
+  border: 1px solid rgba(255,149,0,0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.banner-label {
+  font-size: 0.7rem;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.banner-text {
+  font-size: 1.1rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* 待办列表 */
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.todo-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.todo-list::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.02);
+  border-radius: 3px;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+  background: rgba(6,182,212,0.3);
+  border-radius: 3px;
+}
+
+.todo-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(6,182,212,0.15);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.todo-item:hover {
+  border-color: rgba(6,182,212,0.3);
+  background: rgba(255,255,255,0.05);
+}
+
+.todo-item.active {
+  border-color: var(--amber);
+  background: rgba(255,149,0,0.08);
+  box-shadow: 0 0 15px rgba(255,149,0,0.15);
+}
+
+.todo-item.completed {
+  opacity: 0.5;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  color: var(--text-dim);
+}
+
+.todo-content {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex: 1;
+}
+
+.todo-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--cyan);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.todo-checkbox:hover {
+  background: rgba(6,182,212,0.2);
+}
+
+.todo-text {
+  color: var(--text);
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--text);
+}
+
+.action-btn.set-active:hover {
+  background: rgba(255,149,0,0.2);
+  color: var(--amber);
+}
+
+.action-btn.delete:hover {
+  background: rgba(255,69,58,0.2);
+  color: #ff453a;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-dim);
+}
+
+.empty-state p {
+  margin-bottom: 0.5rem;
+}
+
+.empty-hint {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+/* 响应式 */
+@media (max-width: 900px) {
+  .pomodoro-container {
+    grid-template-columns: 1fr;
+  }
+
+  .time-value {
+    font-size: 3.5rem;
+  }
+}

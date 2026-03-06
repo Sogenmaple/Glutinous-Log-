@@ -14,7 +14,7 @@ export default function PostDetail() {
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/posts/${id}`)
+      const response = await fetch(`http://36.151.149.117:3001/api/posts/${id}`)
       const data = await response.json()
       setPost(data)
     } catch (error) {

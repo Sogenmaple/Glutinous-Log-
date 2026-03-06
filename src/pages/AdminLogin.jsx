@@ -19,7 +19,7 @@ export default function AdminLogin() {
     setError('')
 
     try {
-      const response = await fetch('http://localhost:3001/api/login', {
+      const response = await fetch('http://36.151.149.117:3001/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })

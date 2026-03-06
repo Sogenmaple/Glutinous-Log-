@@ -7,16 +7,8 @@ export default function About() {
   ]
 
   return (
-    <section id="about" className="about">
-      <div className="section-header">
-        <div className="section-line"></div>
-        <h2 className="section-title">
-          <span className="section-icon">◆</span>
-          关于作者
-          <span className="section-icon">◆</span>
-        </h2>
-        <div className="section-line"></div>
-      </div>
+    <section className="about">
+      <div className="about-content-wrapper">
       <div className="about-content">
         <div className="about-terminal">
           <div className="terminal-header">
@@ -66,6 +58,7 @@ export default function About() {
           </div>
         </div>
       </div>
+    </div>
     </section>
   )
 }

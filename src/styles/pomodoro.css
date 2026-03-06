@@ -76,7 +76,6 @@
 /* 内容区域 */
 .pomodoro-content {
   min-height: 600px;
-  height: 750px;
 }
 
 /* 专注视图 - 左右分栏 */
@@ -1675,10 +1674,10 @@
 
 /* 统计视图 */
 .stats-view {
-  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-height: 600px;
 }
 
 .stats-header {
@@ -1927,10 +1926,10 @@
 
 /* 打卡视图 */
 .checkin-view {
-  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-height: 600px;
 }
 
 .checkin-header {

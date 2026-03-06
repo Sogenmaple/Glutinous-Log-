@@ -2261,8 +2261,13 @@
 .post-detail-page {
   min-height: 100vh;
   background: var(--bg-deep);
+  padding-top: 80px;
+}
+
+.post-detail-wrapper {
   padding: 2rem;
-  font-family: var(--font-mono);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .back-btn {
@@ -2385,6 +2390,71 @@
   border-left: 3px solid var(--amber);
   border-radius: 4px;
   margin-bottom: 2rem;
+  font-style: italic;
+}
+
+.markdown-content h2 {
+  font-size: 1.8rem;
+  color: var(--amber);
+  margin: 2rem 0 1rem;
+  font-family: var(--font-display);
+}
+
+.markdown-content h3 {
+  font-size: 1.4rem;
+  color: var(--cyan);
+  margin: 1.5rem 0 0.8rem;
+  font-family: var(--font-mono);
+}
+
+.markdown-content h4 {
+  font-size: 1.1rem;
+  color: var(--text);
+  margin: 1rem 0 0.5rem;
+}
+
+.markdown-content li {
+  margin-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid var(--amber);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.markdown-content pre {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.markdown-content pre code {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid rgba(255,149,0,0.2);
+  margin: 2rem 0;
+}
+
+.markdown-content strong {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.markdown-content em {
+  color: var(--cyan);
   font-style: italic;
 }
 

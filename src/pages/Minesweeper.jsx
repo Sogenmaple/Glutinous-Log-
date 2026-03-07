@@ -1,7 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Header from '../components/Header'
-import { ToolIcon, MineIcon, FlagIcon, TimerIcon, TrophyIcon, RefreshIcon } from '../components/icons/SiteIcons'
 import '../styles/Minesweeper.css'
+
+const DIFFICULTIES = {
+  easy: { rows: 9, cols: 9, mines: 10, label: '简单' },
+  medium: { rows: 16, cols: 16, mines: 40, label: '中等' },
+  hard: { rows: 30, cols: 16, mines: 99, label: '困难' }
+}
 
 export default function Minesweeper() {
   const [grid, setGrid] = useState([])
@@ -13,14 +18,7 @@ export default function Minesweeper() {
   const [difficulty, setDifficulty] = useState('medium')
   const [bestTime, setBestTime] = useState({ easy: null, medium: null, hard: null })
   
-  // 难度配置
-  const difficulties = {
-    easy: { rows: 9, cols: 9, mines: 10, label: '简单' },
-    medium: { rows: 16, cols: 16, mines: 40, label: '中等' },
-    hard: { rows: 16, cols: 30, mines: 99, label: '困难' }
-  }
-  
-  const { rows: ROWS, cols: COLS, mines: MINES } = difficulties[difficulty]
+  const { rows: ROWS, cols: COLS, mines: MINES } = DIFFICULTIES[difficulty]
 
   // 加载最佳记录
   useEffect(() => {
@@ -36,10 +34,10 @@ export default function Minesweeper() {
 
   // 计时器
   useEffect(() => {
-    if (gameOver || gameWon) return
+    if (gameOver || gameWon || firstClick) return
     const interval = setInterval(() => setTimer(t => t + 1), 1000)
     return () => clearInterval(interval)
-  }, [gameOver, gameWon])
+  }, [gameOver, gameWon, firstClick])
 
   // 保存最佳记录
   useEffect(() => {
@@ -51,16 +49,31 @@ export default function Minesweeper() {
         localStorage.setItem('minesweeper_best_times', JSON.stringify(newBest))
       }
     }
-  }, [gameWon])
+  }, [gameWon, timer, bestTime, difficulty])
 
-  // 切换难度时重置游戏
-  useEffect(() => {
-    resetGame()
-  }, [difficulty])
+  // 获取相邻格子
+  const getNeighbors = useCallback((index, cols, rows) => {
+    const row = Math.floor(index / cols)
+    const col = index % cols
+    const neighbors = []
+
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue
+        const nr = row + dr
+        const nc = col + dc
+        if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+          neighbors.push(nr * cols + nc)
+        }
+      }
+    }
+    return neighbors
+  }, [])
 
   // 初始化游戏
-  const initGame = (excludeIndex = -1) => {
-    const newGrid = Array(ROWS * COLS).fill(null).map((_, i) => ({
+  const initGame = useCallback((excludeIndex = -1) => {
+    const totalCells = ROWS * COLS
+    const newGrid = Array(totalCells).fill(null).map((_, i) => ({
       index: i,
       isMine: false,
       isRevealed: false,
@@ -71,7 +84,7 @@ export default function Minesweeper() {
     // 放置地雷（排除第一次点击的位置）
     let minesPlaced = 0
     while (minesPlaced < MINES) {
-      const index = Math.floor(Math.random() * ROWS * COLS)
+      const index = Math.floor(Math.random() * totalCells)
       if (index !== excludeIndex && !newGrid[index].isMine) {
         newGrid[index].isMine = true
         minesPlaced++
@@ -79,9 +92,9 @@ export default function Minesweeper() {
     }
 
     // 计算相邻地雷数
-    for (let i = 0; i < ROWS * COLS; i++) {
+    for (let i = 0; i < totalCells; i++) {
       if (!newGrid[i].isMine) {
-        const neighbors = getNeighbors(i)
+        const neighbors = getNeighbors(i, COLS, ROWS)
         newGrid[i].neighborMines = neighbors.filter(n => newGrid[n].isMine).length
       }
     }
@@ -92,31 +105,32 @@ export default function Minesweeper() {
     setFlags(0)
     setTimer(0)
     setFirstClick(false)
-  }
+  }, [ROWS, COLS, MINES, getNeighbors])
 
-  // 获取相邻格子
-  const getNeighbors = (index) => {
-    const row = Math.floor(index / COLS)
-    const col = index % COLS
-    const neighbors = []
+  // 揭示格子（递归）
+  const revealCell = useCallback((gridState, index, cols, rows) => {
+    const cell = gridState[index]
+    if (cell.isRevealed || cell.isFlagged) return
 
-    for (let dr = -1; dr <= 1; dr++) {
-      for (let dc = -1; dc <= 1; dc++) {
-        if (dr === 0 && dc === 0) continue
-        const nr = row + dr
-        const nc = col + dc
-        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
-          neighbors.push(nr * COLS + nc)
-        }
-      }
+    cell.isRevealed = true
+
+    if (cell.neighborMines === 0) {
+      const neighbors = getNeighbors(index, cols, rows)
+      neighbors.forEach(n => revealCell(gridState, n, cols, rows))
     }
+  }, [getNeighbors])
 
-    return neighbors
-  }
+  // 检查胜利
+  const checkWin = useCallback((gridState) => {
+    const unrevealedSafe = gridState.filter(c => !c.isMine && !c.isRevealed).length
+    if (unrevealedSafe === 0) {
+      setGameWon(true)
+    }
+  }, [])
 
   // 点击格子
-  const handleClick = (index) => {
-    if (gameOver || gameWon || grid[index]?.isFlagged || grid[index]?.isRevealed) return
+  const handleClick = useCallback((index) => {
+    if (gameOver || gameWon || !grid[index] || grid[index]?.isFlagged || grid[index]?.isRevealed) return
 
     // 第一次点击时初始化
     if (firstClick) {
@@ -128,40 +142,27 @@ export default function Minesweeper() {
     const cell = newGrid[index]
 
     if (cell.isMine) {
-      // 踩雷了
       cell.isRevealed = true
       setGrid(newGrid)
       setGameOver(true)
+      
       // 显示所有地雷
-      newGrid.forEach(c => {
-        if (c.isMine) c.isRevealed = true
-      })
-      setGrid([...newGrid])
+      const finalGrid = newGrid.map(c => ({
+        ...c,
+        isRevealed: c.isMine ? true : c.isRevealed
+      }))
+      setGrid(finalGrid)
     } else {
-      // 揭示格子
-      revealCell(newGrid, index)
+      revealCell(newGrid, index, COLS, ROWS)
       setGrid([...newGrid])
       checkWin(newGrid)
     }
-  }
-
-  // 揭示格子（递归）
-  const revealCell = (grid, index) => {
-    const cell = grid[index]
-    if (cell.isRevealed || cell.isFlagged) return
-
-    cell.isRevealed = true
-
-    if (cell.neighborMines === 0) {
-      const neighbors = getNeighbors(index)
-      neighbors.forEach(n => revealCell(grid, n))
-    }
-  }
+  }, [gameOver, gameWon, grid, firstClick, initGame, COLS, ROWS, revealCell, checkWin])
 
   // 右键插旗
-  const handleRightClick = (e, index) => {
+  const handleRightClick = useCallback((e, index) => {
     e.preventDefault()
-    if (gameOver || gameWon || grid[index]?.isRevealed) return
+    if (gameOver || gameWon || !grid[index] || grid[index]?.isRevealed) return
 
     const newGrid = [...grid]
     const cell = newGrid[index]
@@ -175,61 +176,29 @@ export default function Minesweeper() {
     }
     
     setGrid(newGrid)
-  }
-
-  // 检查胜利
-  const checkWin = (grid) => {
-    const unrevealedSafe = grid.filter(c => !c.isMine && !c.isRevealed).length
-    if (unrevealedSafe === 0) {
-      setGameWon(true)
-      // 胜利彩带效果
-      createConfetti()
-    }
-  }
-
-  // 创建彩带效果
-  const createConfetti = () => {
-    const colors = ['#ff9500', '#06b6d4', '#39ff14', '#bd00ff']
-    for (let i = 0; i < 50; i++) {
-      const confetti = document.createElement('div')
-      confetti.className = 'confetti'
-      confetti.style.left = Math.random() * 100 + 'vw'
-      confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      confetti.style.animationDelay = Math.random() * 2 + 's'
-      document.body.appendChild(confetti)
-      setTimeout(() => confetti.remove(), 5000)
-    }
-  }
-
-  // 重置游戏
-  const resetGame = () => {
-    setFirstClick(true)
-    initGame()
-  }
+  }, [gameOver, gameWon, grid])
 
   // 双击自动揭示
-  const handleDoubleClick = (index) => {
-    if (gameOver || gameWon) return
+  const handleDoubleClick = useCallback((index) => {
+    if (gameOver || gameWon || !grid[index]) return
     const cell = grid[index]
     if (!cell.isRevealed || cell.neighborMines === 0) return
 
-    // 检查周围旗帜数量
-    const neighbors = getNeighbors(index)
-    const flaggedCount = neighbors.filter(n => grid[n].isFlagged).length
+    const neighbors = getNeighbors(index, COLS, ROWS)
+    const flaggedCount = neighbors.filter(n => grid[n]?.isFlagged).length
     
     if (flaggedCount === cell.neighborMines) {
-      // 自动揭示周围未标记的格子
       const newGrid = [...grid]
       let hitMine = false
       
       neighbors.forEach(n => {
         const neighbor = newGrid[n]
-        if (!neighbor.isRevealed && !neighbor.isFlagged) {
+        if (neighbor && !neighbor.isRevealed && !neighbor.isFlagged) {
           if (neighbor.isMine) {
             hitMine = true
             neighbor.isRevealed = true
           } else {
-            revealCell(newGrid, n)
+            revealCell(newGrid, n, COLS, ROWS)
           }
         }
       })
@@ -238,27 +207,41 @@ export default function Minesweeper() {
       
       if (hitMine) {
         setGameOver(true)
-        newGrid.forEach(c => {
-          if (c.isMine) c.isRevealed = true
-        })
-        setGrid([...newGrid])
+        const finalGrid = newGrid.map(c => ({
+          ...c,
+          isRevealed: c.isMine ? true : c.isRevealed
+        }))
+        setGrid(finalGrid)
       } else {
         checkWin(newGrid)
       }
     }
+  }, [gameOver, gameWon, grid, COLS, ROWS, getNeighbors, revealCell, checkWin])
+
+  // 重置游戏
+  const resetGame = () => {
+    setFirstClick(true)
+    initGame(-1)
+  }
+
+  // 切换难度
+  const handleDifficultyChange = (key) => {
+    setDifficulty(key)
+    setFirstClick(true)
+    initGame(-1)
   }
 
   // 获取数字颜色
   const getNumberColor = (num) => {
     const colors = {
-      1: '#06b6d4', // cyan
-      2: '#39ff14', // green
-      3: '#ff2d2d', // red
-      4: '#bd00ff', // purple
-      5: '#ff9500', // amber
-      6: '#00e5ff', // cyan-bright
-      7: '#ffffff', // white
-      8: '#71717a'  // gray
+      1: '#06b6d4',
+      2: '#39ff14',
+      3: '#ff2d2d',
+      4: '#bd00ff',
+      5: '#ff9500',
+      6: '#00e5ff',
+      7: '#ffffff',
+      8: '#71717a'
     }
     return colors[num] || '#d4d4d8'
   }
@@ -267,137 +250,230 @@ export default function Minesweeper() {
     <div className="minesweeper-page">
       <Header />
       
-      <div className="minesweeper-container">
-        {/* 标题 */}
-        <div className="minesweeper-header">
-          <h1 className="minesweeper-title">
-            <span className="title-icon">
-              <ToolIcon size={40} color="#ff9500" />
+      <div className="tape-bg"></div>
+      <div className="tape-grid"></div>
+      <div className="tape-scanlines"></div>
+
+      <div className="minesweeper-newspaper">
+        {/* 报头 */}
+        <div className="newspaper-header">
+          <div className="header-date">
+            <span className="date">{new Date().toLocaleDateString('zh-CN')}</span>
+            <span className="issue">VOL.2024.NO.12</span>
+          </div>
+          <div className="header-title">
+            <h1>扫雷</h1>
+            <p className="subtitle">MINESWEEPER · TAPE FUTURISM</p>
+          </div>
+          <div className="header-status">
+            <span className={`status-badge ${firstClick ? 'ready' : gameOver ? 'danger' : gameWon ? 'success' : 'active'}`}>
+              {firstClick ? 'READY' : gameOver ? 'GAME OVER' : gameWon ? 'WON!' : 'PLAYING'}
             </span>
-            <span className="title-text">扫雷</span>
-          </h1>
-          <p className="minesweeper-subtitle">MINESWEEPER - 经典益智游戏</p>
+          </div>
         </div>
 
-        {/* 难度选择 */}
-        <div className="difficulty-selector">
-          {Object.entries(difficulties).map(([key, config]) => (
-            <button
-              key={key}
-              className={`difficulty-btn ${difficulty === key ? 'active' : ''}`}
-              onClick={() => setDifficulty(key)}
-            >
-              {config.label}
+        {/* 主内容区 */}
+        <div className="newspaper-content">
+          {/* 左侧边栏 */}
+          <aside className="news-sidebar-left">
+            {/* 难度选择 */}
+            <div className="difficulty-box">
+              <span className="box-label">DIFFICULTY</span>
+              <div className="difficulty-btns">
+                {Object.entries(DIFFICULTIES).map(([key, config]) => (
+                  <button
+                    key={key}
+                    className={`difficulty-btn ${difficulty === key ? 'active' : ''}`}
+                    onClick={() => handleDifficultyChange(key)}
+                  >
+                    {config.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 游戏信息 */}
+            <div className="info-boxes">
+              <div className="info-box">
+                <span className="info-label">MINES</span>
+                <span className="info-value highlight">{MINES - flags}</span>
+              </div>
+              <div className="info-box">
+                <span className="info-label">TIME</span>
+                <span className="info-value">{timer}s</span>
+              </div>
+              <div className="info-box">
+                <span className="info-label">FLAGS</span>
+                <span className="info-value">{flags}</span>
+              </div>
+              <div className="info-box">
+                <span className="info-label">BEST</span>
+                <span className="info-value best">
+                  {bestTime[difficulty] ? `${bestTime[difficulty]}s` : '--'}
+                </span>
+              </div>
+            </div>
+
+            {/* 重置按钮 */}
+            <button className="reset-btn-newspaper" onClick={resetGame}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+              </svg>
+              重置游戏
             </button>
-          ))}
-        </div>
 
-        {/* 游戏信息栏 */}
-        <div className="minesweeper-info">
-          <div className="info-panel">
-            <span className="info-label">
-              <MineIcon size={16} color="#ff9500" /> 剩余地雷
-            </span>
-            <span className="info-value">{MINES - flags}</span>
-          </div>
-          <div className="info-panel">
-            <span className="info-label">
-              <TimerIcon size={16} color="#06b6d4" /> 时间
-            </span>
-            <span className="info-value">{timer}s</span>
-          </div>
-          <div className="info-panel">
-            <span className="info-label">
-              <TrophyIcon size={16} color="#fbbf24" /> 最佳
-            </span>
-            <span className="info-value best-time">
-              {bestTime[difficulty] ? `${bestTime[difficulty]}s` : '--'}
-            </span>
-          </div>
-          <button className="reset-btn" onClick={resetGame}>
-            <RefreshIcon size={16} color="#06b6d4" /> 重置
-          </button>
-        </div>
+            {/* 操作说明 */}
+            <div className="controls-mini">
+              <div className="controls-mini-header">CONTROLS</div>
+              <div className="control-item">
+                <span className="control-icon">🖱️</span>
+                <span className="control-text">左键点击</span>
+              </div>
+              <div className="control-item">
+                <span className="control-icon">🚩</span>
+                <span className="control-text">右键插旗</span>
+              </div>
+              <div className="control-item">
+                <span className="control-icon">⚡</span>
+                <span className="control-text">双击速开</span>
+              </div>
+            </div>
+          </aside>
 
-        {/* 游戏状态 */}
-        {(gameOver || gameWon) && (
-          <div className={`game-status ${gameWon ? 'won' : 'lost'}`}>
-            {gameWon ? (
-              <>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                  <circle cx="12" cy="8" r="7" />
-                  <polyline points="8.21 13.89 7 12 5 12" />
-                  <polyline points="15.79 13.89 17 12 19 12" />
-                  <path d="M12 22v-3" />
-                  <path d="M12 16l-3 3" />
-                  <path d="M12 16l3 3" />
-                </svg>
-                恭喜获胜！
-              </>
-            ) : (
-              <>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="15" y1="9" x2="9" y2="15" />
-                  <line x1="9" y1="9" x2="15" y2="15" />
-                </svg>
-                游戏结束！
-              </>
-            )}
-          </div>
-        )}
+          {/* 中央游戏区 */}
+          <main className="news-game-area-minesweeper">
+            <div className="game-canvas-minesweeper">
+              {/* 背景网格 */}
+              <div className="bg-grid-minesweeper"></div>
+              
+              {/* 游戏网格 */}
+              <div 
+                className="minesweeper-grid" 
+                style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
+              >
+                {grid.map((cell, index) => (
+                  <div
+                    key={index}
+                    className={`mine-cell ${cell.isRevealed ? 'revealed' : ''} ${cell.isFlagged ? 'flagged' : ''} ${cell.isMine && cell.isRevealed ? 'mine' : ''}`}
+                    onClick={() => handleClick(index)}
+                    onContextMenu={(e) => handleRightClick(e, index)}
+                    onDoubleClick={() => handleDoubleClick(index)}
+                  >
+                    {cell.isFlagged && !cell.isRevealed && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2">
+                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                        <line x1="4" y1="22" x2="4" y2="15"/>
+                      </svg>
+                    )}
+                    {cell.isRevealed && !cell.isMine && cell.neighborMines > 0 && (
+                      <span 
+                        className="cell-number"
+                        style={{ color: getNumberColor(cell.neighborMines) }}
+                      >
+                        {cell.neighborMines}
+                      </span>
+                    )}
+                    {cell.isRevealed && cell.isMine && (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
+                        <circle cx="12" cy="12" r="6"/>
+                        <path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                      </svg>
+                    )}
+                  </div>
+                ))}
+              </div>
 
-        {/* 游戏网格 */}
-        <div className="minesweeper-grid" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
-          {grid.map((cell, index) => (
-            <div
-              key={index}
-              className={`mine-cell ${cell.isRevealed ? 'revealed' : ''} ${cell.isFlagged ? 'flagged' : ''} ${cell.isMine && cell.isRevealed ? 'mine' : ''}`}
-              onClick={() => handleClick(index)}
-              onContextMenu={(e) => handleRightClick(e, index)}
-              onDoubleClick={() => handleDoubleClick(index)}
-            >
-              {cell.isFlagged && !cell.isRevealed && (
-                <span className="cell-flag">
-                  <FlagIcon size={18} color="#bd00ff" />
-                </span>
-              )}
-              {cell.isRevealed && !cell.isMine && cell.neighborMines > 0 && (
-                <span 
-                  className="cell-number"
-                  style={{ color: getNumberColor(cell.neighborMines) }}
-                >
-                  {cell.neighborMines}
-                </span>
-              )}
-              {cell.isRevealed && cell.isMine && (
-                <span className="cell-mine">
-                  <MineIcon size={18} color="#ff2d2d" />
-                </span>
+              {/* 游戏结束覆盖层 */}
+              {(gameOver || gameWon) && (
+                <div className="overlay">
+                  <div className="overlay-content">
+                    {gameWon ? (
+                      <>
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2">
+                          <circle cx="12" cy="8" r="7"/>
+                          <polyline points="8.21 13.89 7 12 5 12"/>
+                          <polyline points="15.79 13.89 17 12 19 12"/>
+                          <path d="M12 22v-3"/>
+                          <path d="M12 16l-3 3"/>
+                          <path d="M12 16l3 3"/>
+                        </svg>
+                        <h2 className="result-title win">恭喜获胜!</h2>
+                        <div className="score-board">
+                          <div className="score-item">
+                            <span className="label">时间</span>
+                            <span className="value">{timer}秒</span>
+                          </div>
+                          <div className="score-item">
+                            <span className="label">难度</span>
+                            <span className="value">{DIFFICULTIES[difficulty].label}</span>
+                          </div>
+                        </div>
+                        {bestTime[difficulty] === timer && (
+                          <div className="new-record">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                            <span>新纪录!</span>
+                          </div>
+                        )}
+                        <button className="start-btn" onClick={resetGame}>再玩一次</button>
+                      </>
+                    ) : (
+                      <>
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="15" y1="9" x2="9" y2="15"/>
+                          <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                        <h2 className="result-title lose">游戏结束</h2>
+                        <div className="score-board">
+                          <div className="score-item">
+                            <span className="label">坚持时间</span>
+                            <span className="value">{timer}秒</span>
+                          </div>
+                          <div className="score-item">
+                            <span className="label">难度</span>
+                            <span className="value">{DIFFICULTIES[difficulty].label}</span>
+                          </div>
+                        </div>
+                        <button className="start-btn" onClick={resetGame}>再来一局</button>
+                      </>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
-          ))}
+          </main>
+
+          {/* 右侧边栏 */}
+          <aside className="news-sidebar-right">
+            <div className="wave-box">
+              <span className="wave-label">SIGNAL</span>
+              <div className="wave-bars">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="wave-bar"></div>
+                ))}
+              </div>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">TAPE</span>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">FUTURE</span>
+            </div>
+          </aside>
         </div>
 
-        {/* 游戏说明 */}
-        <div className="minesweeper-instructions">
-          <h3>游戏说明</h3>
-          <ul>
-            <li>左键点击揭示格子</li>
-            <li>右键点击插旗标记地雷</li>
-            <li>数字表示周围 8 格的地雷数量</li>
-            <li>找出所有非地雷格子即可获胜</li>
-          </ul>
-          
-          <div className="pro-tips">
-            <h4>高级技巧</h4>
-            <ul>
-              <li>双击已揭示的数字可快速揭示周围格子（当周围旗帜数等于数字时）</li>
-              <li>从角落开始扫雷通常更安全</li>
-              <li>记住常见模式：1-1 模式、1-2 模式等</li>
-              <li>不要犹豫，逻辑推理可以解决所有局面</li>
-            </ul>
-          </div>
+        {/* 报尾 */}
+        <div className="newspaper-footer">
+          <span>MINESWEEPER © 2024</span>
+          <span>◆</span>
+          <span>TAPE FUTURISM</span>
+          <span>◆</span>
+          <span>CLASSIC PUZZLE</span>
         </div>
       </div>
     </div>

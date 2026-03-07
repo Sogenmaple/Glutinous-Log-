@@ -1,423 +1,631 @@
 /* ============================================
-   扫雷游戏 - MINESWEEPER
+   扫雷 - 报纸风格 + 磁带未来风
+   铺满屏幕 + 风格化统一
    ============================================ */
 
 .minesweeper-page {
   min-height: 100vh;
-  background: var(--bg-deep);
-  padding-top: 100px;
+  position: relative;
+  padding-top: 80px;
+  background: #050505;
+  overflow-x: hidden;
 }
 
-.minesweeper-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
+.tape-bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(255, 255, 255, 0.04) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* 标题区域 */
-.minesweeper-header {
-  text-align: center;
-  margin-bottom: 2rem;
+.tape-grid {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
 }
 
-.minesweeper-title {
+.tape-scanlines {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ========== 报纸布局 ========== */
+.minesweeper-newspaper {
+  position: relative;
+  z-index: 1;
   display: flex;
+  flex-direction: column;
+  height: calc(100vh - 80px);
+  margin: 0;
+  padding: 0;
+}
+
+/* 报头 */
+.newspaper-header {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
   align-items: center;
-  justify-content: center;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
   gap: 1rem;
-  margin-bottom: 0.5rem;
-  animation: slide-up 1s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.title-icon {
+.header-date {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  filter: drop-shadow(0 0 15px currentColor);
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.title-text {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 3rem);
-  font-weight: 900;
-  color: var(--amber);
-  text-shadow: var(--amber-glow-strong);
-  letter-spacing: 0.08em;
-}
-
-.minesweeper-subtitle {
+.header-date .date {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--cyan);
-  text-shadow: var(--cyan-glow);
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  opacity: 0.9;
+  font-size: 0.7rem;
+  color: #888;
+  letter-spacing: 0.1em;
+}
+
+.header-date .issue {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  color: #666;
+  letter-spacing: 0.2em;
+}
+
+.header-title {
+  text-align: center;
+}
+
+.header-title h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #f87171;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(248, 117, 102, 0.5);
+}
+
+.header-title .subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #666;
+  letter-spacing: 0.15em;
+  margin: 0.25rem 0 0 0;
+}
+
+.header-status {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.status-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  letter-spacing: 0.1em;
+}
+
+.status-badge.ready {
+  color: #22d3ee;
+  background: rgba(34, 211, 238, 0.1);
+}
+
+.status-badge.active {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-badge.success {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.status-badge.danger {
+  color: #f87171;
+  background: rgba(248, 117, 102, 0.1);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
+  50% { opacity: 0.7; box-shadow: 0 0 20px rgba(251, 191, 36, 0.6); }
+}
+
+/* 主内容区 */
+.newspaper-content {
+  display: grid;
+  grid-template-columns: 220px 1fr 160px;
+  gap: 1rem;
+  padding: 1rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 左侧边栏 */
+.news-sidebar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  height: 100%;
 }
 
 /* 难度选择 */
-.difficulty-selector {
+.difficulty-box {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.box-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #666;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.difficulty-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .difficulty-btn {
-  padding: 0.5rem 1.5rem;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,149,0,0.2);
-  border-radius: 6px;
+  font-size: 0.7rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  color: #888;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
+  text-align: center;
 }
 
 .difficulty-btn:hover {
-  background: rgba(255,149,0,0.1);
-  border-color: var(--amber);
-  color: var(--amber);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .difficulty-btn.active {
-  background: rgba(255,149,0,0.2);
-  border-color: var(--amber);
-  color: var(--amber);
-  box-shadow: 0 0 20px rgba(255,149,0,0.4);
+  background: rgba(248, 117, 102, 0.2);
+  border-color: #f87171;
+  color: #f87171;
+  font-weight: 700;
 }
 
-/* 游戏信息栏 */
-.minesweeper-info {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,149,0,0.15);
-  border-radius: 8px;
-  flex-wrap: wrap;
-}
-
-.info-panel {
+/* 信息框 */
+.info-boxes {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
+  gap: 0.5rem;
+}
+
+.info-box {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
 }
 
 .info-label {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-size: 0.6rem;
+  color: #666;
   letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
 }
 
 .info-value {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--amber);
-  text-shadow: 0 0 10px rgba(255,149,0,0.5);
-}
-
-.info-value.best-time {
-  color: var(--cyan);
-  text-shadow: 0 0 10px rgba(6,182,255,0.5);
-}
-
-.reset-btn {
-  padding: 0.75rem 1.5rem;
   font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: var(--cyan);
-  background: rgba(6,182,212,0.1);
-  border: 1px solid var(--cyan);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.reset-btn:hover {
-  background: rgba(6,182,212,0.2);
-  box-shadow: 0 0 20px rgba(6,182,212,0.4);
-  transform: translateY(-2px);
-}
-
-/* 游戏状态 */
-.game-status {
-  text-align: center;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  border-radius: 8px;
-  font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  animation: slide-up 0.5s ease-out;
+  color: #fbbf24;
 }
 
-.game-status.won {
-  background: rgba(57,255,20,0.1);
-  border: 2px solid var(--green);
-  color: var(--green);
-  text-shadow: 0 0 20px rgba(57,255,20,0.6);
+.info-value.highlight {
+  color: #f87171;
+  text-shadow: 0 0 10px rgba(248, 117, 102, 0.5);
 }
 
-.game-status.lost {
-  background: rgba(255,45,45,0.1);
-  border: 2px solid var(--red);
-  color: var(--red);
-  text-shadow: 0 0 20px rgba(255,45,45,0.6);
+.info-value.best {
+  color: #4ade80;
+  text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+}
+
+/* 重置按钮 */
+.reset-btn-newspaper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(248, 117, 102, 0.15);
+  border: 1px solid rgba(248, 117, 102, 0.3);
+  border-radius: 4px;
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reset-btn-newspaper:hover {
+  background: rgba(248, 117, 102, 0.25);
+  transform: translateY(-1px);
+}
+
+/* 操作说明 */
+.controls-mini {
+  margin-top: auto;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.controls-mini-header {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: #666;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #888;
+}
+
+.control-icon {
+  font-size: 0.9rem;
+}
+
+/* 中央游戏区 */
+.news-game-area-minesweeper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.game-canvas-minesweeper {
+  position: relative;
+  background: rgba(10, 10, 10, 0.8);
+  border: 2px solid rgba(248, 117, 102, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(248, 117, 102, 0.15);
+  max-height: calc(100vh - 280px);
+  overflow: auto;
+}
+
+.bg-grid-minesweeper {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(248, 117, 102, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(248, 117, 102, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
 }
 
 /* 游戏网格 */
 .minesweeper-grid {
   display: grid;
-  gap: 2px;
-  background: rgba(255,149,0,0.1);
-  padding: 4px;
-  border-radius: 8px;
-  border: 2px solid rgba(255,149,0,0.3);
-  margin-bottom: 2rem;
-  box-shadow: 0 0 30px rgba(255,149,0,0.1);
+  gap: 1px;
+  background: rgba(248, 117, 102, 0.2);
+  position: relative;
+  z-index: 10;
 }
 
 /* 格子样式 */
 .mine-cell {
-  aspect-ratio: 1;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,149,0,0.2);
-  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1.2rem;
-  font-weight: 700;
+  transition: all 0.1s;
   user-select: none;
 }
 
 .mine-cell:hover:not(.revealed):not(.flagged) {
-  background: rgba(255,149,0,0.15);
-  border-color: var(--amber);
-  box-shadow: 0 0 15px rgba(255,149,0,0.3);
-  transform: scale(1.05);
+  background: rgba(248, 117, 102, 0.15);
+  border-color: rgba(248, 117, 102, 0.4);
 }
 
 .mine-cell.revealed {
-  background: rgba(255,255,255,0.02);
-  border-color: rgba(255,149,0,0.1);
-  cursor: default;
+  background: rgba(0, 0, 0, 0.5);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 .mine-cell.flagged {
-  background: rgba(189,0,255,0.1);
-  border-color: var(--purple);
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
 }
 
 .mine-cell.mine {
-  background: rgba(255,45,45,0.3);
-  border-color: var(--red);
-  animation: mine-explode 0.5s ease-out;
+  background: rgba(248, 117, 102, 0.3);
+  border-color: rgba(248, 117, 102, 0.5);
 }
 
-@keyframes mine-explode {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-/* 格子内容 */
-.cell-flag {
-  font-size: 1.2rem;
-  animation: flag-place 0.3s ease-out;
-}
-
-@keyframes flag-place {
-  0% { transform: scale(0) rotate(-180deg); }
-  100% { transform: scale(1) rotate(0deg); }
-}
-
+/* 数字样式 */
 .cell-number {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 900;
-  text-shadow: 0 0 10px currentColor;
-}
-
-.cell-mine {
-  font-size: 1.3rem;
-  animation: mine-pulse 1s ease-in-out infinite;
-}
-
-@keyframes mine-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
-/* 游戏说明 */
-.minesweeper-instructions {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(6,182,212,0.2);
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-top: 2rem;
-  animation: slide-up 0.6s ease-out;
-}
-
-.minesweeper-instructions h3 {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  color: var(--cyan);
-  margin-bottom: 1rem;
-  text-shadow: 0 0 10px rgba(6,182,255,0.4);
-}
-
-.minesweeper-instructions ul {
-  list-style: none;
-  padding: 0;
-}
-
-.minesweeper-instructions li {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255,149,0,0.1);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-shadow: 0 0 5px currentColor;
+}
+
+/* 覆盖层 */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  backdrop-filter: blur(4px);
+}
+
+.overlay-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.overlay-content h2 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.result-title.win {
+  color: #4ade80;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+}
+
+.result-title.lose {
+  color: #f87171;
+  text-shadow: 0 0 20px rgba(248, 117, 102, 0.5);
+}
+
+.score-board {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.score-item .label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #666;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
+}
+
+.score-item .value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.new-record {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.minesweeper-instructions li:hover {
-  color: var(--amber);
-  padding-left: 0.5rem;
-}
-
-.minesweeper-instructions li:last-child {
-  border-bottom: none;
-}
-
-.minesweeper-instructions li::before {
-  content: '▸';
-  color: var(--amber);
-  font-size: 1.2rem;
-  transition: transform 0.3s ease;
-}
-
-.minesweeper-instructions li:hover::before {
-  transform: translateX(5px);
-}
-
-/* 高级技巧提示 */
-.pro-tips {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(6,182,212,0.2);
-}
-
-.pro-tips h4 {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  color: var(--amber);
-  margin-bottom: 0.75rem;
-  text-shadow: 0 0 10px rgba(255,149,0,0.4);
-}
-
-.pro-tips ul {
-  list-style: none;
-  padding: 0;
-}
-
-.pro-tips li {
+  justify-content: center;
+  color: #fbbf24;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  padding: 0.4rem 0;
-  border-bottom: none;
+  font-size: 0.8rem;
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 4px;
+}
+
+.start-btn {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #000;
+  background: #f87171;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(248, 117, 102, 0.4);
+}
+
+.start-btn:hover {
+  background: #ef4444;
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(248, 117, 102, 0.6);
+}
+
+/* 右侧边栏 */
+.news-sidebar-right {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  height: 100%;
+}
+
+.wave-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.wave-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: #666;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+}
+
+.wave-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 60px;
+  justify-content: center;
+}
+
+.wave-bar {
+  width: 6px;
+  background: linear-gradient(to top, #22d3ee, #f87171);
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+.wave-bar:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { height: 50px; animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { height: 60px; animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { height: 50px; animation-delay: 0.4s; }
+.wave-bar:nth-child(6) { height: 35px; animation-delay: 0.5s; }
+.wave-bar:nth-child(7) { height: 20px; animation-delay: 0.6s; }
+.wave-bar:nth-child(8) { height: 15px; animation-delay: 0.7s; }
+
+@keyframes wave {
+  0%, 100% { 
+    opacity: 0.5; 
+    transform: scaleY(0.5);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scaleY(1.2);
+  }
+}
+
+.deco-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
   gap: 0.5rem;
 }
 
-.pro-tips li::before {
-  content: '▸';
-  color: var(--amber);
-  font-size: 1.2rem;
+.deco-circle {
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  position: relative;
 }
 
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .minesweeper-container {
-    padding: 1rem;
-  }
-
-  .minesweeper-grid {
-    gap: 1px;
-    padding: 2px;
-    overflow-x: auto;
-  }
-
-  .mine-cell {
-    border-radius: 2px;
-    font-size: 0.9rem;
-    min-width: 20px;
-  }
-
-  .cell-flag,
-  .cell-mine {
-    font-size: 0.9rem;
-  }
-
-  .cell-number {
-    font-size: 1rem;
-  }
-
-  .minesweeper-info {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .difficulty-selector {
-    flex-wrap: wrap;
-  }
-
-  .difficulty-btn {
-    padding: 0.4rem 1rem;
-    font-size: 0.8rem;
-  }
-}
-
-/* 困难模式超宽网格 */
-@media (max-width: 1024px) {
-  .minesweeper-grid[style*="30"] {
-    overflow-x: auto;
-    max-width: 100%;
-  }
-}
-
-/* 粒子效果 - 胜利庆祝 */
-.confetti {
-  position: fixed;
+.deco-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 8px;
   height: 8px;
-  pointer-events: none;
-  z-index: 9999;
-  animation: confetti-fall 3s ease-out forwards;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
 }
 
-@keyframes confetti-fall {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 1;
+.deco-text {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: #666;
+  letter-spacing: 0.2em;
+}
+
+/* 报尾 */
+.newspaper-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #666;
+  letter-spacing: 0.1em;
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .newspaper-content {
+    grid-template-columns: 1fr;
   }
-  100% {
-    transform: translateY(100vh) rotate(720deg);
-    opacity: 0;
+  
+  .news-sidebar-left,
+  .news-sidebar-right {
+    display: none;
+  }
+  
+  .news-game-area-minesweeper {
+    padding: 0.5rem;
   }
 }

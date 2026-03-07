@@ -29,16 +29,6 @@ export default function SpecialConstructs() {
       status: 'active'
     },
     {
-      id: 'minesweeper',
-      title: '扫雷游戏',
-      subtitle: 'MINESWEEPER',
-      description: '经典益智扫雷游戏，找出所有非地雷格子',
-      icon: BombIcon,
-      color: 'amber',
-      path: '/special/minesweeper',
-      status: 'active'
-    },
-    {
       id: 'calculator',
       title: '科学计算器',
       subtitle: 'CALCULATOR',

@@ -1,0 +1,195 @@
+/* 圆形时钟 Logo */
+.clock-logo {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 2rem;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 外环 */
+.clock-outer-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 149, 0, 0.3);
+  animation: clock-ring-rotate 30s linear infinite;
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.2);
+}
+
+@keyframes clock-ring-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 中环 */
+.clock-middle-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 149, 0, 0.5);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  animation: clock-ring-pulse 4s ease-in-out infinite;
+}
+
+@keyframes clock-ring-pulse {
+  0%, 100% { 
+    transform: rotate(0deg) scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: rotate(180deg) scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* 表盘背景 */
+.clock-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 149, 0, 0.1) 0%,
+    rgba(13, 13, 24, 0.8) 100%
+  );
+  border: 2px solid rgba(255, 149, 0, 0.4);
+  box-shadow: 
+    inset 0 0 30px rgba(255, 149, 0, 0.15),
+    0 0 20px rgba(255, 149, 0, 0.2);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+/* 刻度 */
+.clock-tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center center;
+  border-radius: 2px;
+}
+
+.clock-tick.major {
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(180deg, #ff9500 0%, rgba(255, 149, 0, 0.3) 100%);
+  box-shadow: 0 0 8px rgba(255, 149, 0, 0.5);
+  margin-left: -2px;
+  margin-top: -8px;
+}
+
+.clock-tick.minor {
+  width: 2px;
+  height: 8px;
+  background: rgba(255, 149, 0, 0.5);
+  margin-left: -1px;
+  margin-top: -4px;
+}
+
+/* 指针基座 */
+.clock-hand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center center;
+  z-index: 10;
+}
+
+/* 时针 */
+.hour-hand .hand-body {
+  width: 6px;
+  height: 50px;
+  background: linear-gradient(180deg, #ff9500 0%, #ffaa33 100%);
+  border-radius: 3px;
+  margin-left: -3px;
+  margin-top: -50px;
+  box-shadow: 0 0 10px rgba(255, 149, 0, 0.6);
+}
+
+/* 分针 */
+.minute-hand .hand-body {
+  width: 4px;
+  height: 70px;
+  background: linear-gradient(180deg, #ffaa33 0%, #ff9500 100%);
+  border-radius: 2px;
+  margin-left: -2px;
+  margin-top: -70px;
+  box-shadow: 0 0 8px rgba(255, 149, 0, 0.5);
+}
+
+/* 秒针 */
+.second-hand {
+  z-index: 20;
+}
+
+.second-hand .hand-body {
+  width: 2px;
+  height: 80px;
+  background: linear-gradient(180deg, #ff453a 0%, #ff9500 100%);
+  margin-left: -1px;
+  margin-top: -80px;
+  box-shadow: 0 0 6px rgba(255, 69, 58, 0.8);
+}
+
+.second-hand .hand-tail {
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background: rgba(255, 149, 0, 0.5);
+  margin-left: -1px;
+  margin-top: 0;
+}
+
+/* 中心点 */
+.clock-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #ff9500 100%);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(255, 149, 0, 0.8);
+  z-index: 30;
+}
+
+/* 装饰光环 */
+.clock-glow {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 149, 0, 0.2) 0%,
+    transparent 60%
+  );
+  animation: clock-glow-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes clock-glow-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* 滴答动画 */
+@keyframes tick-animation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 响应式缩放 */
+@media (max-width: 768px) {
+  .clock-logo {
+    transform: scale(0.8);
+  }
+}

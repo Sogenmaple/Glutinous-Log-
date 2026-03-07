@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GameIcon, BookIcon, UserIcon, TangyuanIcon, ToolIcon } from '../components/icons/SiteIcons'
 import Header from '../components/Header'
+import ClockLogo from '../components/ClockLogo'
+import '../styles/ClockLogo.css'
 
 /**
  * 汤圆的小窝 - 主导航页面
@@ -69,11 +71,7 @@ export default function Home() {
 
       {/* 主标题区域 */}
       <div className={`home-header ${mounted ? 'visible' : ''}`}>
-        <div className="home-avatar">
-          <TangyuanIcon size={80} color="#ff9500" />
-          <div className="avatar-ring"></div>
-          <div className="avatar-ring ring-outer"></div>
-        </div>
+        <ClockLogo size={200} />
         <h1 className="home-title">汤圆的小窝</h1>
         <p className="home-subtitle">TANGYUAN'S CREATIVE CORNER</p>
         <div className="home-divider"></div>

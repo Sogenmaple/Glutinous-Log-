@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Header from '../components/Header'
-import Footer from '../components/Footer'
 import '../styles/Pacman.css'
 
 const COLS = 19
 const ROWS = 21
-const CELL_SIZE = 20
+const CELL_SIZE = 24
 
 // 地图：0=空地，1=墙，2=豆子，3=能量豆
 const INITIAL_MAP = [
@@ -103,172 +102,165 @@ export default function Pacman() {
     setParticles([])
     setPowerMode(false)
     setPowerTimer(0)
+  }
+
+  const startGame = () => {
+    resetGame()
     setGameState('playing')
   }
 
-  const resetPositions = () => {
-    setPacman({ x: 9, y: 15, direction: DIRECTION.RIGHT, nextDirection: DIRECTION.RIGHT })
-    setGhosts([
-      { x: 9, y: 8, color: GHOST_COLORS[0], direction: DIRECTION.UP, scared: false },
-      { x: 8, y: 10, color: GHOST_COLORS[1], direction: DIRECTION.UP, scared: false },
-      { x: 10, y: 10, color: GHOST_COLORS[2], direction: DIRECTION.UP, scared: false },
-      { x: 9, y: 10, color: GHOST_COLORS[3], direction: DIRECTION.UP, scared: false }
-    ])
-    setPowerMode(false)
-    setPowerTimer(0)
-  }
+  const handleKeyDown = useCallback((e) => {
+    if (gameState !== 'playing') {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        startGame()
+      }
+      return
+    }
+    
+    let newDir = null
+    if (e.key === 'ArrowUp' || e.key === 'w') newDir = DIRECTION.UP
+    if (e.key === 'ArrowDown' || e.key === 's') newDir = DIRECTION.DOWN
+    if (e.key === 'ArrowLeft' || e.key === 'a') newDir = DIRECTION.LEFT
+    if (e.key === 'ArrowRight' || e.key === 'd') newDir = DIRECTION.RIGHT
+    
+    if (newDir) {
+      e.preventDefault()
+      setPacman(prev => ({ ...prev, nextDirection: newDir }))
+    }
+  }, [gameState])
 
-  const canMove = useCallback((x, y, currentMap) => {
-    if (x < 0 || x >= COLS || y < 0 || y >= ROWS) return false
-    return currentMap[y] && currentMap[y][x] !== 1
-  }, [])
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
 
-  const movePacman = useCallback(() => {
-    setPacman(prev => {
-      let newDirection = prev.direction
-      if (canChangeDirection.current && prev.nextDirection !== DIRECTION.NONE) {
-        const nextX = prev.x + prev.nextDirection.x
-        const nextY = prev.y + prev.nextDirection.y
-        if (canMove(nextX, nextY, map)) {
-          newDirection = prev.nextDirection
+  // 吃豆人移动
+  useEffect(() => {
+    if (gameState !== 'playing') return
+
+    const movePacman = () => {
+      setPacman(prev => {
+        // 尝试改变方向
+        if (prev.nextDirection !== prev.direction) {
+          const nextX = prev.x + prev.nextDirection.x
+          const nextY = prev.y + prev.nextDirection.y
+          if (nextY >= 0 && nextY < ROWS && nextX >= 0 && nextX < COLS) {
+            const nextCell = map[nextY]?.[nextX]
+            if (nextCell !== 1) {
+              return { ...prev, direction: prev.nextDirection }
+            }
+          }
         }
-      }
 
-      const newX = prev.x + newDirection.x
-      const newY = prev.y + newDirection.y
-
-      if (canMove(newX, newY, map)) {
+        // 按当前方向移动
+        const newX = prev.x + prev.direction.x
+        const newY = prev.y + prev.direction.y
+        
         // 隧道效果
-        let finalX = newX
-        if (finalX < 0) finalX = COLS - 1
-        if (finalX >= COLS) finalX = 0
+        if (newX < 0) return { ...prev, x: COLS - 1 }
+        if (newX >= COLS) return { ...prev, x: 0 }
+        
+        // 检查碰撞
+        if (newY >= 0 && newY < ROWS && newX >= 0 && newX < COLS) {
+          const nextCell = map[newY]?.[newX]
+          if (nextCell !== 1) {
+            let newPacman = { ...prev, x: newX, y: newY }
+            
+            // 吃豆子
+            if (nextCell === 2) {
+              setScore(s => s + 10)
+              setMap(m => {
+                const newMap = [...m]
+                newMap[newY] = [...newMap[newY]]
+                newMap[newY][newX] = 0
+                return newMap
+              })
+              createParticles(newX, newY, '#fbbf24')
+            }
+            // 吃能量豆
+            else if (nextCell === 3) {
+              setScore(s => s + 50)
+              setMap(m => {
+                const newMap = [...m]
+                newMap[newY] = [...newMap[newY]]
+                newMap[newY][newX] = 0
+                return newMap
+              })
+              setPowerMode(true)
+              setPowerTimer(50)
+              setGhosts(gs => gs.map(g => ({ ...g, scared: true })))
+              createParticles(newX, newY, '#3b82f6')
+            }
+            
+            return newPacman
+          }
+        }
+        return prev
+      })
+    }
 
-        return { ...prev, x: finalX, y: newY, direction: newDirection }
-      }
-      return prev
-    })
-    canChangeDirection.current = true
-  }, [map, canMove])
+    gameLoopRef.current = setInterval(movePacman, 150)
+    return () => clearInterval(gameLoopRef.current)
+  }, [gameState, map])
 
-  const moveGhosts = useCallback(() => {
-    setGhosts(prevGhosts => {
-      return prevGhosts.map(ghost => {
+  // 幽灵移动
+  useEffect(() => {
+    if (gameState !== 'playing') return
+
+    const moveGhosts = () => {
+      setGhosts(prevGhosts => prevGhosts.map(ghost => {
         const directions = [DIRECTION.UP, DIRECTION.DOWN, DIRECTION.LEFT, DIRECTION.RIGHT]
-        const validDirections = directions.filter(dir => {
+        const validMoves = directions.filter(dir => {
           const newX = ghost.x + dir.x
           const newY = ghost.y + dir.y
-          return canMove(newX, newY, map) && !(dir.x === -ghost.direction.x && dir.y === -ghost.direction.y)
+          if (newY < 0 || newY >= ROWS || newX < 0 || newX >= COLS) return false
+          if (map[newY]?.[newX] === 1) return false
+          // 不允许掉头
+          if (dir.x === -ghost.direction.x && dir.y === -ghost.direction.y) return false
+          return true
         })
 
         let newDirection = ghost.direction
-        if (validDirections.length > 0) {
-          // 简单 AI：随机选择方向
-          newDirection = validDirections[Math.floor(Math.random() * validDirections.length)]
-        }
-
-        const newX = ghost.x + newDirection.x
-        const newY = ghost.y + newDirection.y
-        let finalX = newX
-        if (finalX < 0) finalX = COLS - 1
-        if (finalX >= COLS) finalX = 0
-
-        if (canMove(finalX, newY, map)) {
-          return { ...ghost, x: finalX, y: newY, direction: newDirection }
-        }
-        return ghost
-      })
-    })
-  }, [map, canMove])
-
-  // 吃豆子和碰撞检测
-  useEffect(() => {
-    if (gameState !== 'playing') return
-
-    // 吃豆子
-    if (map[pacman.y] && map[pacman.y][pacman.x] === 2) {
-      setMap(prev => {
-        const newMap = prev.map(row => [...row])
-        newMap[pacman.y][pacman.x] = 0
-        return newMap
-      })
-      setScore(prev => prev + 10)
-      createParticles(pacman.x, pacman.y, '#fbbf24')
-    }
-
-    // 吃能量豆
-    if (map[pacman.y] && map[pacman.y][pacman.x] === 3) {
-      setMap(prev => {
-        const newMap = prev.map(row => [...row])
-        newMap[pacman.y][pacman.x] = 0
-        return newMap
-      })
-      setScore(prev => prev + 50)
-      setPowerMode(true)
-      setPowerTimer(300)
-      setGhosts(prev => prev.map(g => ({ ...g, scared: true })))
-      createParticles(pacman.x, pacman.y, '#06b6d4')
-    }
-
-    // 检查是否吃完所有豆子
-    const remainingDots = map.flat().filter(cell => cell === 2 || cell === 3).length
-    if (remainingDots === 0) {
-      setLevel(prev => prev + 1)
-      resetPositions()
-      setMap(initMap())
-    }
-
-    // 幽灵碰撞检测
-    const hitGhost = ghosts.find(g => Math.abs(g.x - pacman.x) < 1 && Math.abs(g.y - pacman.y) < 1)
-    if (hitGhost) {
-      if (hitGhost.scared) {
-        // 吃掉幽灵
-        setScore(prev => prev + 200)
-        createParticles(hitGhost.x, hitGhost.y, hitGhost.color)
-        setGhosts(prev => prev.map(g => 
-          g === hitGhost ? { ...g, x: 9, y: 10, scared: false } : g
-        ))
-      } else {
-        // 被幽灵抓到
-        setLives(prev => {
-          const newLives = prev - 1
-          if (newLives <= 0) {
-            setGameState('gameover')
-            if (score > highScore) {
-              setHighScore(score)
-              localStorage.setItem('pacmanHighScore', score.toString())
-            }
+        if (validMoves.length > 0) {
+          // 简单 AI：随机选择有效方向
+          if (ghost.scared) {
+            // 恐惧模式：远离吃豆人
+            const safeMoves = validMoves.filter(dir => {
+              const dist = Math.abs((ghost.x + dir.x) - pacman.x) + Math.abs((ghost.y + dir.y) - pacman.y)
+              return dist > 2
+            })
+            newDirection = safeMoves.length > 0 
+              ? safeMoves[Math.floor(Math.random() * safeMoves.length)]
+              : validMoves[Math.floor(Math.random() * validMoves.length)]
           } else {
-            resetPositions()
+            // 正常模式：有一定概率追踪吃豆人
+            if (Math.random() < 0.4) {
+              const trackingMoves = validMoves.filter(dir => {
+                const oldDist = Math.abs(ghost.x - pacman.x) + Math.abs(ghost.y - pacman.y)
+                const newDist = Math.abs((ghost.x + dir.x) - pacman.x) + Math.abs((ghost.y + dir.y) - pacman.y)
+                return newDist < oldDist
+              })
+              newDirection = trackingMoves.length > 0
+                ? trackingMoves[Math.floor(Math.random() * trackingMoves.length)]
+                : validMoves[Math.floor(Math.random() * validMoves.length)]
+            } else {
+              newDirection = validMoves[Math.floor(Math.random() * validMoves.length)]
+            }
           }
-          return newLives
-        })
-      }
+        }
+
+        return {
+          ...ghost,
+          x: ghost.x + newDirection.x,
+          y: ghost.y + newDirection.y,
+          direction: newDirection
+        }
+      }))
     }
-  }, [pacman, ghosts, map, gameState, score, highScore, initMap])
 
-  // 游戏主循环
-  useEffect(() => {
-    if (gameState !== 'playing') return
-
-    const speed = Math.max(100, 200 - level * 15)
-    gameLoopRef.current = setInterval(movePacman, speed)
-
-    return () => {
-      if (gameLoopRef.current) clearInterval(gameLoopRef.current)
-    }
-  }, [gameState, level, movePacman])
-
-  // 幽灵移动循环
-  useEffect(() => {
-    if (gameState !== 'playing') return
-
-    const ghostSpeed = Math.max(150, 250 - level * 20)
-    ghostLoopRef.current = setInterval(moveGhosts, ghostSpeed)
-
-    return () => {
-      if (ghostLoopRef.current) clearInterval(ghostLoopRef.current)
-    }
-  }, [gameState, level, moveGhosts])
+    ghostLoopRef.current = setInterval(moveGhosts, 200)
+    return () => clearInterval(ghostLoopRef.current)
+  }, [gameState, map, pacman.x, pacman.y])
 
   // 能量模式计时器
   useEffect(() => {
@@ -278,7 +270,7 @@ export default function Pacman() {
       setPowerTimer(prev => {
         if (prev <= 1) {
           setPowerMode(false)
-          setGhosts(g => g.map(ghost => ({ ...ghost, scared: false })))
+          setGhosts(gs => gs.map(g => ({ ...g, scared: false })))
           return 0
         }
         return prev - 1
@@ -288,292 +280,349 @@ export default function Pacman() {
     return () => clearInterval(timer)
   }, [powerMode, gameState])
 
-  // 嘴巴动画
+  // 碰撞检测
   useEffect(() => {
     if (gameState !== 'playing') return
-    const mouthInterval = setInterval(() => {
-      setMouthOpen(prev => !prev)
-    }, 100)
-    return () => clearInterval(mouthInterval)
-  }, [gameState])
+
+    const collision = ghosts.find(ghost => 
+      Math.abs(ghost.x - pacman.x) < 1 && Math.abs(ghost.y - pacman.y) < 1
+    )
+
+    if (collision) {
+      if (powerMode) {
+        // 吃幽灵
+        setScore(s => s + 200)
+        createParticles(collision.x, collision.y, collision.color)
+        setGhosts(gs => gs.map(g => 
+          g === collision ? { ...g, x: 9, y: 10, scared: false } : g
+        ))
+      } else {
+        // 被幽灵抓到
+        setLives(prev => {
+          if (prev <= 1) {
+            setGameState('gameover')
+            if (score > highScore) {
+              setHighScore(score)
+              localStorage.setItem('pacmanHighScore', String(score))
+            }
+            return 0
+          }
+          // 重置位置
+          setPacman({ x: 9, y: 15, direction: DIRECTION.RIGHT, nextDirection: DIRECTION.RIGHT })
+          setGhosts([
+            { x: 9, y: 8, color: GHOST_COLORS[0], direction: DIRECTION.UP, scared: false },
+            { x: 8, y: 10, color: GHOST_COLORS[1], direction: DIRECTION.UP, scared: false },
+            { x: 10, y: 10, color: GHOST_COLORS[2], direction: DIRECTION.UP, scared: false },
+            { x: 9, y: 10, color: GHOST_COLORS[3], direction: DIRECTION.UP, scared: false }
+          ])
+          return prev - 1
+        })
+      }
+    }
+  }, [pacman.x, pacman.y, ghosts, powerMode, gameState, score, highScore])
+
+  // 检查胜利
+  useEffect(() => {
+    if (gameState !== 'playing') return
+
+    const remainingDots = map.flat().filter(cell => cell === 2 || cell === 3).length
+    if (remainingDots === 0) {
+      setLevel(l => l + 1)
+      setMap(initMap())
+      setPacman({ x: 9, y: 15, direction: DIRECTION.RIGHT, nextDirection: DIRECTION.RIGHT })
+      setGhosts([
+        { x: 9, y: 8, color: GHOST_COLORS[0], direction: DIRECTION.UP, scared: false },
+        { x: 8, y: 10, color: GHOST_COLORS[1], direction: DIRECTION.UP, scared: false },
+        { x: 10, y: 10, color: GHOST_COLORS[2], direction: DIRECTION.UP, scared: false },
+        { x: 9, y: 10, color: GHOST_COLORS[3], direction: DIRECTION.UP, scared: false }
+      ])
+    }
+  }, [map, gameState, initMap])
 
   // 粒子动画
   useEffect(() => {
     if (particles.length === 0) return
-    const particleInterval = setInterval(() => {
-      setParticles(prev =>
-        prev
-          .map(p => ({
-            ...p,
-            x: p.x + p.vx,
-            y: p.y + p.vy,
-            vy: p.vy + 0.2,
-            life: p.life - 0.05
-          }))
-          .filter(p => p.life > 0)
+
+    const updateParticles = setInterval(() => {
+      setParticles(prev => prev
+        .map(p => ({
+          ...p,
+          x: p.x + p.vx,
+          y: p.y + p.vy,
+          vy: p.vy + 0.1,
+          life: p.life - 0.05
+        }))
+        .filter(p => p.life > 0)
       )
-    }, 30)
-    return () => clearInterval(particleInterval)
-  }, [particles])
+    }, 50)
 
-  // 键盘控制
+    return () => clearInterval(updateParticles)
+  }, [particles.length])
+
+  // 嘴巴动画
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
-        e.preventDefault()
-        if (gameState === 'playing') {
-          setGameState('paused')
-        } else if (gameState === 'paused') {
-          setGameState('playing')
-        }
-        return
-      }
-
-      if (gameState !== 'playing') return
-
-      let newDirection = null
-      switch (e.key) {
-        case 'ArrowUp': case 'w': case 'W': newDirection = DIRECTION.UP; break
-        case 'ArrowDown': case 's': case 'S': newDirection = DIRECTION.DOWN; break
-        case 'ArrowLeft': case 'a': case 'A': newDirection = DIRECTION.LEFT; break
-        case 'ArrowRight': case 'd': case 'D': newDirection = DIRECTION.RIGHT; break
-        default: return
-      }
-
-      if (newDirection) {
-        setPacman(prev => ({ ...prev, nextDirection: newDirection }))
-        canChangeDirection.current = false
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    if (gameState !== 'playing') return
+    const interval = setInterval(() => setMouthOpen(prev => !prev), 100)
+    return () => clearInterval(interval)
   }, [gameState])
 
   return (
-    <>
+    <div className="pacman-page">
       <Header />
-      <main className="pacman-page-main">
-        <div className="pacman-game-container">
-          <div className="pacman-game-wrapper">
-            {/* 游戏头部 */}
-            <div className="game-header">
-              <div className="game-title">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                  <circle cx="12" cy="12" r="10" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2"/>
-                  <path d="M12 12 L20 8 L20 16 Z" fill="#0f172a"/>
-                </svg>
-                <span>吃豆人</span>
-              </div>
-              <div className="game-stats">
-                <div className="stat">
-                  <span className="stat-label">得分</span>
-                  <span className="stat-value">{score}</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-label">最佳</span>
-                  <span className="stat-value">{highScore}</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-label">生命</span>
-                  <span className="stat-value">{lives}</span>
-                </div>
-                <div className="stat">
-                  <span className="stat-label">关卡</span>
-                  <span className="stat-value">{level}</span>
-                </div>
-              </div>
-            </div>
+      
+      <div className="tape-bg"></div>
+      <div className="tape-grid"></div>
+      <div className="tape-scanlines"></div>
 
-            {/* 游戏画布 */}
-            <div className="pacman-canvas-wrapper">
-              <div className="pacman-canvas" style={{ width: COLS * CELL_SIZE, height: ROWS * CELL_SIZE }}>
-                {/* 地图渲染 */}
-                {map.map((row, y) =>
-                  row.map((cell, x) => (
-                    <div
-                      key={`${x}-${y}`}
-                      className={`pacman-cell ${cell === 1 ? 'wall' : cell === 2 ? 'dot' : cell === 3 ? 'power-dot' : ''}`}
-                      style={{ left: x * CELL_SIZE, top: y * CELL_SIZE }}
-                    />
-                  ))
-                )}
-
-                {/* 吃豆人 */}
-                {gameState !== 'gameover' && (
-                  <div
-                    className="pacman-entity"
-                    style={{
-                      left: pacman.x * CELL_SIZE,
-                      top: pacman.y * CELL_SIZE,
-                      width: CELL_SIZE,
-                      height: CELL_SIZE,
-                      transform: `rotate(${
-                        pacman.direction === DIRECTION.RIGHT ? 0 :
-                        pacman.direction === DIRECTION.DOWN ? 90 :
-                        pacman.direction === DIRECTION.LEFT ? 180 : 270
-                      }deg)`
-                    }}
-                  >
-                    <svg viewBox="0 0 20 20" className="pacman-svg">
-                      {mouthOpen ? (
-                        <path d="M10 0A10 10 0 1 1 10 20A10 10 0 1 1 10 0L10 10Z" fill="#fbbf24" />
-                      ) : (
-                        <circle cx="10" cy="10" r="10" fill="#fbbf24" />
-                      )}
-                    </svg>
-                  </div>
-                )}
-
-                {/* 幽灵 */}
-                {ghosts.map((ghost, i) => (
-                  <div
-                    key={i}
-                    className={`ghost-entity ${ghost.scared ? 'scared' : ''}`}
-                    style={{
-                      left: ghost.x * CELL_SIZE,
-                      top: ghost.y * CELL_SIZE,
-                      width: CELL_SIZE,
-                      height: CELL_SIZE,
-                      backgroundColor: ghost.scared ? '#3b82f6' : ghost.color
-                    }}
-                  >
-                    <div className="ghost-eyes">
-                      <div className="ghost-eye" />
-                      <div className="ghost-eye" />
-                    </div>
-                  </div>
-                ))}
-
-                {/* 粒子效果 */}
-                {particles.map(particle => (
-                  <div
-                    key={particle.id}
-                    className="particle"
-                    style={{
-                      left: particle.x,
-                      top: particle.y,
-                      opacity: particle.life,
-                      backgroundColor: particle.color,
-                      transform: `scale(${particle.life})`
-                    }}
-                  />
-                ))}
-
-                {/* 开始界面 */}
-                {gameState === 'start' && (
-                  <div className="game-overlay start-overlay">
-                    <div className="overlay-content">
-                      <h2>
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                          <circle cx="12" cy="12" r="10" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2"/>
-                          <path d="M12 12 L20 8 L20 16 Z" fill="#0f172a"/>
-                        </svg>
-                        吃豆人
-                      </h2>
-                      <p className="hint">准备好开始挑战了吗？</p>
-                      <button className="start-btn" onClick={resetGame}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                          <polygon points="5 3 19 12 5 21 5 3" />
-                        </svg>
-                        开始游戏
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* 暂停界面 */}
-                {gameState === 'paused' && (
-                  <div className="game-overlay pause-overlay">
-                    <div className="overlay-content">
-                      <h2>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                          <rect x="6" y="4" width="4" height="16" />
-                          <rect x="14" y="4" width="4" height="16" />
-                        </svg>
-                        游戏暂停
-                      </h2>
-                      <p className="hint">按 ESC 或 P 继续</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* 游戏结束界面 */}
-                {gameState === 'gameover' && (
-                  <div className="game-overlay gameover-overlay">
-                    <div className="overlay-content">
-                      <h2>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="15" y1="9" x2="9" y2="15" />
-                          <line x1="9" y1="9" x2="15" y2="15" />
-                        </svg>
-                        游戏结束
-                      </h2>
-                      <p className="final-score">得分：<strong>{score}</strong></p>
-                      <p className="best-score">最佳：<strong>{highScore}</strong></p>
-                      {score >= highScore && score > 0 && (
-                        <p className="new-record">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-                            <path d="M4 22h16" />
-                            <path d="M10 14.66V18c0 .55-.47.98-.97 1.21C7.85 19.75 5.97 21 3 21" />
-                            <path d="M14 14.66V18c0 .55.47.98.97 1.21C16.15 19.75 18.03 21 21 21" />
-                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-                          </svg>
-                          新纪录！
-                        </p>
-                      )}
-                      <button className="start-btn" onClick={resetGame}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                          <polyline points="23 4 23 10 17 10" />
-                          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                        </svg>
-                        再玩一次
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 控制说明 */}
-            <div className="game-controls">
-              <div className="control-item">
-                <kbd>↑↓←→</kbd>
-                <span>或</span>
-                <kbd>WASD</kbd>
-                <span>移动方向</span>
-              </div>
-              <div className="control-item">
-                <kbd>P</kbd>
-                <span>或</span>
-                <kbd>ESC</kbd>
-                <span>暂停游戏</span>
-              </div>
-            </div>
-
-            {/* 游戏技巧 */}
-            <div className="tips-section">
-              <h4>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                  <path d="M9 18h6a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2z" />
-                  <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26C17.81 13.47 19 11.38 19 9a7 7 0 0 0-7-7z" />
-                </svg>
-                游戏技巧
-              </h4>
-              <ul className="tips-list">
-                <li>能量豆可以反转局势，吃掉恐惧的幽灵</li>
-                <li>记住幽灵的移动模式，提前规划路线</li>
-                <li>利用隧道可以快速摆脱幽灵追击</li>
-                <li>每关速度会提升，保持冷静应对</li>
-              </ul>
-            </div>
+      <div className="pacman-newspaper">
+        {/* 报头 */}
+        <div className="newspaper-header">
+          <div className="header-date">
+            <span className="date">{new Date().toLocaleDateString('zh-CN')}</span>
+            <span className="issue">VOL.2024.NO.12</span>
+          </div>
+          <div className="header-title">
+            <h1>吃豆人</h1>
+            <p className="subtitle">PACMAN · TAPE FUTURISM</p>
+          </div>
+          <div className="header-status">
+            <span className={`status-badge ${gameState === 'playing' ? 'active' : gameState === 'gameover' ? 'danger' : 'ready'}`}>
+              {gameState === 'playing' ? 'PLAYING' : gameState === 'gameover' ? 'GAME OVER' : 'READY'}
+            </span>
           </div>
         </div>
-      </main>
-      <Footer />
-    </>
+
+        {/* 主内容区 */}
+        <div className="newspaper-content">
+          {/* 左侧边栏 */}
+          <aside className="news-sidebar-left">
+            <div className="score-box">
+              <span className="score-label">SCORE</span>
+              <span className="score-value">{String(score).padStart(6, '0')}</span>
+            </div>
+            <div className="score-box">
+              <span className="score-label">BEST</span>
+              <span className="score-value highlight">{String(highScore).padStart(6, '0')}</span>
+            </div>
+            <div className="info-box">
+              <span className="info-label">LEVEL</span>
+              <span className="info-value">{level}</span>
+            </div>
+            <div className="info-box">
+              <span className="info-label">LIVES</span>
+              <span className="info-value">{lives}</span>
+            </div>
+            <div className="info-box power-indicator">
+              <span className="info-label">POWER</span>
+              <div className="power-bar">
+                <div className="power-fill" style={{ width: `${(powerTimer / 50) * 100}%` }}></div>
+              </div>
+            </div>
+            
+            {/* 操作说明 */}
+            <div className="controls-mini">
+              <div className="controls-mini-header">
+                <span>CONTROLS</span>
+              </div>
+              <div className="controls-mini-grid">
+                <div className="control-mini">
+                  <span className="mini-key">↑</span>
+                  <span className="mini-label">上</span>
+                </div>
+                <div className="control-mini">
+                  <span className="mini-key">↓</span>
+                  <span className="mini-label">下</span>
+                </div>
+                <div className="control-mini">
+                  <span className="mini-key">←</span>
+                  <span className="mini-label">左</span>
+                </div>
+                <div className="control-mini">
+                  <span className="mini-key">→</span>
+                  <span className="mini-label">右</span>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* 中央游戏区 */}
+          <main className="news-game-area">
+            <div className="game-canvas pacman-canvas">
+              {/* 地图渲染 */}
+              {map.length > 0 && map.map((row, y) => (
+                row.map((cell, x) => (
+                  <div
+                    key={`${x}-${y}`}
+                    className={`pacman-cell ${cell === 1 ? 'wall' : cell === 2 ? 'dot' : cell === 3 ? 'power' : ''}`}
+                    style={{
+                      left: x * CELL_SIZE,
+                      top: y * CELL_SIZE,
+                      width: CELL_SIZE,
+                      height: CELL_SIZE
+                    }}
+                  >
+                    {cell === 2 && <div className="dot"></div>}
+                    {cell === 3 && <div className="power-dot"></div>}
+                  </div>
+                ))
+              ))}
+
+              {/* 吃豆人 */}
+              {gameState !== 'start' && (
+                <div
+                  className="pacman"
+                  style={{
+                    left: pacman.x * CELL_SIZE,
+                    top: pacman.y * CELL_SIZE,
+                    width: CELL_SIZE,
+                    height: CELL_SIZE,
+                    transform: `rotate(${
+                      pacman.direction === DIRECTION.UP ? -90 :
+                      pacman.direction === DIRECTION.DOWN ? 90 :
+                      pacman.direction === DIRECTION.LEFT ? 180 : 0
+                    }deg)`
+                  }}
+                >
+                  <svg viewBox="0 0 20 20" fill="#fbbf24">
+                    {mouthOpen ? (
+                      <path d="M10 0A10 10 0 1 1 10 20A10 10 0 1 1 10 0L10 10Z" />
+                    ) : (
+                      <circle cx="10" cy="10" r="10" />
+                    )}
+                  </svg>
+                </div>
+              )}
+
+              {/* 幽灵 */}
+              {gameState !== 'start' && ghosts.map((ghost, i) => (
+                <div
+                  key={i}
+                  className={`ghost ${ghost.scared ? 'scared' : ''}`}
+                  style={{
+                    left: ghost.x * CELL_SIZE,
+                    top: ghost.y * CELL_SIZE,
+                    width: CELL_SIZE,
+                    height: CELL_SIZE
+                  }}
+                >
+                  <svg viewBox="0 0 20 20" fill={ghost.scared ? '#3b82f6' : ghost.color}>
+                    <path d="M10 0C4.48 0 0 4.48 0 10V20L3.33 16.67L6.67 20L10 16.67L13.33 20L16.67 16.67L20 20V10C20 4.48 15.52 0 10 0Z"/>
+                    <circle cx="6" cy="8" r="2.5" fill="#fff"/>
+                    <circle cx="14" cy="8" r="2.5" fill="#fff"/>
+                    <circle cx="7" cy="8" r="1" fill="#000"/>
+                    <circle cx="15" cy="8" r="1" fill="#000"/>
+                  </svg>
+                </div>
+              ))}
+
+              {/* 粒子效果 */}
+              {particles.map(p => (
+                <div
+                  key={p.id}
+                  className="particle"
+                  style={{
+                    left: p.x,
+                    top: p.y,
+                    backgroundColor: p.color,
+                    opacity: p.life,
+                    width: 4,
+                    height: 4
+                  }}
+                />
+              ))}
+
+              {/* 开始界面 */}
+              {gameState === 'start' && (
+                <div className="overlay">
+                  <div className="overlay-content">
+                    <svg width="60" height="60" viewBox="0 0 20 20" fill="#fbbf24">
+                      <path d="M10 0A10 10 0 1 1 10 20A10 10 0 1 1 10 0L10 10Z" />
+                    </svg>
+                    <h2>吃豆人</h2>
+                    <p className="subtitle">经典街机游戏</p>
+                    <button className="start-btn" onClick={startGame}>开始游戏</button>
+                    <p className="controls-hint">
+                      <span className="key-badge">方向键</span> 移动 · 
+                      <span className="key-badge">能量豆</span> 吃幽灵
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* 游戏结束界面 */}
+              {gameState === 'gameover' && (
+                <div className="overlay">
+                  <div className="overlay-content">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="15" y1="9" x2="9" y2="15"/>
+                      <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    <h2 className="result-title">游戏结束</h2>
+                    <div className="score-board">
+                      <div className="score-item">
+                        <span className="label">得分</span>
+                        <span className="value">{score}</span>
+                      </div>
+                      <div className="score-item">
+                        <span className="label">最佳</span>
+                        <span className="value highlight">{highScore}</span>
+                      </div>
+                      <div className="score-item">
+                        <span className="label">关卡</span>
+                        <span className="value">{level}</span>
+                      </div>
+                    </div>
+                    {score >= highScore && score > 0 && (
+                      <div className="new-record">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2">
+                          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                          <path d="M4 22h16"/>
+                          <path d="M10 14.66V18c0 .55-.47.98-.97 1.21C7.85 19.75 5.97 21 3 21"/>
+                          <path d="M14 14.66V18c0 .55.47.98.97 1.21C16.15 19.75 18.03 21 21 21"/>
+                          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                        </svg>
+                        <span>新纪录!</span>
+                      </div>
+                    )}
+                    <button className="start-btn" onClick={startGame}>再玩一次</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </main>
+
+          {/* 右侧边栏 */}
+          <aside className="news-sidebar-right">
+            <div className="wave-box">
+              <span className="wave-label">SIGNAL</span>
+              <div className="wave-bars">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="wave-bar"></div>
+                ))}
+              </div>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">TAPE</span>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">FUTURE</span>
+            </div>
+          </aside>
+        </div>
+
+        {/* 报尾 */}
+        <div className="newspaper-footer">
+          <span>PACMAN © 2024</span>
+          <span>◆</span>
+          <span>TAPE FUTURISM</span>
+          <span>◆</span>
+          <span>CLASSIC ARCADE</span>
+        </div>
+      </div>
+    </div>
   )
 }

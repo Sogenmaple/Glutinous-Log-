@@ -16,6 +16,7 @@ export default function PrefixSettings() {
     timeout: 5,
     showMatrix: true,
     showBalls: true,
+    showRings: true,
     showEyes: true,
     speed: 1.0
   })
@@ -194,6 +195,19 @@ export default function PrefixSettings() {
                 onChange={(e) => setSettings({...settings, showEyes: e.target.checked})}
               />
               <label htmlFor="show-eyes"></label>
+            </div>
+          </div>
+          
+          <div className="setting-item">
+            <label>扩散圆环</label>
+            <div className="toggle-switch">
+              <input 
+                type="checkbox" 
+                id="show-rings"
+                checked={settings.showRings}
+                onChange={(e) => setSettings({...settings, showRings: e.target.checked})}
+              />
+              <label htmlFor="show-rings"></label>
             </div>
           </div>
         </div>

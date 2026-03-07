@@ -40,6 +40,7 @@ import './styles/header.css'
 import './styles/pomodoro.css'
 import './styles/PrefixScreensaver.css'
 import './styles/PrefixSettings.css'
+import './styles/Home.css'
 
 function AppContent() {
   const [showIntro, setShowIntro] = useState(true)

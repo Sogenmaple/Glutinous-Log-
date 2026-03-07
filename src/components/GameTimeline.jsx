@@ -169,8 +169,6 @@ export default function GameTimeline() {
       </div>
 
       <div className="timeline-container">
-        <div className="timeline-line"></div>
-
         {sortedGames.map((game, index) => {
           const isLeft = index % 2 === 0
           return (

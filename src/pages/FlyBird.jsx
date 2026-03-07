@@ -274,19 +274,24 @@ export default function FlyBird() {
                     transform: `rotate(${birdRotation}deg)`
                   }}
                 >
-                  <svg viewBox="0 0 32 32" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    {/* 身体 - 流线型 */}
-                    <ellipse cx="16" cy="16" rx="14" ry="10" fill="#fbbf24" stroke="#fbbf24" strokeWidth="2"/>
-                    {/* 眼睛 - 未来感护目镜 */}
-                    <ellipse cx="24" cy="14" rx="5" ry="4" fill="#22d3ee" stroke="#fff" strokeWidth="2"/>
-                    <circle cx="25" cy="14" r="2" fill="#fff"/>
-                    {/* 嘴巴 - 几何三角形 */}
-                    <path d="M28 16l6 2-6 4z" fill="#f97316" stroke="#f97316" strokeWidth="2"/>
-                    {/* 翅膀 - 机械感 */}
-                    <path d="M10 18l-8-6" stroke="#fbbf24" strokeWidth="3"/>
-                    <path d="M10 14l-8 6" stroke="#fbbf24" strokeWidth="3"/>
-                    {/* 尾部装饰线 */}
-                    <path d="M4 16l-4 0" stroke="#fbbf24" strokeWidth="2"/>
+                  <svg viewBox="0 0 30 30" fill="none">
+                    {/* 身体 - 琥珀色渐变 */}
+                    <ellipse cx="15" cy="15" rx="14" ry="11" fill="url(#birdBody)" stroke="#f59e0b" strokeWidth="2"/>
+                    {/* 眼睛 */}
+                    <circle cx="22" cy="11" r="4" fill="#fff"/>
+                    <circle cx="23" cy="11" r="2" fill="#0a0a0a"/>
+                    {/* 嘴巴 */}
+                    <path d="M26 14l4 2" stroke="#f97316" strokeWidth="3" strokeLinecap="round"/>
+                    {/* 翅膀 */}
+                    <path d="M8 18l-6-4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                    <path d="M8 12l-6 4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                    {/* 渐变定义 */}
+                    <defs>
+                      <linearGradient id="birdBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#fbbf24"/>
+                        <stop offset="100%" stopColor="#f59e0b"/>
+                      </linearGradient>
+                    </defs>
                   </svg>
                 </div>
               )}
@@ -361,13 +366,19 @@ export default function FlyBird() {
                       </>
                     ) : (
                       <>
-                        <svg width="60" height="60" viewBox="0 0 32 32" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <ellipse cx="16" cy="16" rx="14" ry="10" fill="#fbbf24" stroke="#fbbf24" strokeWidth="2"/>
-                          <ellipse cx="24" cy="14" rx="5" ry="4" fill="#22d3ee" stroke="#fff" strokeWidth="2"/>
-                          <circle cx="25" cy="14" r="2" fill="#fff"/>
-                          <path d="M28 16l6 2-6 4z" fill="#f97316" stroke="#f97316" strokeWidth="2"/>
-                          <path d="M10 18l-8-6" stroke="#fbbf24" strokeWidth="3"/>
-                          <path d="M10 14l-8 6" stroke="#fbbf24" strokeWidth="3"/>
+                        <svg width="60" height="60" viewBox="0 0 30 30" fill="none">
+                          <ellipse cx="15" cy="15" rx="14" ry="11" fill="url(#birdBody2)" stroke="#f59e0b" strokeWidth="2"/>
+                          <circle cx="22" cy="11" r="4" fill="#fff"/>
+                          <circle cx="23" cy="11" r="2" fill="#0a0a0a"/>
+                          <path d="M26 14l4 2" stroke="#f97316" strokeWidth="3" strokeLinecap="round"/>
+                          <path d="M8 18l-6-4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                          <path d="M8 12l-6 4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                          <defs>
+                            <linearGradient id="birdBody2" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#fbbf24"/>
+                              <stop offset="100%" stopColor="#f59e0b"/>
+                            </linearGradient>
+                          </defs>
                         </svg>
                         <h2>飞扬的小鸟</h2>
                         <p className="subtitle">经典休闲游戏</p>

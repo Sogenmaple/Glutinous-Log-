@@ -541,35 +541,32 @@ body :not(code):not(pre) {
   letter-spacing: 0.05em;
 }
 /* ============================================
-   TIMELINE SECTION - 精致排版
+   TIMELINE SECTION - 现代极简排版
    ============================================ */
 .timeline-section {
-  padding: 6rem 2rem 4rem;
-  max-width: 1100px;
+  padding: 5rem 2rem 4rem;
+  max-width: 1000px;
   margin: 0 auto;
-  position: relative;
 }
 
 .timeline-container {
   position: relative;
-  padding: 1rem 0;
+  padding: 2rem 0 1rem;
 }
 
-/* 中央时间轴线 - 细腻渐变 */
+/* 中央时间轴线 */
 .timeline-container::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 0;
   bottom: 0;
-  width: 2px;
+  width: 1px;
   background: linear-gradient(
     to bottom,
-    rgba(255, 149, 0, 0.1) 0%,
-    rgba(255, 149, 0, 0.4) 20%,
-    rgba(255, 149, 0, 0.6) 50%,
-    rgba(255, 149, 0, 0.4) 80%,
-    rgba(255, 149, 0, 0.1) 100%
+    rgba(255, 149, 0, 0.2) 0%,
+    rgba(255, 149, 0, 0.5) 50%,
+    rgba(255, 149, 0, 0.2) 100%
   );
   transform: translateX(-50%);
 }
@@ -578,11 +575,11 @@ body :not(code):not(pre) {
 .timeline-item {
   position: relative;
   width: 50%;
-  padding-right: 48px;
-  margin-bottom: 4rem;
+  padding: 0 50px 0 0;
+  margin-bottom: 3.5rem;
   opacity: 0;
-  transform: translateX(-30px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateX(-20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
 .timeline-item.visible {
@@ -592,30 +589,29 @@ body :not(code):not(pre) {
 
 .timeline-item:nth-child(even) {
   left: 50%;
-  padding-right: 0;
-  padding-left: 48px;
-  transform: translateX(30px);
+  padding: 0 0 0 50px;
+  transform: translateX(20px);
 }
 
 .timeline-item:nth-child(even).visible {
   transform: translateX(0);
 }
 
-/* 时间轴点 - 简洁精致 */
+/* 时间轴点 */
 .timeline-dot {
   position: absolute;
   right: -26px;
-  top: 0;
-  width: 52px;
-  height: 52px;
-  background: var(--bg-deep);
-  border: 2px solid rgba(255, 149, 0, 0.3);
+  top: 6px;
+  width: 54px;
+  height: 54px;
+  background: var(--bg-card);
+  border: 2px solid rgba(255, 149, 0, 0.4);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s ease;
 }
 
 .timeline-item:nth-child(even) .timeline-dot {
@@ -623,102 +619,90 @@ body :not(code):not(pre) {
   left: -26px;
 }
 
-.timeline-dot::before {
+.timeline-dot::after {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: 6px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 149, 0, 0.15) 0%,
-    transparent 70%
-  );
-  opacity: 0;
-  transition: opacity 0.4s ease;
+  background: rgba(255, 149, 0, 0.08);
 }
 
 .timeline-item:hover .timeline-dot {
   border-color: var(--amber);
-  transform: scale(1.08);
-  box-shadow: 0 0 20px rgba(255, 149, 0, 0.3);
-}
-
-.timeline-item:hover .timeline-dot::before {
-  opacity: 1;
+  transform: scale(1.06);
 }
 
 .timeline-dot .vector-icon {
-  width: 24px;
-  height: 24px;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
+  width: 26px;
+  height: 26px;
+  position: relative;
+  z-index: 1;
 }
 
-.timeline-item:hover .timeline-dot .vector-icon {
-  opacity: 1;
-}
-
-/* 内容卡片 - 精致留白 */
+/* 内容卡片 */
 .timeline-content {
   width: 100%;
-  padding: 2rem 1.75rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.015) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
   position: relative;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s ease;
 }
 
-/* 4 角装饰 - 细腻 */
+/* 4 角装饰 */
 .timeline-content .card-corner {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  border: 1px solid rgba(255, 149, 0, 0.2);
-  transition: all 0.4s ease;
-  pointer-events: none;
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(255, 149, 0, 0.3);
+  transition: all 0.35s ease;
 }
 
 .timeline-content .card-corner.tl {
-  top: 10px;
-  left: 10px;
+  top: 8px;
+  left: 8px;
   border-right: none;
   border-bottom: none;
 }
 
 .timeline-content .card-corner.tr {
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   border-left: none;
   border-bottom: none;
 }
 
 .timeline-content .card-corner.bl {
-  bottom: 10px;
-  left: 10px;
+  bottom: 8px;
+  left: 8px;
   border-right: none;
   border-top: none;
 }
 
 .timeline-content .card-corner.br {
-  bottom: 10px;
-  right: 10px;
+  bottom: 8px;
+  right: 8px;
   border-left: none;
   border-top: none;
 }
 
-/* hover 交互 */
+/* hover */
 .timeline-item:hover .timeline-content {
-  border-color: rgba(255, 149, 0, 0.25);
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transform: translateY(-3px);
+  border-color: rgba(255, 149, 0, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
 }
 
 .timeline-item:hover .timeline-content .card-corner {
-  border-color: rgba(255, 149, 0, 0.5);
-  width: 14px;
-  height: 14px;
+  border-color: rgba(255, 149, 0, 0.6);
+  width: 10px;
+  height: 10px;
 }
 
 /* 左侧项目 - 卡片指向右边 */
@@ -747,151 +731,139 @@ body :not(code):not(pre) {
   border-bottom: 8px solid transparent;
 }
 
-/* 日期标签 - 简洁 */
+/* 日期 */
 .timeline-date {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.12em;
-  margin-bottom: 0.75rem;
-  padding: 0.25rem 0;
-  position: relative;
-}
-
-.timeline-date::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 149, 0, 0.3) 0%,
-    rgba(255, 149, 0, 0.1) 100%
-  );
+  font-size: 0.68rem;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  margin-bottom: 0.65rem;
+  padding: 0.2rem 0.65rem;
+  background: rgba(255, 149, 0, 0.08);
+  border-radius: 3px;
+  border: 1px solid rgba(255, 149, 0, 0.15);
 }
 
 /* 标题 */
 .timeline-title {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 0.75rem 0;
-  line-height: 1.35;
-  letter-spacing: 0.02em;
+  margin: 0 0 0.7rem 0;
+  line-height: 1.3;
 }
 
 .timeline-desc {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--text-secondary);
-  line-height: 1.7;
-  margin: 0 0 1rem 0;
+  line-height: 1.65;
+  margin: 0 0 0.9rem 0;
 }
 
 /* 标签 */
 .timeline-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.45rem;
+  margin-bottom: 0.9rem;
 }
 
 .timeline-tag {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  padding: 0.25rem 0.65rem;
+  font-size: 0.66rem;
+  padding: 0.22rem 0.55rem;
   border-radius: 3px;
-  background: rgba(255, 149, 0, 0.06);
-  color: rgba(255, 149, 0, 0.8);
-  border: 1px solid rgba(255, 149, 0, 0.15);
-  letter-spacing: 0.04em;
-  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  letter-spacing: 0.03em;
+  transition: all 0.25s ease;
 }
 
 .timeline-tag:hover {
-  background: rgba(255, 149, 0, 0.1);
-  border-color: rgba(255, 149, 0, 0.3);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
 }
 
 /* 链接 */
 .timeline-links {
   display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  gap: 0.55rem;
 }
 
 .timeline-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   color: var(--text-secondary);
   text-decoration: none;
-  padding: 0.35rem 0.7rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: transparent;
-  transition: all 0.3s ease;
+  padding: 0.28rem 0.6rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.25s ease;
 }
 
 .timeline-link:hover {
-  color: var(--text-primary);
-  border-color: rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.03);
+  color: var(--amber);
+  border-color: rgba(255, 149, 0, 0.2);
+  background: rgba(255, 149, 0, 0.05);
   text-decoration: none;
 }
 
 .timeline-link .link-icon-svg {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   fill: currentColor;
 }
 
-/* 开发中状态 */
+/* 状态 */
 .timeline-status {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  padding: 0.2rem 0.5rem;
+  font-size: 0.63rem;
+  padding: 0.18rem 0.45rem;
   border-radius: 3px;
   margin-left: 0.5rem;
   vertical-align: middle;
-  background: rgba(57, 255, 20, 0.08);
+  background: rgba(57, 255, 20, 0.06);
   color: var(--green);
-  border: 1px solid rgba(57, 255, 20, 0.2);
-  letter-spacing: 0.04em;
+  border: 1px solid rgba(57, 255, 20, 0.15);
+  letter-spacing: 0.03em;
+  font-weight: 600;
 }
 
 /* 响应式 - 平板 */
 @media (max-width: 768px) {
   .timeline-container::before {
-    left: 30px;
+    left: 28px;
   }
   
   .timeline-item,
   .timeline-item:nth-child(even) {
     width: 100%;
     left: 0;
-    padding-left: 70px;
+    padding-left: 68px;
     padding-right: 0;
   }
   
   .timeline-dot,
   .timeline-item:nth-child(even) .timeline-dot {
     right: auto;
-    left: 30px;
+    left: 28px;
   }
 }
 
 /* 响应式 - 手机 */
 @media (max-width: 480px) {
   .timeline-section {
-    padding: 4rem 1rem 3rem;
+    padding: 3.5rem 1rem 3rem;
   }
   
   .timeline-container::before {
@@ -900,8 +872,8 @@ body :not(code):not(pre) {
   
   .timeline-item,
   .timeline-item:nth-child(even) {
-    padding-left: 56px;
-    margin-bottom: 3rem;
+    padding-left: 58px;
+    margin-bottom: 2.5rem;
   }
   
   .timeline-dot,
@@ -912,11 +884,19 @@ body :not(code):not(pre) {
   }
   
   .timeline-content {
-    padding: 1.5rem 1.25rem;
+    padding: 1.4rem 1.2rem;
   }
   
   .timeline-title {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+  }
+  
+  .timeline-date {
+    font-size: 0.65rem;
+  }
+  
+  .timeline-tag {
+    font-size: 0.64rem;
   }
 }
 

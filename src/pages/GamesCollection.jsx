@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { GameIcon, ClockIcon, CodeIcon, BlockIcon, StarIcon, ExperimentIcon, PlayIcon, TrophyIcon } from '../components/icons/SiteIcons'
+import { GameIcon, ClockIcon, StarIcon, ExperimentIcon, BlockIcon, PlayIcon, TrophyIcon, BombIcon, SnakeIcon, BirdIcon, PacmanIcon, DinosaurIcon } from '../components/icons/SiteIcons'
 import '../styles/GamesCollection.css'
 
 /**
- * 游戏宇宙页面 - 报纸风格排版
+ * 游戏宇宙页面 - 磁带未来主义风格
  */
 export default function GamesCollection() {
   const navigate = useNavigate()
@@ -21,185 +21,179 @@ export default function GamesCollection() {
       id: 1,
       title: '渡维',
       subtitle: 'DIMENSIONAL',
-      description: '2024 CiGA Game Jam (7.5-7.6) 作品。在多维空间之间穿梭，突破维度的限制。',
+      description: '2024 CiGA Game Jam 作品。在多维空间之间穿梭，突破维度的限制。',
       icon: StarIcon,
       color: 'cyan',
       date: '2024-07-06',
-      jam: 'CiGA Game Jam 2024',
       tags: ['CiGA', '维度', '解谜'],
-      status: 'released',
-      links: {
-        gmhub: 'https://gmhub.com/game/5421'
-      }
+      path: '/games/1'
     },
     {
       id: 5,
       title: '反物环',
       subtitle: 'ANTIMATTER',
-      description: '2025 CiGA Game Jam (6.27-6.29) 48 小时 Solo 作品。在反物质环带中生存，利用物理机制解开谜题。',
+      description: '2025 CiGA Game Jam 48 小时 Solo 作品。在反物质环带中生存。',
       icon: ExperimentIcon,
       color: 'purple',
       date: '2025-06-29',
-      jam: 'CiGA Game Jam 2025',
-      tags: ['CiGA', '物理', '解谜', 'Solo'],
-      status: 'released',
-      links: {
-        gmhub: 'https://gmhub.com/game/7868',
-        bilibili: 'https://www.bilibili.com/video/BV1HogSz9Eke',
-        taptap: 'https://www.taptap.cn/app/799022'
-      }
+      tags: ['CiGA', '物理', 'Solo'],
+      path: '/games/5'
     },
     {
       id: 2,
       title: '声纹',
       subtitle: 'SOUNDWAVE',
-      description: '2025 聚光灯武汉站 (9.12-9.14) 作品。利用声波频率解谜，在声音的轨迹中寻找真相。T-cat 战队：美术 - 涂朗铭，程序 - 汤圆，策划-cc，策划 - 阿察。',
+      description: '2025 聚光灯武汉站作品。利用声波频率解谜。',
       icon: StarIcon,
       color: 'cyan',
       date: '2025-09-14',
-      jam: '聚光灯 Game Jam 武汉站',
-      tags: ['聚光灯', '音乐', '解谜', 'T-cat'],
-      status: 'released',
-      links: {}
+      tags: ['聚光灯', '音乐', '解谜'],
+      path: '/games/2'
     },
     {
       id: 3,
       title: '逃离俄罗斯方块',
       subtitle: 'ESCAPE TETRIS',
-      description: '2026 聚光灯成都站 (12.19-12.21) 48 小时个人 Solo 作品。经典的俄罗斯方块玩法，但这次你要逃离即将闭合的方块牢笼。',
+      description: '2026 聚光灯成都站 48 小时个人 Solo 作品。',
       icon: BlockIcon,
       color: 'amber',
       date: '2026-12-21',
-      jam: '聚光灯 Game Jam 成都站',
-      tags: ['聚光灯', '解谜', '经典', 'Solo'],
-      status: 'released',
-      links: {}
+      tags: ['聚光灯', '解谜', 'Solo'],
+      path: '/games/3'
     },
     {
       id: 4,
       title: '宇宙泡破',
       subtitle: 'COSMIC BUBBLE',
-      description: '2025 Global Game Jam (1.17-1.19) 作品。在宇宙中穿梭，破解泡泡，探索未知星系。',
+      description: '2025 Global Game Jam 作品。在宇宙中穿梭，破解泡泡。',
       icon: StarIcon,
       color: 'cyan',
       date: '2025-01-19',
-      jam: 'Global Game Jam 2025',
       tags: ['GGJ2025', '太空', '休闲'],
-      status: 'released',
-      links: {}
+      path: '/games/4'
     },
     {
       id: 6,
       title: '稽面划拳',
       subtitle: 'FIST GAME',
-      description: '2026 Global Game Jam (1.30-2.1) 作品。结合传统划拳文化的创意对战游戏。',
+      description: '2026 Global Game Jam 作品。结合传统划拳文化的创意对战。',
       icon: PlayIcon,
       color: 'amber',
       date: '2026-02-01',
-      jam: 'Global Game Jam 2026',
       tags: ['GGJ2026', '对战', '休闲'],
-      status: 'released',
-      links: {
-        gmhub: 'https://gmhub.com/game/9098',
-        bilibili: 'https://www.bilibili.com/video/BV1xeZ7BKEAG'
-      }
+      path: '/games/6'
     },
     {
       id: 7,
-      title: 'Cheat',
-      subtitle: 'COMMERCIAL PROJECT',
-      description: '正在与大隆盛工作室一起开发的商业项目。',
-      icon: CodeIcon,
-      color: 'green',
-      date: '2026-03-05',
-      jam: '商业项目',
-      tags: ['商业', '开发中', '大隆盛工作室'],
-      status: 'development',
-      links: {}
+      title: '扫雷',
+      subtitle: 'MINESWEEPER',
+      description: '经典扫雷游戏，排除所有地雷，完成挑战。',
+      icon: BombIcon,
+      color: 'amber',
+      date: '2024',
+      tags: ['经典', '益智'],
+      path: '/special/minesweeper'
     },
     {
       id: 8,
-      title: '球状围棋',
-      subtitle: 'SPHERE GO',
-      description: '创新围棋变体，在球面上进行对弈，带来全新的空间策略体验。',
-      icon: PlayIcon,
+      title: '贪吃蛇',
+      subtitle: 'SNAKE',
+      description: '经典贪吃蛇游戏，粒子特效，难度递增。',
+      icon: SnakeIcon,
       color: 'cyan',
-      date: '2026-03-05',
-      jam: '个人项目',
-      tags: ['围棋', '策略', '开发中'],
-      status: 'development',
-      links: {}
+      date: '2024',
+      tags: ['经典', '动作'],
+      path: '/special/snake'
     },
     {
       id: 9,
-      title: '层色棋',
-      subtitle: 'LAYERED CHESS',
-      description: '多层色彩棋盘游戏，融合传统棋类与色彩机制的创新玩法。',
-      icon: TrophyIcon,
-      color: 'purple',
-      date: '2026-03-05',
-      jam: '个人项目',
-      tags: ['棋类', '策略', '开发中'],
-      status: 'development',
-      links: {}
+      title: 'FlyBird',
+      subtitle: 'FLAPPY BIRD',
+      description: '飞扬的小鸟，穿越障碍，挑战极限。',
+      icon: BirdIcon,
+      color: 'amber',
+      date: '2024',
+      tags: ['经典', '动作'],
+      path: '/special/flybird'
+    },
+    {
+      id: 10,
+      title: '吃豆人',
+      subtitle: 'PACMAN',
+      description: '经典吃豆人游戏，幽灵 AI，能量豆模式。',
+      icon: PacmanIcon,
+      color: 'amber',
+      date: '2024',
+      tags: ['经典', '动作'],
+      path: '/special/pacman'
+    },
+    {
+      id: 11,
+      title: '恐龙快跑',
+      subtitle: 'DINOSAUR RUN',
+      description: 'Chrome 恐龙游戏，粒子特效，难度 progression。',
+      icon: DinosaurIcon,
+      color: 'cyan',
+      date: '2024',
+      tags: ['经典', '动作'],
+      path: '/special/dinosaur'
     }
   ]
 
   return (
-    <div className="games-collection-page">
+    <div className="games-page">
       <Header />
       
       {/* 背景装饰 */}
-      <div className="newspaper-bg"></div>
-      <div className="newspaper-grid"></div>
+      <div className="games-tape-bg"></div>
+      <div className="games-tape-grid"></div>
+      <div className="games-scanlines"></div>
 
-      {/* 主布局 - 非对称分区 */}
-      <div className="cyber-layout">
-        {/* 左侧边栏 - 导航区 */}
+      {/* 主布局 - 非对称三栏 */}
+      <div className="games-main-layout">
+        {/* 左侧边栏 */}
         <aside className="sidebar-left">
-          <div className="sidebar-section">
-            <ClockIcon size={60} color="#ff9500" />
-            <h2 className="sidebar-title">CYBER<br/>GAMES</h2>
-            <div className="sidebar-divider"></div>
-            <div className="sidebar-stats">
-              <div className="stat-item">
-                <span className="stat-value">09</span>
-                <span className="stat-label">PROJECTS</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-value">06</span>
-                <span className="stat-label">RELEASED</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-value">03</span>
-                <span className="stat-label">DEVELOPING</span>
-              </div>
+          <div className="sidebar-logo">
+            <ClockIcon size={100} color="#ff9500" />
+            <h1 className="sidebar-title">游戏宇宙</h1>
+            <p className="sidebar-subtitle">GAMES UNIVERSE</p>
+          </div>
+          
+          <div className="sidebar-stats">
+            <div className="stat-item">
+              <span className="stat-num">11</span>
+              <span className="stat-label">PROJECTS</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-num">06</span>
+              <span className="stat-label">RELEASED</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-num">03</span>
+              <span className="stat-label">IN DEV</span>
             </div>
           </div>
           
-          <div className="sidebar-section">
+          <div className="sidebar-date">
+            <ClockIcon size={32} color="#ff9500" />
             <div className="date-display">
               <span className="date-year">{new Date().getFullYear()}</span>
-              <span className="date-month">{new Date().toLocaleDateString('zh-CN', { month: 'long' })}</span>
-              <span className="date-day">{new Date().getDate()}</span>
+              <span className="date-month-day">
+                {new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' })}
+              </span>
             </div>
           </div>
         </aside>
 
-        {/* 中央主内容区 */}
-        <main className="main-content">
-          {/* 顶部通栏标题 */}
-          <header className="content-header">
-            <div className="header-line"></div>
-            <h1 className="main-title">
-              <span className="title-cn">游戏宇宙</span>
-              <span className="title-en">GAMES UNIVERSE</span>
-            </h1>
-            <p className="main-subtitle">独立游戏作品集 · 创意与技术的结晶</p>
-            <div className="header-line bottom"></div>
+        {/* 中央内容区 */}
+        <main className="games-content">
+          <header className="games-header">
+            <h2 className="games-title-cn">游戏作品集</h2>
+            <p className="games-title-en">TANGYUAN'S GAME PORTFOLIO</p>
+            <div className="title-line"></div>
           </header>
 
-          {/* 游戏网格 - 非对称布局 */}
+          {/* 游戏网格 */}
           <div className="games-grid-asymmetric">
             {games.map((game, index) => {
               const IconComponent = game.icon
@@ -213,7 +207,6 @@ export default function GamesCollection() {
                   onMouseLeave={() => setHoveredGame(null)}
                   onClick={() => navigate(game.path)}
                 >
-                  {/* 卡片头部 */}
                   <div className="card-header">
                     <span className="card-id">#{String(game.id).padStart(2, '0')}</span>
                     <div className="card-icon-wrapper">
@@ -221,16 +214,13 @@ export default function GamesCollection() {
                     </div>
                   </div>
 
-                  {/* 分隔线 */}
                   <div className="card-divider"></div>
 
-                  {/* 卡片内容 */}
                   <div className="card-body">
                     <h3 className="card-title-cn">{game.title}</h3>
                     <p className="card-title-en">{game.subtitle}</p>
                     <p className="card-desc">{game.description}</p>
                     
-                    {/* 标签组 */}
                     {game.tags && game.tags.length > 0 && (
                       <div className="card-tags">
                         {game.tags.map(tag => (
@@ -240,24 +230,11 @@ export default function GamesCollection() {
                     )}
                   </div>
 
-                  {/* 卡片底部 */}
                   <div className="card-footer">
                     <span className="card-date">{game.date}</span>
-                    <div className="card-links">
-                      {game.links && game.links.gmhub && (
-                        <a href={game.links.gmhub} target="_blank" rel="noopener noreferrer" className="card-link" onClick={(e) => e.stopPropagation()}>G</a>
-                      )}
-                      {game.links && game.links.bilibili && (
-                        <a href={game.links.bilibili} target="_blank" rel="noopener noreferrer" className="card-link" onClick={(e) => e.stopPropagation()}>B</a>
-                      )}
-                      {game.links && game.links.taptap && (
-                        <a href={game.links.taptap} target="_blank" rel="noopener noreferrer" className="card-link" onClick={(e) => e.stopPropagation()}>T</a>
-                      )}
-                    </div>
                     <span className="card-arrow">→</span>
                   </div>
 
-                  {/* 角落装饰 */}
                   <div className="corner-decor tl"></div>
                   <div className="corner-decor tr"></div>
                   <div className="corner-decor bl"></div>
@@ -315,7 +292,7 @@ export default function GamesCollection() {
                 <span className="social-arrow">↗</span>
               </a>
               <a href="https://qm.qq.com/q/AxbQpuKKsK" target="_blank" rel="noopener noreferrer" className="social-link">
-                <span className="social-label">QQ 群：950087304</span>
+                <span className="social-label">QQ:950087304</span>
                 <span className="social-arrow">↗</span>
               </a>
             </div>

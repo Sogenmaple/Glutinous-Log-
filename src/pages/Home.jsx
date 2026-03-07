@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GameIcon, BookIcon, UserIcon, ToolIcon } from '../components/icons/SiteIcons'
+import { GameIcon, BookIcon, UserIcon, ToolIcon, ClockIcon } from '../components/icons/SiteIcons'
 import Header from '../components/Header'
 import '../styles/Home.css'
 
 /**
  * 汤圆的小窝 - 主导航页面
- * 报纸风格排版
+ * 磁带未来主义风格
  */
 export default function Home() {
   const navigate = useNavigate()
@@ -22,7 +22,7 @@ export default function Home() {
       id: 'games',
       title: '游戏宇宙',
       subtitle: 'GAMES UNIVERSE',
-      description: '独立游戏作品集，包含扫雷、贪吃蛇、FlyBird、吃豆人、恐龙快跑等 5 款核心游戏',
+      description: '独立游戏作品集',
       icon: GameIcon,
       color: 'amber',
       path: '/games',
@@ -31,7 +31,7 @@ export default function Home() {
       id: 'blog',
       title: '思维碎片',
       subtitle: 'THOUGHT FRAGMENTS',
-      description: '开发日志与技术分享，记录成长轨迹',
+      description: '开发日志与技术分享',
       icon: BookIcon,
       color: 'cyan',
       path: '/blog',
@@ -40,7 +40,7 @@ export default function Home() {
       id: 'special',
       title: '特殊构造',
       subtitle: 'SPECIAL CONSTRUCTS',
-      description: '实用工具与创意实验的集合，包含番茄钟、计算器等',
+      description: '工具与创意实验',
       icon: ToolIcon,
       color: 'red',
       path: '/special',
@@ -49,7 +49,7 @@ export default function Home() {
       id: 'about',
       title: '关于汤圆',
       subtitle: 'ABOUT ME',
-      description: '独立游戏开发者，创意实现者',
+      description: '开发者信息',
       icon: UserIcon,
       color: 'purple',
       path: '/about',
@@ -61,127 +61,138 @@ export default function Home() {
       <Header />
       
       {/* 背景装饰 */}
-      <div className="home-bg"></div>
-      <div className="home-grid"></div>
+      <div className="tape-bg"></div>
+      <div className="tape-grid"></div>
+      <div className="tape-scanlines"></div>
 
-      {/* 报纸布局 */}
-      <div className="newspaper-layout">
-        {/* 报头 */}
-        <header className="home-header">
-          <div className="header-top">
-            <span className="header-date">{new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            <span className="header-issue">ISSUE NO.2024</span>
+      {/* 磁带未来主义布局 - 非对称 */}
+      <div className="tape-layout">
+        {/* 左侧主时钟区 */}
+        <aside className="left-clock-zone">
+          <div className="clock-container">
+            <ClockIcon size={180} color="#ff9500" />
+            <div className="clock-glow"></div>
           </div>
-          
-          <div className="header-main">
-            <h1 className="header-title">汤圆的小窝</h1>
-            <p className="header-subtitle">TANGYUAN'S CREATIVE CORNER // 创意工作台</p>
+          <div className="clock-label">
+            <span className="label-cn">汤圆</span>
+            <span className="label-en">TANGYUAN</span>
           </div>
-          
-          <div className="header-divider"></div>
-          
-          <div className="header-nav">
-            <span>首页</span>
-            <span className="nav-sep">/</span>
-            <span>导航</span>
-            <span className="nav-sep">/</span>
-            <span>探索</span>
-          </div>
-        </header>
-
-        {/* 主要内容区 */}
-        <main className="home-content">
-          {/* 头条区域 */}
-          <div className="home-featured">
-            <span className="featured-label">FEATURED</span>
-            <div className="featured-content">
-              <h2 className="featured-title">欢迎来到创意工作台</h2>
-              <p className="featured-text">独立游戏开发 · 技术分享 · 创意实验</p>
+          <div className="clock-decor-line"></div>
+          <div className="system-status">
+            <div className="status-item">
+              <span className="status-dot"></span>
+              <span>ONLINE</span>
+            </div>
+            <div className="status-item">
+              <span>PRJ</span>
+              <span className="status-num">09</span>
+            </div>
+            <div className="status-item">
+              <span>REL</span>
+              <span className="status-num">06</span>
             </div>
           </div>
+        </aside>
 
-          {/* 导航网格 - 报纸分栏 */}
-          <div className="home-nav-grid">
+        {/* 中央内容区 */}
+        <main className="center-content">
+          <div className="main-header">
+            <h1 className="main-title">
+              <span className="title-cn">创意工作台</span>
+              <span className="title-en">CREATIVE WORKBENCH</span>
+            </h1>
+            <div className="title-decor"></div>
+          </div>
+
+          <div className="nav-cards-container">
             {navCards.map((card, index) => {
               const IconComponent = card.icon
               return (
-                <article
+                <div
                   key={card.id}
-                  className={`home-nav-card ${card.color} ${hoveredCard === card.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
-                  style={{ animationDelay: `${index * 0.08}s` }}
+                  className={`nav-card ${card.color} ${hoveredCard === card.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
+                  style={{ animationDelay: `${index * 0.1}s` }}
                   onMouseEnter={() => setHoveredCard(card.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                   onClick={() => navigate(card.path)}
                 >
-                  {/* 文章头部 */}
-                  <div className="card-header">
-                    <span className="card-vol">VOL.{String(index + 1).padStart(3, '0')}</span>
-                    <div className="card-icon">
-                      <IconComponent size={48} color="currentColor" />
+                  <div className="card-top">
+                    <span className="card-num">{String(index + 1).padStart(2, '0')}</span>
+                    <div className="card-icon-wrap">
+                      <IconComponent size={36} color="currentColor" />
                     </div>
                   </div>
-
-                  {/* 分隔线 */}
-                  <div className="card-divider"></div>
-
-                  {/* 文章内容 */}
-                  <div className="card-body">
-                    <h3 className="card-title">{card.title}</h3>
-                    <p className="card-subtitle">{card.subtitle}</p>
+                  <div className="card-mid">
+                    <h3 className="card-title-cn">{card.title}</h3>
+                    <p className="card-title-en">{card.subtitle}</p>
                     <p className="card-desc">{card.description}</p>
                   </div>
-
-                  {/* 文章底部 */}
-                  <div className="card-footer">
-                    <span className="read-more">ENTER →</span>
+                  <div className="card-bottom">
+                    <span className="card-enter">ENTER</span>
+                    <span className="card-arrow">→</span>
                   </div>
-
-                  {/* 角落装饰 */}
-                  <div className="card-corner tl"></div>
-                  <div className="card-corner tr"></div>
-                </article>
+                  <div className="card-line"></div>
+                </div>
               )
             })}
           </div>
+        </main>
 
-          {/* 社交链接区 */}
-          <div className="home-social-section">
-            <div className="social-header">
-              <div className="social-line"></div>
-              <span className="social-title">CONNECT</span>
-              <div className="social-line"></div>
+        {/* 右侧信息区 */}
+        <aside className="right-info-zone">
+          <div className="info-block date-block">
+            <ClockIcon size={32} color="#ff9500" />
+            <div className="date-info">
+              <span className="date-year">{new Date().getFullYear()}</span>
+              <span className="date-month">{new Date().toLocaleDateString('zh-CN', { month: 'long' })}</span>
+              <span className="date-day">{String(new Date().getDate()).padStart(2, '0')}</span>
             </div>
-            <div className="social-links">
-              <a href="https://github.com/Sogenmaple" target="_blank" rel="noopener noreferrer" className="social-link">
-                <span className="link-text">GITHUB</span>
-                <span className="link-arrow">↗</span>
+          </div>
+
+          <div className="info-block connect-block">
+            <div className="block-header">
+              <span>CONNECT</span>
+              <div className="block-line"></div>
+            </div>
+            <div className="connect-list">
+              <a href="https://github.com/Sogenmaple" target="_blank" rel="noopener noreferrer" className="connect-item">
+                <span>GITHUB</span>
+                <span className="arrow">↗</span>
               </a>
-              <a href="https://space.bilibili.com/389369217" target="_blank" rel="noopener noreferrer" className="social-link">
-                <span className="link-text">BILIBILI</span>
-                <span className="link-arrow">↗</span>
+              <a href="https://space.bilibili.com/389369217" target="_blank" rel="noopener noreferrer" className="connect-item">
+                <span>BILIBILI</span>
+                <span className="arrow">↗</span>
               </a>
-              <a href="https://www.taptap.cn/developer/338837" target="_blank" rel="noopener noreferrer" className="social-link">
-                <span className="link-text">TAPTAP</span>
-                <span className="link-arrow">↗</span>
+              <a href="https://www.taptap.cn/developer/338837" target="_blank" rel="noopener noreferrer" className="connect-item">
+                <span>TAPTAP</span>
+                <span className="arrow">↗</span>
               </a>
-              <a href="https://qm.qq.com/q/AxbQpuKKsK" target="_blank" rel="noopener noreferrer" className="social-link">
-                <span className="link-text">QQ 群：950087304</span>
-                <span className="link-arrow">↗</span>
+              <a href="https://qm.qq.com/q/AxbQpuKKsK" target="_blank" rel="noopener noreferrer" className="connect-item">
+                <span>QQ:950087304</span>
+                <span className="arrow">↗</span>
               </a>
             </div>
           </div>
-        </main>
 
-        {/* 底部 */}
-        <footer className="home-footer">
-          <div className="footer-divider"></div>
-          <div className="footer-content">
-            <GameIcon size={40} color="#ff9500" />
-            <div className="footer-text">
-              <p>汤圆的小窝</p>
-              <p className="footer-en">TANGYUAN'S CREATIVE CORNER</p>
+          <div className="info-block wave-block">
+            <div className="wave-viz">
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="wave-col" style={{ animationDelay: `${i * 0.08}s` }}></div>
+              ))}
             </div>
-            <div className="footer-decor"></div>
+          </div>
+        </aside>
+
+        {/* 底部装饰条 */}
+        <footer className="bottom-decor">
+          <div className="decor-left">
+            <span>EST.2024</span>
+          </div>
+          <div className="decor-center">
+            <div className="center-line"></div>
+          </div>
+          <div className="decor-right">
+            <span>ALL RIGHTS RESERVED</span>
           </div>
         </footer>
       </div>

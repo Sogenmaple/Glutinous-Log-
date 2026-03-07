@@ -1,162 +1,132 @@
 /* ============================================
-   游戏宇宙页面 - 赛博非对称布局
+   游戏宇宙 - 磁带未来主义风格
+   减少炫光，增强机械感
    ============================================ */
 
-.games-collection-page {
+.games-page {
   min-height: 100vh;
   position: relative;
   padding-top: 80px;
   background: var(--bg-deep);
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
-/* 背景装饰 - 赛博报纸纹理 */
-.newspaper-bg {
+/* 背景装饰 */
+.games-tape-bg {
   position: fixed;
   inset: 0;
-  background: 
-    radial-gradient(
-      ellipse at center,
-      rgba(255, 149, 0, 0.08) 0%,
-      rgba(6, 182, 212, 0.03) 50%,
-      transparent 70%
-    ),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(255, 149, 0, 0.02) 2px,
-      rgba(255, 149, 0, 0.02) 4px
-    );
+  background: radial-gradient(
+    ellipse at 70% 50%,
+    rgba(255, 149, 0, 0.04) 0%,
+    transparent 50%
+  );
   pointer-events: none;
   z-index: 0;
 }
 
-.newspaper-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px,
-    transparent 2px,
-    rgba(255, 149, 0, 0.03) 2px,
-    rgba(255, 149, 0, 0.03) 4px
-  );
-  animation: scanline 8s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes scanline {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(100px); }
-}
-
-.newspaper-grid {
+.games-tape-grid {
   position: fixed;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 149, 0, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 149, 0, 0.06) 1px, transparent 1px),
-    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px, 60px 60px, 20px 20px, 20px 20px;
+    linear-gradient(rgba(255, 149, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 149, 0, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
   pointer-events: none;
   z-index: 0;
-  animation: grid-pulse 4s ease-in-out infinite;
+  opacity: 0.6;
 }
 
-@keyframes grid-pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.8; }
+.games-scanlines {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1) 0px,
+    rgba(0, 0, 0, 0.1) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.3;
 }
 
 /* 主布局 - 非对称三栏 */
-.cyber-layout {
+.games-main-layout {
   display: grid;
-  grid-template-columns: 280px 1fr 300px;
-  min-height: calc(100vh - 200px);
+  grid-template-columns: 240px 1fr 260px;
+  min-height: calc(100vh - 160px);
   position: relative;
   z-index: 1;
 }
 
 /* ========== 左侧边栏 ========== */
 .sidebar-left {
-  padding: 3rem 2rem;
-  border-right: 1px solid rgba(255, 149, 0, 0.15);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 149, 0, 0.03) 0%,
-    transparent 100%
-  );
   display: flex;
   flex-direction: column;
-  gap: 3rem;
+  padding: 3rem 1.5rem;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 149, 0, 0.05) 0%,
+    transparent 100%
+  );
+  border-right: 1px solid rgba(255, 149, 0, 0.1);
 }
 
-.sidebar-section {
-  text-align: center;
+.sidebar-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
 }
 
-.sidebar-section svg {
-  margin-bottom: 1.5rem;
-  animation: float 3s ease-in-out infinite;
+.sidebar-logo svg {
+  filter: drop-shadow(0 0 20px rgba(255, 149, 0, 0.4));
+  animation: logo-float 4s ease-in-out infinite;
 }
 
-@keyframes float {
+@keyframes logo-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
 }
 
 .sidebar-title {
   font-family: var(--font-display);
-  font-size: 2.5rem;
+  font-size: 1.8rem;
   font-weight: 900;
-  color: var(--amber);
-  line-height: 1.1;
-  letter-spacing: 0.1em;
-  text-shadow: 
-    0 0 20px rgba(255, 149, 0, 0.6),
-    0 0 40px rgba(255, 149, 0, 0.3);
-  margin: 0;
+  color: #fff;
+  margin: 1rem 0 0.25rem 0;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 15px rgba(255, 149, 0, 0.5);
 }
 
-.sidebar-divider {
-  width: 60px;
-  height: 2px;
-  margin: 1.5rem auto;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 149, 0, 0.6),
-    transparent
-  );
-  box-shadow: 0 0 10px rgba(255, 149, 0, 0.4);
+.sidebar-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--amber);
+  letter-spacing: 0.2em;
 }
 
 .sidebar-stats {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  margin-top: 2rem;
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem;
-  background: rgba(255, 149, 0, 0.05);
+  padding: 1.5rem;
+  background: rgba(255, 149, 0, 0.04);
   border: 1px solid rgba(255, 149, 0, 0.1);
   border-radius: 4px;
 }
 
-.stat-value {
+.stat-item {
+  text-align: center;
+}
+
+.stat-num {
   font-family: var(--font-display);
   font-size: 2rem;
-  font-weight: 800;
-  color: var(--amber);
-  text-shadow: 0 0 15px rgba(255, 149, 0, 0.5);
+  font-weight: 900;
+  color: var(--cyan);
+  text-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
 }
 
 .stat-label {
@@ -167,148 +137,95 @@
   margin-top: 0.25rem;
 }
 
+.sidebar-date {
+  margin-top: auto;
+  padding: 1.5rem;
+  background: rgba(255, 149, 0, 0.04);
+  border: 1px solid rgba(255, 149, 0, 0.1);
+  border-radius: 4px;
+  text-align: center;
+}
+
 .date-display {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.5rem;
-  background: linear-gradient(
-    135deg,
-    rgba(6, 182, 212, 0.08) 0%,
-    rgba(255, 149, 0, 0.05) 100%
-  );
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  border-radius: 6px;
+  gap: 0.4rem;
 }
 
 .date-year {
   font-family: var(--font-display);
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 900;
   color: var(--cyan);
-  text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
 }
 
-.date-month {
+.date-month-day {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--amber);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.15em;
 }
 
-.date-day {
-  font-family: var(--font-mono);
-  font-size: 1.5rem;
-  color: var(--text-primary);
+/* ========== 中央内容区 ========== */
+.games-content {
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 4rem;
 }
 
-/* ========== 中央主内容区 ========== */
-.main-content {
-  padding: 3rem 3rem 4rem;
-  overflow-y: auto;
-}
-
-.content-header {
+.games-header {
   text-align: center;
-  margin-bottom: 3.5rem;
+  margin-bottom: 3rem;
 }
 
-.header-line {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 149, 0, 0.3) 20%,
-    rgba(255, 149, 0, 0.6) 50%,
-    rgba(6, 182, 212, 0.6) 50%,
-    rgba(6, 182, 212, 0.3) 80%,
-    transparent 100%
-  );
-  box-shadow: 0 0 10px rgba(255, 149, 0, 0.4);
-  margin-bottom: 1.5rem;
-}
-
-.header-line.bottom {
-  margin-top: 1.5rem;
-  margin-bottom: 0;
-}
-
-.main-title {
-  margin: 0;
-}
-
-.title-cn {
-  display: block;
+.games-title-cn {
   font-family: var(--font-display);
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: 900;
   color: #fff;
+  margin: 0 0 0.75rem 0;
   letter-spacing: 0.2em;
-  text-shadow: 
-    0 0 20px rgba(255, 149, 0, 0.8),
-    0 0 40px rgba(255, 149, 0, 0.6),
-    0 0 80px rgba(255, 149, 0, 0.4);
-  animation: title-glow 2s ease-in-out infinite alternate;
+  text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
 }
 
-@keyframes title-glow {
-  0% {
-    text-shadow: 
-      0 0 20px rgba(255, 149, 0, 0.8),
-      0 0 40px rgba(255, 149, 0, 0.6),
-      0 0 80px rgba(255, 149, 0, 0.4);
-  }
-  100% {
-    text-shadow: 
-      0 0 30px rgba(255, 149, 0, 1),
-      0 0 60px rgba(255, 149, 0, 0.8),
-      0 0 100px rgba(255, 149, 0, 0.6);
-  }
-}
-
-.title-en {
-  display: block;
+.games-title-en {
   font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--cyan);
-  letter-spacing: 0.5em;
-  margin-top: 0.75rem;
-  text-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+  letter-spacing: 0.35em;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
 }
 
-.main-subtitle {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.2em;
-  margin: 1rem 0 0 0;
+.title-line {
+  width: 150px;
+  height: 2px;
+  margin: 1.5rem auto 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 149, 0, 0.8),
+    transparent
+  );
+  box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
 }
 
-/* 游戏网格 - 非对称布局 */
+/* 游戏网格 - 非对称 */
 .games-grid-asymmetric {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: minmax(280px, auto);
   gap: 1.5rem;
+  flex: 1;
 }
 
-/* 游戏卡片 */
 .game-card {
   position: relative;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 149, 0, 0.04) 0%,
-    rgba(6, 182, 212, 0.02) 100%
-  );
-  border: 1px solid rgba(255, 149, 0, 0.12);
+  background: rgba(255, 149, 0, 0.03);
+  border: 1px solid rgba(255, 149, 0, 0.1);
   padding: 1.5rem;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
-  transform: translateY(20px);
-  overflow: hidden;
+  transform: translateY(15px);
 }
 
 .game-card.visible {
@@ -316,53 +233,21 @@
   transform: translateY(0);
 }
 
+.game-card:hover {
+  background: rgba(255, 149, 0, 0.06);
+  border-color: var(--theme-color);
+  transform: translateY(-4px);
+}
+
 /* 宽卡片 */
 .game-card.wide {
   grid-column: span 2;
-}
-
-/* 卡片顶部霓虹条 */
-.game-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--theme-color) 50%,
-    transparent 100%
-  );
-  box-shadow: 0 0 10px var(--theme-color);
-  opacity: 0.6;
-  transition: opacity 0.4s ease;
-}
-
-.game-card:hover::before {
-  opacity: 1;
-}
-
-.game-card:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 149, 0, 0.08) 0%,
-    rgba(6, 182, 212, 0.04) 100%
-  );
-  border-color: var(--theme-color);
-  transform: translateY(-6px);
-  box-shadow: 
-    0 10px 40px rgba(0, 0, 0, 0.3),
-    0 0 30px rgba(255, 149, 0, 0.15),
-    inset 0 0 20px rgba(255, 149, 0, 0.05);
 }
 
 /* 颜色主题 */
 .game-card.amber { --theme-color: var(--amber); }
 .game-card.cyan { --theme-color: var(--cyan); }
 .game-card.red { --theme-color: #ff453a; }
-.game-card.green { --theme-color: #22c55e; }
 .game-card.purple { --theme-color: #bd00ff; }
 
 /* 卡片头部 */
@@ -371,11 +256,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 149, 0, 0.1);
 }
 
 .card-id {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--text-dim);
   letter-spacing: 0.15em;
 }
@@ -386,30 +273,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(
-    circle,
-    rgba(255, 149, 0, 0.1) 0%,
-    transparent 70%
-  );
-  border: 1px solid rgba(255, 149, 0, 0.2);
-  border-radius: 50%;
+  background: rgba(255, 149, 0, 0.08);
+  border: 1px solid rgba(255, 149, 0, 0.15);
+  border-radius: 4px;
   color: var(--theme-color);
-  box-shadow: 0 0 15px rgba(255, 149, 0, 0.2);
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
 }
 
 .game-card:hover .card-icon-wrapper {
-  background: radial-gradient(
-    circle,
-    rgba(255, 149, 0, 0.2) 0%,
-    transparent 70%
-  );
+  background: rgba(255, 149, 0, 0.15);
   border-color: var(--theme-color);
   color: #fff;
-  transform: scale(1.1);
-  box-shadow: 
-    0 0 20px rgba(255, 149, 0, 0.4),
-    0 0 40px rgba(255, 149, 0, 0.2);
+  transform: scale(1.05);
 }
 
 /* 分隔线 */
@@ -417,15 +292,11 @@
   height: 1px;
   background: linear-gradient(
     90deg,
-    transparent 0%,
-    rgba(255, 149, 0, 0.3) 20%,
-    rgba(255, 149, 0, 0.6) 50%,
-    rgba(6, 182, 212, 0.6) 50%,
-    rgba(6, 182, 212, 0.3) 80%,
-    transparent 100%
+    transparent,
+    rgba(255, 149, 0, 0.4),
+    transparent
   );
-  margin-bottom: 1rem;
-  box-shadow: 0 0 5px rgba(255, 149, 0, 0.4);
+  margin: 1rem 0;
 }
 
 /* 卡片内容 */
@@ -439,14 +310,7 @@
   font-weight: 800;
   color: #fff;
   margin: 0 0 0.4rem 0;
-  text-shadow: 0 0 10px rgba(255, 149, 0, 0.4);
-  transition: text-shadow 0.3s ease;
-}
-
-.game-card:hover .card-title-cn {
-  text-shadow: 
-    0 0 15px rgba(255, 149, 0, 0.6),
-    0 0 30px rgba(255, 149, 0, 0.4);
+  letter-spacing: 0.1em;
 }
 
 .card-title-en {
@@ -455,13 +319,12 @@
   color: var(--cyan);
   letter-spacing: 0.2em;
   margin: 0 0 0.75rem 0;
-  text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
 }
 
 .card-desc {
   font-size: 0.85rem;
   color: var(--text-secondary);
-  line-height: 1.65;
+  line-height: 1.6;
   margin: 0 0 1rem 0;
 }
 
@@ -469,35 +332,24 @@
 .card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .card-tag {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  color: var(--cyan);
-  background: rgba(6, 182, 212, 0.08);
-  padding: 0.22rem 0.55rem;
-  border-radius: 2px;
-  border: 1px solid rgba(6, 182, 212, 0.2);
-  letter-spacing: 0.08em;
-  text-shadow: 0 0 5px rgba(6, 182, 212, 0.4);
-  transition: all 0.3s ease;
-}
-
-.game-card:hover .card-tag {
-  background: rgba(255, 149, 0, 0.12);
-  border-color: rgba(255, 149, 0, 0.3);
+  font-size: 0.65rem;
   color: var(--amber);
-  text-shadow: 0 0 8px rgba(255, 149, 0, 0.6);
-  transform: translateY(-1px);
+  background: rgba(255, 149, 0, 0.08);
+  padding: 0.25rem 0.75rem;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 149, 0, 0.15);
 }
 
 /* 卡片底部 */
 .card-footer {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.75rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 149, 0, 0.1);
 }
@@ -511,37 +363,34 @@
 
 .card-links {
   display: flex;
-  gap: 0.4rem;
-  margin-left: auto;
+  gap: 0.5rem;
 }
 
 .card-link {
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--cyan);
-  background: rgba(6, 182, 212, 0.08);
-  border: 1px solid rgba(6, 182, 212, 0.2);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
 .card-link:hover {
-  color: #fff;
   background: rgba(255, 149, 0, 0.15);
-  border-color: rgba(255, 149, 0, 0.4);
-  text-decoration: none;
-  box-shadow: 0 0 10px rgba(255, 149, 0, 0.4);
+  border-color: rgba(255, 149, 0, 0.3);
+  color: var(--amber);
 }
 
 .card-arrow {
-  font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--amber);
   opacity: 0;
   transform: translateX(-10px);
@@ -556,10 +405,10 @@
 /* 角落装饰 */
 .corner-decor {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border: 2px solid rgba(255, 149, 0, 0.3);
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
 }
 
 .corner-decor.tl {
@@ -567,7 +416,6 @@
   left: 10px;
   border-right: none;
   border-bottom: none;
-  box-shadow: -1px -1px 5px rgba(255, 149, 0, 0.3);
 }
 
 .corner-decor.tr {
@@ -575,7 +423,6 @@
   right: 10px;
   border-left: none;
   border-bottom: none;
-  box-shadow: 1px -1px 5px rgba(255, 149, 0, 0.3);
 }
 
 .corner-decor.bl {
@@ -583,7 +430,6 @@
   left: 10px;
   border-right: none;
   border-top: none;
-  box-shadow: -1px 1px 5px rgba(255, 149, 0, 0.3);
 }
 
 .corner-decor.br {
@@ -591,49 +437,45 @@
   right: 10px;
   border-left: none;
   border-top: none;
-  box-shadow: 1px 1px 5px rgba(255, 149, 0, 0.3);
 }
 
 .game-card:hover .corner-decor {
-  border-color: rgba(255, 149, 0, 0.8);
-  width: 14px;
-  height: 14px;
-  box-shadow: 
-    0 0 10px rgba(255, 149, 0, 0.6),
-    0 0 20px rgba(255, 149, 0, 0.3);
+  border-color: rgba(255, 149, 0, 0.7);
+  width: 10px;
+  height: 10px;
 }
 
 /* ========== 右侧信息栏 ========== */
 .sidebar-right {
-  padding: 3rem 2rem;
-  border-left: 1px solid rgba(6, 182, 212, 0.15);
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 1.5rem;
+  gap: 1.5rem;
   background: linear-gradient(
-    180deg,
-    rgba(6, 182, 212, 0.03) 0%,
+    270deg,
+    rgba(255, 149, 0, 0.04) 0%,
     transparent 100%
   );
+  border-left: 1px solid rgba(255, 149, 0, 0.1);
 }
 
-.info-panel {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 149, 0, 0.05) 0%,
-    rgba(6, 182, 212, 0.03) 100%
-  );
-  border: 1px solid rgba(255, 149, 0, 0.15);
-  border-radius: 6px;
+.info-panel,
+.social-panel {
+  background: rgba(255, 149, 0, 0.04);
+  border: 1px solid rgba(255, 149, 0, 0.1);
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .panel-header {
   padding: 1rem 1.25rem;
-  background: rgba(255, 149, 0, 0.08);
-  border-bottom: 1px solid rgba(255, 149, 0, 0.15);
+  background: rgba(255, 149, 0, 0.06);
+  border-bottom: 1px solid rgba(255, 149, 0, 0.1);
 }
 
 .panel-title {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--amber);
   letter-spacing: 0.2em;
 }
@@ -644,31 +486,26 @@
 
 .info-row {
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 1.25rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
 }
 
 .info-row:last-child {
   margin-bottom: 0;
 }
 
-.info-label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  letter-spacing: 0.15em;
-}
-
 .info-value {
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .info-value.active {
   color: var(--green);
-  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
 }
 
 .panel-footer {
@@ -686,52 +523,27 @@
 }
 
 .wave-bar {
-  width: 6px;
+  width: 5px;
   background: linear-gradient(
     to top,
-    rgba(255, 149, 0, 0.3) 0%,
+    rgba(6, 182, 212, 0.3) 0%,
     rgba(255, 149, 0, 0.8) 100%
   );
   border-radius: 2px;
-  animation: wave 1s ease-in-out infinite;
+  animation: wave-anim 1s ease-in-out infinite;
 }
 
-@keyframes wave {
+@keyframes wave-anim {
   0%, 100% { height: 20%; }
   50% { height: 100%; }
 }
 
-/* 社交链接面板 */
-.social-panel {
-  margin-top: 1.5rem;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 149, 0, 0.05) 0%,
-    rgba(6, 182, 212, 0.03) 100%
-  );
-  border: 1px solid rgba(255, 149, 0, 0.15);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.social-panel .panel-header {
-  padding: 1rem 1.25rem;
-  background: rgba(255, 149, 0, 0.08);
-  border-bottom: 1px solid rgba(255, 149, 0, 0.15);
-}
-
-.social-panel .panel-title {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--amber);
-  letter-spacing: 0.2em;
-}
-
+/* 社交链接 */
 .social-panel .panel-content {
-  padding: 1.25rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .social-link {
@@ -741,14 +553,14 @@
   padding: 0.75rem 1rem;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  border-radius: 3px;
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
 .social-link:hover {
   background: rgba(255, 149, 0, 0.08);
-  border-color: rgba(255, 149, 0, 0.2);
+  border-color: rgba(255, 149, 0, 0.15);
   transform: translateX(4px);
 }
 
@@ -781,13 +593,9 @@
 .cyber-footer {
   position: relative;
   z-index: 1;
-  padding: 3rem 2rem;
-  border-top: 1px solid rgba(255, 149, 0, 0.15);
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(255, 149, 0, 0.03) 100%
-  );
+  padding: 2rem 4rem;
+  background: rgba(255, 149, 0, 0.03);
+  border-top: 1px solid rgba(255, 149, 0, 0.1);
 }
 
 .footer-grid {
@@ -802,7 +610,6 @@
 
 .footer-content {
   position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -819,7 +626,7 @@
   font-weight: 700;
   color: var(--amber);
   margin: 0;
-  text-shadow: 0 0 15px rgba(255, 149, 0, 0.5);
+  letter-spacing: 0.1em;
 }
 
 .footer-en {
@@ -827,26 +634,27 @@
   font-size: 0.7rem !important;
   color: var(--cyan) !important;
   letter-spacing: 0.2em !important;
-  margin-top: 0.4rem !important;
-  text-shadow: 0 0 8px rgba(6, 182, 212, 0.5) !important;
+  margin-top: 0.5rem !important;
 }
 
 .footer-decor {
-  width: 100px;
-  height: 2px;
+  position: absolute;
+  left: 4rem;
+  right: 4rem;
+  height: 1px;
+  bottom: 0;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 149, 0, 0.6),
+    rgba(255, 149, 0, 0.4),
     transparent
   );
-  box-shadow: 0 0 10px rgba(255, 149, 0, 0.4);
 }
 
 /* ========== 响应式 ========== */
 @media (max-width: 1200px) {
-  .cyber-layout {
-    grid-template-columns: 240px 1fr;
+  .games-main-layout {
+    grid-template-columns: 220px 1fr;
   }
 
   .sidebar-right {
@@ -863,54 +671,73 @@
 }
 
 @media (max-width: 900px) {
-  .cyber-layout {
+  .games-main-layout {
     grid-template-columns: 1fr;
   }
 
   .sidebar-left {
+    flex-direction: row;
+    padding: 2rem;
+    gap: 2rem;
+  }
+
+  .sidebar-logo {
+    margin-bottom: 0;
+  }
+
+  .sidebar-stats {
     display: none;
   }
 
-  .main-content {
-    padding: 2rem 1.5rem 3rem;
+  .sidebar-date {
+    display: none;
   }
 
   .games-grid-asymmetric {
     grid-template-columns: 1fr;
   }
 
-  .title-cn {
-    font-size: 3rem;
+  .games-content {
+    padding: 2rem 1.5rem;
   }
 
-  .title-en {
-    font-size: 0.9rem;
+  .games-title-cn {
+    font-size: 2.5rem;
   }
 }
 
 @media (max-width: 600px) {
-  .main-content {
-    padding: 1.5rem 1rem 2.5rem;
+  .games-page {
+    padding-top: 70px;
   }
 
-  .content-header {
-    margin-bottom: 2.5rem;
+  .games-main-layout {
+    min-height: calc(100vh - 140px);
   }
 
-  .title-cn {
-    font-size: 2.5rem;
+  .sidebar-left {
+    padding: 1.5rem;
   }
 
-  .game-card {
-    padding: 1.25rem;
+  .sidebar-logo svg {
+    width: 80px;
+    height: 80px;
   }
 
-  .card-title-cn {
-    font-size: 1.2rem;
+  .sidebar-title {
+    font-size: 1.5rem;
+  }
+
+  .games-content {
+    padding: 1.5rem;
+  }
+
+  .games-title-cn {
+    font-size: 2rem;
   }
 
   .cyber-footer {
-    padding: 2rem 1rem;
+    padding: 1.5rem;
   }
 
   .footer-content {

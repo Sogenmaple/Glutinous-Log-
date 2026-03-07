@@ -2,16 +2,16 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Header from '../components/Header'
 import '../styles/Dinosaur.css'
 
-const GRAVITY = 0.65
-const JUMP_STRENGTH = -14
-const BASE_SPEED = 7
-const GROUND_Y = 380
-const DINO_X = 50
+const GRAVITY = 0.7
+const JUMP_STRENGTH = -15
+const BASE_SPEED = 8
+const GROUND_OFFSET = 80
+const DINO_X = 80
 
 export default function Dinosaur() {
   const [gameStarted, setGameStarted] = useState(false)
   const [gameOver, setGameOver] = useState(false)
-  const [dinoY, setDinoY] = useState(GROUND_Y)
+  const [dinoY, setDinoY] = useState(0)
   const [obstacles, setObstacles] = useState([])
   const [score, setScore] = useState(0)
   const [highScore, setHighScore] = useState(0)
@@ -25,6 +25,7 @@ export default function Dinosaur() {
   const gameLoopRef = useRef(null)
   const lastTimeRef = useRef(0)
   const scoreRef = useRef(0)
+  const canvasHeightRef = useRef(400)
 
   useEffect(() => {
     const saved = localStorage.getItem('dinosaur_highscore')
@@ -58,11 +59,25 @@ export default function Dinosaur() {
     setParticles(prev => [...prev, ...newParticles])
   }, [])
 
+  const resetGame = useCallback(() => {
+    setGameStarted(false)
+    setGameOver(false)
+    setIsPaused(false)
+    setDinoY(0)
+    dinoVelocityRef.current = 0
+    setObstacles([])
+    setScore(0)
+    setIsDucking(false)
+    speedRef.current = BASE_SPEED
+    setSpeedLevel(1)
+    setParticles([])
+  }, [])
+
   const startGame = useCallback(() => {
     setGameStarted(true)
     setGameOver(false)
     setIsPaused(false)
-    setDinoY(GROUND_Y)
+    setDinoY(0)
     dinoVelocityRef.current = 0
     setObstacles([{ x: 700, type: Math.random() > 0.6 ? 'bird' : 'cactus' }])
     setScore(0)
@@ -81,9 +96,9 @@ export default function Dinosaur() {
     }
     if (isPaused) return
     
-    if (dinoY >= GROUND_Y - 5) {
+    if (dinoY <= 5) {
       dinoVelocityRef.current = JUMP_STRENGTH
-      createParticles(DINO_X + 20, dinoY - 10, 6)
+      createParticles(DINO_X + 20, canvasHeightRef.current - GROUND_OFFSET - dinoY + 10, 6)
     }
   }, [gameStarted, gameOver, isPaused, dinoY, startGame, createParticles])
 
@@ -139,9 +154,9 @@ export default function Dinosaur() {
         
         setDinoY(prevY => {
           const newY = prevY + dinoVelocityRef.current
-          if (newY >= GROUND_Y) {
+          if (newY <= 0) {
             dinoVelocityRef.current = 0
-            return GROUND_Y
+            return 0
           }
           dinoVelocityRef.current += GRAVITY
           return newY
@@ -155,14 +170,14 @@ export default function Dinosaur() {
           newObstacles = newObstacles.filter(obs => obs.x > -50)
           
           const lastObs = newObstacles[newObstacles.length - 1]
-          const minGap = 300 + speedRef.current * 12
+          const minGap = 280 + speedRef.current * 10
           
           if (!lastObs || lastObs.x < 750 - minGap) {
             const type = Math.random() > 0.6 ? 'bird' : 'cactus'
             newObstacles.push({
               x: 800,
               type,
-              y: type === 'bird' ? GROUND_Y - 60 : GROUND_Y
+              y: type === 'bird' ? 70 : 0
             })
           }
           
@@ -188,7 +203,7 @@ export default function Dinosaur() {
           const newLevel = Math.floor(currentScore / 300) + 1
           if (newLevel !== speedLevel) {
             setSpeedLevel(newLevel)
-            speedRef.current = Math.min(BASE_SPEED + (newLevel - 1) * 0.7, 13)
+            speedRef.current = Math.min(BASE_SPEED + (newLevel - 1) * 0.6, 12)
           }
         }
       }
@@ -210,29 +225,39 @@ export default function Dinosaur() {
 
     const dinoWidth = isDucking ? 50 : 40
     const dinoHeight = isDucking ? 25 : 45
+    const groundY = canvasHeightRef.current - GROUND_OFFSET
     const dinoLeft = DINO_X + 5
     const dinoRight = DINO_X + dinoWidth - 5
-    const dinoTop = dinoY - dinoHeight + 5
-    const dinoBottom = dinoY - 3
+    const dinoTop = groundY - dinoY - dinoHeight + 5
+    const dinoBottom = groundY - dinoY - 3
 
     for (const obs of obstacles) {
       const obsWidth = obs.type === 'bird' ? 35 : 25
       const obsHeight = obs.type === 'bird' ? 20 : 35
+      const obsGroundY = obs.type === 'bird' ? groundY - 70 : groundY
       const obsLeft = obs.x + 3
       const obsRight = obs.x + obsWidth - 3
-      const obsTop = obs.y - obsHeight + 3
-      const obsBottom = obs.y - 3
+      const obsTop = obsGroundY - obs.y - obsHeight + 3
+      const obsBottom = obsGroundY - obs.y - 3
 
       if (dinoRight > obsLeft && 
           dinoLeft < obsRight && 
           dinoBottom > obsTop && 
           dinoTop < obsBottom) {
         setGameOver(true)
-        createParticles(DINO_X + 20, dinoY - dinoHeight / 2, 12)
+        createParticles(DINO_X + 20, groundY - dinoY - dinoHeight / 2, 12)
         return
       }
     }
   }, [dinoY, obstacles, gameStarted, gameOver, isPaused, isDucking, createParticles])
+
+  const handleCanvasClick = useCallback(() => {
+    if (gameOver) {
+      resetGame()
+    } else {
+      jump()
+    }
+  }, [gameOver, resetGame, jump])
 
   return (
     <div className="dinosaur-page">
@@ -245,7 +270,7 @@ export default function Dinosaur() {
       <div className="dino-layout">
         <aside className="dino-sidebar-left">
           <div className="logo-section">
-            <svg width="70" height="70" viewBox="0 0 100 100" fill="none" stroke="#fff" strokeWidth="3">
+            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#fff" strokeWidth="3">
               <ellipse cx="50" cy="50" rx="35" ry="20"/>
               <circle cx="70" cy="40" r="12"/>
               <path d="M80 35l15-5M82 40l15-3M80 45l15-2"/>
@@ -281,22 +306,6 @@ export default function Dinosaur() {
               </div>
             </div>
           </div>
-
-          <div className="tips-box">
-            <div className="tips-header">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4M12 8h.01"/>
-              </svg>
-              <span>游戏技巧</span>
-            </div>
-            <ul className="tips-list">
-              <li>长按跳跃更高</li>
-              <li>飞鸟需要蹲下通过</li>
-              <li>仙人掌需要跳跃</li>
-              <li>提前预判障碍物</li>
-            </ul>
-          </div>
         </aside>
 
         <main className="dino-main">
@@ -317,8 +326,8 @@ export default function Dinosaur() {
             </div>
           </div>
 
-          <div className="game-container">
-            <div className="game-canvas" onClick={jump}>
+          <div className="game-section">
+            <div className="game-canvas" onClick={handleCanvasClick}>
               <div className="bg-lines"></div>
               
               {particles.map(p => (
@@ -339,22 +348,16 @@ export default function Dinosaur() {
               {/* 恐龙 - 简约线条风格 */}
               <div 
                 className={`dino ${isDucking ? 'ducking' : ''}`}
-                style={{ top: dinoY - (isDucking ? 25 : 45) }}
+                style={{ bottom: GROUND_OFFSET + dinoY, left: DINO_X }}
               >
                 <svg viewBox="0 0 50 45" fill="none" stroke="#fff" strokeWidth="2">
-                  {/* 身体 */}
                   <ellipse cx="25" cy="30" rx="18" ry="12"/>
-                  {/* 头部 */}
                   <circle cx="38" cy="20" r="8"/>
-                  {/* 嘴巴 */}
                   <path d="M44 18l6-2"/>
                   <path d="M44 20l6 0"/>
-                  {/* 眼睛 */}
                   <circle cx="40" cy="18" r="2" fill="#fff"/>
-                  {/* 腿 */}
                   <path d="M20 40l-3 5" className="leg-left"/>
                   <path d="M30 40l3 5" className="leg-right"/>
-                  {/* 尾巴 */}
                   <path d="M8 32l-8 3"/>
                   {!isDucking && <path d="M25 18l0-8"/>}
                 </svg>
@@ -367,7 +370,7 @@ export default function Dinosaur() {
                   className={`obstacle ${obs.type}`}
                   style={{ 
                     left: obs.x, 
-                    top: obs.y - (obs.type === 'bird' ? 20 : 35)
+                    bottom: GROUND_OFFSET + (obs.type === 'bird' ? 70 + obs.y : obs.y)
                   }}
                 >
                   {obs.type === 'bird' ? (
@@ -430,7 +433,7 @@ export default function Dinosaur() {
                         </div>
                         {score >= highScore && score > 0 && (
                           <div className="new-record">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2">
                               <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
                               <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
                               <path d="M4 22h16"/>
@@ -449,16 +452,16 @@ export default function Dinosaur() {
                         </svg>
                         <h2 className="result-title">恐龙快跑</h2>
                         <p className="subtitle">简约黑白风格</p>
-                        <button className="start-btn" onClick={(e) => { e.stopPropagation(); startGame(); }}>
-                          {gameOver ? '再玩一次' : '开始游戏'}
-                        </button>
-                        <p className="controls-hint">
-                          <span className="key-badge">空格</span> 跳跃 · 
-                          <span className="key-badge">↓</span> 蹲下 · 
-                          <span className="key-badge">P</span> 暂停
-                        </p>
                       </>
                     )}
+                    <button className="start-btn" onClick={(e) => { e.stopPropagation(); startGame(); }}>
+                      {gameOver ? '再玩一次' : '开始游戏'}
+                    </button>
+                    <p className="controls-hint">
+                      <span className="key-badge">空格</span> 跳跃 · 
+                      <span className="key-badge">↓</span> 蹲下 · 
+                      <span className="key-badge">P</span> 暂停
+                    </p>
                   </div>
                 </div>
               )}

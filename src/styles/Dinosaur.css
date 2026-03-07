@@ -1,6 +1,6 @@
 /* ============================================
-   恐龙快跑 - 简约黑白风格
-   修复：留白 + 跳跃高度 + 黑白矢量图
+   恐龙快跑 - 黑白简约风格 v2
+   修复：重新开始 + 留白 + 碰撞 + 排版
    ============================================ */
 
 .dinosaur-page {
@@ -11,15 +11,13 @@
   overflow-x: hidden;
 }
 
-/* 背景装饰 */
 .tape-bg {
   position: fixed;
   inset: 0;
   background: radial-gradient(
     ellipse at 50% 30%,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.02) 40%,
-    transparent 70%
+    rgba(255, 255, 255, 0.05) 0%,
+    transparent 60%
   );
   pointer-events: none;
   z-index: 0;
@@ -29,8 +27,8 @@
   position: fixed;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
   pointer-events: none;
   z-index: 0;
@@ -41,44 +39,42 @@
   inset: 0;
   background: repeating-linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.15) 0px,
-    rgba(0, 0, 0, 0.15) 1px,
+    rgba(0, 0, 0, 0.2) 0px,
+    rgba(0, 0, 0, 0.2) 1px,
     transparent 1px,
     transparent 2px
   );
   pointer-events: none;
   z-index: 0;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
-/* 主布局 */
 .dino-layout {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 200px 1fr;
   position: relative;
   z-index: 1;
   gap: 0;
 }
 
-/* 左侧信息栏 */
 .dino-sidebar-left {
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
+  padding: 1.25rem;
   gap: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .logo-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.25rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
-  gap: 0.75rem;
+  gap: 0.625rem;
 }
 
 .logo-section svg {
@@ -87,12 +83,12 @@
 
 @keyframes logo-float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  50% { transform: translateY(-5px); }
 }
 
 .logo-title {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 900;
   color: #fff;
   margin: 0;
@@ -101,45 +97,44 @@
 
 .logo-subtitle {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #888;
+  font-size: 0.55rem;
+  color: #666;
   letter-spacing: 0.2em;
   margin: 0;
 }
 
-/* 状态面板 */
 .status-panel {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
   overflow: hidden;
   flex: 1;
 }
 
 .panel-header {
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.625rem 0.875rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .panel-header span {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #aaa;
+  font-size: 0.55rem;
+  color: #888;
   letter-spacing: 0.15em;
   font-weight: 700;
 }
 
 .panel-content {
-  padding: 0.875rem;
+  padding: 0.75rem;
 }
 
 .status-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .status-row:last-child {
@@ -148,14 +143,14 @@
 
 .status-row .label {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #777;
+  font-size: 0.55rem;
+  color: #666;
   letter-spacing: 0.1em;
 }
 
 .status-row .value {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #ccc;
   font-weight: 700;
 }
@@ -174,76 +169,24 @@
 
 .status-row .value.level {
   color: #fbbf24;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-/* 技巧提示框 */
-.tips-box {
-  margin-top: auto;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-}
-
-.tips-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.tips-header span {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: #fff;
-  letter-spacing: 0.1em;
-  font-weight: 700;
-}
-
-.tips-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.tips-list li {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: #aaa;
-  padding: 0.35rem 0;
-  padding-left: 1rem;
-  position: relative;
-  line-height: 1.4;
-}
-
-.tips-list li::before {
-  content: '▸';
-  position: absolute;
-  left: 0;
-  color: #fff;
-  font-size: 0.75rem;
-}
-
-/* 中央游戏区 */
 .dino-main {
   display: flex;
   flex-direction: column;
-  padding: 1.5rem;
-  gap: 1rem;
+  padding: 1.25rem;
+  gap: 0.875rem;
 }
 
-/* 顶部信息条 */
 .top-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2.5rem;
-  padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 2rem;
+  padding: 0.625rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
 }
 
@@ -251,38 +194,37 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
+  gap: 0.15rem;
 }
 
 .top-info .info-label {
   font-family: var(--font-mono);
-  font-size: 0.55rem;
-  color: #777;
+  font-size: 0.5rem;
+  color: #666;
   letter-spacing: 0.2em;
 }
 
 .top-info .info-value {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 900;
   color: #fff;
 }
 
 .top-divider {
   width: 1px;
-  height: 1.5rem;
+  height: 1.25rem;
   background: linear-gradient(
     to bottom,
     transparent,
-    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0.25),
     transparent
   );
 }
 
-/* 游戏容器 - 关键修复留白 */
-.game-container {
+.game-section {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   flex: 1;
   min-height: 0;
 }
@@ -291,14 +233,13 @@
   flex: 1;
   position: relative;
   background: #000;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 6px;
   overflow: hidden;
   cursor: pointer;
-  min-height: 400px;
+  min-height: 380px;
 }
 
-/* 背景装饰线 */
 .bg-lines {
   position: absolute;
   inset: 0;
@@ -306,16 +247,14 @@
     90deg,
     transparent,
     transparent 99px,
-    rgba(255, 255, 255, 0.03) 99px,
-    rgba(255, 255, 255, 0.03) 100px
+    rgba(255, 255, 255, 0.025) 99px,
+    rgba(255, 255, 255, 0.025) 100px
   );
   pointer-events: none;
 }
 
-/* 恐龙 - 简约线条 */
 .dino {
   position: absolute;
-  left: 50px;
   width: 50px;
   height: 45px;
   z-index: 10;
@@ -325,7 +264,6 @@
 .dino svg {
   width: 100%;
   height: 100%;
-  animation: none;
 }
 
 .dino.ducking svg {
@@ -335,11 +273,11 @@
 
 .leg-left,
 .leg-right {
-  animation: dino-run 0.1s ease-in-out infinite alternate;
+  animation: dino-run 0.08s ease-in-out infinite alternate;
 }
 
 .leg-right {
-  animation-delay: 0.05s;
+  animation-delay: 0.04s;
 }
 
 @keyframes dino-run {
@@ -347,7 +285,6 @@
   100% { transform: translateY(-3px); }
 }
 
-/* 障碍物 */
 .obstacle {
   position: absolute;
   z-index: 5;
@@ -369,19 +306,18 @@
 }
 
 .wing {
-  animation: bird-flap 0.08s ease-in-out infinite alternate;
+  animation: bird-flap 0.06s ease-in-out infinite alternate;
   transform-origin: 10px 8px;
 }
 
 @keyframes bird-flap {
   0% { transform: rotate(0deg); }
-  100% { transform: rotate(-30deg); }
+  100% { transform: rotate(-25deg); }
 }
 
-/* 地面 */
 .ground {
   position: absolute;
-  bottom: 30px;
+  bottom: 80px;
   left: 0;
   width: 100%;
   height: 2px;
@@ -394,10 +330,9 @@
   width: 100%;
   height: 100%;
   background: #fff;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
 
-/* 粒子效果 */
 .particle {
   position: absolute;
   border-radius: 50%;
@@ -405,7 +340,6 @@
   z-index: 15;
 }
 
-/* 游戏遮罩 */
 .overlay {
   position: absolute;
   inset: 0;
@@ -423,63 +357,63 @@
 
 .overlay-content {
   text-align: center;
-  padding: 2.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  backdrop-filter: blur(8px);
-  max-width: 400px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+  max-width: 380px;
 }
 
 .overlay-content svg {
-  margin-bottom: 1rem;
+  margin-bottom: 0.875rem;
 }
 
 .overlay-content h2 {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   color: #fff;
-  margin: 0.75rem 0;
+  margin: 0.625rem 0;
 }
 
 .overlay-content .subtitle {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #888;
+  font-size: 0.65rem;
+  color: #777;
   letter-spacing: 0.15em;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 .result-title {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   color: #fff;
-  margin: 0.75rem 0;
+  margin: 0.625rem 0;
 }
 
 .score-board {
   display: flex;
-  gap: 2rem;
-  margin: 1.25rem 0;
+  gap: 1.75rem;
+  margin: 1rem 0;
   justify-content: center;
 }
 
 .score-item {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .score-item .label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: #777;
+  font-size: 0.6rem;
+  color: #666;
   letter-spacing: 0.1em;
 }
 
 .score-item .value {
   font-family: var(--font-display);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: #fff;
 }
@@ -492,11 +426,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #fbbf24;
-  margin-bottom: 1rem;
+  margin-bottom: 0.875rem;
   animation: new-record-pulse 1s ease-in-out infinite;
 }
 
@@ -506,17 +440,17 @@
 }
 
 .start-btn {
-  padding: 1rem 2.5rem;
+  padding: 0.875rem 2.25rem;
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 900;
   color: #000;
   background: #fff;
   border: 2px solid #fff;
-  border-radius: 6px;
+  border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 1rem;
+  margin-bottom: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -529,70 +463,69 @@
 
 .controls-hint {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: #777;
+  font-size: 0.6rem;
+  color: #666;
   letter-spacing: 0.1em;
-  line-height: 1.8;
+  line-height: 1.6;
 }
 
 .key-badge {
   display: inline-block;
-  padding: 0.15rem 0.4rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.125rem 0.35rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 3px;
   color: #fff;
   font-weight: 700;
-  margin: 0 0.2rem;
+  margin: 0 0.15rem;
 }
 
 .hint {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #888;
-  margin-top: 0.75rem;
+  font-size: 0.65rem;
+  color: #777;
+  margin-top: 0.625rem;
 }
 
-/* 右侧状态栏 */
 .dino-sidebar-right {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 0.75rem;
-  min-width: 120px;
+  gap: 0.625rem;
+  min-width: 110px;
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
-  padding: 0.875rem;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateX(-3px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(-2px);
 }
 
 .stat-card svg {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .stat-label {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #777;
+  font-size: 0.55rem;
+  color: #666;
   letter-spacing: 0.1em;
 }
 
 .stat-value {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 900;
   color: #fff;
 }
@@ -601,25 +534,24 @@
   color: #22d3ee;
 }
 
-/* 操作说明面板 */
 .controls-panel {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 6px;
-  padding: 1rem 1.25rem;
+  padding: 0.875rem 1rem;
 }
 
 .controls-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .controls-header span {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: #fff;
+  font-size: 0.6rem;
+  color: #aaa;
   letter-spacing: 0.15em;
   font-weight: 700;
 }
@@ -629,7 +561,7 @@
   height: 1px;
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.3),
     transparent
   );
 }
@@ -637,59 +569,58 @@
 .controls-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .control-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.3rem;
 }
 
 .key-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #fff;
   transition: all 0.3s ease;
 }
 
 .control-item:hover .key-icon {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
 
 .key-label {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #888;
+  font-size: 0.55rem;
+  color: #777;
   letter-spacing: 0.1em;
 }
 
 .key-action {
   font-family: var(--font-display);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #fff;
 }
 
-/* 响应式 */
 @media (max-width: 1200px) {
   .dino-layout {
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 180px 1fr;
   }
 
-  .game-container {
+  .game-section {
     flex-direction: column;
   }
 
@@ -717,12 +648,8 @@
     min-width: 200px;
   }
 
-  .tips-box {
-    display: none;
-  }
-
   .game-canvas {
-    min-height: 350px;
+    min-height: 320px;
   }
 
   .controls-grid {
@@ -740,30 +667,30 @@
   }
 
   .game-canvas {
-    min-height: 300px;
+    min-height: 280px;
   }
 
   .overlay-content {
-    padding: 2rem 1.5rem;
+    padding: 1.75rem 1.25rem;
   }
 
   .overlay-content h2,
   .result-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
 
   .score-board {
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
   .controls-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    gap: 0.625rem;
   }
 
   .top-bar {
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 0.875rem;
   }
 
   .dino-sidebar-right {

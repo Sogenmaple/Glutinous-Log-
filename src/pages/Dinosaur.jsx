@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Header from '../components/Header'
 import { ToolIcon } from '../components/icons/SiteIcons'
 import '../styles/Dinosaur.css'
 
 const GRAVITY = 0.6
 const JUMP_STRENGTH = -10
-const OBSTACLE_SPEED = 6
+const BASE_OBSTACLE_SPEED = 6
 const GROUND_Y = 420
+const DINO_X = 50
 
 export default function Dinosaur() {
   const [gameStarted, setGameStarted] = useState(false)
@@ -17,6 +18,11 @@ export default function Dinosaur() {
   const [score, setScore] = useState(0)
   const [highScore, setHighScore] = useState(0)
   const [isDucking, setIsDucking] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
+  const [particleEffects, setParticleEffects] = useState([])
+  const [obstacleSpeed, setObstacleSpeed] = useState(BASE_OBSTACLE_SPEED)
+  const gameLoopRef = useRef(null)
+  const lastTimeRef = useRef(0)
 
   // 加载最佳记录
   useEffect(() => {
@@ -32,30 +38,60 @@ export default function Dinosaur() {
     }
   }, [score, highScore])
 
+  // 创建粒子效果
+  const createParticles = useCallback((x, y, color = '#22c55e') => {
+    const particles = []
+    for (let i = 0; i < 8; i++) {
+      particles.push({
+        id: Date.now() + i,
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 10,
+        vy: (Math.random() - 0.5) * 10,
+        life: 1,
+        color
+      })
+    }
+    setParticleEffects(prev => [...prev, ...particles])
+  }, [])
+
   // 开始游戏
   const startGame = useCallback(() => {
     setGameStarted(true)
     setGameOver(false)
+    setIsPaused(false)
     setDinoY(GROUND_Y)
     setDinoVelocity(0)
     setObstacles([{ x: 800, type: 'cactus', width: 30 }])
     setScore(0)
     setIsDucking(false)
-  }, [])
+    setObstacleSpeed(BASE_OBSTACLE_SPEED)
+    setParticleEffects([])
+    createParticles(DINO_X + 30, GROUND_Y - 30, '#22c55e')
+  }, [createParticles])
 
   // 跳跃
   const jump = useCallback(() => {
+    if (gameOver) return
     if (!gameStarted) {
       startGame()
-    } else if (!gameOver && dinoY >= GROUND_Y) {
+    } else if (!isPaused && dinoY >= GROUND_Y) {
       setDinoVelocity(JUMP_STRENGTH)
+      createParticles(DINO_X + 30, dinoY - 10, 'rgba(255,149,0,0.5)')
     }
-  }, [gameStarted, gameOver, dinoY, startGame])
+  }, [gameStarted, gameOver, isPaused, dinoY, startGame, createParticles])
 
   // 蹲下
   const duck = useCallback((ducking) => {
-    if (gameStarted && !gameOver) {
+    if (gameStarted && !gameOver && !isPaused) {
       setIsDucking(ducking)
+    }
+  }, [gameStarted, gameOver, isPaused])
+
+  // 暂停/继续
+  const togglePause = useCallback(() => {
+    if (gameStarted && !gameOver) {
+      setIsPaused(prev => !prev)
     }
   }, [gameStarted, gameOver])
 
@@ -70,6 +106,10 @@ export default function Dinosaur() {
         e.preventDefault()
         duck(true)
       }
+      if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+        e.preventDefault()
+        togglePause()
+      }
     }
     const handleKeyUp = (e) => {
       if (e.key === 'ArrowDown') {
@@ -82,71 +122,108 @@ export default function Dinosaur() {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [jump, duck])
+  }, [jump, duck, togglePause])
 
   // 游戏循环
   useEffect(() => {
-    if (!gameStarted || gameOver) return
+    if (!gameStarted || gameOver || isPaused) return
 
-    const gameLoop = setInterval(() => {
-      // 更新恐龙位置
-      setDinoY(y => {
-        const newY = y + dinoVelocity
-        return newY >= GROUND_Y ? GROUND_Y : newY
-      })
-      setDinoVelocity(v => (dinoY >= GROUND_Y ? 0 : v + GRAVITY))
+    const gameLoop = () => {
+      const now = Date.now()
+      const deltaTime = now - lastTimeRef.current
+      
+      if (deltaTime >= 16) {
+        lastTimeRef.current = now
+        
+        // 更新恐龙位置
+        setDinoY(y => {
+          const newY = y + dinoVelocity
+          return newY >= GROUND_Y ? GROUND_Y : newY
+        })
+        setDinoVelocity(v => (dinoY >= GROUND_Y ? 0 : v + GRAVITY))
 
-      // 更新障碍物
-      setObstacles(current => {
-        let newObstacles = current.map(obs => ({ ...obs, x: obs.x - OBSTACLE_SPEED }))
+        // 更新障碍物速度和生成
+        setObstacles(current => {
+          let newObstacles = current.map(obs => ({ ...obs, x: obs.x - obstacleSpeed }))
+          
+          // 移除屏幕外的障碍物
+          newObstacles = newObstacles.filter(obs => obs.x > -50)
+          
+          // 添加新障碍物（难度递增）
+          const difficulty = Math.min(score * 0.001, 1)
+          const spawnDistance = 500 - difficulty * 150
+          
+          if (newObstacles.length === 0 || newObstacles[newObstacles.length - 1].x < spawnDistance) {
+            const types = ['cactus', 'cactus', 'cactus', 'bird']
+            const type = types[Math.floor(Math.random() * types.length)]
+            newObstacles.push({ 
+              x: 800, 
+              type, 
+              width: type === 'bird' ? 40 : 30,
+              y: type === 'bird' ? GROUND_Y - 50 - Math.random() * 30 : GROUND_Y 
+            })
+          }
+          
+          return newObstacles
+        })
+
+        // 更新粒子
+        setParticleEffects(prev => 
+          prev
+            .map(p => ({
+              ...p,
+              x: p.x + p.vx,
+              y: p.y + p.vy,
+              vy: p.vy + 0.5,
+              life: p.life - 0.05
+            }))
+            .filter(p => p.life > 0)
+        )
+
+        // 增加分数
+        setScore(s => s + 1)
         
-        // 移除屏幕外的障碍物
-        newObstacles = newObstacles.filter(obs => obs.x > -50)
-        
-        // 添加新障碍物
-        if (newObstacles.length === 0 || newObstacles[newObstacles.length - 1].x < 500) {
-          const types = ['cactus', 'cactus', 'cactus', 'bird']
-          const type = types[Math.floor(Math.random() * types.length)]
-          newObstacles.push({ 
-            x: 800, 
-            type, 
-            width: type === 'bird' ? 40 : 30,
-            y: type === 'bird' ? GROUND_Y - 50 : GROUND_Y 
-          })
+        // 每 100 分提升速度
+        if (score > 0 && score % 100 === 0) {
+          setObstacleSpeed(prev => Math.min(prev + 0.5, 12))
         }
-        
-        return newObstacles
-      })
+      }
+      
+      gameLoopRef.current = requestAnimationFrame(gameLoop)
+    }
 
-      // 增加分数
-      setScore(s => s + 1)
-    }, 16)
+    gameLoopRef.current = requestAnimationFrame(gameLoop)
 
-    return () => clearInterval(gameLoop)
-  }, [gameStarted, gameOver, dinoVelocity, dinoY])
+    return () => {
+      if (gameLoopRef.current) {
+        cancelAnimationFrame(gameLoopRef.current)
+      }
+    }
+  }, [gameStarted, gameOver, isPaused, dinoVelocity, dinoY, obstacleSpeed, score])
 
   // 碰撞检测
   useEffect(() => {
-    if (!gameStarted || gameOver) return
+    if (!gameStarted || gameOver || isPaused) return
 
-    const dinoLeft = 50
-    const dinoRight = isDucking ? 110 : 80
-    const dinoTop = dinoY - (isDucking ? 30 : 60)
-    const dinoBottom = dinoY
+    const dinoLeft = DINO_X + 10
+    const dinoRight = isDucking ? DINO_X + 50 : DINO_X + 40
+    const dinoTop = dinoY - (isDucking ? 30 : 60) + 10
+    const dinoBottom = dinoY - 5
 
     for (const obs of obstacles) {
-      const obsLeft = obs.x
-      const obsRight = obs.x + obs.width
-      const obsTop = obs.type === 'bird' ? obs.y - 30 : obs.y - 40
-      const obsBottom = obs.y
+      const obsLeft = obs.x + 5
+      const obsRight = obs.x + obs.width - 5
+      const obsTop = obs.type === 'bird' ? obs.y - 30 + 5 : obs.y - 40 + 5
+      const obsBottom = obs.y - 5
 
-      if (dinoRight > obsLeft + 10 && dinoLeft < obsRight - 10 &&
-          dinoBottom > obsTop + 10 && dinoTop < obsBottom - 10) {
+      if (dinoRight > obsLeft && dinoLeft < obsRight &&
+          dinoBottom > obsTop && dinoTop < obsBottom) {
         setGameOver(true)
+        createParticles(dinoLeft + 20, dinoTop, '#ef4444')
         return
       }
     }
-  }, [dinoY, obstacles, gameStarted, gameOver, isDucking])
+  }, [dinoY, obstacles, gameStarted, gameOver, isPaused, isDucking, createParticles])
 
   return (
     <div className="dinosaur-page">
@@ -162,8 +239,23 @@ export default function Dinosaur() {
           <p className="dinosaur-subtitle">DINO RUN - 无尽跑酷挑战</p>
         </div>
 
-        <div className="dinosaur-game-area">
+        <div className="dinosaur-game-area" onClick={jump}>
           <div className="game-canvas">
+            {/* 粒子效果 */}
+            {particleEffects.map(particle => (
+              <div
+                key={particle.id}
+                className="particle"
+                style={{
+                  left: particle.x,
+                  top: particle.y,
+                  backgroundColor: particle.color,
+                  opacity: particle.life,
+                  transform: `scale(${particle.life})`
+                }}
+              />
+            ))}
+
             {/* 恐龙 */}
             <div 
               className={`dino ${isDucking ? 'ducking' : ''}`}
@@ -207,7 +299,19 @@ export default function Dinosaur() {
             <div className="ground-line"></div>
 
             {/* 分数 */}
-            <div className="score-display">HI {String(highScore).padStart(5, '0')}  {String(score).padStart(5, '0')}</div>
+            <div className="score-display">
+              HI {String(highScore).padStart(5, '0')}  {String(score).padStart(5, '0')}
+            </div>
+
+            {/* 暂停提示 */}
+            {isPaused && !gameOver && (
+              <div className="game-overlay pause-overlay">
+                <div className="overlay-content">
+                  <h2>⏸️ 游戏暂停</h2>
+                  <p className="hint">按 ESC 或 P 继续</p>
+                </div>
+              </div>
+            )}
 
             {/* 开始/结束界面 */}
             {(!gameStarted || gameOver) && (
@@ -215,19 +319,23 @@ export default function Dinosaur() {
                 <div className="overlay-content">
                   {gameOver ? (
                     <>
-                      <h2>游戏结束</h2>
-                      <p className="final-score">得分：{score}</p>
+                      <h2>💥 游戏结束</h2>
+                      <p className="final-score">得分：<strong>{score}</strong></p>
+                      <p className="best-score">最佳：<strong>{highScore}</strong></p>
                       {score >= highScore && score > 0 && (
                         <p className="new-record">🏆 新纪录！</p>
                       )}
                     </>
                   ) : (
-                    <h2>点击开始</h2>
+                    <>
+                      <h2>🦖 恐龙快跑</h2>
+                      <p className="hint">准备好开始冒险了吗？</p>
+                    </>
                   )}
-                  <button className="start-btn" onClick={startGame}>
-                    {gameOver ? '再玩一次' : '开始游戏'}
+                  <button className="start-btn" onClick={(e) => { e.stopPropagation(); startGame(); }}>
+                    {gameOver ? '🔄 再玩一次' : '▶️ 开始游戏'}
                   </button>
-                  <p className="hint">空格/↑跳跃 | ↓蹲下</p>
+                  <p className="hint">空格/↑跳跃 | ↓蹲下 | P 暂停</p>
                 </div>
               </div>
             )}
@@ -242,6 +350,12 @@ export default function Dinosaur() {
               <span className="stat-label">最佳记录</span>
               <span className="stat-value high">{highScore}</span>
             </div>
+            {gameStarted && !gameOver && (
+              <div className="stat-box speed-indicator">
+                <span className="stat-label">速度</span>
+                <span className="stat-value speed">{Math.round(obstacleSpeed / BASE_OBSTACLE_SPEED * 100)}%</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -251,7 +365,16 @@ export default function Dinosaur() {
             <div className="control-item"><span className="key">空格</span> 跳跃</div>
             <div className="control-item"><span className="key">↑</span> 跳跃</div>
             <div className="control-item"><span className="key">↓</span> 蹲下</div>
-            <div className="control-item"><span className="key">点击</span> 跳跃</div>
+            <div className="control-item"><span className="key">P</span> 暂停/继续</div>
+          </div>
+          <div className="tips-section">
+            <h4>💡 游戏技巧</h4>
+            <ul className="tips-list">
+              <li>仙人掌需要跳跃，飞行鸟需要蹲下或跳跃</li>
+              <li>随着分数提高，速度会越来越快</li>
+              <li>提前预判障碍物类型，做好准备</li>
+              <li>连续跳跃时机要准确，保持节奏</li>
+            </ul>
           </div>
         </div>
       </div>

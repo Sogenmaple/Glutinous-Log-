@@ -187,52 +187,50 @@ export default function GameTimeline() {
               {/* 连接线 */}
               <div className="timeline-connector"></div>
 
-              <div className="timeline-card">
-                {/* 默认显示：标题 + 时间 */}
-                <div className="timeline-header-simple">
-                  <span className="timeline-date-simple">{formatDate(game.date)}</span>
-                  <h3 className="timeline-title-simple">{game.title}</h3>
+              {/* 默认显示：标题 + 时间 */}
+              <div className="timeline-header-simple">
+                <span className="timeline-date-simple">{formatDate(game.date)}</span>
+                <h3 className="timeline-title-simple">{game.title}</h3>
+              </div>
+
+              {/* 悬浮时显示详情 */}
+              <div className="timeline-details">
+                <div className="timeline-header">
+                  <span className="timeline-date">{formatDate(game.date)}</span>
+                  <span className="timeline-jam">{game.jam}</span>
                 </div>
 
-                {/* 悬浮时显示详情 */}
-                <div className="timeline-details">
-                  <div className="timeline-header">
-                    <span className="timeline-date">{formatDate(game.date)}</span>
-                    <span className="timeline-jam">{game.jam}</span>
-                  </div>
-
-                  <div className="timeline-title-row">
-                    <h3 className="timeline-title">{game.title}</h3>
-                    {game.status === 'development' && (
-                      <span className="timeline-status development">开发中</span>
-                    )}
-                  </div>
-
-                  <p className="timeline-desc">{game.description}</p>
-
-                  <div className="timeline-tags">
-                    {game.tags.map(tag => (
-                      <span key={tag} className="timeline-tag">{tag}</span>
-                    ))}
-                  </div>
-
-                  {Object.keys(game.links).length > 0 && (
-                    <div className="timeline-links">
-                      {Object.entries(game.links).map(([type, url]) => (
-                        <a
-                          key={type}
-                          href={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="timeline-link"
-                        >
-                          {renderLinkIcon(type)}
-                          <span className="link-label">{type.toUpperCase()}</span>
-                        </a>
-                      ))}
-                    </div>
+                <div className="timeline-title-row">
+                  <h3 className="timeline-title">{game.title}</h3>
+                  {game.status === 'development' && (
+                    <span className="timeline-status development">开发中</span>
                   )}
                 </div>
+
+                <p className="timeline-desc">{game.description}</p>
+
+                <div className="timeline-tags">
+                  {game.tags.map(tag => (
+                    <span key={tag} className="timeline-tag">{tag}</span>
+                  ))}
+                </div>
+
+                {Object.keys(game.links).length > 0 && (
+                  <div className="timeline-links">
+                    {Object.entries(game.links).map(([type, url]) => (
+                      <a
+                        key={type}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="timeline-link"
+                      >
+                        {renderLinkIcon(type)}
+                        <span className="link-label">{type.toUpperCase()}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )

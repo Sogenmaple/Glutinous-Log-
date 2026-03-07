@@ -583,7 +583,7 @@ body :not(code):not(pre) {
 .timeline-item {
   position: relative;
   width: 45%;
-  margin-bottom: 4rem;
+  margin-bottom: 3rem;
   opacity: 0;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -591,7 +591,7 @@ body :not(code):not(pre) {
 .timeline-item.left {
   float: left;
   clear: left;
-  padding-right: 4rem;
+  padding-right: 3.5rem;
   text-align: right;
   transform: translateX(-50px) translateY(30px);
 }
@@ -599,7 +599,7 @@ body :not(code):not(pre) {
 .timeline-item.right {
   float: right;
   clear: right;
-  padding-left: 4rem;
+  padding-left: 3.5rem;
   text-align: left;
   transform: translateX(50px) translateY(30px);
 }
@@ -671,9 +671,9 @@ body :not(code):not(pre) {
   height: 3px;
 }
 
-/* Timeline Card - 无容器背景 */
+/* Timeline Card - 无容器 */
 .timeline-card {
-  padding: 0.5rem 1rem;
+  padding: 0;
   position: relative;
 }
 
@@ -793,15 +793,16 @@ body :not(code):not(pre) {
   opacity: 0;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
 }
 
-.timeline-card:hover .timeline-details {
+.timeline-item:hover .timeline-details {
   max-height: 500px;
   opacity: 1;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
-.timeline-card:hover .timeline-header-simple {
+.timeline-item:hover .timeline-header-simple {
   display: none;
 }
 

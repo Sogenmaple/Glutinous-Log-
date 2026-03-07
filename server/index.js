@@ -279,6 +279,94 @@ app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
   }
 })
 
+// ============ 用户管理路由（仅管理员）===========
+
+// 获取所有用户（需要管理员权限）
+app.get('/api/users', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: '权限不足' })
+    }
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    let users = JSON.parse(usersData)
+    
+    // 移除密码信息
+    users = users.map(u => ({
+      id: u.id,
+      username: u.username,
+      email: u.email,
+      role: u.role,
+      createdAt: u.createdAt
+    }))
+    
+    res.json(users)
+  } catch (error) {
+    console.error('获取用户列表错误:', error)
+    res.status(500).json({ error: '获取用户列表失败' })
+  }
+})
+
+// 删除用户（需要管理员权限）
+app.delete('/api/users/:id', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: '权限不足' })
+    }
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    let users = JSON.parse(usersData)
+    const index = users.findIndex(u => u.id === req.params.id)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    // 不能删除自己
+    if (users[index].username === req.user.username) {
+      return res.status(400).json({ error: '不能删除自己的账户' })
+    }
+    
+    users.splice(index, 1)
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    res.json({ message: '删除成功' })
+  } catch (error) {
+    console.error('删除用户错误:', error)
+    res.status(500).json({ error: '删除用户失败' })
+  }
+})
+
+// 更新用户角色（需要管理员权限）
+app.put('/api/users/:id/role', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: '权限不足' })
+    }
+    
+    const { role } = req.body
+    if (!['admin', 'user'].includes(role)) {
+      return res.status(400).json({ error: '无效的角色' })
+    }
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    let users = JSON.parse(usersData)
+    const index = users.findIndex(u => u.id === req.params.id)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    users[index].role = role
+    users[index].updatedAt = new Date().toISOString()
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    
+    res.json({ message: '角色更新成功', user: users[index] })
+  } catch (error) {
+    console.error('更新用户角色错误:', error)
+    res.status(500).json({ error: '更新用户角色失败' })
+  }
+})
+
 // 启动服务器
 initDataFiles().then(() => {
   app.listen(PORT, () => {

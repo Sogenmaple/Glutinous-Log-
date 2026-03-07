@@ -83,7 +83,7 @@ export default function Dinosaur() {
     setDinoY(0)
     dinoYRef.current = 0
     dinoVelocityRef.current = 0
-    setObstacles([{ x: 700, type: Math.random() > 0.6 ? 'bird' : 'cactus' }])
+    setObstacles([{ x: 700, type: 'cactus' }])
     setScore(0)
     setIsDucking(false)
     speedRef.current = BASE_SPEED
@@ -111,12 +111,6 @@ export default function Dinosaur() {
     }
   }, [gameStarted, gameOver, isPaused, startGame, resetGame, createParticles])
 
-  const duck = useCallback((ducking) => {
-    if (gameStarted && !gameOver && !isPaused) {
-      setIsDucking(ducking)
-    }
-  }, [gameStarted, gameOver, isPaused])
-
   const togglePause = useCallback(() => {
     if (gameStarted && !gameOver) {
       setIsPaused(prev => !prev)
@@ -129,18 +123,9 @@ export default function Dinosaur() {
         e.preventDefault()
         jump()
       }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        duck(true)
-      }
       if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
         e.preventDefault()
         togglePause()
-      }
-    }
-    const handleKeyUp = (e) => {
-      if (e.key === 'ArrowDown') {
-        duck(false)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -149,7 +134,7 @@ export default function Dinosaur() {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [jump, duck, togglePause])
+  }, [jump, togglePause])
 
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused) return
@@ -180,14 +165,12 @@ export default function Dinosaur() {
           newObstacles = newObstacles.filter(obs => obs.x > -50)
           
           const lastObs = newObstacles[newObstacles.length - 1]
-          const minGap = 300 + speedRef.current * 10
+          const minGap = 350 + speedRef.current * 12
           
           if (!lastObs || lastObs.x < 750 - minGap) {
-            const type = Math.random() > 0.6 ? 'bird' : 'cactus'
             newObstacles.push({
               x: 800,
-              type,
-              y: type === 'bird' ? 65 : 0
+              type: 'cactus'
             })
           }
           
@@ -238,21 +221,20 @@ export default function Dinosaur() {
     if (!gameStarted || gameOver || isPaused) return
 
     const groundY = canvasHeightRef.current - GROUND_HEIGHT
-    const dinoWidth = isDucking ? 40 : 35
-    const dinoHeight = isDucking ? 20 : 40
-    const dinoLeft = DINO_X + 8
-    const dinoRight = DINO_X + dinoWidth - 8
-    const dinoTop = groundY + dinoY - dinoHeight + 8
-    const dinoBottom = groundY + dinoY - 8
+    const dinoWidth = 35
+    const dinoHeight = 40
+    const dinoLeft = DINO_X + 10
+    const dinoRight = DINO_X + dinoWidth - 10
+    const dinoTop = groundY + dinoY - dinoHeight + 10
+    const dinoBottom = groundY + dinoY - 10
 
     for (const obs of obstacles) {
-      const obsWidth = obs.type === 'bird' ? 30 : 20
-      const obsHeight = obs.type === 'bird' ? 15 : 30
-      const obsGroundY = obs.type === 'bird' ? groundY - 65 : groundY
-      const obsLeft = obs.x + 5
-      const obsRight = obs.x + obsWidth - 5
-      const obsTop = obsGroundY + obs.y - obsHeight + 5
-      const obsBottom = obsGroundY + obs.y - 5
+      const obsWidth = 18
+      const obsHeight = 30
+      const obsLeft = obs.x + 4
+      const obsRight = obs.x + obsWidth - 4
+      const obsTop = groundY - obsHeight + 4
+      const obsBottom = groundY - 4
 
       if (dinoRight > obsLeft && 
           dinoLeft < obsRight && 
@@ -327,10 +309,6 @@ export default function Dinosaur() {
                   <span className="mini-label">跳</span>
                 </div>
                 <div className="control-mini">
-                  <span className="mini-key">↓</span>
-                  <span className="mini-label">蹲</span>
-                </div>
-                <div className="control-mini">
                   <span className="mini-key">P</span>
                   <span className="mini-label">停</span>
                 </div>
@@ -360,7 +338,7 @@ export default function Dinosaur() {
 
               {/* 恐龙 */}
               <div 
-                className={`dino ${isDucking ? 'ducking' : ''}`}
+                className="dino"
                 style={{ bottom: GROUND_HEIGHT + dinoY, left: DINO_X }}
               >
                 <svg viewBox="0 0 50 45" fill="none" stroke="#fff" strokeWidth="2">
@@ -372,7 +350,7 @@ export default function Dinosaur() {
                   <path d="M20 40l-3 5" className="leg-left"/>
                   <path d="M30 40l3 5" className="leg-right"/>
                   <path d="M8 32l-8 3"/>
-                  {!isDucking && <path d="M25 18l0-8"/>}
+                  <path d="M25 18l0-8"/>
                 </svg>
               </div>
 
@@ -472,7 +450,6 @@ export default function Dinosaur() {
                     </button>
                     <p className="controls-hint">
                       <span className="key-badge">空格</span> 跳跃 · 
-                      <span className="key-badge">↓</span> 蹲下 · 
                       <span className="key-badge">P</span> 暂停
                     </p>
                   </div>

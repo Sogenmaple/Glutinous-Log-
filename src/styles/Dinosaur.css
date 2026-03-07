@@ -325,11 +325,6 @@
   height: 100%;
 }
 
-.dino.ducking svg {
-  transform: scaleY(0.6);
-  transform-origin: bottom;
-}
-
 .leg-left,
 .leg-right {
   animation: dino-run 0.08s ease-in-out infinite alternate;
@@ -355,23 +350,8 @@
 }
 
 .cactus svg {
-  width: 25px;
-  height: 35px;
-}
-
-.bird svg {
-  width: 35px;
-  height: 20px;
-}
-
-.wing {
-  animation: bird-flap 0.06s ease-in-out infinite alternate;
-  transform-origin: 10px 8px;
-}
-
-@keyframes bird-flap {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(-25deg); }
+  width: 18px;
+  height: 30px;
 }
 
 .ground {

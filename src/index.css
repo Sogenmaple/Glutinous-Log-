@@ -615,7 +615,7 @@ body :not(code):not(pre) {
 
 .timeline-item {
   position: relative;
-  width: 45%;
+  width: calc(50% - 2rem);
   margin-bottom: 4rem;
   opacity: 0;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -624,7 +624,7 @@ body :not(code):not(pre) {
 .timeline-item.left {
   float: left;
   clear: left;
-  padding-right: 5rem;
+  padding-right: 3.5rem;
   text-align: right;
   transform: translateX(-50px) translateY(30px);
 }
@@ -632,7 +632,7 @@ body :not(code):not(pre) {
 .timeline-item.right {
   float: right;
   clear: right;
-  padding-left: 5rem;
+  padding-left: 3.5rem;
   text-align: left;
   transform: translateX(50px) translateY(30px);
 }
@@ -656,6 +656,7 @@ body :not(code):not(pre) {
   box-shadow: 0 0 25px rgba(255, 149, 0, 0.6), inset 0 0 15px rgba(255, 149, 0, 0.1);
   z-index: 20;
   transition: all 0.3s ease;
+  pointer-events: none;
 }
 
 .timeline-item.left .timeline-dot {

@@ -238,21 +238,21 @@ export default function Dinosaur() {
     if (!gameStarted || gameOver || isPaused) return
 
     const groundY = canvasHeightRef.current - GROUND_HEIGHT
-    const dinoWidth = isDucking ? 50 : 40
-    const dinoHeight = isDucking ? 25 : 45
-    const dinoLeft = DINO_X + 5
-    const dinoRight = DINO_X + dinoWidth - 5
-    const dinoTop = groundY + dinoY - dinoHeight + 5
-    const dinoBottom = groundY + dinoY - 3
+    const dinoWidth = isDucking ? 40 : 35
+    const dinoHeight = isDucking ? 20 : 40
+    const dinoLeft = DINO_X + 8
+    const dinoRight = DINO_X + dinoWidth - 8
+    const dinoTop = groundY + dinoY - dinoHeight + 8
+    const dinoBottom = groundY + dinoY - 8
 
     for (const obs of obstacles) {
-      const obsWidth = obs.type === 'bird' ? 35 : 25
-      const obsHeight = obs.type === 'bird' ? 20 : 35
+      const obsWidth = obs.type === 'bird' ? 30 : 20
+      const obsHeight = obs.type === 'bird' ? 15 : 30
       const obsGroundY = obs.type === 'bird' ? groundY - 65 : groundY
-      const obsLeft = obs.x + 3
-      const obsRight = obs.x + obsWidth - 3
-      const obsTop = obsGroundY + obs.y - obsHeight + 3
-      const obsBottom = obsGroundY + obs.y - 3
+      const obsLeft = obs.x + 5
+      const obsRight = obs.x + obsWidth - 5
+      const obsTop = obsGroundY + obs.y - obsHeight + 5
+      const obsBottom = obsGroundY + obs.y - 5
 
       if (dinoRight > obsLeft && 
           dinoLeft < obsRight && 

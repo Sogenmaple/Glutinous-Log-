@@ -52,16 +52,16 @@ export default function Minesweeper() {
     }
   }, [gameWon, timer, difficulty])
 
-  // 创建空网格
-  const createEmptyGrid = useCallback(() => {
-    return Array(ROWS * COLS).fill(null).map((_, i) => ({
+  // 创建空网格 (指定尺寸)
+  const createEmptyGrid = useCallback((rows, cols) => {
+    return Array(rows * cols).fill(null).map((_, i) => ({
       index: i,
       isMine: false,
       isRevealed: false,
       isFlagged: false,
       neighborMines: 0
     }))
-  }, [ROWS, COLS])
+  }, [])
 
   // 获取相邻格子
   const getNeighbors = useCallback((index, cols, rows) => {
@@ -83,12 +83,13 @@ export default function Minesweeper() {
   }, [])
 
   // 放置地雷
-  const placeMines = useCallback((emptyGrid, excludeIndex) => {
+  const placeMines = useCallback((emptyGrid, excludeIndex, rows, cols) => {
     const newGrid = emptyGrid.map(cell => ({ ...cell }))
-    const totalCells = ROWS * COLS
+    const totalCells = rows * cols
+    const { mines: minesCount } = DIFFICULTIES[Object.keys(DIFFICULTIES).find(k => DIFFICULTIES[k].rows === rows && DIFFICULTIES[k].cols === cols) || 'medium']
     let minesPlaced = 0
 
-    while (minesPlaced < MINES) {
+    while (minesPlaced < minesCount) {
       const index = Math.floor(Math.random() * totalCells)
       if (index !== excludeIndex && !newGrid[index].isMine) {
         newGrid[index].isMine = true
@@ -96,27 +97,27 @@ export default function Minesweeper() {
       }
     }
     return newGrid
-  }, [ROWS, COLS, MINES])
+  }, [])
 
   // 计算相邻地雷数
-  const calculateNeighborMines = useCallback((gridState) => {
+  const calculateNeighborMines = useCallback((gridState, rows, cols) => {
     const newGrid = gridState.map(cell => ({ ...cell }))
-    const totalCells = ROWS * COLS
+    const totalCells = rows * cols
 
     for (let i = 0; i < totalCells; i++) {
       if (!newGrid[i].isMine) {
-        const neighbors = getNeighbors(i, COLS, ROWS)
+        const neighbors = getNeighbors(i, cols, rows)
         newGrid[i].neighborMines = neighbors.filter(n => newGrid[n].isMine).length
       }
     }
     return newGrid
-  }, [ROWS, COLS, getNeighbors])
+  }, [getNeighbors])
 
   // 初始化游戏
   const initGame = useCallback((excludeIndex = -1) => {
-    const emptyGrid = createEmptyGrid()
-    const gridWithMines = placeMines(emptyGrid, excludeIndex)
-    const finalGrid = calculateNeighborMines(gridWithMines)
+    const emptyGrid = createEmptyGrid(ROWS, COLS)
+    const gridWithMines = placeMines(emptyGrid, excludeIndex, ROWS, COLS)
+    const finalGrid = calculateNeighborMines(gridWithMines, ROWS, COLS)
     
     setGrid(finalGrid)
     setGameOver(false)
@@ -124,20 +125,20 @@ export default function Minesweeper() {
     setFlags(0)
     setTimer(0)
     setFirstClick(false)
-  }, [createEmptyGrid, placeMines, calculateNeighborMines])
+  }, [createEmptyGrid, placeMines, calculateNeighborMines, ROWS, COLS])
 
   // 揭示格子（递归）
-  const revealCell = useCallback((gridState, index) => {
+  const revealCell = useCallback((gridState, index, cols, rows) => {
     const cell = gridState[index]
     if (cell.isRevealed || cell.isFlagged) return
 
     cell.isRevealed = true
 
     if (cell.neighborMines === 0) {
-      const neighbors = getNeighbors(index, COLS, ROWS)
-      neighbors.forEach(n => revealCell(gridState, n))
+      const neighbors = getNeighbors(index, cols, rows)
+      neighbors.forEach(n => revealCell(gridState, n, cols, rows))
     }
-  }, [COLS, ROWS, getNeighbors])
+  }, [getNeighbors])
 
   // 检查胜利
   const checkWin = useCallback((gridState) => {
@@ -171,11 +172,11 @@ export default function Minesweeper() {
       setGameOver(true)
     } else {
       // 揭示格子
-      revealCell(newGrid, index)
+      revealCell(newGrid, index, COLS, ROWS)
       setGrid([...newGrid])
       checkWin(newGrid)
     }
-  }, [gameOver, gameWon, grid, firstClick, initGame, revealCell, checkWin])
+  }, [gameOver, gameWon, grid, firstClick, initGame, revealCell, checkWin, COLS, ROWS])
 
   // 右键插旗
   const handleRightClick = useCallback((e, index) => {
@@ -216,7 +217,7 @@ export default function Minesweeper() {
             hitMine = true
             neighbor.isRevealed = true
           } else {
-            revealCell(newGrid, n)
+            revealCell(newGrid, n, COLS, ROWS)
           }
         }
       })
@@ -236,25 +237,24 @@ export default function Minesweeper() {
   }, [gameOver, gameWon, grid, COLS, ROWS, getNeighbors, revealCell, checkWin])
 
   // 重置游戏
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     setFirstClick(true)
-    setGrid(createEmptyGrid())
+    setGrid(createEmptyGrid(ROWS, COLS))
     setGameOver(false)
     setGameWon(false)
     setFlags(0)
     setTimer(0)
-  }
+  }, [createEmptyGrid, ROWS, COLS])
 
   // 切换难度
-  const handleDifficultyChange = (key) => {
+  const handleDifficultyChange = useCallback((key) => {
     setDifficulty(key)
     setFirstClick(true)
-    setGrid(createEmptyGrid())
     setGameOver(false)
     setGameWon(false)
     setFlags(0)
     setTimer(0)
-  }
+  }, [])
 
   // 获取数字颜色
   const getNumberColor = (num) => {
@@ -274,9 +274,19 @@ export default function Minesweeper() {
   // 初始化时创建空网格
   useEffect(() => {
     if (grid.length === 0) {
-      setGrid(createEmptyGrid())
+      setGrid(createEmptyGrid(ROWS, COLS))
     }
-  }, [createEmptyGrid, grid.length])
+  }, [createEmptyGrid, grid.length, ROWS, COLS])
+
+  // 难度切换时重置网格
+  useEffect(() => {
+    setGrid(createEmptyGrid(ROWS, COLS))
+    setFirstClick(true)
+    setGameOver(false)
+    setGameWon(false)
+    setFlags(0)
+    setTimer(0)
+  }, [ROWS, COLS, createEmptyGrid])
 
   return (
     <div className="minesweeper-page">

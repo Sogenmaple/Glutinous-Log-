@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Header from '../components/Header'
-import { ToolIcon } from '../components/icons/SiteIcons'
 import '../styles/FlyBird.css'
 
-const GRAVITY = 0.5
-const JUMP_STRENGTH = -8
+const GRAVITY = 0.6
+const JUMP_STRENGTH = -9
 const PIPE_SPEED = 3
-const PIPE_GAP = 150
-const BIRD_SIZE = 30
+const PIPE_GAP = 140
+const BIRD_SIZE = 28
 const BIRD_X = 100
 
 export default function FlyBird() {
@@ -18,19 +17,18 @@ export default function FlyBird() {
   const [birdRotation, setBirdRotation] = useState(0)
   const [pipes, setPipes] = useState([])
   const [score, setScore] = useState(0)
-  const [highScore, setHighScore] = useState(0)
+  const [highScore, setHighScore] = useState(() => {
+    const saved = localStorage.getItem('flybird_highscore')
+    return saved ? parseInt(saved) : 0
+  })
   const [isPaused, setIsPaused] = useState(false)
-  const [particleEffects, setParticleEffects] = useState([])
+  
   const gameLoopRef = useRef(null)
   const lastTimeRef = useRef(0)
+  const birdYRef = useRef(250)
+  const birdVelocityRef = useRef(0)
 
-  // 加载最佳记录
-  useEffect(() => {
-    const saved = localStorage.getItem('flybird_highscore')
-    if (saved) setHighScore(parseInt(saved))
-  }, [])
-
-  // 保存最佳记录
+  // 保存最高分
   useEffect(() => {
     if (score > highScore) {
       setHighScore(score)
@@ -38,355 +36,389 @@ export default function FlyBird() {
     }
   }, [score, highScore])
 
-  // 创建粒子效果
-  const createParticles = useCallback((x, y, color = '#fbbf24') => {
-    const particles = []
-    for (let i = 0; i < 8; i++) {
-      particles.push({
-        id: Date.now() + i,
-        x,
-        y,
-        vx: (Math.random() - 0.5) * 10,
-        vy: (Math.random() - 0.5) * 10,
-        life: 1,
-        color
-      })
-    }
-    setParticleEffects(prev => [...prev, ...particles])
+  const resetGame = useCallback(() => {
+    setGameStarted(false)
+    setGameOver(false)
+    setIsPaused(false)
+    setBirdY(250)
+    birdYRef.current = 250
+    setBirdVelocity(0)
+    birdVelocityRef.current = 0
+    setBirdRotation(0)
+    setPipes([{ x: 600, topHeight: Math.random() * 200 + 100, passed: false }])
+    setScore(0)
   }, [])
 
-  // 开始游戏
   const startGame = useCallback(() => {
     setGameStarted(true)
     setGameOver(false)
     setIsPaused(false)
     setBirdY(250)
+    birdYRef.current = 250
     setBirdVelocity(0)
+    birdVelocityRef.current = 0
     setBirdRotation(0)
     setPipes([{ x: 600, topHeight: Math.random() * 200 + 100, passed: false }])
     setScore(0)
-    setParticleEffects([])
-    createParticles(BIRD_X + 15, 265, '#fbbf24')
-  }, [createParticles])
+    lastTimeRef.current = performance.now()
+  }, [])
 
-  // 跳跃
   const jump = useCallback(() => {
-    if (gameOver) return
+    if (gameOver) {
+      resetGame()
+      return
+    }
     if (!gameStarted) {
       startGame()
-    } else if (!isPaused) {
-      setBirdVelocity(JUMP_STRENGTH)
-      createParticles(BIRD_X + 15, birdY + 15, 'rgba(255,149,0,0.5)')
+      return
     }
-  }, [gameStarted, gameOver, isPaused, birdY, startGame, createParticles])
+    if (isPaused) return
+    
+    birdVelocityRef.current = JUMP_STRENGTH
+  }, [gameStarted, gameOver, isPaused, startGame, resetGame])
 
-  // 暂停/继续
   const togglePause = useCallback(() => {
     if (gameStarted && !gameOver) {
       setIsPaused(prev => !prev)
     }
   }, [gameStarted, gameOver])
 
-  // 键盘控制
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.code === 'Space' || e.key === 'ArrowUp') {
         e.preventDefault()
         jump()
-      } else if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+      }
+      if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
         e.preventDefault()
         togglePause()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [jump, togglePause])
 
-  // 游戏循环
+  // 游戏主循环
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused) return
 
-    const gameLoop = () => {
-      const now = Date.now()
-      const deltaTime = now - lastTimeRef.current
+    const update = (timestamp) => {
+      if (!lastTimeRef.current) lastTimeRef.current = timestamp
+      const deltaTime = timestamp - lastTimeRef.current
       
       if (deltaTime >= 16) {
-        lastTimeRef.current = now
+        lastTimeRef.current = timestamp
         
-        // 更新鸟的位置和旋转
-        setBirdY(y => {
-          const newY = y + birdVelocity
-          if (newY <= 0 || newY >= 470) {
-            setGameOver(true)
-            createParticles(BIRD_X + 15, newY <= 0 ? 15 : 485, '#ef4444')
-            return Math.max(0, Math.min(newY, 470))
-          }
-          return newY
-        })
+        // 更新鸟的位置
+        birdYRef.current += birdVelocityRef.current
+        birdVelocityRef.current += GRAVITY
+        setBirdY(birdYRef.current)
         
-        setBirdVelocity(v => v + GRAVITY)
-        setBirdRotation(rot => Math.min(Math.max(birdVelocity * 3, -30), 90))
+        // 更新旋转
+        setBirdRotation(Math.min(Math.max(birdVelocityRef.current * 3, -30), 90))
 
         // 更新管道
-        setPipes(currentPipes => {
-          let newPipes = currentPipes.map(pipe => ({ ...pipe, x: pipe.x - PIPE_SPEED }))
+        setPipes(prev => {
+          let newPipes = prev.map(pipe => ({
+            ...pipe,
+            x: pipe.x - PIPE_SPEED
+          }))
           
-          // 移除屏幕外的管道
+          // 移除超出屏幕的管道
           newPipes = newPipes.filter(pipe => pipe.x > -60)
           
-          // 添加新管道（难度递增）
-          const difficulty = Math.min(score * 0.1, 1)
-          if (newPipes.length === 0 || newPipes[newPipes.length - 1].x < 400 - difficulty * 50) {
-            newPipes.push({ 
-              x: 600, 
-              topHeight: Math.random() * (200 - difficulty * 50) + 100 + difficulty * 50,
-              passed: false 
+          // 添加新管道
+          const lastPipe = newPipes[newPipes.length - 1]
+          if (lastPipe.x < 300) {
+            newPipes.push({
+              x: 660,
+              topHeight: Math.random() * 200 + 100,
+              passed: false
             })
           }
           
           return newPipes
         })
-        
-        // 更新粒子
-        setParticleEffects(prev => 
-          prev
-            .map(p => ({
-              ...p,
-              x: p.x + p.vx,
-              y: p.y + p.vy,
-              vy: p.vy + 0.5,
-              life: p.life - 0.05
-            }))
-            .filter(p => p.life > 0)
-        )
+
+        // 更新分数
+        setPipes(prev => {
+          prev.forEach(pipe => {
+            if (!pipe.passed && pipe.x + 50 < BIRD_X) {
+              setScore(s => s + 1)
+              pipe.passed = true
+            }
+          })
+          return prev
+        })
       }
       
-      gameLoopRef.current = requestAnimationFrame(gameLoop)
+      gameLoopRef.current = requestAnimationFrame(update)
     }
 
-    gameLoopRef.current = requestAnimationFrame(gameLoop)
+    gameLoopRef.current = requestAnimationFrame(update)
 
     return () => {
       if (gameLoopRef.current) {
         cancelAnimationFrame(gameLoopRef.current)
       }
     }
-  }, [gameStarted, gameOver, isPaused, birdVelocity, score, createParticles])
+  }, [gameStarted, gameOver, isPaused])
 
   // 碰撞检测
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused) return
 
+    const birdTop = birdYRef.current
+    const birdBottom = birdYRef.current + BIRD_SIZE
     const birdLeft = BIRD_X + 5
     const birdRight = BIRD_X + BIRD_SIZE - 5
-    const birdTop = birdY + 5
-    const birdBottom = birdY + BIRD_SIZE - 5
 
-    // 检查管道碰撞
+    // 地面和天花板碰撞
+    if (birdBottom >= 470 || birdTop <= 0) {
+      setGameOver(true)
+      return
+    }
+
+    // 管道碰撞
     for (const pipe of pipes) {
-      const pipeLeft = pipe.x + 5
-      const pipeRight = pipe.x + 60 - 5
-
-      if (birdRight > pipeLeft && birdLeft < pipeRight) {
-        if (birdTop < pipe.topHeight || birdBottom > pipe.topHeight + PIPE_GAP) {
+      const pipeLeft = pipe.x
+      const pipeRight = pipe.x + 50
+      
+      if (birdRight > pipeLeft + 5 && birdLeft < pipeRight - 5) {
+        const topPipeBottom = pipe.topHeight
+        const bottomPipeTop = pipe.topHeight + PIPE_GAP
+        
+        if (birdTop < topPipeBottom || birdBottom > bottomPipeTop) {
           setGameOver(true)
-          createParticles(birdLeft + 15, birdTop + 15, '#ef4444')
           return
         }
       }
-
-      // 得分
-      if (pipe.x + 60 < birdLeft && !pipe.passed) {
-        setScore(s => s + 1)
-        pipe.passed = true
-        createParticles(BIRD_X + 15, birdY + 15, '#39ff14')
-      }
     }
-  }, [birdY, pipes, gameStarted, gameOver, isPaused, createParticles])
+  }, [birdY, pipes, gameStarted, gameOver, isPaused])
 
   return (
     <div className="flybird-page">
       <Header />
-      <div className="flybird-container">
-        <div className="flybird-header">
-          <h1 className="flybird-title">
-            <span className="title-icon">
-              <ToolIcon size={40} color="#ff9500" />
+      
+      <div className="tape-bg"></div>
+      <div className="tape-grid"></div>
+      <div className="tape-scanlines"></div>
+
+      <div className="flybird-newspaper">
+        {/* 报头 */}
+        <div className="newspaper-header">
+          <div className="header-date">
+            <span className="date">{new Date().toLocaleDateString('zh-CN')}</span>
+            <span className="issue">VOL.2024.NO.12</span>
+          </div>
+          <div className="header-title">
+            <h1>飞扬的小鸟</h1>
+            <p className="subtitle">FLAPPY BIRD · TAPE FUTURISM</p>
+          </div>
+          <div className="header-status">
+            <span className={`status-badge ${gameOver ? 'danger' : gameStarted ? 'active' : 'ready'}`}>
+              {gameOver ? 'GAME OVER' : gameStarted ? 'FLYING' : 'READY'}
             </span>
-            <span className="title-text">Flappy Bird</span>
-          </h1>
-          <p className="flybird-subtitle">FLAPPY BIRD - 经典飞行游戏</p>
+          </div>
         </div>
 
-        <div className="flybird-game-area" onClick={jump}>
-          <div className="game-canvas">
-            {/* 粒子效果 */}
-            {particleEffects.map(particle => (
-              <div
-                key={particle.id}
-                className="particle"
-                style={{
-                  left: particle.x,
-                  top: particle.y,
-                  backgroundColor: particle.color,
-                  opacity: particle.life,
-                  transform: `scale(${particle.life})`
-                }}
-              />
-            ))}
-
-            {/* 鸟 */}
-            <div 
-              className="bird"
-              style={{ 
-                top: birdY,
-                transform: `rotate(${birdRotation}deg)`
-              }}
-            >
-              <div className="bird-body"></div>
-              <div className="bird-eye"></div>
-              <div className="bird-wing"></div>
-              <div className="bird-beak"></div>
+        {/* 主内容区 */}
+        <div className="newspaper-content">
+          {/* 左侧边栏 */}
+          <aside className="news-sidebar-left">
+            <div className="score-box">
+              <span className="score-label">SCORE</span>
+              <span className="score-value">{String(score).padStart(3, '0')}</span>
             </div>
-
-            {/* 管道 */}
-            {pipes.map((pipe, index) => (
-              <div key={index} className="pipe-group">
-                <div className="pipe pipe-top" style={{ height: pipe.topHeight, left: pipe.x }}></div>
-                <div className="pipe pipe-bottom" style={{ height: 500 - pipe.topHeight - PIPE_GAP, left: pipe.x, top: pipe.topHeight + PIPE_GAP }}></div>
+            <div className="score-box">
+              <span className="score-label">BEST</span>
+              <span className="score-value highlight">{String(highScore).padStart(3, '0')}</span>
+            </div>
+            
+            {/* 操作说明 */}
+            <div className="controls-mini">
+              <div className="controls-mini-header">
+                <span>CONTROLS</span>
               </div>
-            ))}
-
-            {/* 地面 */}
-            <div className="ground"></div>
-
-            {/* 分数 */}
-            <div className="score-display">{score}</div>
-
-            {/* 暂停提示 */}
-            {isPaused && !gameOver && (
-              <div className="game-overlay pause-overlay">
-                <div className="overlay-content">
-                  <h2>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                      <rect x="6" y="4" width="4" height="16" />
-                      <rect x="14" y="4" width="4" height="16" />
-                    </svg>
-                    游戏暂停
-                  </h2>
-                  <p className="hint">按 ESC 或 P 继续</p>
+              <div className="controls-mini-grid">
+                <div className="control-mini">
+                  <span className="mini-key">␣</span>
+                  <span className="mini-label">跳</span>
+                </div>
+                <div className="control-mini">
+                  <span className="mini-key">↑</span>
+                  <span className="mini-label">跳</span>
+                </div>
+                <div className="control-mini">
+                  <span className="mini-key">P</span>
+                  <span className="mini-label">停</span>
                 </div>
               </div>
-            )}
+            </div>
+          </aside>
 
-            {/* 开始/结束界面 */}
-            {(!gameStarted || gameOver) && (
-              <div className="game-overlay">
-                <div className="overlay-content">
-                  {gameOver ? (
-                    <>
-                      <h2>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="15" y1="9" x2="9" y2="15" />
-                          <line x1="9" y1="9" x2="15" y2="15" />
-                        </svg>
-                        游戏结束
-                      </h2>
-                      <p className="final-score">得分：<strong>{score}</strong></p>
-                      <p className="best-score">最佳：<strong>{highScore}</strong></p>
-                      {score >= highScore && score > 0 && (
-                        <p className="new-record">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-                            <path d="M4 22h16" />
-                            <path d="M10 14.66V18c0 .55-.47.98-.97 1.21C7.85 19.75 5.97 21 3 21" />
-                            <path d="M14 14.66V18c0 .55.47.98.97 1.21C16.15 19.75 18.03 21 21 21" />
-                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-                          </svg>
-                          新纪录！
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <h2>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                          <path d="M8 11h8" />
-                          <path d="M12 7v8" />
-                        </svg>
-                        Flappy Bird
-                      </h2>
-                      <p className="hint">准备好开始冒险了吗？</p>
-                    </>
-                  )}
-                  <button className="start-btn" onClick={(e) => { e.stopPropagation(); startGame(); }}>
+          {/* 中央游戏区 */}
+          <main className="news-game-area">
+            <div className="game-canvas" onClick={jump}>
+              {/* 背景网格 */}
+              <div className="bg-grid"></div>
+              
+              {/* 鸟 */}
+              {gameStarted && (
+                <div
+                  className="bird"
+                  style={{
+                    top: birdY,
+                    transform: `rotate(${birdRotation}deg)`
+                  }}
+                >
+                  <svg viewBox="0 0 30 30" fill="none">
+                    <ellipse cx="15" cy="15" rx="14" ry="11" fill="#fbbf24" stroke="#fff" strokeWidth="2"/>
+                    <circle cx="22" cy="11" r="4" fill="#fff"/>
+                    <circle cx="23" cy="11" r="2" fill="#000"/>
+                    <path d="M26 14l4 2" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                    <path d="M8 18l-6-4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                    <path d="M8 12l-6 4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                  </svg>
+                </div>
+              )}
+
+              {/* 管道 */}
+              {gameStarted && pipes.map((pipe, index) => (
+                <div key={index}>
+                  {/* 上管道 */}
+                  <div
+                    className="pipe-top"
+                    style={{
+                      left: pipe.x,
+                      height: pipe.topHeight
+                    }}
+                  >
+                    <div className="pipe-body"></div>
+                    <div className="pipe-cap"></div>
+                  </div>
+                  
+                  {/* 下管道 */}
+                  <div
+                    className="pipe-bottom"
+                    style={{
+                      left: pipe.x,
+                      height: 500 - pipe.topHeight - PIPE_GAP
+                    }}
+                  >
+                    <div className="pipe-cap"></div>
+                    <div className="pipe-body"></div>
+                  </div>
+                </div>
+              ))}
+
+              {/* 地面 */}
+              <div className="ground"></div>
+
+              {/* 开始界面 */}
+              {(!gameStarted || gameOver) && (
+                <div className="overlay">
+                  <div className="overlay-content">
                     {gameOver ? (
                       <>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                          <polyline points="23 4 23 10 17 10" />
-                          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"/>
+                          <line x1="15" y1="9" x2="9" y2="15"/>
+                          <line x1="9" y1="9" x2="15" y2="15"/>
                         </svg>
-                        再玩一次
+                        <h2 className="result-title">游戏结束</h2>
+                        <div className="score-board">
+                          <div className="score-item">
+                            <span className="label">得分</span>
+                            <span className="value">{score}</span>
+                          </div>
+                          <div className="score-item">
+                            <span className="label">最佳</span>
+                            <span className="value highlight">{highScore}</span>
+                          </div>
+                        </div>
+                        {score >= highScore && score > 0 && (
+                          <div className="new-record">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2">
+                              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                              <path d="M4 22h16"/>
+                              <path d="M10 14.66V18c0 .55-.47.98-.97 1.21C7.85 19.75 5.97 21 3 21"/>
+                              <path d="M14 14.66V18c0 .55.47.98.97 1.21C16.15 19.75 18.03 21 21 21"/>
+                              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                            </svg>
+                            <span>新纪录!</span>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                          <polygon points="5 3 19 12 5 21 5 3" />
+                        <svg width="60" height="60" viewBox="0 0 30 30" fill="none">
+                          <ellipse cx="15" cy="15" rx="14" ry="11" fill="#fbbf24" stroke="#fff" strokeWidth="2"/>
+                          <circle cx="22" cy="11" r="4" fill="#fff"/>
+                          <circle cx="23" cy="11" r="2" fill="#000"/>
                         </svg>
-                        开始游戏
+                        <h2>飞扬的小鸟</h2>
+                        <p className="subtitle">经典休闲游戏</p>
                       </>
                     )}
-                  </button>
-                  <p className="hint">按空格键或点击屏幕跳跃</p>
+                    <button className="start-btn" onClick={(e) => { e.stopPropagation(); startGame(); }}>
+                      {gameOver ? '再玩一次' : '开始游戏'}
+                    </button>
+                    <p className="controls-hint">
+                      <span className="key-badge">空格</span> 跳跃 · 
+                      <span className="key-badge">P</span> 暂停
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
 
-          {/* 侧边信息 */}
-          <div className="flybird-sidebar">
-            <div className="stat-box">
-              <span className="stat-label">当前得分</span>
-              <span className="stat-value">{score}</span>
+              {/* 暂停界面 */}
+              {isPaused && !gameOver && (
+                <div className="overlay pause">
+                  <div className="overlay-content">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                      <rect x="6" y="4" width="4" height="16"/>
+                      <rect x="14" y="4" width="4" height="16"/>
+                    </svg>
+                    <h2>游戏暂停</h2>
+                    <p className="hint">按 P 或 ESC 继续</p>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="stat-box">
-              <span className="stat-label">最佳记录</span>
-              <span className="stat-value high">{highScore}</span>
-            </div>
-            {gameStarted && !gameOver && (
-              <div className="stat-box">
-                <span className="stat-label">按 P 暂停</span>
+          </main>
+
+          {/* 右侧边栏 */}
+          <aside className="news-sidebar-right">
+            <div className="wave-box">
+              <span className="wave-label">SIGNAL</span>
+              <div className="wave-bars">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="wave-bar"></div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">TAPE</span>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">FUTURE</span>
+            </div>
+          </aside>
         </div>
 
-        <div className="flybird-instructions">
-          <h3>操作说明</h3>
-          <div className="controls-grid">
-            <div className="control-item"><span className="key">空格</span> 跳跃</div>
-            <div className="control-item"><span className="key">↑</span> 跳跃</div>
-            <div className="control-item"><span className="key">P</span> 暂停/继续</div>
-            <div className="control-item"><span className="key">点击</span> 跳跃</div>
-          </div>
-          <div className="tips-section">
-            <h4>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                <path d="M9 18h6a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2z" />
-                <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26C17.81 13.47 19 11.38 19 9a7 7 0 0 0-7-7z" />
-              </svg>
-              游戏技巧
-            </h4>
-            <ul className="tips-list">
-              <li>轻点屏幕保持节奏，不要连续点击</li>
-              <li>提前预判管道位置，保持平稳飞行</li>
-              <li>随着分数提高，管道间距会变小</li>
-              <li>利用小鸟旋转判断下落速度</li>
-            </ul>
-          </div>
+        {/* 报尾 */}
+        <div className="newspaper-footer">
+          <span>FLAPPY BIRD © 2024</span>
+          <span>◆</span>
+          <span>TAPE FUTURISM</span>
+          <span>◆</span>
+          <span>CLASSIC CASUAL</span>
         </div>
       </div>
     </div>

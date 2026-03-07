@@ -25,8 +25,8 @@ import FlyBird from './pages/FlyBird'
 import Dinosaur from './pages/Dinosaur'
 import Snake from './pages/Snake'
 import Pacman from './pages/Pacman'
-import ScreenSaver from './pages/ScreenSaver'
-import ScreenSaverSettings from './pages/ScreenSaverSettings'
+import PrefixScreensaver from './pages/PrefixScreensaver'
+import PrefixSettings from './pages/PrefixSettings'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
@@ -38,7 +38,8 @@ import './styles/special.css'
 import './styles/auth.css'
 import './styles/header.css'
 import './styles/pomodoro.css'
-import './styles/ScreenSaver.css'
+import './styles/PrefixScreensaver.css'
+import './styles/PrefixSettings.css'
 
 function AppContent() {
   const [showIntro, setShowIntro] = useState(true)
@@ -51,12 +52,12 @@ function AppContent() {
   // 屏保页面不激活屏保
   const isScreenSaverRoute = location.pathname === '/special/screensaver'
   
-  // 无操作自动激活屏保
+  // 无操作自动激活屏保（风格化前缀）
   useEffect(() => {
     if (isAdminRoute || isScreenSaverRoute) return
     
     // 从 localStorage 读取配置
-    const saved = localStorage.getItem('screensaver_settings')
+    const saved = localStorage.getItem('prefix_settings')
     const config = saved ? JSON.parse(saved) : { enabled: true, timeout: 5 }
     
     if (!config.enabled || config.timeout === 0) return
@@ -252,11 +253,11 @@ function AppContent() {
           {/* 吃豆人 */}
           <Route path="/special/pacman" element={<Pacman />} />
           
-          {/* 屏保设置 */}
-          <Route path="/special/screensaver-settings" element={<ScreenSaverSettings />} />
+          {/* 风格化前缀设置 */}
+          <Route path="/special/prefix-settings" element={<PrefixSettings />} />
           
-          {/* 屏保预览 */}
-          <Route path="/special/screensaver" element={<ScreenSaver />} />
+          {/* 风格化前缀屏保 */}
+          <Route path="/special/prefix" element={<PrefixScreensaver />} />
           
           {/* 文章详情 */}
           <Route path="/post/:id" element={
@@ -273,10 +274,10 @@ function AppContent() {
         </Routes>
       )}
       
-      {/* 屏保覆盖层 */}
+      {/* 风格化前缀屏保覆盖层 */}
       {showScreenSaver && !isAdminRoute && !isScreenSaverRoute && (
         <div className="screensaver-overlay" onClick={exitScreenSaver} onKeyDown={exitScreenSaver} tabIndex={-1}>
-          <ScreenSaver />
+          <PrefixScreensaver />
         </div>
       )}
     </div>

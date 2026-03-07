@@ -99,13 +99,13 @@ export default function SpecialConstructs() {
       status: 'active'
     },
     {
-      id: 'screensaver',
-      title: '屏保设置',
-      subtitle: 'SCREEN SAVER',
-      description: '自定义屏保样式、激活时间和显示效果',
+      id: 'prefix',
+      title: '风格化前缀',
+      subtitle: 'STYLED PREFIX',
+      description: '自定义进场动画、屏保效果和视觉前缀',
       icon: TangyuanIcon,
       color: 'amber',
-      path: '/special/screensaver-settings',
+      path: '/special/prefix-settings',
       status: 'active'
     },
     {

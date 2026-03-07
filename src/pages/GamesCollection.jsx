@@ -296,6 +296,30 @@ export default function GamesCollection() {
               </div>
             </div>
           </div>
+          
+          <div className="social-panel">
+            <div className="panel-header">
+              <span className="panel-title">CONNECT</span>
+            </div>
+            <div className="panel-content">
+              <a href="https://github.com/Sogenmaple" target="_blank" rel="noopener noreferrer" className="social-link">
+                <span className="social-label">GITHUB</span>
+                <span className="social-arrow">↗</span>
+              </a>
+              <a href="https://space.bilibili.com/389369217" target="_blank" rel="noopener noreferrer" className="social-link">
+                <span className="social-label">BILIBILI</span>
+                <span className="social-arrow">↗</span>
+              </a>
+              <a href="https://www.taptap.cn/developer/338837" target="_blank" rel="noopener noreferrer" className="social-link">
+                <span className="social-label">TAPTAP</span>
+                <span className="social-arrow">↗</span>
+              </a>
+              <a href="https://qm.qq.com/q/AxbQpuKKsK" target="_blank" rel="noopener noreferrer" className="social-link">
+                <span className="social-label">QQ 群：950087304</span>
+                <span className="social-arrow">↗</span>
+              </a>
+            </div>
+          </div>
         </aside>
       </div>
 

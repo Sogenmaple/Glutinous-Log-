@@ -701,6 +701,82 @@
   50% { height: 100%; }
 }
 
+/* 社交链接面板 */
+.social-panel {
+  margin-top: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 149, 0, 0.05) 0%,
+    rgba(6, 182, 212, 0.03) 100%
+  );
+  border: 1px solid rgba(255, 149, 0, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.social-panel .panel-header {
+  padding: 1rem 1.25rem;
+  background: rgba(255, 149, 0, 0.08);
+  border-bottom: 1px solid rgba(255, 149, 0, 0.15);
+}
+
+.social-panel .panel-title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--amber);
+  letter-spacing: 0.2em;
+}
+
+.social-panel .panel-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.social-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  background: rgba(255, 149, 0, 0.08);
+  border-color: rgba(255, 149, 0, 0.2);
+  transform: translateX(4px);
+}
+
+.social-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  transition: color 0.3s ease;
+}
+
+.social-link:hover .social-label {
+  color: var(--amber);
+}
+
+.social-arrow {
+  font-size: 1rem;
+  color: var(--cyan);
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover .social-arrow {
+  color: var(--amber);
+  opacity: 1;
+  transform: translateX(3px);
+}
+
 /* ========== 底部通栏 ========== */
 .cyber-footer {
   position: relative;

@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { BombIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, GameIcon } from '../components/icons/SiteIcons'
+import { BombIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, GameIcon, CodeIcon, BlockIcon, StarIcon, ExperimentIcon, PlayIcon, TrophyIcon } from '../components/icons/SiteIcons'
 import '../styles/GamesCollection.css'
 
 /**
- * 小游戏集锦页面
- * 集合所有休闲小游戏
+ * 游戏宇宙页面 - 优雅展示所有项目
  */
 export default function GamesCollection() {
   const navigate = useNavigate()
@@ -17,16 +16,16 @@ export default function GamesCollection() {
     setMounted(true)
   }, [])
 
-  const games = [
+  // 主要游戏项目
+  const mainGames = [
     {
       id: 'minesweeper',
       title: '扫雷',
       subtitle: 'MINESWEEPER',
-      description: '经典扫雷游戏，排除所有地雷',
+      description: '经典益智游戏，排除所有地雷',
       icon: BombIcon,
       color: 'red',
-      path: '/special/minesweeper',
-      status: 'active'
+      path: '/special/minesweeper'
     },
     {
       id: 'snake',
@@ -35,8 +34,7 @@ export default function GamesCollection() {
       description: '经典贪吃蛇，吃掉食物成长',
       icon: SnakeIcon,
       color: 'green',
-      path: '/special/snake',
-      status: 'active'
+      path: '/special/snake'
     },
     {
       id: 'flybird',
@@ -45,8 +43,7 @@ export default function GamesCollection() {
       description: '穿越管道，飞翔挑战',
       icon: BirdIcon,
       color: 'cyan',
-      path: '/special/flybird',
-      status: 'active'
+      path: '/special/flybird'
     },
     {
       id: 'pacman',
@@ -55,8 +52,7 @@ export default function GamesCollection() {
       description: '吃掉所有豆子，躲避幽灵',
       icon: PacmanIcon,
       color: 'amber',
-      path: '/special/pacman',
-      status: 'active'
+      path: '/special/pacman'
     },
     {
       id: 'dinosaur',
@@ -65,18 +61,73 @@ export default function GamesCollection() {
       description: '躲避障碍，奔跑生存',
       icon: DinosaurIcon,
       color: 'green',
-      path: '/special/dinosaur',
-      status: 'active'
+      path: '/special/dinosaur'
     }
   ]
 
-  const colorMap = {
-    amber: '#ff9500',
-    cyan: '#06b6d4',
-    red: '#ff453a',
-    green: '#22c55e',
-    purple: '#bd00ff'
-  }
+  // 游戏宇宙项目（按时间排序）
+  const universeGames = [
+    {
+      id: 'block-puzzle',
+      title: '方块谜题',
+      subtitle: 'BLOCK PUZZLE',
+      description: '几何方块拼接挑战，益智解谜',
+      icon: BlockIcon,
+      color: 'amber',
+      path: '/special/tetris',
+      year: '2024'
+    },
+    {
+      id: 'code-warrior',
+      title: '代码战士',
+      subtitle: 'CODE WARRIOR',
+      description: '编程挑战游戏，提升技能',
+      icon: CodeIcon,
+      color: 'cyan',
+      path: '/games/code',
+      year: '2024'
+    },
+    {
+      id: 'star-collector',
+      title: '星星收集者',
+      subtitle: 'STAR COLLECTOR',
+      description: '平台跳跃收集，挑战反应',
+      icon: StarIcon,
+      color: 'amber',
+      path: '/games/star',
+      year: '2023'
+    },
+    {
+      id: 'experiment-lab',
+      title: '实验实验室',
+      subtitle: 'EXPERIMENT LAB',
+      description: '物理模拟实验，探索发现',
+      icon: ExperimentIcon,
+      color: 'purple',
+      path: '/games/experiment',
+      year: '2023'
+    },
+    {
+      id: 'play-ground',
+      title: '游乐场',
+      subtitle: 'PLAY GROUND',
+      description: '休闲小游戏集合',
+      icon: PlayIcon,
+      color: 'green',
+      path: '/games/play',
+      year: '2022'
+    },
+    {
+      id: 'trophy-hunt',
+      title: '奖杯猎人',
+      subtitle: 'TROPHY HUNT',
+      description: '成就挑战系统',
+      icon: TrophyIcon,
+      color: 'amber',
+      path: '/games/trophy',
+      year: '2022'
+    }
+  ]
 
   return (
     <div className="games-collection-page">
@@ -88,61 +139,100 @@ export default function GamesCollection() {
 
       {/* 页面标题 */}
       <div className={`collection-header ${mounted ? 'visible' : ''}`}>
-        <GameIcon size={60} color="#ff9500" />
-        <h1 className="collection-title">小游戏</h1>
-        <p className="collection-subtitle">GAMES // 休闲游戏集合</p>
+        <GameIcon size={64} color="#ff9500" />
+        <h1 className="collection-title">游戏宇宙</h1>
+        <p className="collection-subtitle">GAMES UNIVERSE // 汤圆游戏作品集</p>
         <div className="collection-divider"></div>
       </div>
 
-      {/* 游戏卡片网格 */}
-      <div className="games-grid">
-        {games.map((game, index) => (
-          <div
-            key={game.id}
-            className={`game-card ${game.color} ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
-            style={{ animationDelay: `${index * 0.1}s` }}
-            onMouseEnter={() => setHoveredGame(game.id)}
-            onMouseLeave={() => setHoveredGame(null)}
-            onClick={() => navigate(game.path)}
-          >
-            {/* 游戏图标 */}
-            <div className="game-icon">
-              <game.icon size={48} color="currentColor" />
-            </div>
+      {/* 主要游戏区域 */}
+      <section className="games-section">
+        <div className="section-label">
+          <span className="label-icon">◆</span>
+          <span>休闲游戏</span>
+          <span className="label-sub">QUICK GAMES</span>
+        </div>
+        
+        <div className="main-games-grid">
+          {mainGames.map((game, index) => {
+            const IconComponent = game.icon
+            return (
+              <div
+                key={game.id}
+                className={`main-game-card ${game.color} ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
+                style={{ animationDelay: `${index * 0.1}s` }}
+                onMouseEnter={() => setHoveredGame(game.id)}
+                onMouseLeave={() => setHoveredGame(null)}
+                onClick={() => navigate(game.path)}
+              >
+                <div className="card-icon">
+                  <IconComponent size={56} color="currentColor" />
+                </div>
+                <h3 className="card-title">{game.title}</h3>
+                <p className="card-subtitle">{game.subtitle}</p>
+                <p className="card-desc">{game.description}</p>
+                <div className="card-arrow">
+                  <span>PLAY</span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </div>
+                <div className="corner tl"></div>
+                <div className="corner tr"></div>
+                <div className="corner bl"></div>
+                <div className="corner br"></div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
 
-            {/* 游戏信息 */}
-            <div className="game-info">
-              <h3 className="game-title">{game.title}</h3>
-              <p className="game-subtitle">{game.subtitle}</p>
-              <p className="game-desc">{game.description}</p>
-            </div>
+      {/* 游戏宇宙时间线 */}
+      <section className="universe-section">
+        <div className="section-label">
+          <span className="label-icon">◆</span>
+          <span>游戏宇宙</span>
+          <span className="label-sub">GAME UNIVERSE</span>
+        </div>
 
-            {/* 开始按钮 */}
-            <div className="game-action">
-              <span className="play-btn">开始游戏</span>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </div>
+        <div className="universe-timeline">
+          {universeGames.map((game, index) => {
+            const IconComponent = game.icon
+            return (
+              <div
+                key={game.id}
+                className={`universe-item ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
+                style={{ animationDelay: `${index * 0.08}s` }}
+                onMouseEnter={() => setHoveredGame(game.id)}
+                onMouseLeave={() => setHoveredGame(null)}
+                onClick={() => navigate(game.path)}
+              >
+                <div className="universe-year">{game.year}</div>
+                <div className="universe-content">
+                  <div className="universe-icon">
+                    <IconComponent size={40} color="currentColor" />
+                  </div>
+                  <div className="universe-info">
+                    <h3 className="universe-title">{game.title}</h3>
+                    <p className="universe-subtitle">{game.subtitle}</p>
+                    <p className="universe-desc">{game.description}</p>
+                  </div>
+                  <div className="universe-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
 
-            {/* 状态标签 */}
-            {game.status === 'active' && (
-              <span className="status-badge active">可玩</span>
-            )}
-
-            {/* 角落装饰 */}
-            <div className="corner-tl"></div>
-            <div className="corner-tr"></div>
-            <div className="corner-bl"></div>
-            <div className="corner-br"></div>
-          </div>
-        ))}
-      </div>
-
-      {/* 底部提示 */}
+      {/* 底部装饰 */}
       <div className="collection-footer">
-        <p>点击任意卡片开始游戏</p>
-        <p className="footer-note">所有游戏均支持键盘和触摸操作</p>
+        <div className="footer-line"></div>
+        <p>EXPLORE THE UNIVERSE</p>
       </div>
     </div>
   )

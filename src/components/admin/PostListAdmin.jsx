@@ -125,11 +125,11 @@ export default function PostListAdmin({ onEdit }) {
             className="filter-select"
           >
             <option value="all">全部类型</option>
-            <option value="project">🎮 游戏项目</option>
-            <option value="devlog">📝 开发日志</option>
-            <option value="tech">💻 技术分享</option>
-            <option value="design">🎨 设计笔记</option>
-            <option value="life">☕ 生活随笔</option>
+            <option value="project">游戏项目</option>
+            <option value="devlog">开发日志</option>
+            <option value="tech">技术分享</option>
+            <option value="design">设计笔记</option>
+            <option value="life">生活随笔</option>
           </select>
 
           <select 
@@ -138,8 +138,8 @@ export default function PostListAdmin({ onEdit }) {
             className="filter-select"
           >
             <option value="all">全部状态</option>
-            <option value="published">✅ 已发布</option>
-            <option value="draft">📄 草稿</option>
+            <option value="published">已发布</option>
+            <option value="draft">草稿</option>
           </select>
         </div>
       </div>

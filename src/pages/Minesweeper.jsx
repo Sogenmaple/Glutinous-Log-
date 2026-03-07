@@ -322,7 +322,28 @@ export default function Minesweeper() {
         {/* 游戏状态 */}
         {(gameOver || gameWon) && (
           <div className={`game-status ${gameWon ? 'won' : 'lost'}`}>
-            {gameWon ? '🎊 恭喜获胜！' : '💥 游戏结束！'}
+            {gameWon ? (
+              <>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
+                  <circle cx="12" cy="8" r="7" />
+                  <polyline points="8.21 13.89 7 12 5 12" />
+                  <polyline points="15.79 13.89 17 12 19 12" />
+                  <path d="M12 22v-3" />
+                  <path d="M12 16l-3 3" />
+                  <path d="M12 16l3 3" />
+                </svg>
+                恭喜获胜！
+              </>
+            ) : (
+              <>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="15" y1="9" x2="9" y2="15" />
+                  <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+                游戏结束！
+              </>
+            )}
           </div>
         )}
 

@@ -85,16 +85,16 @@ export default function PostEditor({ post, onBack }) {
       })
 
       if (response.ok) {
-        setMessage(post ? '✅ 文章已更新' : '✅ 文章已创建')
+        setMessage(post ? '✓ 文章已更新' : '✓ 文章已创建')
         setTimeout(() => {
           onBack()
         }, 1000)
       } else {
         const data = await response.json()
-        setMessage('❌ ' + (data.error || '操作失败'))
+        setMessage('× ' + (data.error || '操作失败'))
       }
     } catch (error) {
-      setMessage('❌ 网络错误')
+      setMessage('× 网络错误')
     } finally {
       setSaving(false)
     }
@@ -109,7 +109,7 @@ export default function PostEditor({ post, onBack }) {
         </button>
       </div>
       
-      {message && <div className={`editor-message ${message.includes('✅') ? 'success' : 'error'}`}>{message}</div>}
+      {message && <div className={`editor-message ${message.includes('✓') ? 'success' : 'error'}`}>{message}</div>}
 
       <form onSubmit={handleSubmit} className="editor-form">
         {/* 标题 */}
@@ -138,7 +138,7 @@ export default function PostEditor({ post, onBack }) {
             <label>类型 *</label>
             <select name="type" value={formData.type} onChange={handleChange}>
               <option value="project">🎮 游戏项目</option>
-              <option value="devlog">📝 开发日志</option>
+              <option value="devlog">开发日志</option>
               <option value="tech">💻 技术分享</option>
               <option value="design">🎨 设计笔记</option>
               <option value="life">☕ 生活随笔</option>
@@ -159,8 +159,8 @@ export default function PostEditor({ post, onBack }) {
           <div className="form-group">
             <label>状态 *</label>
             <select name="status" value={formData.status} onChange={handleChange}>
-              <option value="draft">📄 草稿</option>
-              <option value="published">✅ 已发布</option>
+              <option value="draft">草稿</option>
+              <option value="published">已发布</option>
             </select>
           </div>
         </div>
@@ -245,8 +245,8 @@ export default function PostEditor({ post, onBack }) {
               正文内容
             </label>
             <div className="content-stats">
-              <span className="stat">📝 {charCount} 字</span>
-              <span className="stat">📄 {wordCount} 词</span>
+              <span className="stat">字数：{charCount}</span>
+              <span className="stat">词数：{wordCount}</span>
             </div>
           </div>
           

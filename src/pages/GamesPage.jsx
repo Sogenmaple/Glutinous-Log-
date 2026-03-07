@@ -1,3 +1,4 @@
+import GameTimeline from '../components/GameTimeline'
 import GameShowcase from '../components/GameShowcase'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -18,6 +19,7 @@ export default function GamesPage() {
           <p className="page-subtitle">TANGYUAN'S GAME UNIVERSE · 穿越时空的互动体验</p>
         </div>
         
+        <GameTimeline />
         <GameShowcase />
       </main>
       <Footer />

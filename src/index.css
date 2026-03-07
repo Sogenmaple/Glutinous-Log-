@@ -553,281 +553,107 @@ body :not(code):not(pre) {
 }
 
 /* ============================================
-   TIMELINE SECTION
+
+/* ============================================
+   TIMELINE SECTION - 简洁重构
    ============================================ */
 .timeline-section {
-  padding: 5rem 2rem;
-  max-width: 1200px;
+  padding: 4rem 2rem;
+  max-width: 900px;
   margin: 0 auto;
-  position: relative;
-}
-
-.timeline-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(ellipse at center, rgba(255, 149, 0, 0.03) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-/* 游戏宇宙页面 - 删除时间轴背景 */
-.games-page-main .timeline-section::before {
-  background: transparent;
 }
 
 .timeline-container {
   position: relative;
-  padding: 0;
 }
-
-/* 时间轴线已删除 */
 
 .timeline-item {
-  position: relative;
-  width: 100%;
-  margin-bottom: 2rem;
-  opacity: 1;
-}
-
-.timeline-item.left {
-  float: none;
-  clear: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3rem;
   padding: 0;
-  text-align: center;
-  transform: none;
-}
-
-.timeline-item.right {
-  float: none;
-  clear: none;
-  padding: 0;
-  text-align: center;
-  transform: none;
-}
-
-.timeline-item.visible {
-  opacity: 1;
-  transform: none;
 }
 
 .timeline-dot {
-  position: relative;
-  top: auto;
-  width: 48px;
-  height: 48px;
-  background: rgba(10, 10, 15, 0.9);
-  border: 3px solid #ff9500;
+  width: 40px;
+  height: 40px;
+  background: var(--bg-deep);
+  border: 2px solid var(--amber);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 25px rgba(255, 149, 0, 0.6), inset 0 0 15px rgba(255, 149, 0, 0.1);
-  z-index: 10;
-  transition: all 0.3s ease;
-  margin: 0 auto 1rem;
-}
-
-.timeline-item.left .timeline-dot,
-.timeline-item.right .timeline-dot {
-  left: auto;
-  right: auto;
-}
-
-.timeline-item:hover .timeline-dot {
-  border-color: #ff9500;
-  box-shadow: 0 0 35px rgba(255, 149, 0, 0.8), inset 0 0 20px rgba(255, 149, 0, 0.2);
-  transform: scale(1.15);
+  margin-bottom: 1.2rem;
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.4);
+  flex-shrink: 0;
 }
 
 .timeline-dot .vector-icon {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
 }
 
-/* 连接线已删除 */
-
-/* 开发中状态脉冲光环 */
-.timeline-status.development {
-  position: relative;
-}
-
-.timeline-status.development::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 3px;
-  background: linear-gradient(45deg, var(--green), var(--cyan), var(--green));
-  background-size: 200% 200%;
-  z-index: -1;
-  opacity: 0.3;
-  animation: gradient-rotate 3s linear infinite;
-}
-
-@keyframes gradient-rotate {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.timeline-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.3rem;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+.timeline-details {
+  text-align: center;
+  width: 100%;
 }
 
 .timeline-date {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
-  color: #06b6d4;
-  text-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+  font-size: 0.8rem;
+  color: var(--cyan);
   letter-spacing: 0.12em;
   font-weight: 600;
-}
-
-.timeline-jam {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.1em;
-}
-
-.timeline-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  margin-bottom: 0.9rem;
-  justify-content: inherit;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 .timeline-title {
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 1.4rem;
   font-weight: 900;
-  color: #ff9500;
-  text-shadow: 0 0 20px rgba(255, 149, 0, 0.7), 0 0 40px rgba(255, 149, 0, 0.3);
-  letter-spacing: 0.1em;
-  margin: 0;
-  transition: all 0.3s ease;
+  color: var(--amber);
+  text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
+  letter-spacing: 0.08em;
+  margin: 0 0 0.8rem 0;
   line-height: 1.3;
 }
 
-/* 简洁模式 - 默认显示 */
-.timeline-header-simple {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
-  background: transparent;
-}
-
-.timeline-date-simple {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: #06b6d4;
-  text-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
-  letter-spacing: 0.12em;
-  font-weight: 600;
-}
-
-.timeline-title-simple {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 900;
-  color: #ff9500;
-  text-shadow: 0 0 20px rgba(255, 149, 0, 0.7);
-  letter-spacing: 0.1em;
-  margin: 0;
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-/* 详情区域 - 始终显示 */
-.timeline-details {
-  max-height: none;
-  opacity: 1;
-  padding: 0.5rem 0;
-}
-
-.timeline-header-simple {
-  display: none;
-}
-
-.timeline-status {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 3px;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-  line-height: 1.4;
-}
-
-.timeline-status.development {
-  border: 1px solid rgba(76, 201, 240, 0.4);
-  background: rgba(76, 201, 240, 0.1);
-  color: var(--green);
-  text-shadow: var(--green-glow);
-  animation: pulse-status 2s ease-in-out infinite;
-}
-
-@keyframes pulse-status {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
 .timeline-desc {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.02em;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 1rem 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .timeline-tags {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
 
-.timeline-item.left .timeline-tags {
-  justify-content: flex-end;
-}
-
 .timeline-tag {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  padding: 0;
-  color: rgba(255, 255, 255, 0.7);
-  letter-spacing: 0.08em;
-  background: transparent;
-  cursor: default;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.timeline-tag:hover {
-  color: #ff9500;
-  text-shadow: 0 0 8px rgba(255, 149, 0, 0.5);
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  letter-spacing: 0.05em;
 }
 
 .timeline-links {
   display: flex;
+  justify-content: center;
+  gap: 0.8rem;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.timeline-item.left .timeline-links {
-  justify-content: flex-end;
 }
 
 .timeline-link {
@@ -836,75 +662,40 @@ body :not(code):not(pre) {
   gap: 0.4rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #06b6d4;
+  color: var(--text-secondary);
   text-decoration: none;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  padding: 0.35rem 0.7rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
 }
 
 .timeline-link:hover {
-  color: #06b6d4;
-  text-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
-  transform: translateX(3px);
+  color: var(--amber);
+  border-color: rgba(255, 149, 0, 0.3);
+  background: rgba(255, 149, 0, 0.08);
+  text-decoration: none;
 }
 
-.link-icon-svg {
-  width: 16px;
-  height: 16px;
+.timeline-link .link-icon-svg {
+  width: 15px;
+  height: 15px;
   fill: currentColor;
 }
 
-.link-label {
+.timeline-status {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  background: rgba(57, 255, 20, 0.1);
+  color: var(--green);
+  border: 1px solid rgba(57, 255, 20, 0.2);
   letter-spacing: 0.05em;
 }
-
-.timeline-container::after {
-  content: '';
-  display: table;
-  clear: both;
-}
-
-/* Timeline responsive */
-@media (max-width: 768px) {
-  .timeline-line {
-    left: 24px;
-  }
-
-  .timeline-item,
-  .timeline-item.left,
-  .timeline-item.right {
-    width: 100%;
-    padding-left: 60px;
-    padding-right: 0;
-    text-align: left;
-    float: none;
-  }
-
-  .timeline-item:nth-child(even) {
-    margin-top: 0;
-  }
-
-  .timeline-item.left .timeline-dot,
-  .timeline-item.right .timeline-dot {
-    left: 0;
-    right: auto;
-  }
-
-  .timeline-item.left .timeline-tags,
-  .timeline-item.left .timeline-links {
-    justify-content: flex-start;
-  }
-
-  .timeline-item.left .timeline-title {
-    text-align: left;
-  }
-}
-
-/* ============================================
    APP LAYOUT
    ============================================ */
 .app {

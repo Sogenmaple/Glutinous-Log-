@@ -1,40 +1,12 @@
-import { useState, useEffect } from 'react'
 import { games } from '../data/games'
 
 export default function GameTimeline() {
-  const [hoveredId, setHoveredId] = useState(null)
-  const [visibleItems, setVisibleItems] = useState(new Set())
-
   // 按时间正序排序（从旧到新，精确到年月日）
   const sortedGames = [...games].sort((a, b) => {
     const dateA = new Date(a.date)
     const dateB = new Date(b.date)
     return dateA - dateB
   })
-
-  // 滚动触发动画
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const id = parseInt(entry.target.dataset.id)
-            setVisibleItems((prev) => new Set([...prev, id]))
-          }
-        })
-      },
-      {
-        threshold: 0.2,
-        rootMargin: '0px 0px -100px 0px',
-      }
-    )
-
-    document.querySelectorAll('.timeline-item').forEach((item) => {
-      observer.observe(item)
-    })
-
-    return () => observer.disconnect()
-  }, [])
 
   const renderVectorIcon = (type) => {
     switch (type) {
@@ -174,37 +146,31 @@ export default function GameTimeline() {
           return (
             <div
               key={game.id}
-              data-id={game.id}
-              className={`timeline-item ${isLeft ? 'left' : 'right'} ${visibleItems.has(game.id) ? 'visible' : ''}`}
-              style={{ animationDelay: `${index * 0.1}s` }}
-              onMouseEnter={() => setHoveredId(game.id)}
-              onMouseLeave={() => setHoveredId(null)}
+              className="timeline-item"
             >
               <div className="timeline-dot">
                 {renderVectorIcon(game.iconType)}
               </div>
 
-              {/* 详情内容 */}
               <div className="timeline-details">
-                <div className="timeline-header">
-                  <span className="timeline-date">{formatDate(game.date)}</span>
-                  <span className="timeline-jam">{game.jam}</span>
-                </div>
-
-                <div className="timeline-title-row">
-                  <h3 className="timeline-title">{game.title}</h3>
+                <span className="timeline-date">{formatDate(game.date)}</span>
+                
+                <h3 className="timeline-title">
+                  {game.title}
                   {game.status === 'development' && (
-                    <span className="timeline-status development">开发中</span>
+                    <span className="timeline-status">开发中</span>
                   )}
-                </div>
+                </h3>
 
                 <p className="timeline-desc">{game.description}</p>
 
-                <div className="timeline-tags">
-                  {game.tags.map(tag => (
-                    <span key={tag} className="timeline-tag">{tag}</span>
-                  ))}
-                </div>
+                {game.tags.length > 0 && (
+                  <div className="timeline-tags">
+                    {game.tags.map(tag => (
+                      <span key={tag} className="timeline-tag">{tag}</span>
+                    ))}
+                  </div>
+                )}
 
                 {Object.keys(game.links).length > 0 && (
                   <div className="timeline-links">

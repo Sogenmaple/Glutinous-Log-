@@ -341,8 +341,6 @@ export default function Pacman() {
 
   // 粒子动画
   useEffect(() => {
-    if (particles.length === 0) return
-
     const updateParticles = setInterval(() => {
       setParticles(prev => prev
         .map(p => ({
@@ -357,7 +355,7 @@ export default function Pacman() {
     }, 50)
 
     return () => clearInterval(updateParticles)
-  }, [particles.length])
+  }, [])
 
   // 嘴巴动画
   useEffect(() => {

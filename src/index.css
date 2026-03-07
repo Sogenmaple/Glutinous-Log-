@@ -573,9 +573,62 @@ body :not(code):not(pre) {
   pointer-events: none;
 }
 
-/* 游戏宇宙页面 - 删除时间轴背景 */
+/* 游戏宇宙页面 - 删除时间轴所有样式 */
 .games-page-main .timeline-section::before {
   background: transparent;
+}
+
+.games-page-main .timeline-item {
+  width: 100%;
+  float: none;
+  clear: none;
+  padding: 0;
+  margin-bottom: 2rem;
+  opacity: 1;
+  transform: none;
+}
+
+.games-page-main .timeline-item.left,
+.games-page-main .timeline-item.right {
+  float: none;
+  padding: 0;
+  text-align: center;
+  transform: none;
+}
+
+.games-page-main .timeline-dot {
+  position: relative;
+  top: auto;
+  margin: 0 auto 1rem;
+}
+
+.games-page-main .timeline-item.left .timeline-dot,
+.games-page-main .timeline-item.right .timeline-dot {
+  left: auto;
+  right: auto;
+}
+
+.games-page-main .timeline-connector {
+  display: none;
+}
+
+.games-page-main .timeline-header-simple {
+  padding: 1rem 0;
+}
+
+.games-page-main .timeline-details {
+  max-height: none;
+  opacity: 1;
+  margin-top: 0;
+}
+
+.games-page-main .timeline-item:hover .timeline-details {
+  max-height: none;
+  opacity: 1;
+}
+
+.games-page-main .timeline-item:hover .timeline-header-simple {
+  display: block;
 }
 
 .timeline-container {

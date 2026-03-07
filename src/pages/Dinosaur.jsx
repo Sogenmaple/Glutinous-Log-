@@ -13,18 +13,18 @@ export default function Dinosaur() {
   const [gameStarted, setGameStarted] = useState(false)
   const [gameOver, setGameOver] = useState(false)
   const [dinoY, setDinoY] = useState(GROUND_Y)
-  const [dinoVelocity, setDinoVelocity] = useState(0)
   const [obstacles, setObstacles] = useState([])
   const [score, setScore] = useState(0)
   const [highScore, setHighScore] = useState(0)
   const [isDucking, setIsDucking] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [particles, setParticles] = useState([])
-  const [speed, setSpeed] = useState(BASE_SPEED)
-  const [level, setLevel] = useState(1)
+  
+  // 使用 refs 避免闭包问题
+  const dinoVelocityRef = useRef(0)
+  const speedRef = useRef(BASE_SPEED)
   const gameLoopRef = useRef(null)
   const lastTimeRef = useRef(0)
-  const scoreRef = useRef(0)
 
   // 加载最佳记录
   useEffect(() => {
@@ -39,11 +39,6 @@ export default function Dinosaur() {
       localStorage.setItem('dinosaur_highscore', String(score))
     }
   }, [score, highScore])
-
-  // 保持 scoreRef 同步
-  useEffect(() => {
-    scoreRef.current = score
-  }, [score])
 
   // 创建粒子效果
   const createParticles = useCallback((x, y, color, count = 10) => {
@@ -69,14 +64,13 @@ export default function Dinosaur() {
     setGameOver(false)
     setIsPaused(false)
     setDinoY(GROUND_Y)
-    setDinoVelocity(0)
+    dinoVelocityRef.current = 0
     setObstacles([{ x: 900, type: Math.random() > 0.7 ? 'bird' : 'cactus', width: 30 }])
     setScore(0)
     setIsDucking(false)
-    setSpeed(BASE_SPEED)
-    setLevel(1)
+    speedRef.current = BASE_SPEED
     setParticles([])
-    lastTimeRef.current = Date.now()
+    lastTimeRef.current = performance.now()
     createParticles(DINO_X + 30, GROUND_Y - 30, '#ff9500', 15)
   }, [createParticles])
 
@@ -90,7 +84,7 @@ export default function Dinosaur() {
     if (isPaused) return
     
     if (dinoY >= GROUND_Y - 10) {
-      setDinoVelocity(JUMP_STRENGTH)
+      dinoVelocityRef.current = JUMP_STRENGTH
       createParticles(DINO_X + 30, dinoY, 'rgba(255,149,0,0.6)', 8)
     }
   }, [gameStarted, gameOver, isPaused, dinoY, startGame, createParticles])
@@ -138,34 +132,34 @@ export default function Dinosaur() {
     }
   }, [jump, duck, togglePause])
 
-  // 游戏循环
+  // 游戏循环 - 简化版本
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused) return
 
-    const gameLoop = (timestamp) => {
+    const update = (timestamp) => {
       const deltaTime = timestamp - lastTimeRef.current
       
       if (deltaTime >= 16) {
         lastTimeRef.current = timestamp
         
-        // 更新恐龙
+        // 更新恐龙位置
         setDinoY(prevY => {
-          const newY = prevY + dinoVelocity
+          const newY = prevY + dinoVelocityRef.current
           if (newY >= GROUND_Y) {
-            setDinoVelocity(0)
+            dinoVelocityRef.current = 0
             return GROUND_Y
           }
-          setDinoVelocity(v => v + GRAVITY)
+          dinoVelocityRef.current += GRAVITY
           return newY
         })
 
         // 更新障碍物
-        setObstacles(current => {
-          let newObstacles = current.map(obs => ({ ...obs, x: obs.x - speed }))
+        setObstacles(prev => {
+          let newObstacles = prev.map(obs => ({ ...obs, x: obs.x - speedRef.current }))
           newObstacles = newObstacles.filter(obs => obs.x > -50)
           
           const lastObs = newObstacles[newObstacles.length - 1]
-          const minGap = 400 - speed * 20
+          const minGap = 400 - speedRef.current * 20
           
           if (!lastObs || lastObs.x < 900 - minGap) {
             const type = Math.random() > 0.7 ? 'bird' : 'cactus'
@@ -196,25 +190,23 @@ export default function Dinosaur() {
         // 增加分数
         setScore(s => s + 1)
         
-        // 难度提升
-        const newLevel = Math.floor(scoreRef.current / 500) + 1
-        if (newLevel > level) {
-          setLevel(newLevel)
-          setSpeed(s => Math.min(s + 1, 15))
+        // 难度提升 - 每 500 分加速
+        if (score > 0 && score % 500 === 0) {
+          speedRef.current = Math.min(speedRef.current + 1, 15)
         }
       }
       
-      gameLoopRef.current = requestAnimationFrame(gameLoop)
+      gameLoopRef.current = requestAnimationFrame(update)
     }
 
-    gameLoopRef.current = requestAnimationFrame(gameLoop)
+    gameLoopRef.current = requestAnimationFrame(update)
 
     return () => {
       if (gameLoopRef.current) {
         cancelAnimationFrame(gameLoopRef.current)
       }
     }
-  }, [gameStarted, gameOver, isPaused, dinoVelocity, speed, level])
+  }, [gameStarted, gameOver, isPaused, score])
 
   // 碰撞检测
   useEffect(() => {
@@ -272,12 +264,12 @@ export default function Dinosaur() {
                 </span>
               </div>
               <div className="status-row">
-                <span className="label">等级</span>
-                <span className="value">{level}</span>
+                <span className="label">速度</span>
+                <span className="value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
               </div>
               <div className="status-row">
-                <span className="label">速度</span>
-                <span className="value">{Math.round(speed / BASE_SPEED * 100)}%</span>
+                <span className="label">得分</span>
+                <span className="value">{score}</span>
               </div>
             </div>
           </div>
@@ -364,7 +356,7 @@ export default function Dinosaur() {
                 <div className="ground-pattern"></div>
               </div>
 
-              {/* 分数显示 */}
+              {/* HUD 分数 */}
               <div className="hud-score">
                 <span className="hud-label">SCORE</span>
                 <span className="hud-value">{String(score).padStart(6, '0')}</span>
@@ -429,8 +421,8 @@ export default function Dinosaur() {
                 <span className="stat-value highlight">{highScore}</span>
               </div>
               <div className="stat-card">
-                <span className="stat-label">游戏等级</span>
-                <span className="stat-value">{level}</span>
+                <span className="stat-label">速度</span>
+                <span className="stat-value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
               </div>
             </div>
           </div>

@@ -677,58 +677,15 @@ body :not(code):not(pre) {
   height: 28px;
 }
 
-/* Enhanced Timeline Card */
+/* Timeline Card - 无容器背景 */
 .timeline-card {
-  background: rgba(10, 10, 15, 0.8);
-  border: 1px solid rgba(255, 149, 0, 0.2);
-  border-radius: 10px;
-  padding: 1.6rem;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
-
-/* 卡片边角装饰 */
-.timeline-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 16px;
-  height: 16px;
-  border-top: 2px solid rgba(255, 149, 0, 0.4);
-  border-right: 2px solid rgba(255, 149, 0, 0.4);
-  border-radius: 0 10px 0 0;
+  padding: 0;
   transition: all 0.3s ease;
-}
-
-.timeline-card:hover::after {
-  border-color: #ff9500;
-  opacity: 1;
-  width: 24px;
-  height: 24px;
-}
-
-.timeline-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.15), transparent);
-  transition: left 0.6s ease;
-}
-
-.timeline-card:hover::before {
-  left: 100%;
+  position: relative;
 }
 
 .timeline-card:hover {
-  border-color: #ff9500;
-  box-shadow: 0 0 40px rgba(255, 149, 0, 0.5), inset 0 0 60px rgba(255, 149, 0, 0.08);
-  transform: translateY(-10px) scale(1.03);
+  transform: translateY(-5px);
 }
 
 /* 开发中状态脉冲光环 */
@@ -810,13 +767,42 @@ body :not(code):not(pre) {
   letter-spacing: 0.12em;
 }
 
+/* 连接线 */
+.timeline-connector {
+  position: absolute;
+  top: 50%;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 149, 0, 0.3), rgba(255, 149, 0, 0.8));
+  transform: translateY(-50%);
+  transition: all 0.3s ease;
+}
+
+.timeline-item.left .timeline-connector {
+  right: 100%;
+  margin-right: 10px;
+}
+
+.timeline-item.right .timeline-connector {
+  left: 100%;
+  margin-left: 10px;
+}
+
+.timeline-item:hover .timeline-connector {
+  background: linear-gradient(90deg, rgba(255, 149, 0, 0.8), rgba(255, 149, 0, 1));
+  box-shadow: 0 0 10px rgba(255, 149, 0, 0.8);
+}
+
 /* 简洁模式 - 默认显示 */
 .timeline-header-simple {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem 0;
+  padding: 0.5rem 1rem;
+  background: rgba(10, 10, 15, 0.6);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
 }
 
 .timeline-date-simple {
@@ -846,12 +832,13 @@ body :not(code):not(pre) {
   opacity: 0;
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0 1rem;
 }
 
 .timeline-card:hover .timeline-details {
   max-height: 500px;
   opacity: 1;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .timeline-card:hover .timeline-header-simple {

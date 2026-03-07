@@ -279,21 +279,24 @@
 .news-game-area {
   display: flex;
   flex-direction: column;
-  padding: 0;
-  gap: 0;
+  padding: 1rem;
+  gap: 1rem;
   height: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
 .game-canvas {
-  flex: 1;
   position: relative;
   background: #000;
-  border: none;
-  border-radius: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
-  min-height: 500px;
-  height: 100%;
+  width: 100%;
+  max-width: 900px;
+  height: 450px;
+  flex: none;
 }
 
 .bg-lines {
@@ -373,7 +376,7 @@
 
 .ground {
   position: absolute;
-  bottom: 80px;
+  bottom: 60px;
   left: 0;
   width: 100%;
   height: 2px;

@@ -624,7 +624,7 @@ body :not(code):not(pre) {
 .timeline-item.left {
   float: left;
   clear: left;
-  padding-right: 5rem;
+  padding-right: 4rem;
   text-align: right;
   transform: translateX(-50px) translateY(30px);
 }
@@ -632,7 +632,7 @@ body :not(code):not(pre) {
 .timeline-item.right {
   float: right;
   clear: right;
-  padding-left: 5rem;
+  padding-left: 4rem;
   text-align: left;
   transform: translateX(50px) translateY(30px);
 }
@@ -680,21 +680,22 @@ body :not(code):not(pre) {
 /* 连接线 */
 .timeline-connector {
   position: absolute;
-  top: 24px;
-  width: 50px;
+  top: 50%;
+  width: 40px;
   height: 2px;
   background: linear-gradient(90deg, rgba(255, 149, 0, 0.4), rgba(255, 149, 0, 0.9));
+  transform: translateY(-50%);
   transition: all 0.3s ease;
 }
 
 .timeline-item.left .timeline-connector {
   right: 100%;
-  margin-right: 8px;
+  margin-right: 12px;
 }
 
 .timeline-item.right .timeline-connector {
   left: 100%;
-  margin-left: 8px;
+  margin-left: 12px;
 }
 
 .timeline-item:hover .timeline-connector {
@@ -706,16 +707,7 @@ body :not(code):not(pre) {
 /* Timeline Card - 无容器背景 */
 .timeline-card {
   padding: 0.5rem 1rem;
-  transition: all 0.3s ease;
   position: relative;
-}
-
-.timeline-card:hover {
-  transform: translateX(-5px);
-}
-
-.timeline-item.right .timeline-card:hover {
-  transform: translateX(5px);
 }
 
 /* 开发中状态脉冲光环 */

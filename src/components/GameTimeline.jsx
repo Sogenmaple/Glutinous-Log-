@@ -174,46 +174,96 @@ export default function GameTimeline() {
             data-index={index}
             className={`timeline-item ${visibleItems.has(index) ? 'visible' : ''}`}
           >
-            <div className="timeline-dot">
-              {renderVectorIcon(game.iconType)}
-            </div>
+            {index % 2 === 0 ? (
+              <>
+                <div className="timeline-item-left">
+                  <div className="timeline-card">
+                    <span className="timeline-date-badge">{formatDate(game.date)}</span>
+                    
+                    <h3 className="timeline-title">
+                      {game.title}
+                      {game.status === 'development' && (
+                        <span className="timeline-status">开发中</span>
+                      )}
+                    </h3>
 
-            <div className="timeline-content">
-              <span className="timeline-date">{formatDate(game.date)}</span>
-              
-              <h3 className="timeline-title">
-                {game.title}
-                {game.status === 'development' && (
-                  <span className="timeline-status">开发中</span>
-                )}
-              </h3>
+                    <p className="timeline-desc">{game.description}</p>
 
-              <p className="timeline-desc">{game.description}</p>
+                    {game.tags.length > 0 && (
+                      <div className="timeline-tags-wrapper">
+                        {game.tags.map(tag => (
+                          <span key={tag} className="timeline-tag">{tag}</span>
+                        ))}
+                      </div>
+                    )}
 
-              {game.tags.length > 0 && (
-                <div className="timeline-tags">
-                  {game.tags.map(tag => (
-                    <span key={tag} className="timeline-tag">{tag}</span>
-                  ))}
+                    {Object.keys(game.links).length > 0 && (
+                      <div className="timeline-links-wrapper">
+                        {Object.entries(game.links).map(([type, url]) => (
+                          <a
+                            key={type}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="timeline-link"
+                          >
+                            {renderLinkIcon(type)}
+                            <span className="link-label">{type.toUpperCase()}</span>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+                <div className="timeline-item-right"></div>
+              </>
+            ) : (
+              <>
+                <div className="timeline-item-left"></div>
+                <div className="timeline-item-right">
+                  <div className="timeline-card">
+                    <span className="timeline-date-badge">{formatDate(game.date)}</span>
+                    
+                    <h3 className="timeline-title">
+                      {game.title}
+                      {game.status === 'development' && (
+                        <span className="timeline-status">开发中</span>
+                      )}
+                    </h3>
 
-              {Object.keys(game.links).length > 0 && (
-                <div className="timeline-links">
-                  {Object.entries(game.links).map(([type, url]) => (
-                    <a
-                      key={type}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="timeline-link"
-                    >
-                      {renderLinkIcon(type)}
-                      <span className="link-label">{type.toUpperCase()}</span>
-                    </a>
-                  ))}
+                    <p className="timeline-desc">{game.description}</p>
+
+                    {game.tags.length > 0 && (
+                      <div className="timeline-tags-wrapper">
+                        {game.tags.map(tag => (
+                          <span key={tag} className="timeline-tag">{tag}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    {Object.keys(game.links).length > 0 && (
+                      <div className="timeline-links-wrapper">
+                        {Object.entries(game.links).map(([type, url]) => (
+                          <a
+                            key={type}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="timeline-link"
+                          >
+                            {renderLinkIcon(type)}
+                            <span className="link-label">{type.toUpperCase()}</span>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+              </>
+            )}
+            
+            <div className="timeline-dot-container">
+              <div className="timeline-dot"></div>
             </div>
           </div>
         ))}

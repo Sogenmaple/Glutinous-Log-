@@ -1,5 +1,5 @@
 /* ============================================
-   游戏宇宙页面 - 优雅排版
+   游戏宇宙页面 - 报纸风格排版
    ============================================ */
 
 .games-collection-page {
@@ -10,176 +10,236 @@
   overflow-x: hidden;
 }
 
-/* 背景装饰 */
-.collection-bg-grid {
+/* 背景装饰 - 报纸纹理 */
+.newspaper-bg {
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 149, 0, 0.04) 0%,
+      transparent 70%
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.newspaper-grid {
   position: fixed;
   inset: 0;
   background-image: 
-    linear-gradient(rgba(255, 149, 0, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 149, 0, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
+    linear-gradient(rgba(255, 149, 0, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 149, 0, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
   pointer-events: none;
   z-index: 0;
 }
 
-.collection-bg-glow {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 800px;
-  height: 800px;
-  background: radial-gradient(
-    circle,
-    rgba(255, 149, 0, 0.06) 0%,
-    transparent 70%
-  );
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* 页面标题 */
-.collection-header {
-  text-align: center;
-  padding: 4rem 2rem 3rem;
+/* 报头 */
+.newspaper-header {
   position: relative;
   z-index: 1;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.7s ease;
+  padding: 3rem 2rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.collection-header.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.collection-header svg {
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
   margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 149, 0, 0.1);
+  padding-bottom: 0.75rem;
+}
+
+.header-main {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.header-main svg {
+  margin-bottom: 1rem;
   animation: float 3s ease-in-out infinite;
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
 }
 
-.collection-title {
+.header-title {
   font-family: var(--font-display);
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 900;
   color: var(--amber);
   margin: 0 0 0.5rem 0;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   text-shadow: 
     0 0 30px rgba(255, 149, 0, 0.6),
     0 0 60px rgba(255, 149, 0, 0.3);
 }
 
-.collection-subtitle {
+.header-subtitle {
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-dim);
   letter-spacing: 0.3em;
   margin: 0;
 }
 
-.collection-divider {
-  width: 200px;
-  height: 2px;
-  margin: 1.5rem auto 0;
+.header-divider {
+  width: 100%;
+  height: 3px;
   background: linear-gradient(
     90deg,
-    transparent,
-    rgba(255, 149, 0, 0.5),
-    transparent
+    transparent 0%,
+    rgba(255, 149, 0, 0.3) 20%,
+    rgba(255, 149, 0, 0.6) 50%,
+    rgba(255, 149, 0, 0.3) 80%,
+    transparent 100%
   );
+  margin: 1.5rem 0;
 }
 
-/* 区块标签 */
-.section-label {
+.header-nav {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2.5rem;
+  gap: 3rem;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   letter-spacing: 0.2em;
 }
 
-.label-icon {
-  color: var(--amber);
-  font-size: 1.2rem;
-}
-
-.label-sub {
-  color: var(--text-dim);
-  font-size: 0.75rem;
-}
-
-/* 主要游戏网格 */
-.games-section {
-  padding: 3rem 2rem 4rem;
-  max-width: 1400px;
-  margin: 0 auto;
+/* 主要内容区 */
+.newspaper-content {
   position: relative;
   z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
 }
 
-.main-games-grid {
+/* 头条区域 */
+.headline-section {
+  margin-bottom: 3rem;
+  padding: 2.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 149, 0, 0.08) 0%,
+    rgba(255, 149, 0, 0.02) 100%
+  );
+  border: 1px solid rgba(255, 149, 0, 0.15);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.headline-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--amber);
+  background: rgba(255, 149, 0, 0.1);
+  padding: 0.3rem 0.8rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 149, 0, 0.2);
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+}
+
+.headline-box svg {
+  margin: 1rem 0;
+}
+
+.headline-title {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+  letter-spacing: 0.05em;
+}
+
+.headline-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 游戏分栏 - 报纸排版 */
+.games-columns {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
 }
 
-.main-game-card {
+/* 游戏文章卡片 */
+.game-article {
   position: relative;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.025) 0%,
     rgba(255, 255, 255, 0.01) 100%
   );
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 6px;
-  padding: 2rem 1.75rem;
+  border: 1px solid rgba(255, 149, 0, 0.08);
+  padding: 1.5rem 1.3rem;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(15px);
 }
 
-.main-game-card.visible {
+.game-article.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.main-game-card:hover {
+.game-article:hover {
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.02) 100%
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.015) 100%
   );
-  border-color: rgba(255, 149, 0, 0.25);
-  transform: translateY(-6px);
+  border-color: rgba(255, 149, 0, 0.2);
+  transform: translateY(-4px);
   box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.3),
-    0 0 50px rgba(255, 149, 0, 0.1);
+    0 8px 25px rgba(0, 0, 0, 0.25),
+    0 0 30px rgba(255, 149, 0, 0.08);
 }
 
 /* 颜色主题 */
-.main-game-card.amber { --theme-color: var(--amber); }
-.main-game-card.cyan { --theme-color: var(--cyan); }
-.main-game-card.red { --theme-color: #ff453a; }
-.main-game-card.green { --theme-color: #22c55e; }
-.main-game-card.purple { --theme-color: #bd00ff; }
+.game-article.amber { --theme-color: var(--amber); }
+.game-article.cyan { --theme-color: var(--cyan); }
+.game-article.red { --theme-color: #ff453a; }
+.game-article.green { --theme-color: #22c55e; }
+.game-article.purple { --theme-color: #bd00ff; }
 
-.card-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 1.5rem;
+/* 文章头部 */
+.article-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.article-date {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+.article-icon {
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,274 +249,113 @@
   transition: all 0.4s ease;
 }
 
-.main-game-card:hover .card-icon {
-  background: rgba(255, 149, 0, 0.1);
+.game-article:hover .article-icon {
+  background: rgba(255, 149, 0, 0.12);
   color: var(--amber);
   transform: scale(1.08);
 }
 
-.card-title {
+/* 分隔线 */
+.article-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 149, 0, 0.15),
+    transparent
+  );
+  margin-bottom: 1rem;
+}
+
+/* 文章内容 */
+.article-content {
+  margin-bottom: 1rem;
+}
+
+.article-title {
   font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0 0 0.4rem 0;
-  text-align: center;
-}
-
-.card-subtitle {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  letter-spacing: 0.15em;
-  margin: 0 0 1rem 0;
-  text-align: center;
-}
-
-.card-desc {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  text-align: center;
-  margin: 0 0 1.5rem 0;
-}
-
-.card-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--amber);
-  letter-spacing: 0.1em;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-}
-
-.main-game-card:hover .card-arrow {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.card-arrow .arrow-symbol {
-  transition: transform 0.3s ease;
-}
-
-.main-game-card:hover .arrow-symbol {
-  transform: translateX(4px);
-}
-
-/* 角落装饰 */
-.corner {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  border: 1.5px solid rgba(255, 149, 0, 0.3);
-  transition: all 0.4s ease;
-}
-
-.corner.tl {
-  top: 10px;
-  left: 10px;
-  border-right: none;
-  border-bottom: none;
-}
-
-.corner.tr {
-  top: 10px;
-  right: 10px;
-  border-left: none;
-  border-bottom: none;
-}
-
-.corner.bl {
-  bottom: 10px;
-  left: 10px;
-  border-right: none;
-  border-top: none;
-}
-
-.corner.br {
-  bottom: 10px;
-  right: 10px;
-  border-left: none;
-  border-top: none;
-}
-
-.main-game-card:hover .corner {
-  border-color: rgba(255, 149, 0, 0.6);
-  width: 14px;
-  height: 14px;
-}
-
-/* 游戏宇宙时间线 */
-.universe-section {
-  padding: 4rem 2rem 5rem;
-  max-width: 900px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
-
-.universe-timeline {
-  position: relative;
-  padding: 2rem 0;
-}
-
-.universe-timeline::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(255, 149, 0, 0.3) 10%,
-    rgba(255, 149, 0, 0.5) 50%,
-    rgba(255, 149, 0, 0.3) 90%,
-    transparent 100%
-  );
-}
-
-.universe-item {
-  position: relative;
-  padding-left: 60px;
-  margin-bottom: 2.5rem;
-  cursor: pointer;
-  opacity: 0;
-  transform: translateX(-20px);
-  transition: all 0.6s ease;
-}
-
-.universe-item.visible {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.universe-year {
-  position: absolute;
-  left: 0;
-  top: 0;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--amber);
-  background: rgba(255, 149, 0, 0.1);
-  padding: 0.25rem 0.6rem;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 149, 0, 0.2);
-  letter-spacing: 0.1em;
-}
-
-.universe-content {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  padding: 1.4rem 1.5rem;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 6px;
-  transition: all 0.4s ease;
-}
-
-.universe-item:hover .universe-content {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-  border-color: rgba(255, 149, 0, 0.2);
-  transform: translateX(8px);
-  box-shadow: 
-    0 8px 30px rgba(0, 0, 0, 0.25),
-    0 0 40px rgba(255, 149, 0, 0.08);
-}
-
-.universe-icon {
-  flex-shrink: 0;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 149, 0, 0.08);
-  border-radius: 50%;
-  color: var(--amber);
-  transition: all 0.4s ease;
-}
-
-.universe-item:hover .universe-icon {
-  background: rgba(255, 149, 0, 0.15);
-  transform: scale(1.08);
-}
-
-.universe-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.universe-title {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 0.35rem 0;
   line-height: 1.3;
 }
 
-.universe-subtitle {
+.article-subtitle {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: var(--text-dim);
   letter-spacing: 0.15em;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.65rem 0;
 }
 
-.universe-desc {
-  font-size: 0.88rem;
+.article-text {
+  font-size: 0.82rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0;
 }
 
-.universe-arrow {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-dim);
-  opacity: 0;
-  transform: translateX(-10px);
+/* 文章底部 */
+.article-footer {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 149, 0, 0.08);
+}
+
+.read-more {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--amber);
+  letter-spacing: 0.15em;
   transition: all 0.3s ease;
 }
 
-.universe-item:hover .universe-arrow {
-  opacity: 1;
-  transform: translateX(0);
-  color: var(--amber);
+.game-article:hover .read-more {
+  color: rgba(255, 149, 0, 0.8);
 }
 
-/* 底部装饰 */
-.collection-footer {
-  text-align: center;
-  padding: 3rem 2rem;
+/* 角落装饰 */
+.article-corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid rgba(255, 149, 0, 0.2);
+  transition: all 0.4s ease;
+}
+
+.article-corner.tl {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.article-corner.tr {
+  top: 8px;
+  right: 8px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.game-article:hover .article-corner {
+  border-color: rgba(255, 149, 0, 0.5);
+  width: 10px;
+  height: 10px;
+}
+
+/* 底部 */
+.newspaper-footer {
   position: relative;
   z-index: 1;
+  padding: 3rem 2rem;
+  text-align: center;
 }
 
-.footer-line {
-  width: 150px;
+.footer-divider {
+  width: 200px;
   height: 2px;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.5rem;
   background: linear-gradient(
     90deg,
     transparent,
@@ -465,108 +364,93 @@
   );
 }
 
-.collection-footer p {
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.footer-content p {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-dim);
-  letter-spacing: 0.3em;
+  letter-spacing: 0.15em;
   margin: 0;
 }
 
+.footer-tagline {
+  font-size: 0.65rem !important;
+  color: var(--text-secondary) !important;
+}
+
+/* 响应式 - 大屏 */
+@media (max-width: 1200px) {
+  .games-columns {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 /* 响应式 - 平板 */
-@media (max-width: 768px) {
-  .collection-header {
-    padding: 3rem 1.5rem 2.5rem;
+@media (max-width: 900px) {
+  .header-title {
+    font-size: 2.5rem;
   }
 
-  .collection-title {
-    font-size: 2.25rem;
-  }
-
-  .collection-subtitle {
-    font-size: 0.8rem;
-  }
-
-  .main-games-grid {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  .header-nav {
     gap: 1.5rem;
+    flex-wrap: wrap;
   }
 
-  .main-game-card {
-    padding: 1.75rem 1.5rem;
+  .games-columns {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .universe-section {
-    padding: 3rem 1.5rem 4rem;
-  }
-
-  .universe-item {
-    padding-left: 50px;
-  }
-
-  .universe-content {
-    padding: 1.2rem 1.3rem;
+  .headline-title {
+    font-size: 2rem;
   }
 }
 
 /* 响应式 - 手机 */
-@media (max-width: 480px) {
-  .collection-header {
-    padding: 2.5rem 1rem 2rem;
+@media (max-width: 600px) {
+  .newspaper-header {
+    padding: 2rem 1.5rem 1.5rem;
   }
 
-  .collection-title {
-    font-size: 1.85rem;
+  .header-title {
+    font-size: 2rem;
   }
 
-  .collection-subtitle {
+  .header-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .header-nav {
+    gap: 1rem;
     font-size: 0.7rem;
-    letter-spacing: 0.2em;
   }
 
-  .main-games-grid {
+  .games-columns {
     grid-template-columns: 1fr;
   }
 
-  .main-game-card {
-    padding: 1.5rem 1.3rem;
+  .game-article {
+    padding: 1.3rem 1.2rem;
   }
 
-  .card-icon {
-    width: 70px;
-    height: 70px;
+  .headline-section {
+    padding: 2rem 1.5rem;
   }
 
-  .card-title {
-    font-size: 1.35rem;
+  .headline-title {
+    font-size: 1.75rem;
   }
 
-  .universe-section {
-    padding: 2.5rem 1rem 3.5rem;
+  .headline-desc {
+    font-size: 0.9rem;
   }
 
-  .universe-item {
-    padding-left: 45px;
-    margin-bottom: 2rem;
-  }
-
-  .universe-year {
-    font-size: 0.65rem;
-    padding: 0.2rem 0.5rem;
-  }
-
-  .universe-content {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1.2rem;
-  }
-
-  .universe-icon {
-    width: 50px;
-    height: 50px;
-  }
-
-  .universe-arrow {
-    display: none;
+  .newspaper-content {
+    padding: 1.5rem 1.5rem 3rem;
   }
 }

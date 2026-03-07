@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { BombIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, GameIcon, CodeIcon, BlockIcon, StarIcon, ExperimentIcon, PlayIcon, TrophyIcon } from '../components/icons/SiteIcons'
+import { BombIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, GameIcon, CodeIcon, BlockIcon, StarIcon, ExperimentIcon, PlayIcon, TrophyIcon, BookIcon, ClockIcon, TangyuanIcon } from '../components/icons/SiteIcons'
 import '../styles/GamesCollection.css'
 
 /**
- * 游戏宇宙页面 - 优雅展示所有项目
+ * 游戏宇宙页面 - 报纸风格排版
  */
 export default function GamesCollection() {
   const navigate = useNavigate()
@@ -16,116 +16,116 @@ export default function GamesCollection() {
     setMounted(true)
   }, [])
 
-  // 主要游戏项目
-  const mainGames = [
+  const games = [
     {
       id: 'minesweeper',
       title: '扫雷',
       subtitle: 'MINESWEEPER',
-      description: '经典益智游戏，排除所有地雷',
+      description: '经典益智游戏，排除所有地雷，考验逻辑思维能力',
       icon: BombIcon,
       color: 'red',
-      path: '/special/minesweeper'
+      path: '/special/minesweeper',
+      date: 'VOL.001'
     },
     {
       id: 'snake',
       title: '贪吃蛇',
       subtitle: 'SNAKE',
-      description: '经典贪吃蛇，吃掉食物成长',
+      description: '经典贪吃蛇，吃掉食物成长，挑战反应速度',
       icon: SnakeIcon,
       color: 'green',
-      path: '/special/snake'
+      path: '/special/snake',
+      date: 'VOL.002'
     },
     {
       id: 'flybird',
       title: 'FlyBird',
       subtitle: 'FLAPPY BIRD',
-      description: '穿越管道，飞翔挑战',
+      description: '穿越管道，飞翔挑战，极限操作',
       icon: BirdIcon,
       color: 'cyan',
-      path: '/special/flybird'
+      path: '/special/flybird',
+      date: 'VOL.003'
     },
     {
       id: 'pacman',
       title: '吃豆人',
       subtitle: 'PAC-MAN',
-      description: '吃掉所有豆子，躲避幽灵',
+      description: '吃掉所有豆子，躲避幽灵，经典街机回忆',
       icon: PacmanIcon,
       color: 'amber',
-      path: '/special/pacman'
+      path: '/special/pacman',
+      date: 'VOL.004'
     },
     {
       id: 'dinosaur',
       title: '恐龙快跑',
       subtitle: 'DINO RUN',
-      description: '躲避障碍，奔跑生存',
+      description: '躲避障碍，奔跑生存，无尽挑战模式',
       icon: DinosaurIcon,
       color: 'green',
-      path: '/special/dinosaur'
-    }
-  ]
-
-  // 游戏宇宙项目（按时间排序）
-  const universeGames = [
+      path: '/special/dinosaur',
+      date: 'VOL.005'
+    },
     {
-      id: 'block-puzzle',
-      title: '方块谜题',
-      subtitle: 'BLOCK PUZZLE',
-      description: '几何方块拼接挑战，益智解谜',
+      id: 'tetris',
+      title: '俄罗斯方块',
+      subtitle: 'TETRIS',
+      description: '几何方块拼接，消除挑战，益智经典',
       icon: BlockIcon,
       color: 'amber',
       path: '/special/tetris',
-      year: '2024'
+      date: 'VOL.006'
     },
     {
-      id: 'code-warrior',
-      title: '代码战士',
-      subtitle: 'CODE WARRIOR',
-      description: '编程挑战游戏，提升技能',
+      id: 'code',
+      title: '代码挑战',
+      subtitle: 'CODE CHALLENGE',
+      description: '编程技能提升，算法练习，逻辑思维',
       icon: CodeIcon,
       color: 'cyan',
-      path: '/games/code',
-      year: '2024'
+      path: '/special/code',
+      date: 'VOL.007'
     },
     {
-      id: 'star-collector',
-      title: '星星收集者',
+      id: 'star',
+      title: '星星收集',
       subtitle: 'STAR COLLECTOR',
-      description: '平台跳跃收集，挑战反应',
+      description: '平台跳跃，收集挑战，反应测试',
       icon: StarIcon,
       color: 'amber',
-      path: '/games/star',
-      year: '2023'
+      path: '/special/star',
+      date: 'VOL.008'
     },
     {
-      id: 'experiment-lab',
+      id: 'experiment',
       title: '实验实验室',
       subtitle: 'EXPERIMENT LAB',
-      description: '物理模拟实验，探索发现',
+      description: '物理模拟，探索发现，创意实验',
       icon: ExperimentIcon,
       color: 'purple',
-      path: '/games/experiment',
-      year: '2023'
+      path: '/special/experiment',
+      date: 'VOL.009'
     },
     {
-      id: 'play-ground',
+      id: 'play',
       title: '游乐场',
       subtitle: 'PLAY GROUND',
-      description: '休闲小游戏集合',
+      description: '休闲游戏集合，轻松娱乐',
       icon: PlayIcon,
       color: 'green',
-      path: '/games/play',
-      year: '2022'
+      path: '/special/play',
+      date: 'VOL.010'
     },
     {
-      id: 'trophy-hunt',
+      id: 'trophy',
       title: '奖杯猎人',
       subtitle: 'TROPHY HUNT',
-      description: '成就挑战系统',
+      description: '成就挑战系统，收集荣誉',
       icon: TrophyIcon,
       color: 'amber',
-      path: '/games/trophy',
-      year: '2022'
+      path: '/special/trophy',
+      date: 'VOL.011'
     }
   ]
 
@@ -134,106 +134,99 @@ export default function GamesCollection() {
       <Header />
       
       {/* 背景装饰 */}
-      <div className="collection-bg-grid"></div>
-      <div className="collection-bg-glow"></div>
+      <div className="newspaper-bg"></div>
+      <div className="newspaper-grid"></div>
 
-      {/* 页面标题 */}
-      <div className={`collection-header ${mounted ? 'visible' : ''}`}>
-        <GameIcon size={64} color="#ff9500" />
-        <h1 className="collection-title">游戏宇宙</h1>
-        <p className="collection-subtitle">GAMES UNIVERSE // 汤圆游戏作品集</p>
-        <div className="collection-divider"></div>
-      </div>
-
-      {/* 主要游戏区域 */}
-      <section className="games-section">
-        <div className="section-label">
-          <span className="label-icon">◆</span>
-          <span>休闲游戏</span>
-          <span className="label-sub">QUICK GAMES</span>
+      {/* 报头 */}
+      <header className="newspaper-header">
+        <div className="header-top">
+          <span className="header-date">{new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          <span className="header-issue">ISSUE NO.2024</span>
         </div>
         
-        <div className="main-games-grid">
-          {mainGames.map((game, index) => {
+        <div className="header-main">
+          <TangyuanIcon size={80} color="#ff9500" />
+          <h1 className="header-title">游戏宇宙报</h1>
+          <p className="header-subtitle">GAMES UNIVERSE NEWSPAPER</p>
+        </div>
+        
+        <div className="header-divider"></div>
+        
+        <div className="header-nav">
+          <span>休闲游戏</span>
+          <span>益智挑战</span>
+          <span>动作冒险</span>
+          <span>创意实验</span>
+        </div>
+      </header>
+
+      {/* 主要内容区 - 报纸分栏 */}
+      <main className="newspaper-content">
+        {/* 头条区域 */}
+        <section className="headline-section">
+          <div className="headline-box">
+            <span className="headline-label">FEATURED</span>
+            <GameIcon size={60} color="#ff9500" />
+            <h2 className="headline-title">汤圆游戏作品集</h2>
+            <p className="headline-desc">探索互动娱乐的无限可能 · 独立游戏开发者的创意结晶</p>
+          </div>
+        </section>
+
+        {/* 游戏网格 - 报纸分栏布局 */}
+        <div className="games-columns">
+          {games.map((game, index) => {
             const IconComponent = game.icon
             return (
-              <div
+              <article
                 key={game.id}
-                className={`main-game-card ${game.color} ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className={`game-article ${game.color} ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
+                style={{ animationDelay: `${index * 0.05}s` }}
                 onMouseEnter={() => setHoveredGame(game.id)}
                 onMouseLeave={() => setHoveredGame(null)}
                 onClick={() => navigate(game.path)}
               >
-                <div className="card-icon">
-                  <IconComponent size={56} color="currentColor" />
+                {/* 文章头部 */}
+                <div className="article-header">
+                  <span className="article-date">{game.date}</span>
+                  <div className="article-icon">
+                    <IconComponent size={36} color="currentColor" />
+                  </div>
                 </div>
-                <h3 className="card-title">{game.title}</h3>
-                <p className="card-subtitle">{game.subtitle}</p>
-                <p className="card-desc">{game.description}</p>
-                <div className="card-arrow">
-                  <span>PLAY</span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
+
+                {/* 分隔线 */}
+                <div className="article-divider"></div>
+
+                {/* 文章内容 */}
+                <div className="article-content">
+                  <h3 className="article-title">{game.title}</h3>
+                  <p className="article-subtitle">{game.subtitle}</p>
+                  <p className="article-text">{game.description}</p>
                 </div>
-                <div className="corner tl"></div>
-                <div className="corner tr"></div>
-                <div className="corner bl"></div>
-                <div className="corner br"></div>
-              </div>
+
+                {/* 文章底部 */}
+                <div className="article-footer">
+                  <span className="read-more">READ MORE →</span>
+                </div>
+
+                {/* 装饰元素 */}
+                <div className="article-corner tl"></div>
+                <div className="article-corner tr"></div>
+              </article>
             )
           })}
         </div>
-      </section>
+      </main>
 
-      {/* 游戏宇宙时间线 */}
-      <section className="universe-section">
-        <div className="section-label">
-          <span className="label-icon">◆</span>
-          <span>游戏宇宙</span>
-          <span className="label-sub">GAME UNIVERSE</span>
+      {/* 底部 */}
+      <footer className="newspaper-footer">
+        <div className="footer-divider"></div>
+        <div className="footer-content">
+          <BookIcon size={32} color="#ff9500" />
+          <p>汤圆的小窝 · 游戏宇宙报</p>
+          <p className="footer-tagline">CREATED WITH PASSION · DESIGNED WITH LOVE</p>
+          <ClockIcon size={24} color="#ff9500" />
         </div>
-
-        <div className="universe-timeline">
-          {universeGames.map((game, index) => {
-            const IconComponent = game.icon
-            return (
-              <div
-                key={game.id}
-                className={`universe-item ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
-                style={{ animationDelay: `${index * 0.08}s` }}
-                onMouseEnter={() => setHoveredGame(game.id)}
-                onMouseLeave={() => setHoveredGame(null)}
-                onClick={() => navigate(game.path)}
-              >
-                <div className="universe-year">{game.year}</div>
-                <div className="universe-content">
-                  <div className="universe-icon">
-                    <IconComponent size={40} color="currentColor" />
-                  </div>
-                  <div className="universe-info">
-                    <h3 className="universe-title">{game.title}</h3>
-                    <p className="universe-subtitle">{game.subtitle}</p>
-                    <p className="universe-desc">{game.description}</p>
-                  </div>
-                  <div className="universe-arrow">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </section>
-
-      {/* 底部装饰 */}
-      <div className="collection-footer">
-        <div className="footer-line"></div>
-        <p>EXPLORE THE UNIVERSE</p>
-      </div>
+      </footer>
     </div>
   )
 }

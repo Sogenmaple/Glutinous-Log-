@@ -198,7 +198,9 @@ app.get('/api/posts/:id', async (req, res) => {
   try {
     const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
     const posts = JSON.parse(postsData)
-    const post = posts.find(p => p.id === req.params.id)
+    // 兼容数字和字符串 ID
+    const postId = req.params.id
+    const post = posts.find(p => String(p.id) === postId)
     
     if (!post) {
       return res.status(404).json({ error: '文章不存在' })

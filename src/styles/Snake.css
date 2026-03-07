@@ -1,350 +1,582 @@
-/* 贪吃蛇游戏页面 */
-.snake-page-main {
+/* ============================================
+   贪吃蛇 - 报纸风格 + 磁带未来风
+   铺满屏幕 + 风格化统一
+   ============================================ */
+
+.snake-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-  padding: 2rem 1rem;
+  position: relative;
+  padding-top: 80px;
+  background: #050505;
+  overflow-x: hidden;
 }
 
-.snake-game-container {
-  max-width: 800px;
-  margin: 0 auto;
+.tape-bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(255, 255, 255, 0.04) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
-.snake-game-wrapper {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
-  padding: 2rem;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.tape-grid {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* 游戏头部 */
-.game-header {
+.tape-scanlines {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ========== 报纸布局 ========== */
+.snake-newspaper {
+  position: relative;
+  z-index: 1;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  height: calc(100vh - 80px);
+  margin: 0;
+  padding: 0;
+}
+
+/* 报头 */
+.newspaper-header {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
   align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
   gap: 1rem;
 }
 
-.game-title {
-  display: flex;
-  align-items: center;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #fbbf24;
-  text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
-}
-
-.game-stats {
-  display: flex;
-  gap: 2rem;
-}
-
-.stat {
+.header-date {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 0.25rem;
 }
 
-.stat-label {
-  font-size: 0.75rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.header-date .date {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #888;
+  letter-spacing: 0.1em;
+}
+
+.header-date .issue {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  color: #666;
+  letter-spacing: 0.2em;
+}
+
+.header-title {
+  text-align: center;
+}
+
+.header-title h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #4ade80;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+}
+
+.header-title .subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #666;
+  letter-spacing: 0.15em;
+  margin: 0.25rem 0 0 0;
+}
+
+.header-status {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.status-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  letter-spacing: 0.1em;
+}
+
+.status-badge.ready {
+  color: #22d3ee;
+  background: rgba(34, 211, 238, 0.1);
+}
+
+.status-badge.active {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-badge.danger {
+  color: #f87171;
+  background: rgba(248, 117, 102, 0.1);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(74, 222, 128, 0.3); }
+  50% { opacity: 0.7; box-shadow: 0 0 20px rgba(74, 222, 128, 0.6); }
+}
+
+/* 主内容区 */
+.newspaper-content {
+  display: grid;
+  grid-template-columns: 200px 1fr 160px;
+  gap: 1rem;
+  padding: 1rem;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 左侧边栏 */
+.news-sidebar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  height: 100%;
+}
+
+.score-box, .info-box {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.score-label, .info-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #666;
+  letter-spacing: 0.1em;
   margin-bottom: 0.25rem;
 }
 
-.stat-value {
-  font-size: 1.5rem;
+.score-value, .info-value {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #06b6d4;
+  color: #4ade80;
 }
 
-/* 游戏画布 */
-.snake-canvas-wrapper {
+.score-value.highlight {
+  color: #22d3ee;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+}
+
+/* 中央游戏区 */
+.news-game-area {
   display: flex;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  align-items: center;
+  padding: 1rem;
+}
+
+.game-canvas {
+  position: relative;
+  background: rgba(10, 10, 10, 0.8);
+  border: 2px solid rgba(74, 222, 128, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(74, 222, 128, 0.15);
 }
 
 .snake-canvas {
-  position: relative;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
-  overflow: hidden;
-  border: 2px solid rgba(251, 191, 36, 0.3);
-  box-shadow: 0 0 30px rgba(251, 191, 36, 0.1);
+  width: calc(20 * 22px);
+  height: calc(20 * 22px);
 }
 
-/* 网格背景 */
-.snake-grid {
+.bg-grid {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: repeat(20, 1fr);
-  grid-template-rows: repeat(20, 1fr);
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(74, 222, 128, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 222, 128, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
 }
 
-.grid-cell {
-  border: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-/* 蛇 */
+/* 蛇身 */
 .snake-segment {
   position: absolute;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  border: 1px solid rgba(74, 222, 128, 0.5);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+  z-index: 10;
   transition: all 0.05s ease;
 }
 
 .snake-segment.head {
-  background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
-  box-shadow: 0 0 15px rgba(251, 191, 36, 0.8);
-  z-index: 2;
+  background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+  border: 2px solid rgba(134, 239, 172, 0.6);
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.6);
+  z-index: 11;
 }
 
-.snake-segment.head::before,
-.snake-segment.head::after {
-  content: '';
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background: #1e293b;
-  border-radius: 50%;
-  top: 4px;
-}
-
-.snake-segment.head::before {
-  left: 4px;
-}
-
-.snake-segment.head::after {
-  right: 4px;
+.snake-segment.head svg {
+  width: 100%;
+  height: 100%;
 }
 
 /* 食物 */
-.snake-food {
+.food {
   position: absolute;
-  background: radial-gradient(circle, #ef4444 0%, #dc2626 100%);
-  border-radius: 50%;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+  z-index: 10;
   animation: food-pulse 1s ease-in-out infinite;
 }
 
+.food svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+}
+
 @keyframes food-pulse {
-  0%, 100% {
+  0%, 100% { 
     transform: scale(1);
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+    opacity: 1;
   }
-  50% {
+  50% { 
     transform: scale(1.1);
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+    opacity: 0.9;
   }
 }
 
-/* 粒子效果 */
-.particle {
+/* 覆盖层 */
+.overlay {
   position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* 游戏覆盖层 */
-.game-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(15, 23, 42, 0.9);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 30;
   backdrop-filter: blur(4px);
 }
 
 .overlay-content {
   text-align: center;
-  color: #fff;
+  padding: 2rem;
 }
 
 .overlay-content h2 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-family: var(--font-display);
   font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #fbbf24;
+  color: #4ade80;
+  margin: 1rem 0 0.5rem 0;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
 }
 
-.overlay-content .hint {
-  font-size: 1rem;
-  color: #94a3b8;
+.overlay-content .subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #666;
+  letter-spacing: 0.1em;
   margin-bottom: 1.5rem;
 }
 
-.final-score,
-.best-score {
-  font-size: 1.125rem;
-  margin: 0.5rem 0;
-  color: #cbd5e1;
+.result-title {
+  color: #f87171 !important;
+  text-shadow: 0 0 20px rgba(248, 117, 102, 0.5) !important;
 }
 
-.final-score strong,
-.best-score strong {
-  color: #06b6d4;
-  font-size: 1.25rem;
+.score-board {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.score-item .label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: #666;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.25rem;
+}
+
+.score-item .value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+.score-item .value.highlight {
+  color: #22d3ee;
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
 }
 
 .new-record {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
   justify-content: center;
-  font-size: 1.25rem;
   color: #fbbf24;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
   margin: 1rem 0;
-  animation: record-pulse 0.5s ease-in-out infinite;
-}
-
-@keyframes record-pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
+  padding: 0.5rem 1rem;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 4px;
 }
 
 .start-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.875rem 2rem;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #0f172a;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #000;
+  background: #4ade80;
   border: none;
-  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
   margin-top: 1rem;
+  transition: all 0.2s;
+  box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
 }
 
 .start-btn:hover {
+  background: #22c55e;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.6);
+  box-shadow: 0 0 30px rgba(74, 222, 128, 0.6);
 }
 
-.start-btn:active {
-  transform: translateY(0);
+.controls-hint {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: #666;
+  margin-top: 1rem;
 }
 
-/* 控制说明 */
-.game-controls {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.control-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #94a3b8;
-}
-
-kbd {
+.controls-hint .key-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  margin: 0 0.25rem;
+  color: #4ade80;
+}
+
+/* 右侧边栏 */
+.news-sidebar-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 4px;
-  color: #fbbf24;
+  height: 100%;
 }
 
-/* 游戏技巧 */
-.tips-section {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 1.5rem;
-  border: 1px solid rgba(251, 191, 36, 0.2);
+.wave-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
 }
 
-.tips-section h4 {
+.wave-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: #666;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.5rem;
+}
+
+.wave-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 60px;
+  justify-content: center;
+}
+
+.wave-bar {
+  width: 6px;
+  background: linear-gradient(to top, #22d3ee, #4ade80);
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+.wave-bar:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { height: 50px; animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { height: 60px; animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { height: 50px; animation-delay: 0.4s; }
+.wave-bar:nth-child(6) { height: 35px; animation-delay: 0.5s; }
+.wave-bar:nth-child(7) { height: 20px; animation-delay: 0.6s; }
+.wave-bar:nth-child(8) { height: 15px; animation-delay: 0.7s; }
+
+@keyframes wave {
+  0%, 100% { 
+    opacity: 0.5; 
+    transform: scaleY(0.5);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scaleY(1.2);
+  }
+}
+
+.deco-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  gap: 0.5rem;
+}
+
+.deco-circle {
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  position: relative;
+}
+
+.deco-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+}
+
+.deco-text {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: #666;
+  letter-spacing: 0.2em;
+}
+
+/* 操作说明 */
+.controls-mini {
+  margin-top: auto;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.controls-mini-header {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: #666;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.controls-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+
+.control-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mini-key {
   display: flex;
   align-items: center;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fbbf24;
-  margin-bottom: 1rem;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(74, 222, 128, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 3px;
+  font-size: 0.8rem;
+  color: #4ade80;
 }
 
-.tips-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.mini-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: #666;
 }
 
-.tips-list li {
-  position: relative;
-  padding-left: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-  color: #cbd5e1;
-  line-height: 1.6;
+/* 报尾 */
+.newspaper-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: #666;
+  letter-spacing: 0.1em;
 }
 
-.tips-list li::before {
-  content: '▸';
-  position: absolute;
-  left: 0;
-  color: #06b6d4;
-  font-weight: bold;
-}
-
-/* 响应式设计 */
-@media (max-width: 640px) {
-  .snake-game-wrapper {
-    padding: 1rem;
+/* 响应式 */
+@media (max-width: 1200px) {
+  .newspaper-content {
+    grid-template-columns: 1fr;
   }
-
-  .game-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .game-title {
-    font-size: 1.5rem;
-  }
-
-  .game-stats {
-    gap: 1rem;
-  }
-
-  .snake-canvas {
-    transform: scale(0.9);
-    transform-origin: center top;
-  }
-
-  .game-controls {
-    flex-direction: column;
-    gap: 0.5rem;
+  
+  .news-sidebar-left,
+  .news-sidebar-right {
+    display: none;
   }
 }

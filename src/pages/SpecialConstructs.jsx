@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, TangyuanIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, TangyuanIcon, GameIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -18,6 +18,17 @@ export default function SpecialConstructs() {
   }, [])
 
   const specialTools = [
+    {
+      id: 'games',
+      title: '小游戏',
+      subtitle: 'GAMES',
+      description: '休闲小游戏集合，扫雷/贪吃蛇/FlyBird 等',
+      icon: GameIcon,
+      color: 'amber',
+      path: '/special/games',
+      status: 'active',
+      featured: true
+    },
     {
       id: 'pomodoro',
       title: '番茄钟待办',

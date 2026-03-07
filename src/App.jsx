@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { HashRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Header from './components/Header'
 import Hero from './components/Hero'
@@ -25,6 +25,7 @@ import FlyBird from './pages/FlyBird'
 import Dinosaur from './pages/Dinosaur'
 import Snake from './pages/Snake'
 import Pacman from './pages/Pacman'
+import ScreenSaver from './pages/ScreenSaver'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
@@ -36,13 +37,53 @@ import './styles/special.css'
 import './styles/auth.css'
 import './styles/header.css'
 import './styles/pomodoro.css'
+import './styles/ScreenSaver.css'
 
 function AppContent() {
   const [showIntro, setShowIntro] = useState(true)
+  const [showScreenSaver, setShowScreenSaver] = useState(false)
   const location = useLocation()
   
   // 后台页面跳过 Intro 动画
   const isAdminRoute = location.pathname.startsWith('/admin')
+  
+  // 屏保页面不激活屏保
+  const isScreenSaverRoute = location.pathname === '/special/screensaver'
+  
+  // 5 分钟无操作自动激活屏保
+  useEffect(() => {
+    if (isAdminRoute || isScreenSaverRoute) return
+    
+    let idleTimer = null
+    const IDLE_TIMEOUT = 5 * 60 * 1000 // 5 分钟
+    
+    const resetTimer = () => {
+      if (idleTimer) clearTimeout(idleTimer)
+      idleTimer = setTimeout(() => {
+        setShowScreenSaver(true)
+      }, IDLE_TIMEOUT)
+    }
+    
+    // 监听用户活动
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart']
+    events.forEach(event => {
+      document.addEventListener(event, resetTimer)
+    })
+    
+    resetTimer()
+    
+    return () => {
+      if (idleTimer) clearTimeout(idleTimer)
+      events.forEach(event => {
+        document.removeEventListener(event, resetTimer)
+      })
+    }
+  }, [isAdminRoute, isScreenSaverRoute])
+  
+  // 退出屏保
+  const exitScreenSaver = useCallback(() => {
+    setShowScreenSaver(false)
+  }, [])
 
   // 全局自定义光标 - 点实时跟随，圈延迟跟随
   useEffect(() => {
@@ -204,6 +245,9 @@ function AppContent() {
           {/* 吃豆人 */}
           <Route path="/special/pacman" element={<Pacman />} />
           
+          {/* 屏保 */}
+          <Route path="/special/screensaver" element={<ScreenSaver />} />
+          
           {/* 文章详情 */}
           <Route path="/post/:id" element={
             <>
@@ -217,6 +261,13 @@ function AppContent() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
         </Routes>
+      )}
+      
+      {/* 屏保覆盖层 */}
+      {showScreenSaver && !isAdminRoute && !isScreenSaverRoute && (
+        <div className="screensaver-overlay" onClick={exitScreenSaver} onKeyDown={exitScreenSaver} tabIndex={-1}>
+          <ScreenSaver />
+        </div>
       )}
     </div>
   )

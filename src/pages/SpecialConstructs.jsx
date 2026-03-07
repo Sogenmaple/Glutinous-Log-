@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, BlockIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, BlockIcon, TangyuanIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -96,6 +96,16 @@ export default function SpecialConstructs() {
       icon: PacmanIcon,
       color: 'amber',
       path: '/special/pacman',
+      status: 'active'
+    },
+    {
+      id: 'screensaver',
+      title: '屏保模式',
+      subtitle: 'SCREEN SAVER',
+      description: '开屏动画屏保，5 分钟无操作自动激活，沉浸式视觉体验',
+      icon: TangyuanIcon,
+      color: 'amber',
+      path: '/special/screensaver',
       status: 'active'
     },
     {

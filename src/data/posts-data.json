@@ -63,11 +63,12 @@
     "tags": [
       "测试"
     ],
-    "status": "draft",
+    "status": "published",
     "date": "2026-03-07",
     "readTime": "1 分钟",
     "createdAt": "2026-03-07T04:00:26.133Z",
-    "updatedAt": "2026-03-07T04:00:26.133Z"
+    "updatedAt": "2026-03-07T06:14:05.833Z",
+    "coverImage": ""
   },
   {
     "id": "1772860582202",
@@ -77,11 +78,11 @@
     "type": "project",
     "category": "游戏项目",
     "tags": [],
-    "status": "draft",
+    "status": "published",
     "coverImage": "",
     "readTime": "5 分钟",
     "date": "2026-03-07",
     "createdAt": "2026-03-07T05:16:22.202Z",
-    "updatedAt": "2026-03-07T05:16:22.202Z"
+    "updatedAt": "2026-03-07T06:13:39.960Z"
   }
 ]

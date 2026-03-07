@@ -639,8 +639,8 @@ body :not(code):not(pre) {
 
 /* 内容卡片 */
 .timeline-content {
-  width: calc(100% - 60px);
-  max-width: 480px;
+  width: 100%;
+  max-width: 450px;
   padding: 1.5rem;
   background: linear-gradient(
     135deg,

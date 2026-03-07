@@ -57,7 +57,6 @@ export default function Pacman() {
   })
   const [lives, setLives] = useState(3)
   const [level, setLevel] = useState(1)
-  const [particles, setParticles] = useState([])
   const [powerMode, setPowerMode] = useState(false)
   const [powerTimer, setPowerTimer] = useState(0)
   const [mouthOpen, setMouthOpen] = useState(true)
@@ -69,23 +68,6 @@ export default function Pacman() {
   const initMap = useCallback(() => {
     return INITIAL_MAP.map(row => [...row])
   }, [])
-
-  const createParticles = (x, y, color) => {
-    const newParticles = []
-    for (let i = 0; i < 8; i++) {
-      const angle = (Math.PI * 2 * i) / 8
-      newParticles.push({
-        id: Date.now() + i,
-        x: x * CELL_SIZE + CELL_SIZE / 2,
-        y: y * CELL_SIZE + CELL_SIZE / 2,
-        vx: Math.cos(angle) * (2 + Math.random() * 2),
-        vy: Math.sin(angle) * (2 + Math.random() * 2),
-        life: 1,
-        color
-      })
-    }
-    setParticles(prev => [...prev, ...newParticles])
-  }
 
   const resetGame = () => {
     setMap(initMap())
@@ -99,7 +81,6 @@ export default function Pacman() {
     setScore(0)
     setLives(3)
     setLevel(1)
-    setParticles([])
     setPowerMode(false)
     setPowerTimer(0)
   }
@@ -175,7 +156,6 @@ export default function Pacman() {
                 newMap[newY][newX] = 0
                 return newMap
               })
-              createParticles(newX, newY, '#fbbf24')
             }
             // 吃能量豆
             else if (nextCell === 3) {
@@ -189,7 +169,6 @@ export default function Pacman() {
               setPowerMode(true)
               setPowerTimer(50)
               setGhosts(gs => gs.map(g => ({ ...g, scared: true })))
-              createParticles(newX, newY, '#3b82f6')
             }
             
             return newPacman
@@ -292,7 +271,6 @@ export default function Pacman() {
       if (powerMode) {
         // 吃幽灵
         setScore(s => s + 200)
-        createParticles(collision.x, collision.y, collision.color)
         setGhosts(gs => gs.map(g => 
           g === collision ? { ...g, x: 9, y: 10, scared: false } : g
         ))
@@ -338,24 +316,6 @@ export default function Pacman() {
       ])
     }
   }, [map, gameState, initMap])
-
-  // 粒子动画
-  useEffect(() => {
-    const updateParticles = setInterval(() => {
-      setParticles(prev => prev
-        .map(p => ({
-          ...p,
-          x: p.x + p.vx,
-          y: p.y + p.vy,
-          vy: p.vy + 0.1,
-          life: p.life - 0.05
-        }))
-        .filter(p => p.life > 0)
-      )
-    }, 50)
-
-    return () => clearInterval(updateParticles)
-  }, [])
 
   // 嘴巴动画
   useEffect(() => {
@@ -511,22 +471,6 @@ export default function Pacman() {
                     <circle cx="15" cy="8" r="1" fill="#000"/>
                   </svg>
                 </div>
-              ))}
-
-              {/* 粒子效果 */}
-              {particles.map(p => (
-                <div
-                  key={p.id}
-                  className="particle"
-                  style={{
-                    left: p.x,
-                    top: p.y,
-                    backgroundColor: p.color,
-                    opacity: p.life,
-                    width: 4,
-                    height: 4
-                  }}
-                />
               ))}
 
               {/* 开始界面 */}

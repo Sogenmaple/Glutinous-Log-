@@ -550,29 +550,68 @@ body :not(code):not(pre) {
   position: relative;
 }
 
+/* 背景光晕 */
+.timeline-section::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 149, 0, 0.08) 0%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .timeline-container {
   position: relative;
   padding: 2rem 0;
+  z-index: 1;
 }
 
-/* 中央时间轴线 */
+/* 中央时间轴线 - 加粗 + 双层发光 */
 .timeline-container::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 4px;
   background: linear-gradient(
     to bottom,
-    rgba(255, 149, 0, 0.2) 0%,
-    rgba(255, 149, 0, 0.6) 15%,
+    transparent 0%,
+    rgba(255, 149, 0, 0.3) 10%,
     rgba(255, 149, 0, 0.8) 50%,
-    rgba(255, 149, 0, 0.6) 85%,
-    rgba(255, 149, 0, 0.2) 100%
+    rgba(255, 149, 0, 0.3) 90%,
+    transparent 100%
   );
   transform: translateX(-50%);
-  box-shadow: 0 0 20px rgba(255, 149, 0, 0.4);
+  box-shadow: 
+    0 0 30px rgba(255, 149, 0, 0.6),
+    0 0 60px rgba(255, 149, 0, 0.3);
+}
+
+/* 时间轴线内发光 */
+.timeline-container::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 200, 100, 0.9) 50%,
+    transparent 100%
+  );
+  transform: translateX(-50%);
+  z-index: 1;
 }
 
 /* 时间轴项目 - 左右交替 */
@@ -602,23 +641,46 @@ body :not(code):not(pre) {
   transform: translateX(0);
 }
 
-/* 时间轴点 */
+/* 时间轴点 - 旋转发光动画 */
+@keyframes rotate-glow {
+  0% {
+    box-shadow: 
+      0 0 25px rgba(255, 149, 0, 0.6),
+      0 0 0 8px rgba(255, 149, 0, 0.08),
+      inset 0 0 20px rgba(255, 149, 0, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 35px rgba(255, 149, 0, 0.8),
+      0 0 0 12px rgba(255, 149, 0, 0.15),
+      inset 0 0 30px rgba(255, 149, 0, 0.2);
+  }
+  100% {
+    box-shadow: 
+      0 0 25px rgba(255, 149, 0, 0.6),
+      0 0 0 8px rgba(255, 149, 0, 0.08),
+      inset 0 0 20px rgba(255, 149, 0, 0.1);
+  }
+}
+
 .timeline-dot {
   position: absolute;
   right: -24px;
   top: 0;
-  width: 48px;
-  height: 48px;
-  background: var(--bg-deep);
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(
+    135deg,
+    var(--bg-deep) 0%,
+    rgba(255, 149, 0, 0.05) 100%
+  );
   border: 3px solid var(--amber);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
-  box-shadow: 
-    0 0 25px rgba(255, 149, 0, 0.6),
-    0 0 0 8px rgba(255, 149, 0, 0.08);
+  z-index: 3;
+  animation: rotate-glow 3s ease-in-out infinite;
   transition: all 0.3s ease;
 }
 
@@ -627,39 +689,130 @@ body :not(code):not(pre) {
   left: -24px;
 }
 
+.timeline-dot::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 149, 0, 0.8),
+    rgba(255, 200, 100, 0.4),
+    rgba(255, 149, 0, 0.8)
+  );
+  filter: blur(8px);
+  opacity: 0.6;
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .timeline-item:hover .timeline-dot {
-  transform: scale(1.15);
-  box-shadow: 
-    0 0 35px rgba(255, 149, 0, 0.8),
-    0 0 0 12px rgba(255, 149, 0, 0.12);
+  transform: scale(1.2);
+  border-color: rgba(255, 200, 100, 0.9);
+}
+
+.timeline-item:hover .timeline-dot::before {
+  opacity: 1;
+  filter: blur(10px);
 }
 
 .timeline-dot .vector-icon {
-  width: 24px;
-  height: 24px;
-  filter: drop-shadow(0 0 6px rgba(255, 149, 0, 0.6));
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 0 8px rgba(255, 149, 0, 0.8));
+  z-index: 1;
 }
 
-/* 内容卡片 */
+/* 内容卡片 - 玻璃态 + 4 角装饰 */
 .timeline-content {
   width: 100%;
-  padding: 1.5rem;
+  padding: 1.6rem;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.04) 0%,
     rgba(255, 255, 255, 0.01) 100%
   );
-  border: 1px solid rgba(255, 149, 0, 0.15);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 149, 0, 0.18);
+  border-radius: 10px;
   position: relative;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+/* 卡片顶部渐变条 */
+.timeline-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 149, 0, 0.6) 50%,
+    transparent 100%
+  );
+}
+
+/* 4 角装饰 */
+.timeline-content .card-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 149, 0, 0.4);
   transition: all 0.3s ease;
 }
 
+.timeline-content .card-corner.tl {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 4px 0 0 0;
+}
+
+.timeline-content .card-corner.tr {
+  top: 8px;
+  right: 8px;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 4px 0 0;
+}
+
+.timeline-content .card-corner.bl {
+  bottom: 8px;
+  left: 8px;
+  border-right: none;
+  border-top: none;
+  border-radius: 0 0 0 4px;
+}
+
+.timeline-content .card-corner.br {
+  bottom: 8px;
+  right: 8px;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 4px 0;
+}
+
 .timeline-item:hover .timeline-content {
-  border-color: rgba(255, 149, 0, 0.3);
-  box-shadow: 0 8px 32px rgba(255, 149, 0, 0.12);
-  transform: translateY(-2px);
+  border-color: rgba(255, 149, 0, 0.4);
+  box-shadow: 
+    0 10px 40px rgba(255, 149, 0, 0.15),
+    0 0 80px rgba(255, 149, 0, 0.08);
+  transform: translateY(-4px);
+}
+
+.timeline-item:hover .timeline-content .card-corner {
+  border-color: rgba(255, 149, 0, 0.8);
+  width: 16px;
+  height: 16px;
 }
 
 /* 左侧项目 - 卡片指向右边 */
@@ -670,157 +823,224 @@ body :not(code):not(pre) {
   top: 24px;
   width: 0;
   height: 0;
-  border-left: 8px solid rgba(255, 149, 0, 0.15);
+  border-left: 8px solid rgba(255, 149, 0, 0.2);
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
 }
 
 /* 右侧项目 - 卡片指向左边 */
-.timeline-item:nth-child(even) .timeline-content::after {
+.timeline-item:nth-child(even) .timeline-content::before {
+  content: '';
+  position: absolute;
   left: -8px;
-  right: auto;
-  border-left: none;
-  border-right: 8px solid rgba(255, 149, 0, 0.15);
+  top: 24px;
+  width: 0;
+  height: 0;
+  border-right: 8px solid rgba(255, 149, 0, 0.2);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+/* 日期标签 - 霓虹胶囊 */
+@keyframes pulse-cyan {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+  }
 }
 
 .timeline-date {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--cyan);
-  letter-spacing: 0.12em;
-  font-weight: 600;
-  margin-bottom: 0.6rem;
-  padding: 0.25rem 0.75rem;
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.25);
-  border-radius: 3px;
-  text-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  padding: 0.3rem 0.85rem;
+  background: linear-gradient(
+    135deg,
+    rgba(6, 182, 212, 0.15) 0%,
+    rgba(6, 182, 212, 0.05) 100%
+  );
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  border-radius: 20px;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+  animation: pulse-cyan 3s ease-in-out infinite;
 }
 
+/* 标题 - 强发光 */
 .timeline-title {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: var(--amber);
-  margin: 0 0 0.8rem 0;
+  margin: 0 0 0.9rem 0;
   line-height: 1.3;
-  text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
-  letter-spacing: 0.05em;
+  text-shadow: 
+    0 0 20px rgba(255, 149, 0, 0.6),
+    0 0 40px rgba(255, 149, 0, 0.3);
+  letter-spacing: 0.06em;
 }
 
 .timeline-desc {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   color: var(--text-secondary);
-  line-height: 1.7;
-  margin: 0 0 1rem 0;
+  line-height: 1.8;
+  margin: 0 0 1.1rem 0;
 }
 
+/* 标签 - 霓虹按钮 */
 .timeline-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
 }
 
 .timeline-tag {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 3px;
-  background: rgba(255, 149, 0, 0.08);
+  font-size: 0.7rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 4px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 149, 0, 0.12) 0%,
+    rgba(255, 149, 0, 0.06) 100%
+  );
   color: var(--amber-bright);
-  border: 1px solid rgba(255, 149, 0, 0.2);
-  letter-spacing: 0.05em;
-  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 149, 0, 0.3);
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(255, 149, 0, 0.5);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .timeline-tag:hover {
-  background: rgba(255, 149, 0, 0.15);
+  background: rgba(255, 149, 0, 0.2);
   border-color: var(--amber);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3);
 }
 
+/* 链接按钮 */
 .timeline-links {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.7rem;
   flex-wrap: wrap;
 }
 
 .timeline-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--text-secondary);
   text-decoration: none;
-  padding: 0.35rem 0.7rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
-  transition: all 0.2s ease;
+  padding: 0.4rem 0.8rem;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
 }
 
 .timeline-link:hover {
   color: var(--amber);
-  border-color: rgba(255, 149, 0, 0.3);
-  background: rgba(255, 149, 0, 0.08);
+  border-color: rgba(255, 149, 0, 0.4);
+  background: rgba(255, 149, 0, 0.1);
   text-decoration: none;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 149, 0, 0.25);
 }
 
 .timeline-link .link-icon-svg {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   fill: currentColor;
+}
+
+/* 开发中状态 - 呼吸灯 */
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+  }
+  50% {
+    opacity: 0.85;
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+  }
 }
 
 .timeline-status {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 3px;
-  margin-left: 0.5rem;
+  font-size: 0.68rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 4px;
+  margin-left: 0.6rem;
   vertical-align: middle;
-  background: rgba(57, 255, 20, 0.12);
+  background: linear-gradient(
+    135deg,
+    rgba(57, 255, 20, 0.15) 0%,
+    rgba(57, 255, 20, 0.08) 100%
+  );
   color: var(--green);
-  border: 1px solid rgba(57, 255, 20, 0.3);
-  letter-spacing: 0.05em;
-  text-shadow: 0 0 6px rgba(57, 255, 20, 0.4);
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.6);
+  animation: pulse-green 2s ease-in-out infinite;
 }
 
 /* 响应式 - 平板 */
 @media (max-width: 768px) {
+  .timeline-section::before {
+    width: 95%;
+    height: 95%;
+  }
+  
   .timeline-container::before {
+    left: 30px;
+  }
+  
+  .timeline-container::after {
     left: 30px;
   }
   
   .timeline-item,
   .timeline-item:nth-child(even) {
+    width: 100%;
+    left: 0;
     padding-left: 70px;
     padding-right: 0;
-    justify-content: flex-start;
   }
   
   .timeline-dot,
   .timeline-item:nth-child(even) .timeline-dot {
+    right: auto;
     left: 30px;
-    transform: translateX(-50%);
   }
   
-  .timeline-item .timeline-content::after,
-  .timeline-item:nth-child(even) .timeline-content::after {
+  .timeline-item .timeline-content::after {
     left: -8px;
     right: auto;
     border-left: none;
-    border-right: 8px solid rgba(255, 149, 0, 0.15);
+    border-right: 8px solid rgba(255, 149, 0, 0.2);
   }
   
-  .timeline-content {
-    width: 100%;
-    max-width: none;
+  .timeline-item:nth-child(even) .timeline-content::before {
+    left: -8px;
+    border-left: none;
+    border-right: 8px solid rgba(255, 149, 0, 0.2);
   }
 }
 
@@ -830,7 +1050,16 @@ body :not(code):not(pre) {
     padding: 3rem 1rem;
   }
   
+  .timeline-section::before {
+    width: 100%;
+    height: 100%;
+  }
+  
   .timeline-container::before {
+    left: 24px;
+  }
+  
+  .timeline-container::after {
     left: 24px;
   }
   
@@ -842,8 +1071,8 @@ body :not(code):not(pre) {
   .timeline-dot,
   .timeline-item:nth-child(even) .timeline-dot {
     left: 24px;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
   }
   
   .timeline-dot .vector-icon {
@@ -852,11 +1081,30 @@ body :not(code):not(pre) {
   }
   
   .timeline-content {
-    padding: 1.2rem;
+    padding: 1.3rem;
+  }
+  
+  .timeline-content .card-corner {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .timeline-item:hover .timeline-content .card-corner {
+    width: 10px;
+    height: 10px;
   }
   
   .timeline-title {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
+  }
+  
+  .timeline-date {
+    font-size: 0.68rem;
+  }
+  
+  .timeline-tag {
+    font-size: 0.66rem;
+    padding: 0.22rem 0.55rem;
   }
 }
 

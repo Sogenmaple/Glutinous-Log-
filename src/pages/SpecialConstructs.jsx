@@ -20,12 +20,12 @@ export default function SpecialConstructs() {
   const specialTools = [
     {
       id: 'games',
-      title: '小游戏',
-      subtitle: 'GAMES',
-      description: '休闲小游戏集合，扫雷/贪吃蛇/FlyBird 等',
+      title: '休闲小游戏',
+      subtitle: 'CASUAL GAMES',
+      description: '经典休闲小游戏集合，扫雷/贪吃蛇/吃豆人等',
       icon: GameIcon,
       color: 'amber',
-      path: '/special/games',
+      path: '/games',
       status: 'active',
       featured: true
     },

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { TangyuanIcon, BombIcon, BlockIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, CalculatorIcon, ClockIcon } from '../components/icons/SiteIcons'
+import { BombIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, GameIcon } from '../components/icons/SiteIcons'
 import '../styles/GamesCollection.css'
 
 /**
@@ -29,36 +29,6 @@ export default function GamesCollection() {
       status: 'active'
     },
     {
-      id: 'tetris',
-      title: '俄罗斯方块',
-      subtitle: 'TETRIS',
-      description: '经典方块消除，挑战最高分',
-      icon: BlockIcon,
-      color: 'amber',
-      path: '/special/tetris',
-      status: 'active'
-    },
-    {
-      id: 'flybird',
-      title: '飞扬的小鸟',
-      subtitle: 'FLAPPY BIRD',
-      description: '穿越管道，飞翔挑战',
-      icon: BirdIcon,
-      color: 'cyan',
-      path: '/special/flybird',
-      status: 'active'
-    },
-    {
-      id: 'dinosaur',
-      title: '恐龙快跑',
-      subtitle: 'DINO RUN',
-      description: '躲避障碍，奔跑生存',
-      icon: DinosaurIcon,
-      color: 'green',
-      path: '/special/dinosaur',
-      status: 'active'
-    },
-    {
       id: 'snake',
       title: '贪吃蛇',
       subtitle: 'SNAKE',
@@ -66,6 +36,16 @@ export default function GamesCollection() {
       icon: SnakeIcon,
       color: 'green',
       path: '/special/snake',
+      status: 'active'
+    },
+    {
+      id: 'flybird',
+      title: 'FlyBird',
+      subtitle: 'FLAPPY BIRD',
+      description: '穿越管道，飞翔挑战',
+      icon: BirdIcon,
+      color: 'cyan',
+      path: '/special/flybird',
       status: 'active'
     },
     {
@@ -79,23 +59,13 @@ export default function GamesCollection() {
       status: 'active'
     },
     {
-      id: 'calculator',
-      title: '计算器',
-      subtitle: 'CALCULATOR',
-      description: '复古风格计算器',
-      icon: CalculatorIcon,
-      color: 'purple',
-      path: '/special/calculator',
-      status: 'active'
-    },
-    {
-      id: 'pomodoro',
-      title: '番茄钟',
-      subtitle: 'POMODORO',
-      description: '25 分钟工作法时间管理',
-      icon: ClockIcon,
-      color: 'red',
-      path: '/special/pomodoro',
+      id: 'dinosaur',
+      title: '恐龙快跑',
+      subtitle: 'DINO RUN',
+      description: '躲避障碍，奔跑生存',
+      icon: DinosaurIcon,
+      color: 'green',
+      path: '/special/dinosaur',
       status: 'active'
     }
   ]
@@ -118,9 +88,7 @@ export default function GamesCollection() {
 
       {/* 页面标题 */}
       <div className={`collection-header ${mounted ? 'visible' : ''}`}>
-        <div className="header-icon">
-          <TangyuanIcon size={60} color="#ff9500" />
-        </div>
+        <GameIcon size={60} color="#ff9500" />
         <h1 className="collection-title">小游戏</h1>
         <p className="collection-subtitle">GAMES // 休闲游戏集合</p>
         <div className="collection-divider"></div>

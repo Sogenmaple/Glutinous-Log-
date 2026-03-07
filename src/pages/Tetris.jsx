@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Header from '../components/Header'
 import { ToolIcon } from '../components/icons/SiteIcons'
 import '../styles/Tetris.css'
@@ -36,6 +36,9 @@ export default function Tetris() {
   const [isPaused, setIsPaused] = useState(false)
   const [gameStarted, setGameStarted] = useState(false)
   const [highScore, setHighScore] = useState(0)
+  const [particleEffects, setParticleEffects] = useState([])
+  const [ghostPosition, setGhostPosition] = useState({ x: 0, y: 0 })
+  const gameLoopRef = useRef(null)
 
   // 加载最佳记录
   useEffect(() => {
@@ -51,10 +54,29 @@ export default function Tetris() {
       setHighScore(score)
       localStorage.setItem('tetris_highscore', String(score))
     }
-  }, [score])
+  }, [score, highScore])
 
   // 初始化游戏板
   const createBoard = () => Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill(0))
+
+  // 创建粒子效果
+  const createParticles = useCallback((y, color) => {
+    const particles = []
+    for (let x = 0; x < BOARD_WIDTH; x++) {
+      for (let i = 0; i < 3; i++) {
+        particles.push({
+          id: Date.now() + '-' + x + '-' + i,
+          x: x * CELL_SIZE + CELL_SIZE / 2,
+          y: y * CELL_SIZE + CELL_SIZE / 2,
+          vx: (Math.random() - 0.5) * 10,
+          vy: (Math.random() - 0.5) * 10 - 5,
+          life: 1,
+          color
+        })
+      }
+    }
+    setParticleEffects(prev => [...prev, ...particles])
+  }, [])
 
   // 开始游戏
   const startGame = () => {
@@ -70,6 +92,7 @@ export default function Tetris() {
     setGameOver(false)
     setIsPaused(false)
     setGameStarted(true)
+    setParticleEffects([])
   }
 
   // 检查碰撞
@@ -111,11 +134,13 @@ export default function Tetris() {
 
     // 检查并消除行
     let linesCleared = 0
+    const clearedLines = []
     for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
       if (newBoard[y].every(cell => cell !== 0)) {
         newBoard.splice(y, 1)
         newBoard.unshift(Array(BOARD_WIDTH).fill(0))
         linesCleared++
+        clearedLines.push(y)
         y++
       }
     }
@@ -129,6 +154,11 @@ export default function Tetris() {
           setLevel(lvl => lvl + 1)
         }
         return newLines
+      })
+      
+      // 为每行消除创建粒子效果
+      clearedLines.forEach(y => {
+        createParticles(y, color)
       })
     }
 
@@ -147,7 +177,23 @@ export default function Tetris() {
       setNextPiece(newNext)
       setPosition(newPos)
     }
-  }, [board, currentPiece, nextPiece, position, level, checkCollision])
+  }, [board, currentPiece, nextPiece, position, level, checkCollision, createParticles])
+
+  // 计算幽灵位置
+  const calculateGhostPosition = useCallback(() => {
+    if (!currentPiece || !gameStarted || gameOver || isPaused) return
+    
+    let ghostY = position.y
+    while (!checkCollision(currentPiece, { ...position, y: ghostY + 1 }, board)) {
+      ghostY++
+    }
+    setGhostPosition({ x: position.x, y: ghostY })
+  }, [currentPiece, position, board, gameStarted, gameOver, isPaused, checkCollision])
+
+  // 更新幽灵位置
+  useEffect(() => {
+    calculateGhostPosition()
+  }, [position, currentPiece, calculateGhostPosition])
 
   // 下落
   const moveDown = useCallback(() => {
@@ -170,23 +216,47 @@ export default function Tetris() {
     }
   }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision])
 
-  // 旋转
+  // 旋转（使用临时形状，不影响原始数据）
+  const [rotatedShapes, setRotatedShapes] = useState({})
+  
   const rotatePiece = useCallback(() => {
     if (!gameStarted || gameOver || isPaused) return
-    const rotated = rotate(currentPiece)
-    const testPiece = { ...TETROMINOES[currentPiece], shape: rotated }
     
-    // 墙踢
+    const currentShape = TETROMINOES[currentPiece].shape
+    const rotated = currentShape[0].map((_, i) => currentShape.map(row => row[i]).reverse())
+    
+    // 墙踢测试
     const kicks = [0, -1, 1, -2, 2]
     for (const kick of kicks) {
-      const newPos = { ...position, x: position.x + kick }
-      if (!checkCollision(currentPiece, newPos, board)) {
-        TETROMINOES[currentPiece].shape = rotated
-        setPosition(newPos)
+      const testPos = { ...position, x: position.x + kick }
+      let canPlace = true
+      
+      // 检查旋转后的碰撞
+      for (let y = 0; y < rotated.length; y++) {
+        for (let x = 0; x < rotated[y].length; x++) {
+          if (rotated[y][x]) {
+            const newX = testPos.x + x
+            const newY = testPos.y + y
+            if (newX < 0 || newX >= BOARD_WIDTH || newY >= BOARD_HEIGHT) {
+              canPlace = false
+              break
+            }
+            if (newY >= 0 && board[newY][newX]) {
+              canPlace = false
+              break
+            }
+          }
+        }
+        if (!canPlace) break
+      }
+      
+      if (canPlace) {
+        setRotatedShapes(prev => ({ ...prev, [currentPiece]: rotated }))
+        setPosition(testPos)
         return
       }
     }
-  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, rotate, checkCollision])
+  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision])
 
   // 快速下落
   const hardDrop = useCallback(() => {
@@ -202,20 +272,29 @@ export default function Tetris() {
   // 键盘控制
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (!gameStarted && e.key === ' ') {
+        e.preventDefault()
+        startGame()
+        return
+      }
       if (!gameStarted) return
+      
       switch (e.key) {
         case 'ArrowLeft': move(-1); break
         case 'ArrowRight': move(1); break
         case 'ArrowDown': moveDown(); break
         case 'ArrowUp': rotatePiece(); break
         case ' ': hardDrop(); break
-        case 'p': setIsPaused(p => !p); break
+        case 'p':
+        case 'P':
+        case 'Escape':
+          setIsPaused(p => !p); break
         default: break
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [gameStarted, move, moveDown, rotatePiece, hardDrop])
+  }, [gameStarted, move, moveDown, rotatePiece, hardDrop, startGame])
 
   // 游戏循环
   useEffect(() => {
@@ -224,6 +303,34 @@ export default function Tetris() {
     const interval = setInterval(moveDown, speed)
     return () => clearInterval(interval)
   }, [gameStarted, gameOver, isPaused, level, moveDown])
+
+  // 粒子动画循环
+  useEffect(() => {
+    if (particleEffects.length === 0) return
+    
+    const updateParticles = () => {
+      setParticleEffects(prev =>
+        prev
+          .map(p => ({
+            ...p,
+            x: p.x + p.vx,
+            y: p.y + p.vy,
+            vy: p.vy + 0.5,
+            life: p.life - 0.03
+          }))
+          .filter(p => p.life > 0)
+      )
+      gameLoopRef.current = requestAnimationFrame(updateParticles)
+    }
+    
+    gameLoopRef.current = requestAnimationFrame(updateParticles)
+    
+    return () => {
+      if (gameLoopRef.current) {
+        cancelAnimationFrame(gameLoopRef.current)
+      }
+    }
+  }, [particleEffects.length])
 
   return (
     <div className="tetris-page">
@@ -241,24 +348,101 @@ export default function Tetris() {
 
         <div className="tetris-wrapper">
           <div className="tetris-board-container">
+            {/* 粒子效果层 */}
+            <div className="particle-layer">
+              {particleEffects.map(particle => (
+                <div
+                  key={particle.id}
+                  className="particle"
+                  style={{
+                    left: particle.x,
+                    top: particle.y,
+                    backgroundColor: particle.color,
+                    opacity: particle.life,
+                    transform: `scale(${particle.life})`
+                  }}
+                />
+              ))}
+            </div>
+
             <div className="tetris-board" style={{ gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${CELL_SIZE}px)` }}>
               {board.map((row, y) => row.map((cell, x) => (
                 <div key={`${y}-${x}`} className="tetris-cell" style={{ backgroundColor: cell || 'transparent' }} />
               )))}
+              
+              {/* 幽灵方块 */}
+              {currentPiece && gameStarted && !gameOver && !isPaused && (
+                <>
+                  {(rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape).map((row, dy) => row.map((cell, dx) => {
+                    if (!cell) return null
+                    const x = ghostPosition.x + dx
+                    const y = ghostPosition.y + dy
+                    if (y < 0) return null
+                    return (
+                      <div 
+                        key={`ghost-${y}-${x}`} 
+                        className="tetris-cell ghost"
+                        style={{ 
+                          borderColor: TETROMINOES[currentPiece].color,
+                          gridRowStart: y + 1,
+                          gridColumnStart: x + 1
+                        }} 
+                      />
+                    )
+                  }))}
+                </>
+              )}
+              
+              {/* 当前方块 */}
               {currentPiece && gameStarted && !gameOver && (
                 <>
-                  {TETROMINOES[currentPiece].shape.map((row, dy) => row.map((cell, dx) => {
+                  {(rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape).map((row, dy) => row.map((cell, dx) => {
                     if (!cell) return null
                     const x = position.x + dx
                     const y = position.y + dy
                     if (y < 0) return null
                     return (
-                      <div key={`piece-${y}-${x}`} className="tetris-cell current" style={{ backgroundColor: TETROMINOES[currentPiece].color }} />
+                      <div 
+                        key={`piece-${y}-${x}`} 
+                        className="tetris-cell current" 
+                        style={{ 
+                          backgroundColor: TETROMINOES[currentPiece].color,
+                          gridRowStart: y + 1,
+                          gridColumnStart: x + 1
+                        }} 
+                      />
                     )
                   }))}
                 </>
               )}
             </div>
+
+            {(gameOver || isPaused) && gameStarted && (
+              <div className={`game-overlay ${gameOver ? 'gameover' : 'paused'}`}>
+                <div className="overlay-content">
+                  {gameOver ? (
+                    <>
+                      <h2>💥 游戏结束</h2>
+                      <p className="final-score">得分：<strong>{score}</strong></p>
+                      <p className="best-score">最佳：<strong>{highScore}</strong></p>
+                      {score >= highScore && score > 0 && (
+                        <p className="new-record">🏆 新纪录！</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <h2>⏸️ 游戏暂停</h2>
+                      <p className="hint">按 ESC 或 P 继续</p>
+                    </>
+                  )}
+                  {gameOver && (
+                    <button className="start-btn" onClick={startGame}>
+                      🔄 再玩一次
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="tetris-sidebar">
@@ -296,15 +480,19 @@ export default function Tetris() {
 
             <div className="tetris-controls">
               {!gameStarted || gameOver ? (
-                <button className="start-btn" onClick={startGame}>{gameOver ? '再玩一次' : '开始游戏'}</button>
+                <button className="start-btn" onClick={startGame}>
+                  {gameOver ? '🔄 再玩一次' : '▶️ 开始游戏'}
+                </button>
               ) : (
-                <button className="pause-btn" onClick={() => setIsPaused(p => !p)}>{isPaused ? '继续' : '暂停'}</button>
+                <button className="pause-btn" onClick={() => setIsPaused(p => !p)}>
+                  {isPaused ? '▶️ 继续' : '⏸️ 暂停'}
+                </button>
               )}
             </div>
 
-            {(gameOver || isPaused) && gameStarted && (
-              <div className={`game-overlay ${gameOver ? 'gameover' : 'paused'}`}>
-                {gameOver ? '游戏结束' : '游戏暂停'}
+            {!gameStarted && (
+              <div className="start-hint">
+                <p>按空格键开始游戏</p>
               </div>
             )}
           </div>
@@ -317,7 +505,16 @@ export default function Tetris() {
             <div className="control-item"><span className="key">↑</span> 旋转</div>
             <div className="control-item"><span className="key">↓</span> 加速下落</div>
             <div className="control-item"><span className="key">空格</span> 直接掉落</div>
-            <div className="control-item"><span className="key">P</span> 暂停游戏</div>
+            <div className="control-item"><span className="key">P</span> 暂停/继续</div>
+          </div>
+          <div className="tips-section">
+            <h4>💡 游戏技巧</h4>
+            <ul className="tips-list">
+              <li>使用幽灵方块预览落点，提前规划位置</li>
+              <li>尽量保持表面平整，避免留下空洞</li>
+              <li>长条方块（I）适合消除多行</li>
+              <li>每消除 10 行升一级，速度会加快</li>
+            </ul>
           </div>
         </div>
       </div>

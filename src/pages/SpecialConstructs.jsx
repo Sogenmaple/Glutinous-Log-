@@ -105,13 +105,13 @@ export default function SpecialConstructs() {
           <p className="page-subtitle">SPECIAL CONSTRUCTS // TOOLS & EXPERIMENTS</p>
         </div>
 
-        <div className="tools-grid">
+        <div className="special-grid">
           {specialTools.map((tool, index) => {
             const IconComponent = tool.icon
             return (
               <div
                 key={tool.id}
-                className={`tool-card ${tool.color} ${tool.featured ? 'featured' : ''} ${hoveredCard === tool.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
+                className={`special-card ${tool.color} ${tool.featured ? 'featured' : ''} ${hoveredCard === tool.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onMouseEnter={() => setHoveredCard(tool.id)}
                 onMouseLeave={() => setHoveredCard(null)}

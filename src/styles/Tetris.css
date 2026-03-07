@@ -1,35 +1,117 @@
 /* ============================================
    俄罗斯方块 - TETRIS
+   报纸风格 + 磁带未来主义
    ============================================ */
 
 .tetris-page {
   min-height: 100vh;
   background: var(--bg-deep);
   padding-top: 100px;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.tetris-container {
-  max-width: 800px;
-  margin: 0 auto;
+/* 背景效果 */
+.tape-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.03) 0%, rgba(255, 149, 0, 0.02) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tape-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tape-scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1) 0px,
+    transparent 1px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 报纸容器 */
+.tetris-newspaper {
+  position: relative;
+  z-index: 10;
+  max-width: 1200px;
+  margin: 2rem auto;
   padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  animation: slide-up 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 标题区域 */
-.tetris-header {
-  text-align: center;
+/* 报头 */
+.newspaper-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(255, 149, 0, 0.4);
   margin-bottom: 2rem;
 }
 
-.tetris-title {
+.header-date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.header-date .date {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.header-date .issue {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+}
+
+.header-title {
+  text-align: center;
+}
+
+.header-title h1 {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
   margin-bottom: 0.5rem;
-  animation: slide-up 1s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.tetris-title .title-text {
+.header-title .title-text {
   font-family: var(--font-display);
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 900;
@@ -38,63 +120,314 @@
   letter-spacing: 0.08em;
 }
 
-.tetris-subtitle {
+.header-title .subtitle {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--cyan);
   text-shadow: var(--cyan-glow);
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  opacity: 0.9;
 }
 
-/* 游戏包装器 */
-.tetris-wrapper {
+.header-status {
   display: flex;
+  justify-content: flex-end;
+}
+
+.status-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.status-badge.ready {
+  color: var(--cyan);
+  background: rgba(6, 182, 212, 0.1);
+}
+
+.status-badge.active {
+  color: var(--green);
+  background: rgba(34, 197, 94, 0.1);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-badge.paused {
+  color: var(--amber);
+  background: rgba(255, 149, 0, 0.1);
+}
+
+.status-badge.danger {
+  color: var(--red);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* 主内容区 */
+.newspaper-content {
+  display: grid;
+  grid-template-columns: 220px 1fr 180px;
   gap: 2rem;
+  align-items: start;
+}
+
+/* 左侧边栏 */
+.news-sidebar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 信息盒子 */
+.info-boxes {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 149, 0, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.info-value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.info-value.highlight {
+  color: var(--amber);
+  text-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+}
+
+.info-value.best {
+  color: var(--cyan);
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+/* 下一个方块 */
+.next-piece-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.box-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+}
+
+.next-piece-display {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid rgba(6, 182, 212, 0.1);
+}
+
+.next-row {
+  display: flex;
+  gap: 1px;
+}
+
+.next-cell {
+  border-radius: 2px;
+  box-shadow: 0 0 5px currentColor;
+}
+
+/* 控制按钮 */
+.tetris-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.start-btn-newspaper,
+.pause-btn-newspaper {
+  flex: 1;
+  padding: 0.875rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.start-btn-newspaper {
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.4) 0%, rgba(255, 149, 0, 0.2) 100%);
+  color: #fff;
+  border: 1px solid rgba(255, 149, 0, 0.6);
+}
+
+.start-btn-newspaper:hover {
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.6) 0%, rgba(255, 149, 0, 0.3) 100%);
+  box-shadow: 0 0 30px rgba(255, 149, 0, 0.6);
+}
+
+.pause-btn-newspaper {
+  background: rgba(6, 182, 212, 0.2);
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+}
+
+.pause-btn-newspaper:hover {
+  background: rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+}
+
+/* 操作说明 */
+.controls-mini {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.controls-mini-header {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.control-item {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-item:last-child {
+  padding-bottom: 0;
+}
+
+/* 中央游戏区 */
+.news-game-area-tetris {
+  display: flex;
+  justify-content: center;
+}
+
+.game-canvas-tetris {
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 149, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 0 40px rgba(255, 149, 0, 0.15);
+}
+
+.bg-grid-tetris {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* 游戏板容器 */
 .tetris-board-container {
   position: relative;
-  border: 3px solid rgba(255,149,0,0.4);
-  border-radius: 8px;
-  background: rgba(0,0,0,0.5);
-  box-shadow: 0 0 40px rgba(255,149,0,0.2);
+  z-index: 10;
 }
 
 /* 游戏板 */
 .tetris-board {
+  position: relative;
   display: grid;
   gap: 1px;
-  background: rgba(255,149,0,0.1);
+  background: rgba(255, 149, 0, 0.1);
   padding: 2px;
+  border-radius: 4px;
 }
 
-.tetris-cell {
-  width: 30px;
-  height: 30px;
+/* 背景格子 */
+.tetris-cell-bg {
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 2px;
-  transition: background-color 0.1s ease;
 }
 
-.tetris-cell.current {
-  box-shadow: 0 0 10px currentColor;
-  animation: cell-pulse 0.5s ease-in-out infinite;
-}
-
-.tetris-cell.ghost {
+/* 幽灵方块 */
+.tetris-cell-ghost {
+  width: 28px;
+  height: 28px;
   background: transparent;
   border: 2px dashed currentColor;
   opacity: 0.4;
   box-sizing: border-box;
+  border-radius: 2px;
+}
+
+/* 已锁定方块 */
+.tetris-cell-locked {
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 当前方块 */
+.tetris-cell-current {
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  box-shadow: 0 0 15px currentColor, inset 0 0 10px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  animation: cell-pulse 0.5s ease-in-out infinite;
 }
 
 @keyframes cell-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+  50% { opacity: 0.85; }
 }
 
 /* 粒子效果层 */
@@ -117,126 +450,6 @@
   box-shadow: 0 0 10px currentColor;
 }
 
-/* 侧边栏 */
-.tetris-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  min-width: 180px;
-}
-
-/* 统计面板 */
-.tetris-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.stat-box {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,149,0,0.2);
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.stat-label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  letter-spacing: 0.1em;
-}
-
-.stat-value {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--amber);
-  text-shadow: 0 0 10px rgba(255,149,0,0.5);
-}
-
-.stat-value.high {
-  color: var(--cyan);
-  text-shadow: 0 0 10px rgba(6,182,255,0.5);
-}
-
-/* 下一个方块 */
-.next-piece-box {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(6,182,212,0.2);
-  border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
-}
-
-.next-piece-box h3 {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  color: var(--cyan);
-  margin-bottom: 1rem;
-}
-
-.next-piece-display {
-  display: inline-block;
-  background: rgba(0,0,0,0.3);
-  padding: 0.5rem;
-  border-radius: 4px;
-}
-
-.next-row {
-  display: flex;
-  gap: 1px;
-}
-
-.next-cell {
-  width: 20px;
-  height: 20px;
-  border-radius: 2px;
-}
-
-/* 控制按钮 */
-.tetris-controls {
-  display: flex;
-  gap: 1rem;
-}
-
-.start-btn, .pause-btn {
-  flex: 1;
-  padding: 1rem;
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.start-btn {
-  background: linear-gradient(135deg, rgba(255,149,0,0.4) 0%, rgba(255,149,0,0.2) 100%);
-  color: #fff;
-  border: 1px solid rgba(255,149,0,0.6);
-}
-
-.start-btn:hover {
-  background: linear-gradient(135deg, rgba(255,149,0,0.6) 0%, rgba(255,149,0,0.3) 100%);
-  box-shadow: 0 0 30px rgba(255,149,0,0.6);
-}
-
-.pause-btn {
-  background: rgba(6,182,212,0.2);
-  color: var(--cyan);
-  border: 1px solid var(--cyan);
-}
-
-.pause-btn:hover {
-  background: rgba(6,182,212,0.3);
-  box-shadow: 0 0 20px rgba(6,182,212,0.4);
-}
-
 /* 游戏遮罩 */
 .game-overlay {
   position: absolute;
@@ -244,56 +457,82 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 30;
   backdrop-filter: blur(4px);
+  border-radius: 8px;
 }
 
 .overlay-content {
   text-align: center;
   padding: 2rem;
-  background: rgba(255,255,255,0.05);
-  border: 2px solid rgba(255,149,0,0.4);
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 149, 0, 0.4);
   border-radius: 12px;
   backdrop-filter: blur(10px);
+  max-width: 400px;
 }
 
-.overlay-content h2 {
+.overlay-content svg {
+  margin-bottom: 1rem;
+}
+
+.result-title {
   font-family: var(--font-display);
   font-size: 2rem;
-  color: var(--amber);
-  margin-bottom: 1rem;
-  text-shadow: 0 0 20px rgba(255,149,0,0.6);
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 20px currentColor;
 }
 
-.final-score,
-.best-score {
+.result-title.lose {
+  color: var(--red);
+}
+
+.result-title.paused {
+  color: var(--cyan);
+}
+
+.score-board {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.score-item .label {
   font-family: var(--font-mono);
-  font-size: 1.5rem;
-  color: var(--text);
-  margin-bottom: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-.final-score strong,
-.best-score strong {
+.score-item .value {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--amber);
-  font-size: 1.8rem;
 }
 
 .new-record {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: #fbbf24;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
   animation: pulse 1s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
 }
 
 .hint {
@@ -303,126 +542,156 @@
   margin-top: 0.5rem;
 }
 
-.start-hint {
-  text-align: center;
-  padding: 1rem;
-  background: rgba(255,149,0,0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(255,149,0,0.3);
-}
-
-.start-hint p {
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: var(--amber);
-  margin: 0;
-}
-
-/* 操作说明 */
-.tetris-instructions {
-  margin-top: 2rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(6,182,212,0.2);
-  border-radius: 8px;
-  padding: 1.5rem;
-  animation: slide-up 0.6s ease-out;
-}
-
-.tetris-instructions h3 {
+.start-btn {
+  padding: 1rem 2rem;
   font-family: var(--font-display);
-  font-size: 1.2rem;
-  color: var(--cyan);
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.controls-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.75rem;
-}
-
-.control-item {
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.key {
-  background: rgba(255,149,0,0.15);
-  border: 1px solid rgba(255,149,0,0.4);
-  border-radius: 4px;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8rem;
-  color: var(--amber);
+  font-size: 1.1rem;
   font-weight: 700;
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.4) 0%, rgba(255, 149, 0, 0.2) 100%);
+  color: #fff;
+  border: 1px solid rgba(255, 149, 0, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-/* 游戏技巧 */
-.tips-section {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(6,182,212,0.2);
+.start-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.6) 0%, rgba(255, 149, 0, 0.3) 100%);
+  box-shadow: 0 0 30px rgba(255, 149, 0, 0.6);
 }
 
-.tips-section h4 {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  color: var(--cyan);
+/* 右侧边栏 */
+.news-sidebar-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.wave-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.wave-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.1em;
   margin-bottom: 0.75rem;
 }
 
-.tips-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.wave-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 40px;
 }
 
-.tips-list li {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  padding: 0.5rem 0;
-  padding-left: 1.5rem;
+.wave-bar {
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to top, var(--cyan), var(--purple));
+  border-radius: 2px;
+  animation: wave 1s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(1) { animation-delay: 0s; }
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; }
+.wave-bar:nth-child(6) { animation-delay: 0.5s; }
+.wave-bar:nth-child(7) { animation-delay: 0.6s; }
+.wave-bar:nth-child(8) { animation-delay: 0.7s; }
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1.2); }
+}
+
+.deco-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 149, 0, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
   position: relative;
 }
 
-.tips-list li::before {
-  content: '▸';
-  position: absolute;
-  left: 0;
+.deco-circle {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 0.5rem;
+  border: 2px solid rgba(255, 149, 0, 0.4);
+  border-radius: 50%;
+  animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.deco-text {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   color: var(--amber);
+  letter-spacing: 0.2em;
+}
+
+/* 报尾 */
+.newspaper-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  margin-top: 2rem;
+  border-top: 1px solid rgba(6, 182, 212, 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
 }
 
 /* 响应式设计 */
-@media (max-width: 768px) {
-  .tetris-wrapper {
-    flex-direction: column;
-    align-items: center;
+@media (max-width: 1024px) {
+  .newspaper-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
-  .tetris-sidebar {
-    width: 100%;
-    max-width: 300px;
-    flex-direction: row;
-    flex-wrap: wrap;
+  .news-sidebar-left,
+  .news-sidebar-right {
+    display: none;
+  }
+
+  .news-game-area-tetris {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .tetris-newspaper {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .newspaper-header {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .header-date,
+  .header-status {
     justify-content: center;
   }
 
-  .tetris-stats {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .stat-box {
-    min-width: 80px;
-    padding: 0.75rem;
-  }
-
-  .next-piece-box {
-    order: -1;
+  .game-canvas-tetris {
+    padding: 0.5rem;
   }
 }

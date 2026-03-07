@@ -6,7 +6,7 @@ import '../styles/Tetris.css'
 // 游戏常量
 const BOARD_WIDTH = 10
 const BOARD_HEIGHT = 20
-const CELL_SIZE = 30
+const CELL_SIZE = 28
 
 // 方块形状
 const TETROMINOES = {
@@ -38,6 +38,7 @@ export default function Tetris() {
   const [highScore, setHighScore] = useState(0)
   const [particleEffects, setParticleEffects] = useState([])
   const [ghostPosition, setGhostPosition] = useState({ x: 0, y: 0 })
+  const [rotatedShapes, setRotatedShapes] = useState({})
   const gameLoopRef = useRef(null)
 
   // 加载最佳记录
@@ -57,7 +58,9 @@ export default function Tetris() {
   }, [score, highScore])
 
   // 初始化游戏板
-  const createBoard = () => Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill(0))
+  const createBoard = useCallback(() => 
+    Array.from({ length: BOARD_HEIGHT }, () => Array(BOARD_WIDTH).fill(0)), 
+  [])
 
   // 创建粒子效果
   const createParticles = useCallback((y, color) => {
@@ -79,10 +82,11 @@ export default function Tetris() {
   }, [])
 
   // 开始游戏
-  const startGame = () => {
-    setBoard(createBoard())
+  const startGame = useCallback(() => {
+    const newBoard = createBoard()
     const first = randomTetromino()
     const second = randomTetromino()
+    setBoard(newBoard)
     setCurrentPiece(first)
     setNextPiece(second)
     setPosition({ x: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES[first].shape[0].length / 2), y: 0 })
@@ -93,14 +97,15 @@ export default function Tetris() {
     setIsPaused(false)
     setGameStarted(true)
     setParticleEffects([])
-  }
+    setRotatedShapes({})
+  }, [createBoard])
 
   // 检查碰撞
-  const checkCollision = useCallback((piece, pos, boardData) => {
-    const shape = TETROMINOES[piece].shape
-    for (let y = 0; y < shape.length; y++) {
-      for (let x = 0; x < shape[y].length; x++) {
-        if (shape[y][x]) {
+  const checkCollision = useCallback((piece, pos, boardData, shape) => {
+    const pieceShape = shape || TETROMINOES[piece].shape
+    for (let y = 0; y < pieceShape.length; y++) {
+      for (let x = 0; x < pieceShape[y].length; x++) {
+        if (pieceShape[y][x]) {
           const newX = pos.x + x
           const newY = pos.y + y
           if (newX < 0 || newX >= BOARD_WIDTH || newY >= BOARD_HEIGHT) return true
@@ -111,17 +116,10 @@ export default function Tetris() {
     return false
   }, [])
 
-  // 旋转方块
-  const rotate = useCallback((piece) => {
-    const shape = TETROMINOES[piece].shape
-    const rotated = shape[0].map((_, i) => shape.map(row => row[i]).reverse())
-    return rotated
-  }, [])
-
   // 锁定方块
   const lockPiece = useCallback(() => {
     const newBoard = board.map(row => [...row])
-    const shape = TETROMINOES[currentPiece].shape
+    const shape = rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape
     const color = TETROMINOES[currentPiece].color
 
     for (let y = 0; y < shape.length; y++) {
@@ -156,7 +154,6 @@ export default function Tetris() {
         return newLines
       })
       
-      // 为每行消除创建粒子效果
       clearedLines.forEach(y => {
         createParticles(y, color)
       })
@@ -167,28 +164,33 @@ export default function Tetris() {
     // 生成新方块
     const newPiece = nextPiece
     const newNext = randomTetromino()
-    const newPos = { x: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES[newPiece].shape[0].length / 2), y: 0 }
+    const newPos = { 
+      x: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES[newPiece].shape[0].length / 2), 
+      y: 0 
+    }
 
-    if (checkCollision(newPiece, newPos, newBoard)) {
+    if (checkCollision(newPiece, newPos, newBoard, null)) {
       setGameOver(true)
       setGameStarted(false)
     } else {
       setCurrentPiece(newPiece)
       setNextPiece(newNext)
       setPosition(newPos)
+      setRotatedShapes({})
     }
-  }, [board, currentPiece, nextPiece, position, level, checkCollision, createParticles])
+  }, [board, currentPiece, nextPiece, position, level, checkCollision, createParticles, rotatedShapes])
 
   // 计算幽灵位置
   const calculateGhostPosition = useCallback(() => {
     if (!currentPiece || !gameStarted || gameOver || isPaused) return
     
+    const shape = rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape
     let ghostY = position.y
-    while (!checkCollision(currentPiece, { ...position, y: ghostY + 1 }, board)) {
+    while (!checkCollision(currentPiece, { ...position, y: ghostY + 1 }, board, shape)) {
       ghostY++
     }
     setGhostPosition({ x: position.x, y: ghostY })
-  }, [currentPiece, position, board, gameStarted, gameOver, isPaused, checkCollision])
+  }, [currentPiece, position, board, gameStarted, gameOver, isPaused, checkCollision, rotatedShapes])
 
   // 更新幽灵位置
   useEffect(() => {
@@ -199,75 +201,55 @@ export default function Tetris() {
   const moveDown = useCallback(() => {
     if (!gameStarted || gameOver || isPaused) return
 
+    const shape = rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape
     const newPos = { ...position, y: position.y + 1 }
-    if (checkCollision(currentPiece, newPos, board)) {
+    if (checkCollision(currentPiece, newPos, board, shape)) {
       lockPiece()
     } else {
       setPosition(newPos)
     }
-  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision, lockPiece])
+  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision, lockPiece, rotatedShapes])
 
   // 左右移动
   const move = useCallback((dir) => {
     if (!gameStarted || gameOver || isPaused) return
+    const shape = rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape
     const newPos = { ...position, x: position.x + dir }
-    if (!checkCollision(currentPiece, newPos, board)) {
+    if (!checkCollision(currentPiece, newPos, board, shape)) {
       setPosition(newPos)
     }
-  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision])
+  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision, rotatedShapes])
 
-  // 旋转（使用临时形状，不影响原始数据）
-  const [rotatedShapes, setRotatedShapes] = useState({})
-  
+  // 旋转
   const rotatePiece = useCallback(() => {
     if (!gameStarted || gameOver || isPaused) return
     
-    const currentShape = TETROMINOES[currentPiece].shape
+    const currentShape = rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape
     const rotated = currentShape[0].map((_, i) => currentShape.map(row => row[i]).reverse())
     
     // 墙踢测试
     const kicks = [0, -1, 1, -2, 2]
     for (const kick of kicks) {
       const testPos = { ...position, x: position.x + kick }
-      let canPlace = true
-      
-      // 检查旋转后的碰撞
-      for (let y = 0; y < rotated.length; y++) {
-        for (let x = 0; x < rotated[y].length; x++) {
-          if (rotated[y][x]) {
-            const newX = testPos.x + x
-            const newY = testPos.y + y
-            if (newX < 0 || newX >= BOARD_WIDTH || newY >= BOARD_HEIGHT) {
-              canPlace = false
-              break
-            }
-            if (newY >= 0 && board[newY][newX]) {
-              canPlace = false
-              break
-            }
-          }
-        }
-        if (!canPlace) break
-      }
-      
-      if (canPlace) {
+      if (!checkCollision(currentPiece, testPos, board, rotated)) {
         setRotatedShapes(prev => ({ ...prev, [currentPiece]: rotated }))
         setPosition(testPos)
         return
       }
     }
-  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision])
+  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision, rotatedShapes])
 
   // 快速下落
   const hardDrop = useCallback(() => {
     if (!gameStarted || gameOver || isPaused) return
+    const shape = rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape
     let newY = position.y
-    while (!checkCollision(currentPiece, { ...position, y: newY + 1 }, board)) {
+    while (!checkCollision(currentPiece, { ...position, y: newY + 1 }, board, shape)) {
       newY++
     }
     setPosition({ ...position, y: newY })
     setTimeout(lockPiece, 50)
-  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision, lockPiece])
+  }, [gameStarted, gameOver, isPaused, currentPiece, position, board, checkCollision, lockPiece, rotatedShapes])
 
   // 键盘控制
   useEffect(() => {
@@ -332,211 +314,111 @@ export default function Tetris() {
     }
   }, [particleEffects.length])
 
+  // 重置旋转状态当新方块生成时
+  useEffect(() => {
+    if (currentPiece && !gameStarted) {
+      setRotatedShapes({})
+    }
+  }, [currentPiece, gameStarted])
+
   return (
     <div className="tetris-page">
       <Header />
-      <div className="tetris-container">
-        <div className="tetris-header">
-          <h1 className="tetris-title">
-            <span className="title-icon">
-              <BlockIcon size={40} color="#fbbf24" />
+      
+      <div className="tape-bg"></div>
+      <div className="tape-grid"></div>
+      <div className="tape-scanlines"></div>
+
+      <div className="tetris-newspaper">
+        {/* 报头 */}
+        <div className="newspaper-header">
+          <div className="header-date">
+            <span className="date">{new Date().toLocaleDateString('zh-CN')}</span>
+            <span className="issue">VOL.2024.NO.12</span>
+          </div>
+          <div className="header-title">
+            <h1>
+              <span className="title-icon">
+                <BlockIcon size={40} color="#fbbf24" />
+              </span>
+              <span className="title-text">俄罗斯方块</span>
+            </h1>
+            <p className="subtitle">TETRIS · TAPE FUTURISM</p>
+          </div>
+          <div className="header-status">
+            <span className={`status-badge ${!gameStarted ? 'ready' : gameOver ? 'danger' : isPaused ? 'paused' : 'active'}`}>
+              {!gameStarted ? 'READY' : gameOver ? 'GAME OVER' : isPaused ? 'PAUSED' : 'PLAYING'}
             </span>
-            <span className="title-text">俄罗斯方块</span>
-          </h1>
-          <p className="tetris-subtitle">TETRIS - 经典益智游戏</p>
+          </div>
         </div>
 
-        <div className="tetris-wrapper">
-          <div className="tetris-board-container">
-            {/* 粒子效果层 */}
-            <div className="particle-layer">
-              {particleEffects.map(particle => (
-                <div
-                  key={particle.id}
-                  className="particle"
-                  style={{
-                    left: particle.x,
-                    top: particle.y,
-                    backgroundColor: particle.color,
-                    opacity: particle.life,
-                    transform: `scale(${particle.life})`
-                  }}
-                />
-              ))}
-            </div>
-
-            <div className="tetris-board" style={{ gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${CELL_SIZE}px)` }}>
-              {board.map((row, y) => row.map((cell, x) => (
-                <div key={`${y}-${x}`} className="tetris-cell" style={{ backgroundColor: cell || 'transparent' }} />
-              )))}
-              
-              {/* 幽灵方块 */}
-              {currentPiece && gameStarted && !gameOver && !isPaused && (
-                <>
-                  {(rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape).map((row, dy) => row.map((cell, dx) => {
-                    if (!cell) return null
-                    const x = ghostPosition.x + dx
-                    const y = ghostPosition.y + dy
-                    if (y < 0) return null
-                    return (
-                      <div 
-                        key={`ghost-${y}-${x}`} 
-                        className="tetris-cell ghost"
-                        style={{ 
-                          borderColor: TETROMINOES[currentPiece].color,
-                          gridRowStart: y + 1,
-                          gridColumnStart: x + 1
-                        }} 
-                      />
-                    )
-                  }))}
-                </>
-              )}
-              
-              {/* 当前方块 */}
-              {currentPiece && gameStarted && !gameOver && (
-                <>
-                  {(rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape).map((row, dy) => row.map((cell, dx) => {
-                    if (!cell) return null
-                    const x = position.x + dx
-                    const y = position.y + dy
-                    if (y < 0) return null
-                    return (
-                      <div 
-                        key={`piece-${y}-${x}`} 
-                        className="tetris-cell current" 
-                        style={{ 
-                          backgroundColor: TETROMINOES[currentPiece].color,
-                          gridRowStart: y + 1,
-                          gridColumnStart: x + 1
-                        }} 
-                      />
-                    )
-                  }))}
-                </>
-              )}
-            </div>
-
-            {(gameOver || isPaused) && gameStarted && (
-              <div className={`game-overlay ${gameOver ? 'gameover' : 'paused'}`}>
-                <div className="overlay-content">
-                  {gameOver ? (
-                    <>
-                      <h2>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="15" y1="9" x2="9" y2="15" />
-                          <line x1="9" y1="9" x2="15" y2="15" />
-                        </svg>
-                        游戏结束
-                      </h2>
-                      <p className="final-score">得分：<strong>{score}</strong></p>
-                      <p className="best-score">最佳：<strong>{highScore}</strong></p>
-                      {score >= highScore && score > 0 && (
-                        <p className="new-record">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-                            <path d="M4 22h16" />
-                            <path d="M10 14.66V18c0 .55-.47.98-.97 1.21C7.85 19.75 5.97 21 3 21" />
-                            <path d="M14 14.66V18c0 .55.47.98.97 1.21C16.15 19.75 18.03 21 21 21" />
-                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
-                          </svg>
-                          新纪录！
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <h2>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                          <rect x="6" y="4" width="4" height="16" />
-                          <rect x="14" y="4" width="4" height="16" />
-                        </svg>
-                        游戏暂停
-                      </h2>
-                      <p className="hint">按 ESC 或 P 继续</p>
-                    </>
-                  )}
-                  {gameOver && (
-                    <button className="start-btn" onClick={startGame}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                        <polyline points="23 4 23 10 17 10" />
-                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                      </svg>
-                      再玩一次
-                    </button>
-                  )}
-                </div>
+        {/* 主内容区 */}
+        <div className="newspaper-content">
+          {/* 左侧边栏 */}
+          <aside className="news-sidebar-left">
+            {/* 游戏信息 */}
+            <div className="info-boxes">
+              <div className="info-box">
+                <span className="info-label">SCORE</span>
+                <span className="info-value highlight">{score}</span>
               </div>
-            )}
-          </div>
-
-          <div className="tetris-sidebar">
-            <div className="tetris-stats">
-              <div className="stat-box">
-                <span className="stat-label">分数</span>
-                <span className="stat-value">{score}</span>
+              <div className="info-box">
+                <span className="info-label">BEST</span>
+                <span className="info-value best">{highScore}</span>
               </div>
-              <div className="stat-box">
-                <span className="stat-label">最佳</span>
-                <span className="stat-value high">{highScore}</span>
+              <div className="info-box">
+                <span className="info-label">LEVEL</span>
+                <span className="info-value">{level}</span>
               </div>
-              <div className="stat-box">
-                <span className="stat-label">等级</span>
-                <span className="stat-value">{level}</span>
-              </div>
-              <div className="stat-box">
-                <span className="stat-label">消除行</span>
-                <span className="stat-value">{lines}</span>
+              <div className="info-box">
+                <span className="info-label">LINES</span>
+                <span className="info-value">{lines}</span>
               </div>
             </div>
 
+            {/* 下一个方块 */}
             <div className="next-piece-box">
-              <h3>下一个</h3>
+              <span className="box-label">NEXT</span>
               <div className="next-piece-display">
                 {nextPiece && TETROMINOES[nextPiece].shape.map((row, y) => (
                   <div key={y} className="next-row">
                     {row.map((cell, x) => (
-                      <div key={x} className="next-cell" style={{ backgroundColor: cell ? TETROMINOES[nextPiece].color : 'transparent' }} />
+                      <div 
+                        key={x} 
+                        className="next-cell" 
+                        style={{ 
+                          backgroundColor: cell ? TETROMINOES[nextPiece].color : 'transparent',
+                          width: '20px',
+                          height: '20px'
+                        }} 
+                      />
                     ))}
                   </div>
                 ))}
               </div>
             </div>
 
+            {/* 控制按钮 */}
             <div className="tetris-controls">
               {!gameStarted || gameOver ? (
-                <button className="start-btn" onClick={startGame}>
-                  {gameOver ? (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                        <polyline points="23 4 23 10 17 10" />
-                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-                      </svg>
-                      再玩一次
-                    </>
-                  ) : (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                        <polygon points="5 3 19 12 5 21 5 3" />
-                      </svg>
-                      开始游戏
-                    </>
-                  )}
+                <button className="start-btn-newspaper" onClick={startGame}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="5 3 19 12 5 21 5 3" />
+                  </svg>
+                  {gameOver ? '再玩一次' : '开始游戏'}
                 </button>
               ) : (
-                <button className="pause-btn" onClick={() => setIsPaused(p => !p)}>
+                <button className="pause-btn-newspaper" onClick={() => setIsPaused(p => !p)}>
                   {isPaused ? (
                     <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <polygon points="5 3 19 12 5 21 5 3" />
                       </svg>
                       继续
                     </>
                   ) : (
                     <>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <rect x="6" y="4" width="4" height="16" />
                         <rect x="14" y="4" width="4" height="16" />
                       </svg>
@@ -547,38 +429,215 @@ export default function Tetris() {
               )}
             </div>
 
-            {!gameStarted && (
-              <div className="start-hint">
-                <p>按空格键开始游戏</p>
+            {/* 操作说明 */}
+            <div className="controls-mini">
+              <div className="controls-mini-header">CONTROLS</div>
+              <div className="control-item">
+                <span className="control-text">← → 左右移动</span>
               </div>
-            )}
-          </div>
+              <div className="control-item">
+                <span className="control-text">↑ 旋转</span>
+              </div>
+              <div className="control-item">
+                <span className="control-text">↓ 加速下落</span>
+              </div>
+              <div className="control-item">
+                <span className="control-text">空格 直接掉落</span>
+              </div>
+              <div className="control-item">
+                <span className="control-text">P 暂停/继续</span>
+              </div>
+            </div>
+          </aside>
+
+          {/* 中央游戏区 */}
+          <main className="news-game-area-tetris">
+            <div className="game-canvas-tetris">
+              {/* 背景网格 */}
+              <div className="bg-grid-tetris"></div>
+              
+              {/* 游戏板 */}
+              <div className="tetris-board-container">
+                {/* 粒子效果层 */}
+                <div className="particle-layer">
+                  {particleEffects.map(particle => (
+                    <div
+                      key={particle.id}
+                      className="particle"
+                      style={{
+                        left: particle.x,
+                        top: particle.y,
+                        backgroundColor: particle.color,
+                        opacity: particle.life,
+                        transform: `scale(${particle.life})`
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <div 
+                  className="tetris-board" 
+                  style={{ 
+                    gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${CELL_SIZE}px)`,
+                    gridTemplateRows: `repeat(${BOARD_HEIGHT}, ${CELL_SIZE}px)`
+                  }}
+                >
+                  {/* 背景格子 */}
+                  {board.map((row, y) => row.map((cell, x) => (
+                    <div 
+                      key={`bg-${y}-${x}`} 
+                      className="tetris-cell-bg"
+                      style={{ 
+                        gridRowStart: y + 1,
+                        gridColumnStart: x + 1
+                      }} 
+                    />
+                  )))}
+                  
+                  {/* 幽灵方块 */}
+                  {currentPiece && gameStarted && !gameOver && !isPaused && (
+                    <>
+                      {(rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape).map((row, dy) => row.map((cell, dx) => {
+                        if (!cell) return null
+                        const x = ghostPosition.x + dx
+                        const y = ghostPosition.y + dy
+                        if (y < 0) return null
+                        return (
+                          <div 
+                            key={`ghost-${y}-${x}`} 
+                            className="tetris-cell-ghost"
+                            style={{ 
+                              borderColor: TETROMINOES[currentPiece].color,
+                              gridRowStart: y + 1,
+                              gridColumnStart: x + 1
+                            }} 
+                          />
+                        )
+                      }))}
+                    </>
+                  )}
+                  
+                  {/* 已锁定方块 */}
+                  {board.map((row, y) => row.map((cell, x) => {
+                    if (!cell) return null
+                    return (
+                      <div 
+                        key={`locked-${y}-${x}`} 
+                        className="tetris-cell-locked"
+                        style={{ 
+                          backgroundColor: cell,
+                          gridRowStart: y + 1,
+                          gridColumnStart: x + 1
+                        }} 
+                      />
+                    )
+                  }))}
+                  
+                  {/* 当前方块 */}
+                  {currentPiece && gameStarted && !gameOver && (
+                    <>
+                      {(rotatedShapes[currentPiece] || TETROMINOES[currentPiece].shape).map((row, dy) => row.map((cell, dx) => {
+                        if (!cell) return null
+                        const x = position.x + dx
+                        const y = position.y + dy
+                        if (y < 0) return null
+                        return (
+                          <div 
+                            key={`piece-${y}-${x}`} 
+                            className="tetris-cell-current" 
+                            style={{ 
+                              backgroundColor: TETROMINOES[currentPiece].color,
+                              gridRowStart: y + 1,
+                              gridColumnStart: x + 1
+                            }} 
+                          />
+                        )
+                      }))}
+                    </>
+                  )}
+                </div>
+
+                {/* 游戏结束/暂停遮罩 */}
+                {(gameOver || (isPaused && gameStarted)) && (
+                  <div className={`game-overlay ${gameOver ? 'gameover' : 'paused'}`}>
+                    <div className="overlay-content">
+                      {gameOver ? (
+                        <>
+                          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                          </svg>
+                          <h2 className="result-title lose">游戏结束</h2>
+                          <div className="score-board">
+                            <div className="score-item">
+                              <span className="label">得分</span>
+                              <span className="value">{score}</span>
+                            </div>
+                            <div className="score-item">
+                              <span className="label">最佳</span>
+                              <span className="value">{highScore}</span>
+                            </div>
+                            <div className="score-item">
+                              <span className="label">等级</span>
+                              <span className="value">{level}</span>
+                            </div>
+                          </div>
+                          {score >= highScore && score > 0 && (
+                            <div className="new-record">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                              </svg>
+                              <span>新纪录!</span>
+                            </div>
+                          )}
+                          <button className="start-btn" onClick={startGame}>再玩一次</button>
+                        </>
+                      ) : (
+                        <>
+                          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2">
+                            <rect x="6" y="4" width="4" height="16" />
+                            <rect x="14" y="4" width="4" height="16" />
+                          </svg>
+                          <h2 className="result-title paused">游戏暂停</h2>
+                          <p className="hint">按 ESC 或 P 继续</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </main>
+
+          {/* 右侧边栏 */}
+          <aside className="news-sidebar-right">
+            <div className="wave-box">
+              <span className="wave-label">SIGNAL</span>
+              <div className="wave-bars">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="wave-bar"></div>
+                ))}
+              </div>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">TAPE</span>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">FUTURE</span>
+            </div>
+          </aside>
         </div>
 
-        <div className="tetris-instructions">
-          <h3>操作说明</h3>
-          <div className="controls-grid">
-            <div className="control-item"><span className="key">←→</span> 左右移动</div>
-            <div className="control-item"><span className="key">↑</span> 旋转</div>
-            <div className="control-item"><span className="key">↓</span> 加速下落</div>
-            <div className="control-item"><span className="key">空格</span> 直接掉落</div>
-            <div className="control-item"><span className="key">P</span> 暂停/继续</div>
-          </div>
-          <div className="tips-section">
-            <h4>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
-                <path d="M9 18h6a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-1a2 2 0 0 1 2-2z" />
-                <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26C17.81 13.47 19 11.38 19 9a7 7 0 0 0-7-7z" />
-              </svg>
-              游戏技巧
-            </h4>
-            <ul className="tips-list">
-              <li>使用幽灵方块预览落点，提前规划位置</li>
-              <li>尽量保持表面平整，避免留下空洞</li>
-              <li>长条方块（I）适合消除多行</li>
-              <li>每消除 10 行升一级，速度会加快</li>
-            </ul>
-          </div>
+        {/* 报尾 */}
+        <div className="newspaper-footer">
+          <span>TETRIS © 2024</span>
+          <span>◆</span>
+          <span>TAPE FUTURISM</span>
+          <span>◆</span>
+          <span>CLASSIC PUZZLE</span>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { TangyuanIcon } from '../components/icons/SiteIcons'
+import { TangyuanIcon, BombIcon, BlockIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, CalculatorIcon, ClockIcon } from '../components/icons/SiteIcons'
 import '../styles/GamesCollection.css'
 
 /**
@@ -23,7 +23,7 @@ export default function GamesCollection() {
       title: '扫雷',
       subtitle: 'MINESWEEPER',
       description: '经典扫雷游戏，排除所有地雷',
-      icon: '💣',
+      icon: BombIcon,
       color: 'red',
       path: '/special/minesweeper',
       status: 'active'
@@ -33,7 +33,7 @@ export default function GamesCollection() {
       title: '俄罗斯方块',
       subtitle: 'TETRIS',
       description: '经典方块消除，挑战最高分',
-      icon: '🧱',
+      icon: BlockIcon,
       color: 'amber',
       path: '/special/tetris',
       status: 'active'
@@ -43,7 +43,7 @@ export default function GamesCollection() {
       title: '飞扬的小鸟',
       subtitle: 'FLAPPY BIRD',
       description: '穿越管道，飞翔挑战',
-      icon: '🐦',
+      icon: BirdIcon,
       color: 'cyan',
       path: '/special/flybird',
       status: 'active'
@@ -53,7 +53,7 @@ export default function GamesCollection() {
       title: '恐龙快跑',
       subtitle: 'DINO RUN',
       description: '躲避障碍，奔跑生存',
-      icon: '🦖',
+      icon: DinosaurIcon,
       color: 'green',
       path: '/special/dinosaur',
       status: 'active'
@@ -63,7 +63,7 @@ export default function GamesCollection() {
       title: '贪吃蛇',
       subtitle: 'SNAKE',
       description: '经典贪吃蛇，吃掉食物成长',
-      icon: '🐍',
+      icon: SnakeIcon,
       color: 'green',
       path: '/special/snake',
       status: 'active'
@@ -73,7 +73,7 @@ export default function GamesCollection() {
       title: '吃豆人',
       subtitle: 'PAC-MAN',
       description: '吃掉所有豆子，躲避幽灵',
-      icon: '👻',
+      icon: PacmanIcon,
       color: 'amber',
       path: '/special/pacman',
       status: 'active'
@@ -83,7 +83,7 @@ export default function GamesCollection() {
       title: '计算器',
       subtitle: 'CALCULATOR',
       description: '复古风格计算器',
-      icon: '🔢',
+      icon: CalculatorIcon,
       color: 'purple',
       path: '/special/calculator',
       status: 'active'
@@ -93,7 +93,7 @@ export default function GamesCollection() {
       title: '番茄钟',
       subtitle: 'POMODORO',
       description: '25 分钟工作法时间管理',
-      icon: '🍅',
+      icon: ClockIcon,
       color: 'red',
       path: '/special/pomodoro',
       status: 'active'
@@ -139,7 +139,7 @@ export default function GamesCollection() {
           >
             {/* 游戏图标 */}
             <div className="game-icon">
-              {game.icon}
+              <game.icon size={48} color="currentColor" />
             </div>
 
             {/* 游戏信息 */}

@@ -621,7 +621,7 @@ body :not(code):not(pre) {
 
 .timeline-item {
   position: relative;
-  width: calc(50% - 3rem);
+  width: calc(50% - 2rem);
   margin-bottom: 4rem;
   opacity: 0;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -654,9 +654,25 @@ body :not(code):not(pre) {
   transform: translateX(0) translateY(0);
 }
 
-.timeline-dot {
+/* 节点独立包装器 */
+.timeline-dot-wrapper {
   position: absolute;
   top: 1.6rem;
+  width: 48px;
+  height: 48px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.timeline-dot-wrapper.left {
+  right: calc(50% - 24px);
+}
+
+.timeline-dot-wrapper.right {
+  left: calc(50% - 24px);
+}
+
+.timeline-dot {
   width: 48px;
   height: 48px;
   background: rgba(10, 10, 15, 0.9);
@@ -666,20 +682,10 @@ body :not(code):not(pre) {
   align-items: center;
   justify-content: center;
   box-shadow: 0 0 25px rgba(255, 149, 0, 0.6), inset 0 0 15px rgba(255, 149, 0, 0.1);
-  z-index: 20;
   transition: all 0.3s ease;
-  pointer-events: none;
 }
 
-.timeline-item.left .timeline-dot {
-  right: -24px;
-}
-
-.timeline-item.right .timeline-dot {
-  left: -24px;
-}
-
-.timeline-item:hover .timeline-dot {
+.timeline-dot-wrapper:hover .timeline-dot {
   border-color: #ff9500;
   box-shadow: 0 0 35px rgba(255, 149, 0, 0.8), inset 0 0 20px rgba(255, 149, 0, 0.2);
   transform: scale(1.15);

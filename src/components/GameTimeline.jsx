@@ -220,7 +220,19 @@ export default function GameTimeline() {
                   </div>
                 )}
               </div>
+            </div>
+          )
+        })}
 
+        {/* 节点独立出来，不参与卡片布局 */}
+        {sortedGames.map((game, index) => {
+          const isLeft = index % 2 === 0
+          return (
+            <div
+              key={`dot-${game.id}`}
+              className={`timeline-dot-wrapper ${isLeft ? 'left' : 'right'}`}
+              data-dot-for={game.id}
+            >
               <div className="timeline-dot">
                 {renderVectorIcon(game.iconType)}
               </div>

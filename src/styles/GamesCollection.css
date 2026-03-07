@@ -1,10 +1,12 @@
 /* 小游戏集锦页面 */
 .games-collection-page {
   min-height: 100vh;
+  background: #050508;
   background: var(--bg-deep);
   position: relative;
   overflow: hidden;
   padding-top: 80px;
+  color: #d4d4d8;
 }
 
 /* 背景装饰 */
@@ -66,6 +68,7 @@
 
 .collection-title {
   font-size: 2.5rem;
+  color: #d4d4d8;
   color: var(--text-primary);
   margin: 0 0 0.5rem;
   text-shadow: 0 0 20px rgba(255, 149, 0, 0.3);
@@ -73,7 +76,9 @@
 
 .collection-subtitle {
   font-size: 1rem;
+  font-family: 'Courier New', monospace;
   font-family: var(--font-mono);
+  color: #a1a1aa;
   color: var(--text-secondary);
   margin: 0;
   letter-spacing: 0.15em;
@@ -98,7 +103,9 @@
 
 .game-card {
   position: relative;
+  background: #0a0a0f;
   background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 2rem;
@@ -152,13 +159,16 @@
 
 .game-title {
   font-size: 1.5rem;
+  color: #d4d4d8;
   color: var(--text-primary);
   margin: 0 0 0.5rem;
 }
 
 .game-subtitle {
   font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
   font-family: var(--font-mono);
+  color: #a1a1aa;
   color: var(--text-secondary);
   margin: 0 0 0.75rem;
   letter-spacing: 0.1em;
@@ -166,6 +176,7 @@
 
 .game-desc {
   font-size: 0.875rem;
+  color: #71717a;
   color: var(--text-dim);
   margin: 0;
   line-height: 1.5;
@@ -262,6 +273,7 @@
 .collection-footer {
   text-align: center;
   padding: 3rem 2rem;
+  color: #a1a1aa;
   color: var(--text-secondary);
 }
 

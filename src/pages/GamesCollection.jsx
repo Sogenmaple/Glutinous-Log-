@@ -121,8 +121,8 @@ export default function GamesCollection() {
         <div className="header-icon">
           <TangyuanIcon size={60} color="#ff9500" />
         </div>
-        <h1 className="collection-title">小游戏集锦</h1>
-        <p className="collection-subtitle">GAMES COLLECTION // 休闲游戏集合</p>
+        <h1 className="collection-title">小游戏</h1>
+        <p className="collection-subtitle">GAMES // 休闲游戏集合</p>
         <div className="collection-divider"></div>
       </div>
 

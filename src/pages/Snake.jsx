@@ -52,9 +52,11 @@ export default function Snake() {
     setSnake(initialSnake)
     setFood(generateFood(initialSnake))
     setDirection(DIRECTION.RIGHT)
+    directionRef.current = DIRECTION.RIGHT
     setScore(0)
     setSpeed(INITIAL_SPEED)
     setGameState('playing')
+    canChangeDirection.current = true
   }
 
   const gameOver = useCallback(() => {
@@ -92,11 +94,11 @@ export default function Snake() {
         setScore(s => s + 10)
         setFood(generateFood(newSnake))
         setSpeed(s => Math.max(MIN_SPEED, s - SPEED_DECREMENT))
-        canChangeDirection.current = true
       } else {
         newSnake.pop()
       }
 
+      canChangeDirection.current = true
       return newSnake
     })
   }, [food, generateFood, gameOver])
@@ -120,8 +122,6 @@ export default function Snake() {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (!canChangeDirection.current) return
-
       const keyMap = {
         ArrowUp: DIRECTION.UP,
         ArrowDown: DIRECTION.DOWN,
@@ -137,6 +137,9 @@ export default function Snake() {
       if (!newDir) return
 
       e.preventDefault()
+      
+      if (!canChangeDirection.current) return
+      
       const current = directionRef.current
       if (newDir.x !== -current.x && newDir.y !== -current.y) {
         setDirection(newDir)

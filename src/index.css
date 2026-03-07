@@ -575,7 +575,7 @@ body :not(code):not(pre) {
 
 .timeline-container {
   position: relative;
-  padding: 3rem 0;
+  padding: 0;
 }
 
 .timeline-line {

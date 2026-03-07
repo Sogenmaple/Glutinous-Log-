@@ -153,100 +153,162 @@ export default function GamesCollection() {
       <div className="newspaper-bg"></div>
       <div className="newspaper-grid"></div>
 
-      {/* 报头 */}
-      <header className="newspaper-header">
-        <div className="header-top">
-          <span className="header-date">{new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-          <span className="header-issue">ISSUE NO.2024</span>
-        </div>
-        
-        <div className="header-main">
-          <TangyuanIcon size={80} color="#ff9500" />
-          <h1 className="header-title">游戏宇宙</h1>
-          <p className="header-subtitle">GAMES UNIVERSE // 汤圆游戏作品集</p>
-        </div>
-        
-        <div className="header-divider"></div>
-      </header>
+      {/* 主布局 - 非对称分区 */}
+      <div className="cyber-layout">
+        {/* 左侧边栏 - 导航区 */}
+        <aside className="sidebar-left">
+          <div className="sidebar-section">
+            <TangyuanIcon size={60} color="#ff9500" />
+            <h2 className="sidebar-title">CYBER<br/>GAMES</h2>
+            <div className="sidebar-divider"></div>
+            <div className="sidebar-stats">
+              <div className="stat-item">
+                <span className="stat-value">09</span>
+                <span className="stat-label">PROJECTS</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">06</span>
+                <span className="stat-label">RELEASED</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">03</span>
+                <span className="stat-label">DEVELOPING</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="sidebar-section">
+            <div className="date-display">
+              <span className="date-year">{new Date().getFullYear()}</span>
+              <span className="date-month">{new Date().toLocaleDateString('zh-CN', { month: 'long' })}</span>
+              <span className="date-day">{new Date().getDate()}</span>
+            </div>
+          </div>
+        </aside>
 
-      {/* 主要内容区 - 报纸分栏 */}
-      <main className="newspaper-content">
-        {/* 游戏网格 - 报纸分栏布局 */}
-        <div className="games-columns">
-          {games.map((game, index) => {
-            const IconComponent = game.icon
-            return (
-              <article
-                key={game.id}
-                className={`game-article ${game.color} ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
-                style={{ animationDelay: `${index * 0.06}s` }}
-                onMouseEnter={() => setHoveredGame(game.id)}
-                onMouseLeave={() => setHoveredGame(null)}
-                onClick={() => navigate(game.path)}
-              >
-                {/* 文章头部 */}
-                <div className="article-header">
-                  <span className="article-date">{game.date}</span>
-                  <div className="article-icon">
-                    <IconComponent size={36} color="currentColor" />
-                  </div>
-                </div>
+        {/* 中央主内容区 */}
+        <main className="main-content">
+          {/* 顶部通栏标题 */}
+          <header className="content-header">
+            <div className="header-line"></div>
+            <h1 className="main-title">
+              <span className="title-cn">游戏宇宙</span>
+              <span className="title-en">GAMES UNIVERSE</span>
+            </h1>
+            <p className="main-subtitle">独立游戏作品集 · 创意与技术的结晶</p>
+            <div className="header-line bottom"></div>
+          </header>
 
-                {/* 分隔线 */}
-                <div className="article-divider"></div>
-
-                {/* 文章内容 */}
-                <div className="article-content">
-                  <h3 className="article-title">{game.title}</h3>
-                  <p className="article-subtitle">{game.subtitle}</p>
-                  <p className="article-text">{game.description}</p>
-                  
-                  {/* 标签 */}
-                  {game.tags && game.tags.length > 0 && (
-                    <div className="article-tags">
-                      {game.tags.map(tag => (
-                        <span key={tag} className="article-tag">{tag}</span>
-                      ))}
+          {/* 游戏网格 - 非对称布局 */}
+          <div className="games-grid-asymmetric">
+            {games.map((game, index) => {
+              const IconComponent = game.icon
+              const isWide = index === 0 || index === 3 || index === 6
+              return (
+                <article
+                  key={game.id}
+                  className={`game-card ${game.color} ${isWide ? 'wide' : ''} ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                  onMouseEnter={() => setHoveredGame(game.id)}
+                  onMouseLeave={() => setHoveredGame(null)}
+                  onClick={() => navigate(game.path)}
+                >
+                  {/* 卡片头部 */}
+                  <div className="card-header">
+                    <span className="card-id">#{String(game.id).padStart(2, '0')}</span>
+                    <div className="card-icon-wrapper">
+                      <IconComponent size={32} color="currentColor" />
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {/* 文章底部 */}
-                <div className="article-footer">
-                  {game.links && game.links.gmhub && (
-                    <a href={game.links.gmhub} target="_blank" rel="noopener noreferrer" className="article-link" onClick={(e) => e.stopPropagation()}>
-                      GMHUB ↗
-                    </a>
-                  )}
-                  {game.links && game.links.bilibili && (
-                    <a href={game.links.bilibili} target="_blank" rel="noopener noreferrer" className="article-link" onClick={(e) => e.stopPropagation()}>
-                      BILI ↗
-                    </a>
-                  )}
-                  {game.links && game.links.taptap && (
-                    <a href={game.links.taptap} target="_blank" rel="noopener noreferrer" className="article-link" onClick={(e) => e.stopPropagation()}>
-                      TAPTAP ↗
-                    </a>
-                  )}
-                  <span className="read-more">VIEW →</span>
-                </div>
+                  {/* 分隔线 */}
+                  <div className="card-divider"></div>
 
-                {/* 装饰元素 */}
-                <div className="article-corner tl"></div>
-                <div className="article-corner tr"></div>
-              </article>
-            )
-          })}
-        </div>
-      </main>
+                  {/* 卡片内容 */}
+                  <div className="card-body">
+                    <h3 className="card-title-cn">{game.title}</h3>
+                    <p className="card-title-en">{game.subtitle}</p>
+                    <p className="card-desc">{game.description}</p>
+                    
+                    {/* 标签组 */}
+                    {game.tags && game.tags.length > 0 && (
+                      <div className="card-tags">
+                        {game.tags.map(tag => (
+                          <span key={tag} className="card-tag">{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
 
-      {/* 底部 */}
-      <footer className="newspaper-footer">
-        <div className="footer-divider"></div>
+                  {/* 卡片底部 */}
+                  <div className="card-footer">
+                    <span className="card-date">{game.date}</span>
+                    <div className="card-links">
+                      {game.links && game.links.gmhub && (
+                        <a href={game.links.gmhub} target="_blank" rel="noopener noreferrer" className="card-link" onClick={(e) => e.stopPropagation()}>G</a>
+                      )}
+                      {game.links && game.links.bilibili && (
+                        <a href={game.links.bilibili} target="_blank" rel="noopener noreferrer" className="card-link" onClick={(e) => e.stopPropagation()}>B</a>
+                      )}
+                      {game.links && game.links.taptap && (
+                        <a href={game.links.taptap} target="_blank" rel="noopener noreferrer" className="card-link" onClick={(e) => e.stopPropagation()}>T</a>
+                      )}
+                    </div>
+                    <span className="card-arrow">→</span>
+                  </div>
+
+                  {/* 角落装饰 */}
+                  <div className="corner-decor tl"></div>
+                  <div className="corner-decor tr"></div>
+                  <div className="corner-decor bl"></div>
+                  <div className="corner-decor br"></div>
+                </article>
+              )
+            })}
+          </div>
+        </main>
+
+        {/* 右侧信息栏 */}
+        <aside className="sidebar-right">
+          <div className="info-panel">
+            <div className="panel-header">
+              <span className="panel-title">SYSTEM INFO</span>
+            </div>
+            <div className="panel-content">
+              <div className="info-row">
+                <span className="info-label">ENGINE</span>
+                <span className="info-value">Unity</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">JAMS</span>
+                <span className="info-value">CiGA / GGJ / 聚光灯</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">STATUS</span>
+                <span className="info-value active">ONLINE</span>
+              </div>
+            </div>
+            <div className="panel-footer">
+              <div className="wave-visualizer">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="wave-bar" style={{ animationDelay: `${i * 0.1}s` }}></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      {/* 底部通栏 */}
+      <footer className="cyber-footer">
+        <div className="footer-grid"></div>
         <div className="footer-content">
-          <GameIcon size={32} color="#ff9500" />
-          <p>汤圆游戏作品集 · 独立游戏开发</p>
-          <p className="footer-tagline">CREATED WITH PASSION</p>
+          <GameIcon size={40} color="#ff9500" />
+          <div className="footer-text">
+            <p>汤圆游戏作品集</p>
+            <p className="footer-en">TANGYUAN'S GAME UNIVERSE</p>
+          </div>
+          <div className="footer-decor"></div>
         </div>
       </footer>
     </div>

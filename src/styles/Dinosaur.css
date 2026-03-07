@@ -314,8 +314,8 @@
 
 .dino {
   position: absolute;
-  width: 50px;
-  height: 45px;
+  width: 60px;
+  height: 50px;
   z-index: 10;
   transition: none;
 }
@@ -327,16 +327,16 @@
 
 .leg-left,
 .leg-right {
-  animation: dino-run 0.08s ease-in-out infinite alternate;
+  animation: dino-run 0.1s ease-in-out infinite alternate;
 }
 
 .leg-right {
-  animation-delay: 0.04s;
+  animation-delay: 0.05s;
 }
 
 @keyframes dino-run {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-3px); }
+  0% { transform: translateY(0) rotate(-5deg); }
+  100% { transform: translateY(-4px) rotate(5deg); }
 }
 
 .obstacle {
@@ -350,8 +350,8 @@
 }
 
 .cactus svg {
-  width: 18px;
-  height: 30px;
+  width: 30px;
+  height: 45px;
 }
 
 .ground {

@@ -221,20 +221,20 @@ export default function Dinosaur() {
     if (!gameStarted || gameOver || isPaused) return
 
     const groundY = canvasHeightRef.current - GROUND_HEIGHT
-    const dinoWidth = 35
+    const dinoWidth = 50
     const dinoHeight = 40
-    const dinoLeft = DINO_X + 10
-    const dinoRight = DINO_X + dinoWidth - 10
-    const dinoTop = groundY + dinoY - dinoHeight + 10
-    const dinoBottom = groundY + dinoY - 10
+    const dinoLeft = DINO_X + 8
+    const dinoRight = DINO_X + dinoWidth - 8
+    const dinoTop = groundY + dinoY - dinoHeight + 8
+    const dinoBottom = groundY + dinoY - 8
 
     for (const obs of obstacles) {
-      const obsWidth = 18
-      const obsHeight = 30
-      const obsLeft = obs.x + 4
-      const obsRight = obs.x + obsWidth - 4
-      const obsTop = groundY - obsHeight + 4
-      const obsBottom = groundY - 4
+      const obsWidth = 25
+      const obsHeight = 40
+      const obsLeft = obs.x + 3
+      const obsRight = obs.x + obsWidth - 3
+      const obsTop = groundY - obsHeight + 3
+      const obsBottom = groundY - 3
 
       if (dinoRight > obsLeft && 
           dinoLeft < obsRight && 
@@ -341,46 +341,51 @@ export default function Dinosaur() {
                 className="dino"
                 style={{ bottom: GROUND_HEIGHT + dinoY, left: DINO_X }}
               >
-                <svg viewBox="0 0 50 45" fill="none" stroke="#fff" strokeWidth="2">
-                  <ellipse cx="25" cy="30" rx="18" ry="12"/>
-                  <circle cx="38" cy="20" r="8"/>
-                  <path d="M44 18l6-2"/>
-                  <path d="M44 20l6 0"/>
-                  <circle cx="40" cy="18" r="2" fill="#fff"/>
-                  <path d="M20 40l-3 5" className="leg-left"/>
-                  <path d="M30 40l3 5" className="leg-right"/>
-                  <path d="M8 32l-8 3"/>
-                  <path d="M25 18l0-8"/>
+                <svg viewBox="0 0 60 50" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  {/* 身体 */}
+                  <ellipse cx="30" cy="32" rx="20" ry="14"/>
+                  {/* 脖子 */}
+                  <path d="M45 28l12-8"/>
+                  {/* 头 */}
+                  <circle cx="52" cy="18" r="9"/>
+                  {/* 嘴巴 */}
+                  <path d="M58 16l4-2"/>
+                  <path d="M58 20l4 0"/>
+                  {/* 眼睛 */}
+                  <circle cx="54" cy="16" r="2" fill="#fff"/>
+                  {/* 背刺 */}
+                  <path d="M25 20l-3-8"/>
+                  <path d="M30 19l-2-7"/>
+                  <path d="M35 20l-1-6"/>
+                  {/* 腿 */}
+                  <path d="M22 44l-4 6" className="leg-left"/>
+                  <path d="M38 44l4 6" className="leg-right"/>
+                  {/* 尾巴 */}
+                  <path d="M12 34l-10-3"/>
+                  <path d="M12 38l-8 2"/>
                 </svg>
               </div>
 
-              {/* 障碍物 */}
+              {/* 障碍物 - 仙人掌 */}
               {obstacles.map((obs, index) => (
                 <div 
                   key={index}
-                  className={`obstacle ${obs.type}`}
+                  className="obstacle cactus"
                   style={{ 
                     left: obs.x, 
-                    bottom: obs.type === 'bird' ? GROUND_HEIGHT + 65 + obs.y : GROUND_HEIGHT + obs.y
+                    bottom: GROUND_HEIGHT
                   }}
                 >
-                  {obs.type === 'bird' ? (
-                    <svg viewBox="0 0 35 20" fill="none" stroke="#fff" strokeWidth="2">
-                      <ellipse cx="18" cy="10" rx="12" ry="6"/>
-                      <path d="M30 8l5-2"/>
-                      <path d="M30 12l5 0"/>
-                      <circle cx="32" cy="9" r="1.5" fill="#fff"/>
-                      <path d="M10 8q-3-5-8-6" className="wing"/>
-                    </svg>
-                  ) : (
-                    <svg viewBox="0 0 25 35" fill="none" stroke="#fff" strokeWidth="2">
-                      <path d="M12 35l0-25"/>
-                      <path d="M12 20l-8-5"/>
-                      <path d="M12 25l8-4"/>
-                      <path d="M12 15l-6-4"/>
-                      <path d="M12 10l6-3"/>
-                    </svg>
-                  )}
+                  <svg viewBox="0 0 30 45" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    {/* 主干 */}
+                    <path d="M15 45L15 12"/>
+                    {/* 左分支 */}
+                    <path d="M15 28l-8-6a4 4 0 0 0-4 4v3a3 3 0 0 0 3 3h3"/>
+                    {/* 右分支 */}
+                    <path d="M15 22l8-4a4 4 0 0 1 4 4v4a3 3 0 0 1-3 3h-3"/>
+                    {/* 顶部 */}
+                    <circle cx="15" cy="10" r="3"/>
+                  </svg>
                 </div>
               ))}
 

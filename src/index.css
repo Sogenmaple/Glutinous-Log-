@@ -541,45 +541,68 @@ body :not(code):not(pre) {
   letter-spacing: 0.05em;
 }
 /* ============================================
-   TIMELINE SECTION - 现代极简排版
+   TIMELINE SECTION - 精致视觉设计
    ============================================ */
 .timeline-section {
-  padding: 5rem 2rem 4rem;
-  max-width: 1000px;
+  padding: 6rem 2rem 5rem;
+  max-width: 1100px;
   margin: 0 auto;
+  position: relative;
+}
+
+/* 背景氛围光 */
+.timeline-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 149, 0, 0.06) 0%,
+    transparent 70%
+  );
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .timeline-container {
   position: relative;
-  padding: 2rem 0 1rem;
+  padding: 3rem 0 2rem;
+  z-index: 1;
 }
 
-/* 中央时间轴线 */
+/* 中央时间轴线 - 精致渐变 */
 .timeline-container::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 0;
   bottom: 0;
-  width: 1px;
+  width: 2px;
   background: linear-gradient(
     to bottom,
-    rgba(255, 149, 0, 0.2) 0%,
-    rgba(255, 149, 0, 0.5) 50%,
-    rgba(255, 149, 0, 0.2) 100%
+    rgba(255, 149, 0, 0.15) 0%,
+    rgba(255, 149, 0, 0.5) 30%,
+    rgba(255, 149, 0, 0.6) 50%,
+    rgba(255, 149, 0, 0.5) 70%,
+    rgba(255, 149, 0, 0.15) 100%
   );
   transform: translateX(-50%);
+  box-shadow: 0 0 20px rgba(255, 149, 0, 0.3);
 }
 
 /* 时间轴项目 - 左右交替 */
 .timeline-item {
   position: relative;
   width: 50%;
-  padding: 0 50px 0 0;
-  margin-bottom: 3.5rem;
+  padding: 0 55px 0 0;
+  margin-bottom: 4.5rem;
   opacity: 0;
-  transform: translateX(-20px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateX(-25px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
 .timeline-item.visible {
@@ -589,120 +612,152 @@ body :not(code):not(pre) {
 
 .timeline-item:nth-child(even) {
   left: 50%;
-  padding: 0 0 0 50px;
-  transform: translateX(20px);
+  padding: 0 0 0 55px;
+  transform: translateX(25px);
 }
 
 .timeline-item:nth-child(even).visible {
   transform: translateX(0);
 }
 
-/* 时间轴点 */
+/* 时间轴点 - 精致设计 */
 .timeline-dot {
   position: absolute;
-  right: -26px;
-  top: 6px;
-  width: 54px;
-  height: 54px;
-  background: var(--bg-card);
-  border: 2px solid rgba(255, 149, 0, 0.4);
+  right: -27px;
+  top: 4px;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(
+    135deg,
+    var(--bg-card) 0%,
+    rgba(255, 149, 0, 0.05) 100%
+  );
+  border: 2px solid rgba(255, 149, 0, 0.35);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
-  transition: all 0.35s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .timeline-item:nth-child(even) .timeline-dot {
   right: auto;
-  left: -26px;
+  left: -27px;
 }
 
-.timeline-dot::after {
+.timeline-dot::before {
   content: '';
   position: absolute;
-  inset: 6px;
+  inset: -3px;
   border-radius: 50%;
-  background: rgba(255, 149, 0, 0.08);
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 149, 0, 0.4),
+    rgba(255, 180, 50, 0.2),
+    rgba(255, 149, 0, 0.4)
+  );
+  filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: -1;
 }
 
 .timeline-item:hover .timeline-dot {
-  border-color: var(--amber);
-  transform: scale(1.06);
+  border-color: rgba(255, 149, 0, 0.6);
+  transform: scale(1.08);
+  box-shadow: 0 6px 25px rgba(255, 149, 0, 0.25);
+}
+
+.timeline-item:hover .timeline-dot::before {
+  opacity: 0.7;
 }
 
 .timeline-dot .vector-icon {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   position: relative;
   z-index: 1;
+  filter: drop-shadow(0 2px 6px rgba(255, 149, 0, 0.3));
 }
 
-/* 内容卡片 */
+/* 内容卡片 - 精致设计 */
 .timeline-content {
   width: 100%;
-  padding: 1.75rem 1.5rem;
+  padding: 1.85rem 1.6rem;
   background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.03) 0%,
-    rgba(255, 255, 255, 0.015) 100%
+    135deg,
+    rgba(255, 255, 255, 0.035) 0%,
+    rgba(255, 255, 255, 0.02) 100%
   );
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   position: relative;
-  transition: all 0.35s ease;
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* 4 角装饰 */
 .timeline-content .card-corner {
   position: absolute;
-  width: 8px;
-  height: 8px;
-  border: 1px solid rgba(255, 149, 0, 0.3);
-  transition: all 0.35s ease;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid rgba(255, 149, 0, 0.35);
+  transition: all 0.4s ease;
 }
 
 .timeline-content .card-corner.tl {
-  top: 8px;
-  left: 8px;
+  top: 10px;
+  left: 10px;
   border-right: none;
   border-bottom: none;
+  border-radius: 3px 0 0 0;
 }
 
 .timeline-content .card-corner.tr {
-  top: 8px;
-  right: 8px;
+  top: 10px;
+  right: 10px;
   border-left: none;
   border-bottom: none;
+  border-radius: 0 3px 0 0;
 }
 
 .timeline-content .card-corner.bl {
-  bottom: 8px;
-  left: 8px;
+  bottom: 10px;
+  left: 10px;
   border-right: none;
   border-top: none;
+  border-radius: 0 0 0 3px;
 }
 
 .timeline-content .card-corner.br {
-  bottom: 8px;
-  right: 8px;
+  bottom: 10px;
+  right: 10px;
   border-left: none;
   border-top: none;
+  border-radius: 0 0 3px 0;
 }
 
 /* hover */
 .timeline-item:hover .timeline-content {
-  border-color: rgba(255, 149, 0, 0.3);
-  background: rgba(255, 255, 255, 0.04);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 149, 0, 0.4);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 35px rgba(0, 0, 0, 0.2),
+    0 0 40px rgba(255, 149, 0, 0.08);
 }
 
 .timeline-item:hover .timeline-content .card-corner {
-  border-color: rgba(255, 149, 0, 0.6);
-  width: 10px;
-  height: 10px;
+  border-color: rgba(255, 149, 0, 0.7);
+  width: 13px;
+  height: 13px;
 }
 
 /* 左侧项目 - 卡片指向右边 */
@@ -731,172 +786,190 @@ body :not(code):not(pre) {
   border-bottom: 8px solid transparent;
 }
 
-/* 日期 */
+/* 日期 - 精致标签 */
 .timeline-date {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--amber);
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  color: rgba(255, 200, 100, 0.9);
+  letter-spacing: 0.12em;
   font-weight: 600;
-  margin-bottom: 0.65rem;
-  padding: 0.2rem 0.65rem;
-  background: rgba(255, 149, 0, 0.08);
-  border-radius: 3px;
-  border: 1px solid rgba(255, 149, 0, 0.15);
+  margin-bottom: 0.8rem;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 149, 0, 0.1) 0%,
+    rgba(255, 149, 0, 0.05) 100%
+  );
+  border-radius: 4px;
+  border: 1px solid rgba(255, 149, 0, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 149, 0, 0.1);
 }
 
-/* 标题 */
+/* 标题 - 强层次 */
 .timeline-title {
   font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: var(--text-primary);
-  margin: 0 0 0.7rem 0;
+  margin: 0 0 0.75rem 0;
   line-height: 1.3;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .timeline-desc {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.65;
-  margin: 0 0 0.9rem 0;
+  line-height: 1.7;
+  margin: 0 0 1rem 0;
 }
 
-/* 标签 */
+/* 标签 - 胶囊样式 */
 .timeline-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-bottom: 0.9rem;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .timeline-tag {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
-  padding: 0.22rem 0.55rem;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  letter-spacing: 0.03em;
-  transition: all 0.25s ease;
+  font-size: 0.68rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 12px;
+  background: rgba(255, 149, 0, 0.08);
+  color: rgba(255, 180, 100, 0.9);
+  border: 1px solid rgba(255, 149, 0, 0.15);
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .timeline-tag:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-  color: var(--text-primary);
+  background: rgba(255, 149, 0, 0.15);
+  border-color: rgba(255, 149, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);
 }
 
-/* 链接 */
+/* 链接 - 精致按钮 */
 .timeline-links {
   display: flex;
-  gap: 0.55rem;
+  gap: 0.6rem;
 }
 
 .timeline-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.68rem;
   color: var(--text-secondary);
   text-decoration: none;
-  padding: 0.28rem 0.6rem;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.02);
-  transition: all 0.25s ease;
+  padding: 0.35rem 0.75rem;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .timeline-link:hover {
-  color: var(--amber);
-  border-color: rgba(255, 149, 0, 0.2);
-  background: rgba(255, 149, 0, 0.05);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
   text-decoration: none;
+  transform: translateY(-1px);
 }
 
 .timeline-link .link-icon-svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   fill: currentColor;
 }
 
-/* 状态 */
+/* 状态 - 精致徽章 */
 .timeline-status {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.63rem;
-  padding: 0.18rem 0.45rem;
-  border-radius: 3px;
-  margin-left: 0.5rem;
+  font-size: 0.65rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 12px;
+  margin-left: 0.55rem;
   vertical-align: middle;
-  background: rgba(57, 255, 20, 0.06);
+  background: linear-gradient(
+    135deg,
+    rgba(57, 255, 20, 0.1) 0%,
+    rgba(57, 255, 20, 0.05) 100%
+  );
   color: var(--green);
-  border: 1px solid rgba(57, 255, 20, 0.15);
-  letter-spacing: 0.03em;
-  font-weight: 600;
+  border: 1px solid rgba(57, 255, 20, 0.25);
+  letter-spacing: 0.04em;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(57, 255, 20, 0.15);
 }
 
 /* 响应式 - 平板 */
 @media (max-width: 768px) {
+  .timeline-section::before {
+    width: 400px;
+    height: 400px;
+  }
+  
   .timeline-container::before {
-    left: 28px;
+    left: 30px;
   }
   
   .timeline-item,
   .timeline-item:nth-child(even) {
     width: 100%;
     left: 0;
-    padding-left: 68px;
+    padding-left: 72px;
     padding-right: 0;
   }
   
   .timeline-dot,
   .timeline-item:nth-child(even) .timeline-dot {
     right: auto;
-    left: 28px;
+    left: 30px;
   }
 }
 
 /* 响应式 - 手机 */
 @media (max-width: 480px) {
   .timeline-section {
-    padding: 3.5rem 1rem 3rem;
+    padding: 4rem 1rem 3.5rem;
+  }
+  
+  .timeline-section::before {
+    width: 280px;
+    height: 280px;
   }
   
   .timeline-container::before {
-    left: 24px;
+    left: 26px;
   }
   
   .timeline-item,
   .timeline-item:nth-child(even) {
-    padding-left: 58px;
-    margin-bottom: 2.5rem;
+    padding-left: 62px;
+    margin-bottom: 3rem;
   }
   
   .timeline-dot,
   .timeline-item:nth-child(even) .timeline-dot {
-    left: 24px;
-    width: 48px;
-    height: 48px;
+    left: 26px;
+    width: 50px;
+    height: 50px;
   }
   
   .timeline-content {
-    padding: 1.4rem 1.2rem;
+    padding: 1.5rem 1.3rem;
   }
   
   .timeline-title {
-    font-size: 1.15rem;
-  }
-  
-  .timeline-date {
-    font-size: 0.65rem;
-  }
-  
-  .timeline-tag {
-    font-size: 0.64rem;
+    font-size: 1.2rem;
   }
 }
 

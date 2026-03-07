@@ -125,59 +125,10 @@
   padding: 2rem 2rem 4rem;
 }
 
-/* 头条区域 */
-.headline-section {
-  margin-bottom: 3rem;
-  padding: 2.5rem;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 149, 0, 0.08) 0%,
-    rgba(255, 149, 0, 0.02) 100%
-  );
-  border: 1px solid rgba(255, 149, 0, 0.15);
-  border-radius: 6px;
-  text-align: center;
-}
-
-.headline-label {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: var(--amber);
-  background: rgba(255, 149, 0, 0.1);
-  padding: 0.3rem 0.8rem;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 149, 0, 0.2);
-  letter-spacing: 0.2em;
-  margin-bottom: 1rem;
-}
-
-.headline-box svg {
-  margin: 1rem 0;
-}
-
-.headline-title {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0 0 0.75rem 0;
-  letter-spacing: 0.05em;
-}
-
-.headline-desc {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin: 0;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
 /* 游戏分栏 - 报纸排版 */
 .games-columns {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1.5rem;
 }
 
@@ -230,10 +181,14 @@
   margin-bottom: 0.75rem;
 }
 
-.article-date {
+.article-status {
   font-family: var(--font-mono);
   font-size: 0.65rem;
-  color: var(--text-dim);
+  color: var(--green);
+  background: rgba(34, 197, 94, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid rgba(34, 197, 94, 0.2);
   letter-spacing: 0.1em;
 }
 
@@ -385,7 +340,7 @@
 }
 
 /* 响应式 - 大屏 */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .games-columns {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -397,17 +352,8 @@
     font-size: 2.5rem;
   }
 
-  .header-nav {
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-
   .games-columns {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .headline-title {
-    font-size: 2rem;
   }
 }
 
@@ -425,29 +371,12 @@
     font-size: 0.75rem;
   }
 
-  .header-nav {
-    gap: 1rem;
-    font-size: 0.7rem;
-  }
-
   .games-columns {
     grid-template-columns: 1fr;
   }
 
   .game-article {
     padding: 1.3rem 1.2rem;
-  }
-
-  .headline-section {
-    padding: 2rem 1.5rem;
-  }
-
-  .headline-title {
-    font-size: 1.75rem;
-  }
-
-  .headline-desc {
-    font-size: 0.9rem;
   }
 
   .newspaper-content {

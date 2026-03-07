@@ -1,12 +1,39 @@
+import { useState, useEffect } from 'react'
 import { games } from '../data/games'
 
 export default function GameTimeline() {
+  const [visibleItems, setVisibleItems] = useState(new Set())
+
   // 按时间正序排序（从旧到新，精确到年月日）
   const sortedGames = [...games].sort((a, b) => {
     const dateA = new Date(a.date)
     const dateB = new Date(b.date)
     return dateA - dateB
   })
+
+  // 滚动触发动画
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.dataset.index)
+            setVisibleItems((prev) => new Set([...prev, index]))
+          }
+        })
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -80px 0px',
+      }
+    )
+
+    document.querySelectorAll('.timeline-item').forEach((item) => {
+      observer.observe(item)
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   const renderVectorIcon = (type) => {
     switch (type) {
@@ -141,62 +168,55 @@ export default function GameTimeline() {
       </div>
 
       <div className="timeline-container">
-        {sortedGames.map((game, index) => {
-          const isLeft = index % 2 === 0
-          return (
-            <div
-              key={game.id}
-              className="timeline-item"
-            >
-              <div className="timeline-dot">
-                {renderVectorIcon(game.iconType)}
-              </div>
-
-              <div className="timeline-details">
-                <div className="card-corner tl"></div>
-                <div className="card-corner tr"></div>
-                <div className="card-corner bl"></div>
-                <div className="card-corner br"></div>
-                
-                <span className="timeline-date">{formatDate(game.date)}</span>
-                
-                <h3 className="timeline-title">
-                  {game.title}
-                  {game.status === 'development' && (
-                    <span className="timeline-status">开发中</span>
-                  )}
-                </h3>
-
-                <p className="timeline-desc">{game.description}</p>
-
-                {game.tags.length > 0 && (
-                  <div className="timeline-tags">
-                    {game.tags.map(tag => (
-                      <span key={tag} className="timeline-tag">{tag}</span>
-                    ))}
-                  </div>
-                )}
-
-                {Object.keys(game.links).length > 0 && (
-                  <div className="timeline-links">
-                    {Object.entries(game.links).map(([type, url]) => (
-                      <a
-                        key={type}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="timeline-link"
-                      >
-                        {renderLinkIcon(type)}
-                        <span className="link-label">{type.toUpperCase()}</span>
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
+        {sortedGames.map((game, index) => (
+          <div
+            key={game.id}
+            data-index={index}
+            className={`timeline-item ${visibleItems.has(index) ? 'visible' : ''}`}
+          >
+            <div className="timeline-dot">
+              {renderVectorIcon(game.iconType)}
             </div>
-          )
-        })}
+
+            <div className="timeline-content">
+              <span className="timeline-date">{formatDate(game.date)}</span>
+              
+              <h3 className="timeline-title">
+                {game.title}
+                {game.status === 'development' && (
+                  <span className="timeline-status">开发中</span>
+                )}
+              </h3>
+
+              <p className="timeline-desc">{game.description}</p>
+
+              {game.tags.length > 0 && (
+                <div className="timeline-tags">
+                  {game.tags.map(tag => (
+                    <span key={tag} className="timeline-tag">{tag}</span>
+                  ))}
+                </div>
+              )}
+
+              {Object.keys(game.links).length > 0 && (
+                <div className="timeline-links">
+                  {Object.entries(game.links).map(([type, url]) => (
+                    <a
+                      key={type}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="timeline-link"
+                    >
+                      {renderLinkIcon(type)}
+                      <span className="link-label">{type.toUpperCase()}</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   )

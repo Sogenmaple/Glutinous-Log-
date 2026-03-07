@@ -624,6 +624,7 @@ body :not(code):not(pre) {
 .timeline-item.left {
   float: left;
   clear: left;
+  padding-right: 5rem;
   text-align: right;
   transform: translateX(-50px) translateY(30px);
 }
@@ -631,22 +632,9 @@ body :not(code):not(pre) {
 .timeline-item.right {
   float: right;
   clear: right;
+  padding-left: 5rem;
   text-align: left;
   transform: translateX(50px) translateY(30px);
-}
-
-/* 透明外层容器 */
-.timeline-item-wrapper {
-  position: relative;
-  padding: 1.6rem;
-}
-
-.timeline-item.left .timeline-item-wrapper {
-  padding-right: 5rem;
-}
-
-.timeline-item.right .timeline-item-wrapper {
-  padding-left: 5rem;
 }
 
 .timeline-item.visible {
@@ -656,7 +644,7 @@ body :not(code):not(pre) {
 
 .timeline-dot {
   position: absolute;
-  top: 1.6rem;
+  top: 0;
   width: 48px;
   height: 48px;
   background: rgba(10, 10, 15, 0.9);
@@ -671,11 +659,11 @@ body :not(code):not(pre) {
 }
 
 .timeline-item.left .timeline-dot {
-  right: -24px;
+  right: -26px;
 }
 
 .timeline-item.right .timeline-dot {
-  left: -24px;
+  left: -26px;
 }
 
 .timeline-item:hover .timeline-dot {

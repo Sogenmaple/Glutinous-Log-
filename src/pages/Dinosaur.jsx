@@ -466,8 +466,8 @@ export default function Dinosaur() {
             <div className="wave-box">
               <span className="wave-label">SIGNAL</span>
               <div className="wave-bars">
-                {[1,2,3,4,5,4,3,2].map((h, i) => (
-                  <div key={i} className="wave-bar" style={{ '--bar-height': h * 15 }}></div>
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="wave-bar"></div>
                 ))}
               </div>
             </div>

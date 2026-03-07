@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import { GameIcon, TangyuanIcon, CodeIcon, BlockIcon, StarIcon, ExperimentIcon, PlayIcon, TrophyIcon } from '../components/icons/SiteIcons'
+import { GameIcon, ClockIcon, CodeIcon, BlockIcon, StarIcon, ExperimentIcon, PlayIcon, TrophyIcon } from '../components/icons/SiteIcons'
 import '../styles/GamesCollection.css'
 
 /**
@@ -158,7 +158,7 @@ export default function GamesCollection() {
         {/* 左侧边栏 - 导航区 */}
         <aside className="sidebar-left">
           <div className="sidebar-section">
-            <TangyuanIcon size={60} color="#ff9500" />
+            <ClockIcon size={60} color="#ff9500" />
             <h2 className="sidebar-title">CYBER<br/>GAMES</h2>
             <div className="sidebar-divider"></div>
             <div className="sidebar-stats">

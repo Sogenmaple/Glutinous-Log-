@@ -327,15 +327,24 @@ export default function Minesweeper() {
             <div className="controls-mini">
               <div className="controls-mini-header">CONTROLS</div>
               <div className="control-item">
-                <span className="control-icon">🖱️</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2" className="control-svg">
+                  <circle cx="12" cy="12" r="9"/>
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+                </svg>
                 <span className="control-text">左键点击</span>
               </div>
               <div className="control-item">
-                <span className="control-icon">🚩</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" className="control-svg">
+                  <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                  <line x1="4" y1="22" x2="4" y2="15"/>
+                </svg>
                 <span className="control-text">右键插旗</span>
               </div>
               <div className="control-item">
-                <span className="control-icon">⚡</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" className="control-svg">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
                 <span className="control-text">双击速开</span>
               </div>
             </div>
@@ -350,7 +359,10 @@ export default function Minesweeper() {
               {/* 游戏网格 */}
               <div 
                 className="minesweeper-grid" 
-                style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
+                style={{ 
+                  gridTemplateColumns: `repeat(${COLS}, 28px)`,
+                  gridTemplateRows: `repeat(${ROWS}, 28px)`
+                }}
               >
                 {grid.map((cell, index) => (
                   <div

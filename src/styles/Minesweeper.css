@@ -318,6 +318,10 @@
   font-size: 0.9rem;
 }
 
+.control-svg {
+  flex-shrink: 0;
+}
+
 /* 中央游戏区 */
 .news-game-area-minesweeper {
   display: flex;
@@ -357,20 +361,24 @@
   z-index: 10;
   width: fit-content;
   margin: 0 auto;
+  padding: 2px;
 }
 
 /* 格子样式 */
 .mine-cell {
   width: 28px;
   height: 28px;
+  min-width: 28px;
+  min-height: 28px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.1s;
   user-select: none;
+  box-sizing: border-box;
 }
 
 .mine-cell:hover:not(.revealed):not(.flagged) {

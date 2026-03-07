@@ -177,6 +177,12 @@ export default function GameTimeline() {
             <div className="timeline-dot"></div>
             
             <div className="timeline-card">
+              {/* 4 角螺丝装饰 */}
+              <div className="card-screw tl"></div>
+              <div className="card-screw tr"></div>
+              <div className="card-screw bl"></div>
+              <div className="card-screw br"></div>
+              
               <span className="timeline-date-badge">{formatDate(game.date)}</span>
               
               <h3 className="timeline-title">

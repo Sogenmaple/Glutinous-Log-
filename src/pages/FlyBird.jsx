@@ -5,7 +5,7 @@ import '../styles/FlyBird.css'
 const GRAVITY = 0.6
 const JUMP_STRENGTH = -9
 const PIPE_SPEED = 3
-const PIPE_GAP = 140
+const PIPE_GAP = 170
 const BIRD_SIZE = 28
 const BIRD_X = 100
 
@@ -274,13 +274,19 @@ export default function FlyBird() {
                     transform: `rotate(${birdRotation}deg)`
                   }}
                 >
-                  <svg viewBox="0 0 30 30" fill="none">
-                    <ellipse cx="15" cy="15" rx="14" ry="11" fill="#fbbf24" stroke="#fff" strokeWidth="2"/>
-                    <circle cx="22" cy="11" r="4" fill="#fff"/>
-                    <circle cx="23" cy="11" r="2" fill="#000"/>
-                    <path d="M26 14l4 2" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
-                    <path d="M8 18l-6-4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
-                    <path d="M8 12l-6 4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                  <svg viewBox="0 0 32 32" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {/* 身体 - 流线型 */}
+                    <ellipse cx="16" cy="16" rx="14" ry="10" fill="#fbbf24" stroke="#fbbf24" strokeWidth="2"/>
+                    {/* 眼睛 - 未来感护目镜 */}
+                    <ellipse cx="24" cy="14" rx="5" ry="4" fill="#22d3ee" stroke="#fff" strokeWidth="2"/>
+                    <circle cx="25" cy="14" r="2" fill="#fff"/>
+                    {/* 嘴巴 - 几何三角形 */}
+                    <path d="M28 16l6 2-6 4z" fill="#f97316" stroke="#f97316" strokeWidth="2"/>
+                    {/* 翅膀 - 机械感 */}
+                    <path d="M10 18l-8-6" stroke="#fbbf24" strokeWidth="3"/>
+                    <path d="M10 14l-8 6" stroke="#fbbf24" strokeWidth="3"/>
+                    {/* 尾部装饰线 */}
+                    <path d="M4 16l-4 0" stroke="#fbbf24" strokeWidth="2"/>
                   </svg>
                 </div>
               )}
@@ -355,10 +361,13 @@ export default function FlyBird() {
                       </>
                     ) : (
                       <>
-                        <svg width="60" height="60" viewBox="0 0 30 30" fill="none">
-                          <ellipse cx="15" cy="15" rx="14" ry="11" fill="#fbbf24" stroke="#fff" strokeWidth="2"/>
-                          <circle cx="22" cy="11" r="4" fill="#fff"/>
-                          <circle cx="23" cy="11" r="2" fill="#000"/>
+                        <svg width="60" height="60" viewBox="0 0 32 32" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <ellipse cx="16" cy="16" rx="14" ry="10" fill="#fbbf24" stroke="#fbbf24" strokeWidth="2"/>
+                          <ellipse cx="24" cy="14" rx="5" ry="4" fill="#22d3ee" stroke="#fff" strokeWidth="2"/>
+                          <circle cx="25" cy="14" r="2" fill="#fff"/>
+                          <path d="M28 16l6 2-6 4z" fill="#f97316" stroke="#f97316" strokeWidth="2"/>
+                          <path d="M10 18l-8-6" stroke="#fbbf24" strokeWidth="3"/>
+                          <path d="M10 14l-8 6" stroke="#fbbf24" strokeWidth="3"/>
                         </svg>
                         <h2>飞扬的小鸟</h2>
                         <p className="subtitle">经典休闲游戏</p>

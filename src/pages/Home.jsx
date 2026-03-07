@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GameIcon, BookIcon, UserIcon, TangyuanIcon, ToolIcon } from '../components/icons/SiteIcons'
 import Header from '../components/Header'
-import GameCarousel3D from '../components/GameCarousel3D'
-import '../styles/GameCarousel3D.css'
 
 /**
  * 汤圆的小窝 - 主导航页面
@@ -126,9 +124,6 @@ export default function Home() {
           )
         })}
       </div>
-
-      {/* 3D 游戏轮播 */}
-      <GameCarousel3D />
 
       {/* 底部装饰 */}
       <div className="home-footer">

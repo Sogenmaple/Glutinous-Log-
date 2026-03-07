@@ -355,6 +355,8 @@
   background: rgba(248, 117, 102, 0.2);
   position: relative;
   z-index: 10;
+  width: fit-content;
+  margin: 0 auto;
 }
 
 /* 格子样式 */

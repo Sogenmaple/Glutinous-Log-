@@ -20,13 +20,14 @@ export default function Dinosaur() {
   const [isPaused, setIsPaused] = useState(false)
   const [particles, setParticles] = useState([])
   const [speedLevel, setSpeedLevel] = useState(1)
-  const canvasHeightRef = useRef(CANVAS_HEIGHT)
   
+  const dinoYRef = useRef(0)
   const dinoVelocityRef = useRef(0)
   const speedRef = useRef(BASE_SPEED)
   const gameLoopRef = useRef(null)
   const lastTimeRef = useRef(0)
   const scoreRef = useRef(0)
+  const canvasHeightRef = useRef(CANVAS_HEIGHT)
 
   useEffect(() => {
     const saved = localStorage.getItem('dinosaur_highscore')
@@ -65,6 +66,7 @@ export default function Dinosaur() {
     setGameOver(false)
     setIsPaused(false)
     setDinoY(0)
+    dinoYRef.current = 0
     dinoVelocityRef.current = 0
     setObstacles([])
     setScore(0)
@@ -79,6 +81,7 @@ export default function Dinosaur() {
     setGameOver(false)
     setIsPaused(false)
     setDinoY(0)
+    dinoYRef.current = 0
     dinoVelocityRef.current = 0
     setObstacles([{ x: 700, type: Math.random() > 0.6 ? 'bird' : 'cactus' }])
     setScore(0)
@@ -100,12 +103,13 @@ export default function Dinosaur() {
     }
     if (isPaused) return
     
-    if (dinoY === 0) {
+    // 使用 ref 检查是否在地面
+    if (dinoYRef.current === 0) {
       dinoVelocityRef.current = JUMP_STRENGTH
       const groundY = canvasHeightRef.current - GROUND_HEIGHT
       createParticles(DINO_X + 20, groundY - 10, 6)
     }
-  }, [gameStarted, gameOver, isPaused, dinoY, startGame, resetGame, createParticles])
+  }, [gameStarted, gameOver, isPaused, startGame, resetGame, createParticles])
 
   const duck = useCallback((ducking) => {
     if (gameStarted && !gameOver && !isPaused) {
@@ -157,16 +161,17 @@ export default function Dinosaur() {
       if (deltaTime >= 16) {
         lastTimeRef.current = timestamp
         
-        setDinoY(prevY => {
-          const newY = prevY + dinoVelocityRef.current
-          if (newY <= 0) {
-            dinoVelocityRef.current = 0
-            return 0
-          }
+        // 更新恐龙位置
+        dinoYRef.current += dinoVelocityRef.current
+        if (dinoYRef.current <= 0) {
+          dinoYRef.current = 0
+          dinoVelocityRef.current = 0
+        } else {
           dinoVelocityRef.current -= GRAVITY
-          return Math.max(0, newY)
-        })
+        }
+        setDinoY(dinoYRef.current)
 
+        // 更新障碍物
         setObstacles(prev => {
           let newObstacles = prev.map(obs => ({ 
             ...obs, 
@@ -189,6 +194,7 @@ export default function Dinosaur() {
           return newObstacles
         })
 
+        // 更新粒子
         setParticles(prev => 
           prev
             .map(p => ({
@@ -201,8 +207,10 @@ export default function Dinosaur() {
             .filter(p => p.life > 0)
         )
 
+        // 更新分数
         setScore(s => s + 1)
         
+        // 难度递增
         const currentScore = scoreRef.current
         if (currentScore > 0 && currentScore % 300 === 0) {
           const newLevel = Math.floor(currentScore / 300) + 1
@@ -225,6 +233,7 @@ export default function Dinosaur() {
     }
   }, [gameStarted, gameOver, isPaused, speedLevel])
 
+  // 碰撞检测
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused) return
 

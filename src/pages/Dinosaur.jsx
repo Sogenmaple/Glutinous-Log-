@@ -19,12 +19,14 @@ export default function Dinosaur() {
   const [isDucking, setIsDucking] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [particles, setParticles] = useState([])
+  const [speedLevel, setSpeedLevel] = useState(1)
   
   // 使用 refs 避免闭包问题
   const dinoVelocityRef = useRef(0)
   const speedRef = useRef(BASE_SPEED)
   const gameLoopRef = useRef(null)
   const lastTimeRef = useRef(0)
+  const scoreRef = useRef(0)
 
   // 加载最佳记录
   useEffect(() => {
@@ -39,6 +41,11 @@ export default function Dinosaur() {
       localStorage.setItem('dinosaur_highscore', String(score))
     }
   }, [score, highScore])
+
+  // 同步 scoreRef
+  useEffect(() => {
+    scoreRef.current = score
+  }, [score])
 
   // 创建粒子效果
   const createParticles = useCallback((x, y, color, count = 10) => {
@@ -69,6 +76,7 @@ export default function Dinosaur() {
     setScore(0)
     setIsDucking(false)
     speedRef.current = BASE_SPEED
+    setSpeedLevel(1)
     setParticles([])
     lastTimeRef.current = performance.now()
     createParticles(DINO_X + 30, GROUND_Y - 30, '#ff9500', 15)
@@ -83,6 +91,7 @@ export default function Dinosaur() {
     }
     if (isPaused) return
     
+    // 检查是否在地面
     if (dinoY >= GROUND_Y - 10) {
       dinoVelocityRef.current = JUMP_STRENGTH
       createParticles(DINO_X + 30, dinoY, 'rgba(255,149,0,0.6)', 8)
@@ -132,11 +141,12 @@ export default function Dinosaur() {
     }
   }, [jump, duck, togglePause])
 
-  // 游戏循环 - 简化版本
+  // 游戏循环 - 稳定版本
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused) return
 
     const update = (timestamp) => {
+      if (!lastTimeRef.current) lastTimeRef.current = timestamp
       const deltaTime = timestamp - lastTimeRef.current
       
       if (deltaTime >= 16) {
@@ -191,8 +201,13 @@ export default function Dinosaur() {
         setScore(s => s + 1)
         
         // 难度提升 - 每 500 分加速
-        if (score > 0 && score % 500 === 0) {
-          speedRef.current = Math.min(speedRef.current + 1, 15)
+        const currentScore = scoreRef.current
+        if (currentScore > 0 && currentScore % 500 === 0) {
+          const newLevel = Math.floor(currentScore / 500) + 1
+          if (newLevel !== speedLevel) {
+            setSpeedLevel(newLevel)
+            speedRef.current = Math.min(BASE_SPEED + newLevel - 1, 15)
+          }
         }
       }
       
@@ -206,7 +221,7 @@ export default function Dinosaur() {
         cancelAnimationFrame(gameLoopRef.current)
       }
     }
-  }, [gameStarted, gameOver, isPaused, score])
+  }, [gameStarted, gameOver, isPaused, speedLevel])
 
   // 碰撞检测
   useEffect(() => {
@@ -253,24 +268,31 @@ export default function Dinosaur() {
           </div>
 
           <div className="status-panel">
-            <div className="panel-header">
-              <span>STATUS</span>
+            <div className="panel-header amber">
+              <span>SYSTEM STATUS</span>
             </div>
             <div className="panel-content">
               <div className="status-row">
-                <span className="label">状态</span>
-                <span className={`value ${gameOver ? 'danger' : gameStarted ? 'active' : ''}`}>
+                <span className="label">运行状态</span>
+                <span className={`value ${gameOver ? 'danger' : gameStarted ? 'active' : 'ready'}`}>
                   {gameOver ? 'GAME OVER' : gameStarted ? 'RUNNING' : 'READY'}
                 </span>
               </div>
               <div className="status-row">
-                <span className="label">速度</span>
+                <span className="label">当前等级</span>
+                <span className="value level">{speedLevel}</span>
+              </div>
+              <div className="status-row">
+                <span className="label">移动速度</span>
                 <span className="value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
               </div>
               <div className="status-row">
-                <span className="label">得分</span>
+                <span className="label">实时得分</span>
                 <span className="value">{score}</span>
               </div>
+            </div>
+            <div className="panel-footer">
+              <span>TAPE FUTURISM v1.0</span>
             </div>
           </div>
 
@@ -280,10 +302,41 @@ export default function Dinosaur() {
               <span className="time">{new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
           </div>
+
+          {/* 技巧提示框 */}
+          <div className="tips-box">
+            <div className="tips-header">
+              <span>💡 游戏技巧</span>
+            </div>
+            <ul className="tips-list">
+              <li>仙人掌需要跳跃躲避</li>
+              <li>飞行鸟可以蹲下或跳跃</li>
+              <li>分数越高速速度越快</li>
+              <li>保持节奏提前预判</li>
+            </ul>
+          </div>
         </aside>
 
         {/* 中央游戏区 */}
         <main className="dino-main">
+          {/* 顶部信息条 */}
+          <div className="top-bar">
+            <div className="top-info">
+              <span className="info-label">LEVEL</span>
+              <span className="info-value">{speedLevel}</span>
+            </div>
+            <div className="top-divider"></div>
+            <div className="top-info">
+              <span className="info-label">SPEED</span>
+              <span className="info-value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
+            </div>
+            <div className="top-divider"></div>
+            <div className="top-info">
+              <span className="info-label">SCORE</span>
+              <span className="info-value">{String(score).padStart(6, '0')}</span>
+            </div>
+          </div>
+
           <div className="game-area">
             <div className="game-canvas" onClick={jump}>
               {/* 背景装饰线 */}
@@ -356,18 +409,13 @@ export default function Dinosaur() {
                 <div className="ground-pattern"></div>
               </div>
 
-              {/* HUD 分数 */}
-              <div className="hud-score">
-                <span className="hud-label">SCORE</span>
-                <span className="hud-value">{String(score).padStart(6, '0')}</span>
-              </div>
-
               {/* 暂停遮罩 */}
               {isPaused && !gameOver && (
                 <div className="overlay pause">
                   <div className="overlay-content">
-                    <h2>⏸ 游戏暂停</h2>
-                    <p>按 P 或 ESC 继续</p>
+                    <div className="pause-icon">⏸</div>
+                    <h2>游戏暂停</h2>
+                    <p className="hint">按 P 或 ESC 继续游戏</p>
                   </div>
                 </div>
               )}
@@ -378,33 +426,45 @@ export default function Dinosaur() {
                   <div className="overlay-content">
                     {gameOver ? (
                       <>
-                        <div className="game-over-icon">✖</div>
-                        <h2>游戏结束</h2>
+                        <div className="result-icon gameover">✖</div>
+                        <h2 className="result-title">游戏结束</h2>
                         <div className="score-board">
                           <div className="score-item">
-                            <span className="label">得分</span>
+                            <span className="label">本局得分</span>
                             <span className="value">{score}</span>
                           </div>
                           <div className="score-item">
-                            <span className="label">最佳</span>
+                            <span className="label">最佳记录</span>
                             <span className="value highlight">{highScore}</span>
                           </div>
                         </div>
                         {score >= highScore && score > 0 && (
-                          <div className="new-record">🏆 新纪录!</div>
+                          <div className="new-record">
+                            <span className="trophy">🏆</span>
+                            <span>新纪录诞生!</span>
+                          </div>
                         )}
                       </>
                     ) : (
                       <>
-                        <div className="start-icon">▶</div>
-                        <h2>恐龙快跑</h2>
-                        <p className="subtitle">无尽跑酷挑战</p>
+                        <div className="result-icon start">▶</div>
+                        <h2 className="result-title">恐龙快跑</h2>
+                        <p className="subtitle">无尽跑酷挑战 · 磁带未来风</p>
+                        <div className="feature-list">
+                          <span className="feature-item">✨ 粒子效果</span>
+                          <span className="feature-item">📈 难度递增</span>
+                          <span className="feature-item">🏆 最佳记录</span>
+                        </div>
                       </>
                     )}
                     <button className="start-btn" onClick={(e) => { e.stopPropagation(); startGame(); }}>
                       {gameOver ? '再玩一次' : '开始游戏'}
                     </button>
-                    <p className="controls-hint">空格/↑跳跃 | ↓蹲下 | P 暂停</p>
+                    <p className="controls-hint">
+                      <span className="key-badge">空格</span> 跳跃 · 
+                      <span className="key-badge">↓</span> 蹲下 · 
+                      <span className="key-badge">P</span> 暂停
+                    </p>
                   </div>
                 </div>
               )}
@@ -413,21 +473,29 @@ export default function Dinosaur() {
             {/* 右侧状态栏 */}
             <div className="dino-sidebar-right">
               <div className="stat-card">
+                <div className="stat-icon">📊</div>
                 <span className="stat-label">当前得分</span>
                 <span className="stat-value">{score}</span>
               </div>
               <div className="stat-card">
+                <div className="stat-icon">🏆</div>
                 <span className="stat-label">最佳记录</span>
                 <span className="stat-value highlight">{highScore}</span>
               </div>
               <div className="stat-card">
-                <span className="stat-label">速度</span>
+                <div className="stat-icon">⚡</div>
+                <span className="stat-label">游戏等级</span>
+                <span className="stat-value">{speedLevel}</span>
+              </div>
+              <div className="stat-card">
+                <div className="stat-icon">🚀</div>
+                <span className="stat-label">移动速度</span>
                 <span className="stat-value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
               </div>
             </div>
           </div>
 
-          {/* 操作说明 */}
+          {/* 操作说明面板 */}
           <div className="controls-panel">
             <div className="controls-header">
               <span>操作说明</span>
@@ -436,7 +504,7 @@ export default function Dinosaur() {
             <div className="controls-grid">
               <div className="control-item">
                 <span className="key-icon">␣</span>
-                <span className="key-label">空格</span>
+                <span className="key-label">空格键</span>
                 <span className="key-action">跳跃</span>
               </div>
               <div className="control-item">

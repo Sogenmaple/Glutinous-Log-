@@ -573,62 +573,9 @@ body :not(code):not(pre) {
   pointer-events: none;
 }
 
-/* 游戏宇宙页面 - 删除时间轴所有样式 */
+/* 游戏宇宙页面 - 删除时间轴背景 */
 .games-page-main .timeline-section::before {
   background: transparent;
-}
-
-.games-page-main .timeline-item {
-  width: 100%;
-  float: none;
-  clear: none;
-  padding: 0;
-  margin-bottom: 2rem;
-  opacity: 1;
-  transform: none;
-}
-
-.games-page-main .timeline-item.left,
-.games-page-main .timeline-item.right {
-  float: none;
-  padding: 0;
-  text-align: center;
-  transform: none;
-}
-
-.games-page-main .timeline-dot {
-  position: relative;
-  top: auto;
-  margin: 0 auto 1rem;
-}
-
-.games-page-main .timeline-item.left .timeline-dot,
-.games-page-main .timeline-item.right .timeline-dot {
-  left: auto;
-  right: auto;
-}
-
-.games-page-main .timeline-connector {
-  display: none;
-}
-
-.games-page-main .timeline-header-simple {
-  padding: 1rem 0;
-}
-
-.games-page-main .timeline-details {
-  max-height: none;
-  opacity: 1;
-  margin-top: 0;
-}
-
-.games-page-main .timeline-item:hover .timeline-details {
-  max-height: none;
-  opacity: 1;
-}
-
-.games-page-main .timeline-item:hover .timeline-header-simple {
-  display: block;
 }
 
 .timeline-container {
@@ -640,36 +587,35 @@ body :not(code):not(pre) {
 
 .timeline-item {
   position: relative;
-  width: 45%;
-  margin-bottom: 3rem;
-  opacity: 0;
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  margin-bottom: 2rem;
+  opacity: 1;
 }
 
 .timeline-item.left {
-  float: left;
-  clear: left;
-  padding-right: 3.5rem;
-  text-align: right;
-  transform: translateX(-50px) translateY(30px);
+  float: none;
+  clear: none;
+  padding: 0;
+  text-align: center;
+  transform: none;
 }
 
 .timeline-item.right {
-  float: right;
-  clear: right;
-  padding-left: 3.5rem;
-  text-align: left;
-  transform: translateX(50px) translateY(30px);
+  float: none;
+  clear: none;
+  padding: 0;
+  text-align: center;
+  transform: none;
 }
 
 .timeline-item.visible {
   opacity: 1;
-  transform: translateX(0) translateY(0);
+  transform: none;
 }
 
 .timeline-dot {
-  position: absolute;
-  top: 0;
+  position: relative;
+  top: auto;
   width: 48px;
   height: 48px;
   background: rgba(10, 10, 15, 0.9);
@@ -681,14 +627,13 @@ body :not(code):not(pre) {
   box-shadow: 0 0 25px rgba(255, 149, 0, 0.6), inset 0 0 15px rgba(255, 149, 0, 0.1);
   z-index: 10;
   transition: all 0.3s ease;
+  margin: 0 auto 1rem;
 }
 
-.timeline-item.left .timeline-dot {
-  right: -26px;
-}
-
+.timeline-item.left .timeline-dot,
 .timeline-item.right .timeline-dot {
-  left: -26px;
+  left: auto;
+  right: auto;
 }
 
 .timeline-item:hover .timeline-dot {
@@ -702,32 +647,7 @@ body :not(code):not(pre) {
   height: 28px;
 }
 
-/* 连接线 */
-.timeline-connector {
-  position: absolute;
-  top: 50%;
-  width: 40px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255, 149, 0, 0.4), rgba(255, 149, 0, 0.9));
-  transform: translateY(-50%);
-  transition: all 0.3s ease;
-}
-
-.timeline-item.left .timeline-connector {
-  right: 100%;
-  margin-right: 12px;
-}
-
-.timeline-item.right .timeline-connector {
-  left: 100%;
-  margin-left: 12px;
-}
-
-.timeline-item:hover .timeline-connector {
-  background: linear-gradient(90deg, rgba(255, 149, 0, 0.9), rgba(255, 149, 0, 1));
-  box-shadow: 0 0 12px rgba(255, 149, 0, 0.8);
-  height: 3px;
-}
+/* 连接线已删除 */
 
 /* 开发中状态脉冲光环 */
 .timeline-status.development {
@@ -828,22 +748,14 @@ body :not(code):not(pre) {
   transition: all 0.3s ease;
 }
 
-/* 详情区域 - 默认隐藏 */
+/* 详情区域 - 始终显示 */
 .timeline-details {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 0;
-}
-
-.timeline-item:hover .timeline-details {
-  max-height: 500px;
+  max-height: none;
   opacity: 1;
-  margin-top: 0.5rem;
+  padding: 0.5rem 0;
 }
 
-.timeline-item:hover .timeline-header-simple {
+.timeline-header-simple {
   display: none;
 }
 

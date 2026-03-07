@@ -184,16 +184,7 @@ export default function GameTimeline() {
                 {renderVectorIcon(game.iconType)}
               </div>
 
-              {/* 连接线 */}
-              <div className="timeline-connector"></div>
-
-              {/* 默认显示：标题 + 时间 */}
-              <div className="timeline-header-simple">
-                <span className="timeline-date-simple">{formatDate(game.date)}</span>
-                <h3 className="timeline-title-simple">{game.title}</h3>
-              </div>
-
-              {/* 悬浮时显示详情 */}
+              {/* 详情内容 */}
               <div className="timeline-details">
                 <div className="timeline-header">
                   <span className="timeline-date">{formatDate(game.date)}</span>

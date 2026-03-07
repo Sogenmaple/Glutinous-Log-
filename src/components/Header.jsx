@@ -79,6 +79,12 @@ export default function Header() {
               {showUserMenu && (
                 <div className="user-dropdown">
                   <div className="dropdown-item" onClick={() => {
+                    navigate('/profile')
+                    setShowUserMenu(false)
+                  }}>
+                    👤 个人中心
+                  </div>
+                  <div className="dropdown-item" onClick={() => {
                     navigate('/special/pomodoro')
                     setShowUserMenu(false)
                   }}>
@@ -100,6 +106,7 @@ export default function Header() {
                       </div>
                     </>
                   )}
+                  <div className="dropdown-divider"></div>
                   <div className="dropdown-item" onClick={handleLogout}>
                     退出登录
                   </div>

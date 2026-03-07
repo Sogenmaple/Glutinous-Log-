@@ -6,6 +6,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import multer from 'multer'
+import { sendVerificationCode, verifyCode } from './services/emailService.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -421,6 +422,170 @@ app.post('/api/upload', authenticateToken, upload.single('image'), async (req, r
   } catch (error) {
     console.error('上传错误:', error)
     res.status(500).json({ error: error.message || '上传失败' })
+  }
+})
+
+// ============ 验证码路由 ============
+
+// 发送注册验证码
+app.post('/api/send-code', async (req, res) => {
+  try {
+    const { email, type } = req.body
+    
+    if (!email) {
+      return res.status(400).json({ error: '邮箱不能为空' })
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: '邮箱格式不正确' })
+    }
+    
+    // 检查邮箱是否已存在（仅注册时）
+    if (type === 'register') {
+      const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+      const users = JSON.parse(usersData)
+      const existingUser = users.find(u => u.email === email)
+      if (existingUser) {
+        return res.status(400).json({ error: '该邮箱已被注册' })
+      }
+    }
+    
+    const result = await sendVerificationCode(email, type || 'register')
+    
+    if (result.success) {
+      res.json({ message: '验证码已发送', expires: 300 })
+    } else {
+      res.status(500).json({ error: result.error || '发送失败' })
+    }
+  } catch (error) {
+    console.error('发送验证码错误:', error)
+    res.status(500).json({ error: '发送失败' })
+  }
+})
+
+// 验证验证码
+app.post('/api/verify-code', async (req, res) => {
+  try {
+    const { email, code, type } = req.body
+    
+    if (!email || !code) {
+      return res.status(400).json({ error: '邮箱和验证码不能为空' })
+    }
+    
+    const result = await verifyCode(email, code, type || 'register')
+    
+    if (result.success) {
+      res.json({ message: '验证成功' })
+    } else {
+      res.status(400).json({ error: result.error })
+    }
+  } catch (error) {
+    console.error('验证错误:', error)
+    res.status(500).json({ error: '验证失败' })
+  }
+})
+
+// ============ 个人资料路由 ============
+
+// 获取当前用户资料
+app.get('/api/profile', authenticateToken, async (req, res) => {
+  try {
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    const users = JSON.parse(usersData)
+    const user = users.find(u => u.id === req.user.id)
+    
+    if (!user) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    res.json({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar || null,
+      displayName: user.displayName || user.username,
+      bio: user.bio || '',
+      role: user.role,
+      createdAt: user.createdAt
+    })
+  } catch (error) {
+    console.error('获取资料错误:', error)
+    res.status(500).json({ error: '获取资料失败' })
+  }
+})
+
+// 更新个人资料
+app.put('/api/profile', authenticateToken, async (req, res) => {
+  try {
+    const { displayName, bio, avatar } = req.body
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    let users = JSON.parse(usersData)
+    const index = users.findIndex(u => u.id === req.user.id)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    if (displayName) users[index].displayName = displayName
+    if (bio !== undefined) users[index].bio = bio
+    if (avatar) users[index].avatar = avatar
+    
+    users[index].updatedAt = new Date().toISOString()
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    
+    res.json({
+      message: '更新成功',
+      user: {
+        id: users[index].id,
+        username: users[index].username,
+        email: users[index].email,
+        displayName: users[index].displayName,
+        bio: users[index].bio,
+        avatar: users[index].avatar,
+        role: users[index].role
+      }
+    })
+  } catch (error) {
+    console.error('更新资料错误:', error)
+    res.status(500).json({ error: '更新失败' })
+  }
+})
+
+// 修改密码
+app.put('/api/profile/change-password', authenticateToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+    
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: '请填写所有必填项' })
+    }
+    
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: '新密码长度至少为 6 位' })
+    }
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    let users = JSON.parse(usersData)
+    const index = users.findIndex(u => u.id === req.user.id)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    const validPassword = await bcrypt.compare(currentPassword, users[index].password)
+    if (!validPassword) {
+      return res.status(401).json({ error: '当前密码错误' })
+    }
+    
+    users[index].password = await bcrypt.hash(newPassword, 10)
+    users[index].updatedAt = new Date().toISOString()
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    
+    res.json({ message: '密码修改成功' })
+  } catch (error) {
+    console.error('修改密码错误:', error)
+    res.status(500).json({ error: '修改失败' })
   }
 })
 

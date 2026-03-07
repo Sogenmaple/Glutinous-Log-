@@ -29,6 +29,7 @@ import PrefixScreensaver from './pages/PrefixScreensaver'
 import PrefixSettings from './pages/PrefixSettings'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Profile from './pages/Profile'
 import CursorEffect from './components/CursorEffect'
 import './App.css'
 import './styles/intro.css'
@@ -40,6 +41,7 @@ import './styles/header.css'
 import './styles/pomodoro.css'
 import './styles/PrefixScreensaver.css'
 import './styles/PrefixSettings.css'
+import './styles/Profile.css'
 
 function AppContent() {
   const [showIntro, setShowIntro] = useState(true)
@@ -225,6 +227,7 @@ function AppContent() {
           {/* 认证页面 */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
           
           {/* 特殊构造页面 */}
           <Route path="/special" element={<SpecialConstructs />} />

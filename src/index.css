@@ -578,6 +578,12 @@ body :not(code):not(pre) {
   padding: 3rem 0;
 }
 
+.timeline-container::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
 .timeline-line {
   position: absolute;
   left: 50%;
@@ -615,7 +621,7 @@ body :not(code):not(pre) {
 
 .timeline-item {
   position: relative;
-  width: calc(50% - 2rem);
+  width: calc(50% - 3rem);
   margin-bottom: 4rem;
   opacity: 0;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -624,7 +630,6 @@ body :not(code):not(pre) {
 .timeline-item.left {
   float: left;
   clear: left;
-  padding-right: 3.5rem;
   text-align: right;
   transform: translateX(-50px) translateY(30px);
 }
@@ -632,7 +637,6 @@ body :not(code):not(pre) {
 .timeline-item.right {
   float: right;
   clear: right;
-  padding-left: 3.5rem;
   text-align: left;
   transform: translateX(50px) translateY(30px);
 }

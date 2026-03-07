@@ -555,98 +555,264 @@ body :not(code):not(pre) {
 /* ============================================
 
 /* ============================================
-   TIMELINE SECTION - 简洁重构
+   TIMELINE SECTION - 磁带未来主义风格
    ============================================ */
 .timeline-section {
-  padding: 4rem 2rem;
-  max-width: 900px;
+  padding: 5rem 2rem;
+  max-width: 1000px;
   margin: 0 auto;
+  position: relative;
+}
+
+/* 背景光晕 */
+.timeline-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 100%;
+  background: radial-gradient(ellipse at center, rgba(255, 149, 0, 0.05) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .timeline-container {
   position: relative;
 }
 
+/* 中央时间轴线 */
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 149, 0, 0.3) 10%,
+    rgba(255, 149, 0, 0.6) 50%,
+    rgba(255, 149, 0, 0.3) 90%,
+    transparent 100%
+  );
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
 .timeline-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
   padding: 0;
+  position: relative;
 }
 
+/* 时间轴点 - 磁带风格 */
 .timeline-dot {
-  width: 40px;
-  height: 40px;
-  background: var(--bg-deep);
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-secondary) 100%);
   border: 2px solid var(--amber);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.2rem;
-  box-shadow: 0 0 20px rgba(255, 149, 0, 0.4);
+  margin-bottom: 1.5rem;
+  box-shadow: 
+    0 0 25px rgba(255, 149, 0, 0.5),
+    inset 0 0 20px rgba(255, 149, 0, 0.1),
+    0 0 0 4px rgba(255, 149, 0, 0.05);
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+.timeline-dot::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 149, 0, 0) 0deg,
+    rgba(255, 149, 0, 0.4) 60deg,
+    rgba(255, 149, 0, 0.8) 120deg,
+    rgba(255, 149, 0, 0.4) 180deg,
+    rgba(255, 149, 0, 0) 360deg
+  );
+  animation: rotate-glow 3s linear infinite;
+  z-index: -1;
+}
+
+@keyframes rotate-glow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.timeline-item:hover .timeline-dot {
+  transform: scale(1.1);
+  box-shadow: 
+    0 0 35px rgba(255, 149, 0, 0.7),
+    inset 0 0 25px rgba(255, 149, 0, 0.2),
+    0 0 0 6px rgba(255, 149, 0, 0.1);
 }
 
 .timeline-dot .vector-icon {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 0 8px rgba(255, 149, 0, 0.6));
 }
 
 .timeline-details {
   text-align: center;
   width: 100%;
+  max-width: 650px;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.02) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  border: 1px solid rgba(255, 149, 0, 0.1);
+  border-radius: 8px;
+  position: relative;
+  backdrop-filter: blur(4px);
+}
+
+.timeline-details::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 149, 0, 0.3) 50%,
+    transparent 100%
+  );
+}
+
+/* 四角装饰 */
+.timeline-details::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid var(--amber);
+  border-left: 2px solid var(--amber);
+  border-radius: 2px 0 0 0;
+}
+
+.timeline-details .card-corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--amber);
+}
+
+.timeline-details .card-corner.tl {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 2px 0 0 0;
+}
+
+.timeline-details .card-corner.tr {
+  top: -1px;
+  right: -1px;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 2px 0 0;
+}
+
+.timeline-details .card-corner.bl {
+  bottom: -1px;
+  left: -1px;
+  border-right: none;
+  border-top: none;
+  border-radius: 0 0 0 2px;
+}
+
+.timeline-details .card-corner.br {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 2px 0;
 }
 
 .timeline-date {
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--cyan);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
   display: block;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+  position: relative;
+  display: inline-block;
+  padding: 0.25rem 0.8rem;
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 3px;
 }
 
 .timeline-title {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: var(--amber);
-  text-shadow: 0 0 20px rgba(255, 149, 0, 0.5);
-  letter-spacing: 0.08em;
-  margin: 0 0 0.8rem 0;
+  text-shadow: 
+    0 0 20px rgba(255, 149, 0, 0.6),
+    0 0 40px rgba(255, 149, 0, 0.3);
+  letter-spacing: 0.1em;
+  margin: 0 0 1rem 0;
   line-height: 1.3;
 }
 
 .timeline-desc {
   font-size: 0.95rem;
   color: var(--text-secondary);
-  line-height: 1.7;
-  margin: 0 0 1rem 0;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
+  line-height: 1.8;
+  margin: 0 0 1.2rem 0;
 }
 
 .timeline-tags {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.6rem;
+  margin-bottom: 1.2rem;
 }
 
 .timeline-tag {
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  padding: 0.25rem 0.6rem;
+  padding: 0.3rem 0.7rem;
   border-radius: 3px;
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 149, 0, 0.08);
+  color: var(--amber-bright);
+  border: 1px solid rgba(255, 149, 0, 0.2);
   letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  text-shadow: 0 0 8px rgba(255, 149, 0, 0.4);
+}
+
+.timeline-tag:hover {
+  background: rgba(255, 149, 0, 0.15);
+  border-color: var(--amber);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.2);
 }
 
 .timeline-links {
@@ -659,42 +825,59 @@ body :not(code):not(pre) {
 .timeline-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-secondary);
   text-decoration: none;
-  padding: 0.35rem 0.7rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .timeline-link:hover {
   color: var(--amber);
-  border-color: rgba(255, 149, 0, 0.3);
-  background: rgba(255, 149, 0, 0.08);
+  border-color: rgba(255, 149, 0, 0.4);
+  background: rgba(255, 149, 0, 0.1);
   text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 149, 0, 0.15);
 }
 
 .timeline-link .link-icon-svg {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   fill: currentColor;
+  filter: drop-shadow(0 0 4px currentColor);
 }
 
 .timeline-status {
   display: inline-block;
   font-family: var(--font-mono);
   font-size: 0.65rem;
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.6rem;
   border-radius: 3px;
-  margin-left: 0.5rem;
+  margin-left: 0.6rem;
   vertical-align: middle;
-  background: rgba(57, 255, 20, 0.1);
+  background: rgba(57, 255, 20, 0.12);
   color: var(--green);
-  border: 1px solid rgba(57, 255, 20, 0.2);
+  border: 1px solid rgba(57, 255, 20, 0.3);
   letter-spacing: 0.05em;
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+    opacity: 0.8;
+  }
 }
    APP LAYOUT
    ============================================ */

@@ -153,6 +153,11 @@ export default function GameTimeline() {
               </div>
 
               <div className="timeline-details">
+                <div className="card-corner tl"></div>
+                <div className="card-corner tr"></div>
+                <div className="card-corner bl"></div>
+                <div className="card-corner br"></div>
+                
                 <span className="timeline-date">{formatDate(game.date)}</span>
                 
                 <h3 className="timeline-title">

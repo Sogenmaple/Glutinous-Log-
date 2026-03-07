@@ -36,5 +36,37 @@
     "createdAt": "2026-03-06T01:17:34.253Z",
     "updatedAt": "2026-03-06T01:17:34.253Z",
     "author": "admin"
+  },
+  {
+    "id": "1772855904643",
+    "title": "测试文章",
+    "excerpt": "测试摘要",
+    "content": "测试内容",
+    "type": "project",
+    "category": "游戏项目",
+    "tags": [
+      "测试"
+    ],
+    "status": "published",
+    "date": "2026-03-07",
+    "readTime": "5 分钟",
+    "createdAt": "2026-03-07T03:58:24.643Z",
+    "updatedAt": "2026-03-07T03:58:24.643Z"
+  },
+  {
+    "id": "1772856026133",
+    "title": "测试发布功能",
+    "excerpt": "测试",
+    "content": "内容",
+    "type": "devlog",
+    "category": "游戏项目",
+    "tags": [
+      "测试"
+    ],
+    "status": "draft",
+    "date": "2026-03-07",
+    "readTime": "1 分钟",
+    "createdAt": "2026-03-07T04:00:26.133Z",
+    "updatedAt": "2026-03-07T04:00:26.133Z"
   }
 ]

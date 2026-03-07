@@ -171,59 +171,62 @@ export default function GameTimeline() {
       <div className="timeline-container">
         <div className="timeline-line"></div>
 
-        {sortedGames.map((game, index) => (
-          <div
-            key={game.id}
-            data-id={game.id}
-            className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'} ${visibleItems.has(game.id) ? 'visible' : ''}`}
-            style={{ animationDelay: `${index * 0.1}s` }}
-            onMouseEnter={() => setHoveredId(game.id)}
-            onMouseLeave={() => setHoveredId(null)}
-          >
-            <div className="timeline-dot">
-              {renderVectorIcon(game.iconType)}
-            </div>
-
-            <div className="timeline-card">
-              <div className="timeline-header">
-                <span className="timeline-date">{formatDate(game.date)}</span>
-                <span className="timeline-jam">{game.jam}</span>
+        {sortedGames.map((game, index) => {
+          const isLeft = index % 2 === 0
+          return (
+            <div
+              key={game.id}
+              data-id={game.id}
+              className={`timeline-item ${isLeft ? 'left' : 'right'} ${visibleItems.has(game.id) ? 'visible' : ''}`}
+              style={{ animationDelay: `${index * 0.1}s` }}
+              onMouseEnter={() => setHoveredId(game.id)}
+              onMouseLeave={() => setHoveredId(null)}
+            >
+              <div className="timeline-dot">
+                {renderVectorIcon(game.iconType)}
               </div>
 
-              <div className="timeline-title-row">
-                <h3 className="timeline-title">{game.title}</h3>
-                {game.status === 'development' && (
-                  <span className="timeline-status development">开发中</span>
-                )}
-              </div>
+              <div className="timeline-card">
+                <div className="timeline-header">
+                  <span className="timeline-date">{formatDate(game.date)}</span>
+                  <span className="timeline-jam">{game.jam}</span>
+                </div>
 
-              <p className="timeline-desc">{game.description}</p>
+                <div className="timeline-title-row">
+                  <h3 className="timeline-title">{game.title}</h3>
+                  {game.status === 'development' && (
+                    <span className="timeline-status development">开发中</span>
+                  )}
+                </div>
 
-              <div className="timeline-tags">
-                {game.tags.map(tag => (
-                  <span key={tag} className="timeline-tag">{tag}</span>
-                ))}
-              </div>
+                <p className="timeline-desc">{game.description}</p>
 
-              {Object.keys(game.links).length > 0 && (
-                <div className="timeline-links">
-                  {Object.entries(game.links).map(([type, url]) => (
-                    <a
-                      key={type}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="timeline-link"
-                    >
-                      {renderLinkIcon(type)}
-                      <span className="link-label">{type.toUpperCase()}</span>
-                    </a>
+                <div className="timeline-tags">
+                  {game.tags.map(tag => (
+                    <span key={tag} className="timeline-tag">{tag}</span>
                   ))}
                 </div>
-              )}
+
+                {Object.keys(game.links).length > 0 && (
+                  <div className="timeline-links">
+                    {Object.entries(game.links).map(([type, url]) => (
+                      <a
+                        key={type}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="timeline-link"
+                      >
+                        {renderLinkIcon(type)}
+                        <span className="link-label">{type.toUpperCase()}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </section>
   )

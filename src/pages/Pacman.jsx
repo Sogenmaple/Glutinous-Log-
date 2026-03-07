@@ -360,9 +360,8 @@ export default function Pacman() {
             <div className="game-header">
               <div className="game-title">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 12l6-4" />
-                  <path d="M12 12l6 4" />
+                  <circle cx="12" cy="12" r="10" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2"/>
+                  <path d="M12 12 L20 8 L20 16 Z" fill="#0f172a"/>
                 </svg>
                 <span>吃豆人</span>
               </div>
@@ -467,9 +466,8 @@ export default function Pacman() {
                     <div className="overlay-content">
                       <h2>
                         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-                          <circle cx="12" cy="12" r="10" />
-                          <path d="M12 12l6-4" />
-                          <path d="M12 12l6 4" />
+                          <circle cx="12" cy="12" r="10" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2"/>
+                          <path d="M12 12 L20 8 L20 16 Z" fill="#0f172a"/>
                         </svg>
                         吃豆人
                       </h2>

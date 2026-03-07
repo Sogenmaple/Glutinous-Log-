@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Header from '../components/Header'
-import { ToolIcon } from '../components/icons/SiteIcons'
+import { BlockIcon } from '../components/icons/SiteIcons'
 import '../styles/Tetris.css'
 
 // 游戏常量
@@ -339,7 +339,7 @@ export default function Tetris() {
         <div className="tetris-header">
           <h1 className="tetris-title">
             <span className="title-icon">
-              <ToolIcon size={40} color="#ff9500" />
+              <BlockIcon size={40} color="#fbbf24" />
             </span>
             <span className="title-text">俄罗斯方块</span>
           </h1>

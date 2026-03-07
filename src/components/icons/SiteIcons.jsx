@@ -310,6 +310,18 @@ export function ToolIcon({ size = 48, color = 'currentColor' }) {
   )
 }
 
+// 方块图标（俄罗斯方块用）
+export function BlockIcon({ size = 48, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="8" y="8" width="14" height="14" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+      <rect x="26" y="8" width="14" height="14" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+      <rect x="8" y="26" width="14" height="14" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+      <rect x="26" y="26" width="14" height="14" rx="2" stroke={color} strokeWidth="2" fill="none"/>
+    </svg>
+  )
+}
+
 // 时钟图标
 export function ClockIcon({ size = 48, color = 'currentColor' }) {
   return (

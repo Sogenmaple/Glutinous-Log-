@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, BlockIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -53,7 +53,7 @@ export default function SpecialConstructs() {
       title: '俄罗斯方块',
       subtitle: 'TETRIS',
       description: '经典益智俄罗斯方块，消除行来得分',
-      icon: ToolIcon,
+      icon: BlockIcon,
       color: 'purple',
       path: '/special/tetris',
       status: 'active'

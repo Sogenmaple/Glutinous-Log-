@@ -624,18 +624,18 @@ body :not(code):not(pre) {
 .timeline-item.left {
   float: left;
   clear: both;
-  padding-right: 3.5rem;
+  padding-right: 2.5rem;
   text-align: right;
-  transform: translateX(-8px) translateY(30px);
+  transform: translateX(-5px) translateY(30px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .timeline-item.right {
   float: right;
   clear: both;
-  padding-left: 3.5rem;
+  padding-left: 2.5rem;
   text-align: left;
-  transform: translateX(8px) translateY(30px);
+  transform: translateX(5px) translateY(30px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -653,37 +653,37 @@ body :not(code):not(pre) {
 .timeline-dot {
   position: absolute;
   top: 0;
-  width: 56px;
-  height: 56px;
+  width: 48px;
+  height: 48px;
   background: linear-gradient(135deg, rgba(255, 149, 0, 0.15), rgba(255, 149, 0, 0.05));
-  border: 4px solid #ff9500;
+  border: 3px solid #ff9500;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 35px rgba(255, 149, 0, 0.8), 0 0 70px rgba(255, 149, 0, 0.4), inset 0 0 20px rgba(255, 149, 0, 0.2);
+  box-shadow: 0 0 25px rgba(255, 149, 0, 0.6), 0 0 50px rgba(255, 149, 0, 0.3), inset 0 0 15px rgba(255, 149, 0, 0.15);
   z-index: 10;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .timeline-item.left .timeline-dot {
-  right: -28px;
+  right: -24px;
 }
 
 .timeline-item.right .timeline-dot {
-  left: -28px;
+  left: -24px;
 }
 
 .timeline-item:hover .timeline-dot {
   border-color: #ff9500;
-  box-shadow: 0 0 50px rgba(255, 149, 0, 0.9), 0 0 100px rgba(255, 149, 0, 0.5), inset 0 0 25px rgba(255, 149, 0, 0.3);
-  transform: scale(1.2) rotate(180deg);
+  box-shadow: 0 0 35px rgba(255, 149, 0, 0.8), 0 0 70px rgba(255, 149, 0, 0.4), inset 0 0 20px rgba(255, 149, 0, 0.25);
+  transform: scale(1.15) rotate(180deg);
 }
 
 .timeline-dot .vector-icon {
-  width: 32px;
-  height: 32px;
-  filter: drop-shadow(0 0 8px rgba(255, 149, 0, 0.8));
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 6px rgba(255, 149, 0, 0.7));
 }
 
 /* Enhanced Timeline Card */
@@ -691,12 +691,21 @@ body :not(code):not(pre) {
   background: linear-gradient(135deg, rgba(15, 15, 20, 0.95), rgba(10, 10, 15, 0.9));
   border: 1.5px solid rgba(255, 149, 0, 0.3);
   border-radius: 12px;
-  padding: 1.8rem;
+  padding: 1.6rem;
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(15px);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 0 30px rgba(255, 149, 0, 0.03);
+}
+
+/* 靠时间轴一侧的加粗琥珀色边框 */
+.timeline-item.left .timeline-card {
+  border-right: 3px solid #ff9500;
+}
+
+.timeline-item.right .timeline-card {
+  border-left: 3px solid #ff9500;
 }
 
 /* 卡片边角装饰 */

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon, SnakeIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -86,6 +86,16 @@ export default function SpecialConstructs() {
       icon: SnakeIcon,
       color: 'amber',
       path: '/special/snake',
+      status: 'active'
+    },
+    {
+      id: 'pacman',
+      title: '吃豆人',
+      subtitle: 'PAC-MAN',
+      description: '经典吃豆人游戏，吃掉所有豆子，躲避幽灵追击',
+      icon: PacmanIcon,
+      color: 'amber',
+      path: '/special/pacman',
       status: 'active'
     },
     {

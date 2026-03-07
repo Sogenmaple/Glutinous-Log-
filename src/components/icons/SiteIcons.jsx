@@ -156,6 +156,18 @@ export function SnakeIcon({ size = 48, color = 'currentColor' }) {
   )
 }
 
+// 吃豆人图标
+export function PacmanIcon({ size = 48, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="24" cy="24" r="18" stroke={color} strokeWidth="2" fill="none"/>
+      <path d="M24 24l14-10" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M24 24l14 10" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="24" cy="24" r="3" fill={color} opacity="0.3"/>
+    </svg>
+  )
+}
+
 // 游戏手柄图标
 export function GameIcon({ size = 48, color = 'currentColor' }) {
   return (

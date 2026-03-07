@@ -24,6 +24,7 @@ import Tetris from './pages/Tetris'
 import FlyBird from './pages/FlyBird'
 import Dinosaur from './pages/Dinosaur'
 import Snake from './pages/Snake'
+import Pacman from './pages/Pacman'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
@@ -199,6 +200,9 @@ function AppContent() {
           
           {/* 贪吃蛇 */}
           <Route path="/special/snake" element={<Snake />} />
+          
+          {/* 吃豆人 */}
+          <Route path="/special/pacman" element={<Pacman />} />
           
           {/* 文章详情 */}
           <Route path="/post/:id" element={

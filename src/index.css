@@ -578,12 +578,6 @@ body :not(code):not(pre) {
   padding: 3rem 0;
 }
 
-.timeline-container::after {
-  content: '';
-  display: table;
-  clear: both;
-}
-
 .timeline-line {
   position: absolute;
   left: 50%;
@@ -621,7 +615,7 @@ body :not(code):not(pre) {
 
 .timeline-item {
   position: relative;
-  width: calc(50% - 2rem);
+  width: 45%;
   margin-bottom: 4rem;
   opacity: 0;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -630,23 +624,17 @@ body :not(code):not(pre) {
 .timeline-item.left {
   float: left;
   clear: left;
+  padding-right: 5rem;
   text-align: right;
   transform: translateX(-50px) translateY(30px);
-}
-
-.timeline-item.left .timeline-card {
-  margin-left: auto;
 }
 
 .timeline-item.right {
   float: right;
   clear: right;
+  padding-left: 5rem;
   text-align: left;
   transform: translateX(50px) translateY(30px);
-}
-
-.timeline-item.right .timeline-card {
-  margin-right: auto;
 }
 
 .timeline-item.visible {
@@ -656,7 +644,7 @@ body :not(code):not(pre) {
 
 .timeline-dot {
   position: absolute;
-  top: 1.6rem;
+  top: 0;
   width: 48px;
   height: 48px;
   background: rgba(10, 10, 15, 0.9);
@@ -668,18 +656,17 @@ body :not(code):not(pre) {
   box-shadow: 0 0 25px rgba(255, 149, 0, 0.6), inset 0 0 15px rgba(255, 149, 0, 0.1);
   z-index: 10;
   transition: all 0.3s ease;
-  pointer-events: none;
 }
 
-.timeline-dot.left {
-  right: calc(50% - 24px);
+.timeline-item.left .timeline-dot {
+  right: -26px;
 }
 
-.timeline-dot.right {
-  left: calc(50% - 24px);
+.timeline-item.right .timeline-dot {
+  left: -26px;
 }
 
-.timeline-dot:hover {
+.timeline-item:hover .timeline-dot {
   border-color: #ff9500;
   box-shadow: 0 0 35px rgba(255, 149, 0, 0.8), inset 0 0 20px rgba(255, 149, 0, 0.2);
   transform: scale(1.15);

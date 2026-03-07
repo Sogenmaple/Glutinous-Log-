@@ -182,6 +182,10 @@ export default function GameTimeline() {
               onMouseEnter={() => setHoveredId(game.id)}
               onMouseLeave={() => setHoveredId(null)}
             >
+              <div className="timeline-dot">
+                {renderVectorIcon(game.iconType)}
+              </div>
+
               <div className="timeline-card">
                 <div className="timeline-header">
                   <span className="timeline-date">{formatDate(game.date)}</span>
@@ -220,20 +224,6 @@ export default function GameTimeline() {
                   </div>
                 )}
               </div>
-            </div>
-          )
-        })}
-
-        {/* 节点独立出来，放在所有卡片后面 */}
-        {sortedGames.map((game, index) => {
-          const isLeft = index % 2 === 0
-          return (
-            <div
-              key={`dot-${game.id}`}
-              className={`timeline-dot ${isLeft ? 'left' : 'right'}`}
-              data-dot-for={game.id}
-            >
-              {renderVectorIcon(game.iconType)}
             </div>
           )
         })}

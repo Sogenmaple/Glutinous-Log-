@@ -21,9 +21,9 @@ export default function Home() {
   const navCards = [
     {
       id: 'games',
-      title: '游戏宇宙',
-      subtitle: 'GAMES UNIVERSE',
-      description: '探索我的游戏作品集，穿越时空的互动体验',
+      title: '汤圆的游戏',
+      subtitle: "TANGYUAN'S GAMES",
+      description: '独立游戏作品集合集',
       icon: GameIcon,
       color: 'amber',
       path: '/games',
@@ -31,9 +31,9 @@ export default function Home() {
     },
     {
       id: 'blog',
-      title: '思维碎片',
-      subtitle: 'THOUGHT FRAGMENTS',
-      description: '开发日志、技术分享与生活随笔',
+      title: '汤圆的博客',
+      subtitle: "TANGYUAN'S BLOG",
+      description: '开发日志与技术分享',
       icon: BookIcon,
       color: 'cyan',
       path: '/blog',

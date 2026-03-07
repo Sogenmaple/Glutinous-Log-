@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../styles/PrefixScreensaver.css'
 
 /**
  * 风格化前缀屏保
- * 使用 Intro 动画作为屏保效果
+ * 完全复用 Intro 动画效果（代码雨 + 球体 + 扩散圆环 + 眼睛）
  */
 export default function PrefixScreensaver() {
   const navigate = useNavigate()
@@ -13,6 +13,7 @@ export default function PrefixScreensaver() {
   const [settings, setSettings] = useState({
     showMatrix: true,
     showBalls: true,
+    showRings: true,
     showEyes: true,
     speed: 1.0
   })
@@ -54,7 +55,7 @@ export default function PrefixScreensaver() {
     }
   }, [exitScreenSaver])
 
-  // Canvas 动画
+  // Canvas 动画（完全复用 Intro）
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -62,14 +63,21 @@ export default function PrefixScreensaver() {
     const ctx = canvas.getContext('2d')
     let width = canvas.width = window.innerWidth
     let height = canvas.height = window.innerHeight
+    let time = 0
+
+    // 初始黑色背景
+    ctx.fillStyle = '#000'
+    ctx.fillRect(0, 0, width, height)
 
     const handleResize = () => {
       width = canvas.width = window.innerWidth
       height = canvas.height = window.innerHeight
+      ctx.fillStyle = '#000'
+      ctx.fillRect(0, 0, width, height)
     }
     window.addEventListener('resize', handleResize)
 
-    // 代码雨
+    // 代码字符集
     const chars = '01TGXYZWABXY'
     const fontSize = 11
     const columns = Math.floor(width / fontSize)
@@ -80,11 +88,16 @@ export default function PrefixScreensaver() {
 
     // 四个球体
     const balls = [
-      { x: 0.5, y: 0.5, radius: 0.12, angle: 0, speed: 0.015, orbitRadius: 0, isCenter: true },
+      { x: 0.5, y: 0.5, radius: 0.12, angle: 0, speed: 0, orbitRadius: 0, isCenter: true },
       { x: 0.5, y: 0.5, radius: 0.08, angle: 0, speed: 0.015, orbitRadius: 0.2, isCenter: false },
       { x: 0.5, y: 0.5, radius: 0.06, angle: 2, speed: -0.02, orbitRadius: 0.28, isCenter: false },
       { x: 0.5, y: 0.5, radius: 0.07, angle: 4, speed: 0.012, orbitRadius: 0.35, isCenter: false },
     ]
+
+    // 扩散圆环
+    const rings = []
+    const ringInterval = 100
+    const maxRingRadius = 0.7
 
     // 眼睛
     const eyes = {
@@ -100,11 +113,11 @@ export default function PrefixScreensaver() {
     }
     window.addEventListener('mousemove', handleMouseMove)
 
-    let time = 0
     const animate = () => {
       time += settings.speed
       
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
+      // 半透明背景，形成拖尾
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'
       ctx.fillRect(0, 0, width, height)
 
       const centerX = width / 2
@@ -133,21 +146,128 @@ export default function PrefixScreensaver() {
         }
       }
 
+      // 生成扩散圆环
+      if (settings.showRings && time % ringInterval === 0) {
+        rings.push({
+          radius: 0.1,
+          speed: 3,
+          width: 1,
+          opacity: 0.4,
+        })
+      }
+
+      // 更新和绘制扩散圆环
+      if (settings.showRings) {
+        for (let i = rings.length - 1; i >= 0; i--) {
+          const ring = rings[i]
+          const decayFactor = Math.max(0.3, 1 - ring.radius / maxRingRadius)
+          ring.speed = 3 * decayFactor
+          ring.radius += ring.speed / Math.min(width, height)
+          ring.width = 1 + (ring.radius / maxRingRadius) * 4
+          ring.opacity = 0.4 * (1 - ring.radius / maxRingRadius)
+
+          if (ring.radius >= maxRingRadius) {
+            rings.splice(i, 1)
+            continue
+          }
+
+          const ringPixelRadius = ring.radius * Math.min(width, height)
+
+          ctx.beginPath()
+          const segments = 360
+          for (let angle = 0; angle <= segments; angle++) {
+            const rad = (angle / segments) * Math.PI * 2
+            let x = centerX + Math.cos(rad) * ringPixelRadius
+            let y = centerY + Math.sin(rad) * ringPixelRadius
+
+            balls.forEach((ball) => {
+              if (ball.isCenter) return
+              const ballX = ball.x * width
+              const ballY = ball.y * height
+              const ballRadius = ball.radius * Math.min(width, height)
+              const dx = x - ballX
+              const dy = y - ballY
+              const distance = Math.sqrt(dx * dx + dy * dy)
+              const influenceRadius = ballRadius * 3
+              if (distance < influenceRadius) {
+                const influence = 1 - distance / influenceRadius
+                const noise1 = Math.sin(distance * 0.1 + time * 0.1) * 0.5
+                const noise2 = Math.cos(distance * 0.2 - time * 0.15) * 0.3
+                const noise3 = Math.sin((distance + time) * 0.05) * 0.2
+                const noise = (noise1 + noise2 + noise3) * influence * 2
+                x += noise
+                y += noise
+              }
+            })
+
+            if (angle === 0) {
+              ctx.moveTo(x, y)
+            } else {
+              ctx.lineTo(x, y)
+            }
+          }
+
+          ctx.strokeStyle = `rgba(0, 0, 0, ${ring.opacity})`
+          ctx.lineWidth = ring.width
+          ctx.lineCap = 'round'
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'
+          ctx.shadowBlur = 8
+          ctx.stroke()
+          ctx.shadowBlur = 0
+        }
+      }
+
       // 绘制球体
       if (settings.showBalls) {
         balls.forEach((ball) => {
-          const x = ball.x * width
-          const y = ball.y * height
-          const radius = ball.radius * Math.min(width, height)
+          const ballCenterX = ball.x * width
+          const ballCenterY = ball.y * height
+          const ballRadius = ball.radius * Math.min(width, height)
+          const pulse = 1 + Math.sin(time * 0.05) * 0.05
+          const currentRadius = ballRadius * pulse
 
-          const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
-          gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)')
-          gradient.addColorStop(0.3, 'rgba(200, 200, 200, 0.4)')
-          gradient.addColorStop(1, 'rgba(100, 100, 100, 0.1)')
-
-          ctx.fillStyle = gradient
+          // 球体光晕
+          const gradient1 = ctx.createRadialGradient(
+            ballCenterX, ballCenterY, currentRadius * 0.5,
+            ballCenterX, ballCenterY, currentRadius * 1.5
+          )
+          gradient1.addColorStop(0, 'rgba(0, 0, 0, 0.2)')
+          gradient1.addColorStop(0.5, 'rgba(50, 50, 50, 0.1)')
+          gradient1.addColorStop(1, 'rgba(100, 100, 100, 0)')
+          ctx.fillStyle = gradient1
           ctx.beginPath()
-          ctx.arc(x, y, radius, 0, Math.PI * 2)
+          ctx.arc(ballCenterX, ballCenterY, currentRadius * 1.5, 0, Math.PI * 2)
+          ctx.fill()
+
+          // 球体边框
+          const gradient2 = ctx.createRadialGradient(
+            ballCenterX, ballCenterY, currentRadius * 0.8,
+            ballCenterX, ballCenterY, currentRadius * 1.2
+          )
+          gradient2.addColorStop(0, 'rgba(255, 255, 255, 0.1)')
+          gradient2.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)')
+          gradient2.addColorStop(1, 'rgba(255, 255, 255, 0)')
+          ctx.strokeStyle = gradient2
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.arc(ballCenterX, ballCenterY, currentRadius, 0, Math.PI * 2)
+          ctx.stroke()
+
+          // 球体核心
+          const coreGradient = ctx.createRadialGradient(
+            ballCenterX - currentRadius * 0.3,
+            ballCenterY - currentRadius * 0.3,
+            0,
+            ballCenterX,
+            ballCenterY,
+            currentRadius
+          )
+          coreGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)')
+          coreGradient.addColorStop(0.5, 'rgba(200, 200, 200, 0.4)')
+          coreGradient.addColorStop(1, 'rgba(100, 100, 100, 0.1)')
+          ctx.fillStyle = coreGradient
+          ctx.beginPath()
+          ctx.arc(ballCenterX, ballCenterY, currentRadius, 0, Math.PI * 2)
           ctx.fill()
         })
       }

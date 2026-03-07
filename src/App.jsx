@@ -25,6 +25,7 @@ import FlyBird from './pages/FlyBird'
 import Dinosaur from './pages/Dinosaur'
 import Snake from './pages/Snake'
 import Pacman from './pages/Pacman'
+import GamesCollection from './pages/GamesCollection'
 import PrefixScreensaver from './pages/PrefixScreensaver'
 import PrefixSettings from './pages/PrefixSettings'
 import Login from './pages/Login'
@@ -228,6 +229,9 @@ function AppContent() {
           
           {/* 特殊构造页面 */}
           <Route path="/special" element={<SpecialConstructs />} />
+          
+          {/* 小游戏集锦 */}
+          <Route path="/special/games" element={<GamesCollection />} />
           
           {/* 番茄钟待办 */}
           <Route path="/special/pomodoro" element={<PomodoroTodo />} />

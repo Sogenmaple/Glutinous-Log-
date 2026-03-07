@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon, SnakeIcon, PacmanIcon, BlockIcon, TangyuanIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, TangyuanIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -18,6 +18,17 @@ export default function SpecialConstructs() {
   }, [])
 
   const specialTools = [
+    {
+      id: 'games-collection',
+      title: '小游戏集锦',
+      subtitle: 'GAMES COLLECTION',
+      description: '集合所有休闲小游戏，扫雷/俄罗斯方块/贪吃蛇等',
+      icon: TangyuanIcon,
+      color: 'amber',
+      path: '/special/games',
+      status: 'active',
+      featured: true
+    },
     {
       id: 'pomodoro',
       title: '番茄钟待办',
@@ -46,56 +57,6 @@ export default function SpecialConstructs() {
       icon: CalculatorIcon,
       color: 'cyan',
       path: '/special/calculator',
-      status: 'active'
-    },
-    {
-      id: 'tetris',
-      title: '俄罗斯方块',
-      subtitle: 'TETRIS',
-      description: '经典益智俄罗斯方块，消除行来得分',
-      icon: BlockIcon,
-      color: 'purple',
-      path: '/special/tetris',
-      status: 'active'
-    },
-    {
-      id: 'flybird',
-      title: '飞扬的小鸟',
-      subtitle: 'FLAPPY BIRD',
-      description: '经典飞行游戏，躲避管道飞跃障碍',
-      icon: BirdIcon,
-      color: 'amber',
-      path: '/special/flybird',
-      status: 'active'
-    },
-    {
-      id: 'dinosaur',
-      title: '恐龙快跑',
-      subtitle: 'DINO RUN',
-      description: 'Chrome 小恐龙游戏，无尽跑酷挑战',
-      icon: DinosaurIcon,
-      color: 'green',
-      path: '/special/dinosaur',
-      status: 'active'
-    },
-    {
-      id: 'snake',
-      title: '贪吃蛇',
-      subtitle: 'SNAKE',
-      description: '经典贪吃蛇游戏，吃掉食物变长，挑战最高分',
-      icon: SnakeIcon,
-      color: 'amber',
-      path: '/special/snake',
-      status: 'active'
-    },
-    {
-      id: 'pacman',
-      title: '吃豆人',
-      subtitle: 'PAC-MAN',
-      description: '经典吃豆人游戏，吃掉所有豆子，躲避幽灵追击',
-      icon: PacmanIcon,
-      color: 'amber',
-      path: '/special/pacman',
       status: 'active'
     },
     {
@@ -151,55 +112,36 @@ export default function SpecialConstructs() {
             </span>
             <span className="title-text">特殊构造</span>
           </h1>
-          <p className="page-subtitle">SPECIAL CONSTRUCTS - 工具 · 实验 · 创意</p>
+          <p className="page-subtitle">SPECIAL CONSTRUCTS // TOOLS & EXPERIMENTS</p>
         </div>
 
-        <div className="special-grid">
+        <div className="tools-grid">
           {specialTools.map((tool, index) => {
             const IconComponent = tool.icon
             return (
               <div
                 key={tool.id}
-                className={`special-card ${tool.color} ${hoveredCard === tool.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
+                className={`tool-card ${tool.color} ${tool.featured ? 'featured' : ''} ${hoveredCard === tool.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
                 onMouseEnter={() => setHoveredCard(tool.id)}
                 onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => tool.status === 'active' && navigate(tool.path)}
+                onClick={() => navigate(tool.path)}
               >
-                <div className="card-bg-decoration"></div>
-                
+                <div className="card-icon">
+                  <IconComponent size={48} color="currentColor" />
+                </div>
+
                 <div className="card-content">
-                  <div className="card-icon">
-                    <IconComponent size={56} color="currentColor" />
-                  </div>
                   <h3 className="card-title">{tool.title}</h3>
                   <p className="card-subtitle">{tool.subtitle}</p>
                   <p className="card-description">{tool.description}</p>
-                  
-                  <div className="card-status">
-                    {tool.status === 'active' ? (
-                      <span className="status-badge active">
-                        <span className="status-dot"></span>
-                        可用
-                      </span>
-                    ) : (
-                      <span className="status-badge coming-soon">
-                        敬请期待
-                      </span>
-                    )}
-                  </div>
-
-                  {tool.status === 'active' && (
-                    <div className="card-arrow">
-                      <span>ENTER</span>
-                      <span className="arrow-symbol">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                          <path d="M8 4l8 8-8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </span>
-                    </div>
-                  )}
                 </div>
+
+                {tool.status === 'active' ? (
+                  <span className="status-badge active">可用</span>
+                ) : (
+                  <span className="status-badge coming-soon">即将推出</span>
+                )}
 
                 <div className="card-corner tl"></div>
                 <div className="card-corner tr"></div>
@@ -209,8 +151,9 @@ export default function SpecialConstructs() {
             )
           })}
         </div>
+
+        <Footer />
       </main>
-      <Footer />
     </>
   )
 }

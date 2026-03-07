@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { GameIcon, BookIcon, UserIcon, ToolIcon, ClockIcon } from '../components/icons/SiteIcons'
+import { GameIcon, BookIcon, UserIcon, ToolIcon, ClockIcon, CodeIcon, BombIcon, SnakeIcon, BirdIcon, PacmanIcon, DinosaurIcon } from '../components/icons/SiteIcons'
 import Header from '../components/Header'
 import '../styles/Home.css'
 
@@ -59,11 +59,11 @@ export default function Home() {
   // 子页面内容预览
   const subPages = {
     games: [
-      { name: '扫雷', icon: '💣', path: '/special/minesweeper' },
-      { name: '贪吃蛇', icon: '🐍', path: '/special/snake' },
-      { name: 'FlyBird', icon: '🐦', path: '/special/flybird' },
-      { name: '吃豆人', icon: '👻', path: '/special/pacman' },
-      { name: '恐龙快跑', icon: '🦖', path: '/special/dinosaur' }
+      { name: '扫雷', icon: BombIcon, path: '/special/minesweeper' },
+      { name: '贪吃蛇', icon: SnakeIcon, path: '/special/snake' },
+      { name: 'FlyBird', icon: BirdIcon, path: '/special/flybird' },
+      { name: '吃豆人', icon: PacmanIcon, path: '/special/pacman' },
+      { name: '恐龙快跑', icon: DinosaurIcon, path: '/special/dinosaur' }
     ],
     blog: [
       { title: '开发日志 #001', date: '2024-12-01', excerpt: '项目启动与架构设计' },
@@ -71,13 +71,13 @@ export default function Home() {
       { title: '开发日志 #003', date: '2024-12-10', excerpt: 'UI/UX 设计心得' }
     ],
     special: [
-      { name: '番茄钟', icon: '🍅', desc: '25 分钟专注工作法' },
-      { name: '计算器', icon: '🔢', desc: '科学计算工具' },
-      { name: '代码片段', icon: '💻', desc: '常用代码库' }
+      { name: '番茄钟', icon: ClockIcon, desc: '25 分钟专注工作法' },
+      { name: '计算器', icon: CodeIcon, desc: '科学计算工具' },
+      { name: '代码片段', icon: CodeIcon, desc: '常用代码库' }
     ],
     about: [
       { label: '技能', value: 'Unity / React / Node.js' },
-      { label: '坐标', value: '中国·成都' },
+      { label: '坐标', value: '中国·武汉' },
       { label: '状态', value: '独立开发中' }
     ]
   }
@@ -160,7 +160,7 @@ export default function Home() {
               </div>
               <div className="dw-row">
                 <span className="dw-label">LOCATION</span>
-                <span className="dw-value">成都 · 中国</span>
+                <span className="dw-value">武汉 · 中国</span>
               </div>
             </div>
 
@@ -189,16 +189,19 @@ export default function Home() {
                     <span className="st-cn">游戏宇宙</span>
                     <span className="st-en">GAMES</span>
                   </div>
-                  <a href="/games" className="section-more">MORE →</a>
+                  <span className="section-more" onClick={() => navigate('/games')}>MORE →</span>
                 </div>
                 <div className="section-content">
                   <div className="sub-pages-list">
-                    {subPages.games.map((game, i) => (
-                      <a key={i} href={game.path} className="sub-page-item">
-                        <span className="spi-icon">{game.icon}</span>
-                        <span className="spi-name">{game.name}</span>
-                      </a>
-                    ))}
+                    {subPages.games.map((game, i) => {
+                      const IconComp = game.icon
+                      return (
+                        <div key={i} className="sub-page-item" onClick={() => navigate(game.path)}>
+                          <div className="spi-icon"><IconComp size={24} color="currentColor" /></div>
+                          <span className="spi-name">{game.name}</span>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               </section>
@@ -211,7 +214,7 @@ export default function Home() {
                     <span className="st-cn">思维碎片</span>
                     <span className="st-en">BLOG</span>
                   </div>
-                  <a href="/blog" className="section-more">MORE →</a>
+                  <span className="section-more" onClick={() => navigate('/blog')}>MORE →</span>
                 </div>
                 <div className="section-content">
                   <div className="blog-posts-list">
@@ -234,19 +237,22 @@ export default function Home() {
                     <span className="st-cn">特殊构造</span>
                     <span className="st-en">SPECIAL</span>
                   </div>
-                  <a href="/special" className="section-more">MORE →</a>
+                  <span className="section-more" onClick={() => navigate('/special')}>MORE →</span>
                 </div>
                 <div className="section-content">
                   <div className="sub-pages-list">
-                    {subPages.special.map((item, i) => (
-                      <div key={i} className="sub-page-item">
-                        <span className="spi-icon">{item.icon}</span>
-                        <div className="spi-info">
-                          <span className="spi-name">{item.name}</span>
-                          <span className="spi-desc">{item.desc}</span>
+                    {subPages.special.map((item, i) => {
+                      const IconComp = item.icon
+                      return (
+                        <div key={i} className="sub-page-item" onClick={() => navigate(item.path || '/special')}>
+                          <div className="spi-icon"><IconComp size={24} color="currentColor" /></div>
+                          <div className="spi-info">
+                            <span className="spi-name">{item.name}</span>
+                            <span className="spi-desc">{item.desc}</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               </section>
@@ -259,7 +265,7 @@ export default function Home() {
                     <span className="st-cn">关于汤圆</span>
                     <span className="st-en">ABOUT</span>
                   </div>
-                  <a href="/about" className="section-more">MORE →</a>
+                  <span className="section-more" onClick={() => navigate('/about')}>MORE →</span>
                 </div>
                 <div className="section-content">
                   <div className="about-info-list">

@@ -461,7 +461,7 @@
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 4px;
-  text-decoration: none;
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
@@ -471,8 +471,16 @@
   transform: translateX(4px);
 }
 
+.games-section .sub-page-item { --theme-color: var(--amber); }
+.special-section .sub-page-item { --theme-color: #ff453a; }
+
 .spi-icon {
-  font-size: 1.5rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-color);
 }
 
 .spi-name {

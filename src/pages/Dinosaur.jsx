@@ -298,6 +298,31 @@ export default function Dinosaur() {
               <span className="info-label">SPEED</span>
               <span className="info-value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
             </div>
+            
+            {/* 操作说明移到左侧边栏底部 */}
+            <div className="controls-mini">
+              <div className="controls-mini-header">
+                <span>CONTROLS</span>
+              </div>
+              <div className="controls-mini-grid">
+                <div className="control-mini">
+                  <span className="mini-key">␣</span>
+                  <span className="mini-label">跳</span>
+                </div>
+                <div className="control-mini">
+                  <span className="mini-key">↑</span>
+                  <span className="mini-label">跳</span>
+                </div>
+                <div className="control-mini">
+                  <span className="mini-key">↓</span>
+                  <span className="mini-label">蹲</span>
+                </div>
+                <div className="control-mini">
+                  <span className="mini-key">P</span>
+                  <span className="mini-label">停</span>
+                </div>
+              </div>
+            </div>
           </aside>
 
           {/* 中央游戏区 */}
@@ -440,36 +465,6 @@ export default function Dinosaur() {
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* 操作说明 */}
-            <div className="controls-panel">
-              <div className="controls-header">
-                <span>操作说明</span>
-                <div className="header-line"></div>
-              </div>
-              <div className="controls-grid">
-                <div className="control-item">
-                  <span className="key-icon">␣</span>
-                  <span className="key-label">空格</span>
-                  <span className="key-action">跳跃</span>
-                </div>
-                <div className="control-item">
-                  <span className="key-icon">↑</span>
-                  <span className="key-label">上箭头</span>
-                  <span className="key-action">跳跃</span>
-                </div>
-                <div className="control-item">
-                  <span className="key-icon">↓</span>
-                  <span className="key-label">下箭头</span>
-                  <span className="key-action">蹲下</span>
-                </div>
-                <div className="control-item">
-                  <span className="key-icon">P</span>
-                  <span className="key-label">P 键</span>
-                  <span className="key-action">暂停</span>
-                </div>
-              </div>
             </div>
           </main>
 

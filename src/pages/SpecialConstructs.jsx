@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, BirdIcon, DinosaurIcon, SnakeIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -76,6 +76,16 @@ export default function SpecialConstructs() {
       icon: DinosaurIcon,
       color: 'green',
       path: '/special/dinosaur',
+      status: 'active'
+    },
+    {
+      id: 'snake',
+      title: '贪吃蛇',
+      subtitle: 'SNAKE',
+      description: '经典贪吃蛇游戏，吃掉食物变长，挑战最高分',
+      icon: SnakeIcon,
+      color: 'amber',
+      path: '/special/snake',
       status: 'active'
     },
     {

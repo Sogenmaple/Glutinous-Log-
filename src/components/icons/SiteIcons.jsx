@@ -142,6 +142,20 @@ export function DinosaurIcon({ size = 24, color = 'currentColor' }) {
   )
 }
 
+// 蛇图标
+export function SnakeIcon({ size = 48, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 24c0-6 4-10 10-10s10 4 10 10-4 10-10 10-10-4-10-10z" stroke={color} strokeWidth="2" fill="none"/>
+      <circle cx="20" cy="22" r="2" fill={color} opacity="0.6"/>
+      <circle cx="28" cy="22" r="2" fill={color} opacity="0.6"/>
+      <path d="M22 28c0 2 2 4 4 4s4-2 4-4" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M8 24c-2 0-4-2-4-4s2-4 4-4" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <path d="M40 24c2 0 4-2 4-4s-2-4-4-4" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
+
 // 游戏手柄图标
 export function GameIcon({ size = 48, color = 'currentColor' }) {
   return (

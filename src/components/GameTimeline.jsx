@@ -182,11 +182,12 @@ export default function GameTimeline() {
               onMouseEnter={() => setHoveredId(game.id)}
               onMouseLeave={() => setHoveredId(null)}
             >
-              <div className="timeline-dot">
-                {renderVectorIcon(game.iconType)}
-              </div>
+              <div className="timeline-item-wrapper">
+                <div className="timeline-dot">
+                  {renderVectorIcon(game.iconType)}
+                </div>
 
-              <div className="timeline-card">
+                <div className="timeline-card">
                 <div className="timeline-header">
                   <span className="timeline-date">{formatDate(game.date)}</span>
                   <span className="timeline-jam">{game.jam}</span>
@@ -223,6 +224,7 @@ export default function GameTimeline() {
                     ))}
                   </div>
                 )}
+                </div>
               </div>
             </div>
           )

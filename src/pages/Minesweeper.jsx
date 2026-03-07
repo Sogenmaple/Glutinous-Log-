@@ -5,7 +5,7 @@ import '../styles/Minesweeper.css'
 const DIFFICULTIES = {
   easy: { rows: 9, cols: 9, mines: 10, label: '简单' },
   medium: { rows: 16, cols: 16, mines: 40, label: '中等' },
-  hard: { rows: 30, cols: 16, mines: 99, label: '困难' }
+  hard: { rows: 24, cols: 24, mines: 99, label: '困难' }
 }
 
 export default function Minesweeper() {

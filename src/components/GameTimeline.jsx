@@ -179,12 +179,6 @@ export default function GameTimeline() {
             </div>
 
             <div className="timeline-content">
-              {/* 4 角装饰 */}
-              <div className="card-corner tl"></div>
-              <div className="card-corner tr"></div>
-              <div className="card-corner bl"></div>
-              <div className="card-corner br"></div>
-              
               <span className="timeline-date">{formatDate(game.date)}</span>
               
               <h3 className="timeline-title">

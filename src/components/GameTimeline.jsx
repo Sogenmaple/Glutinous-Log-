@@ -186,9 +186,6 @@ export default function GameTimeline() {
                 {renderVectorIcon(game.iconType)}
               </div>
 
-              {/* 连接线 */}
-              <div className="timeline-connector"></div>
-
               <div className="timeline-card">
                 {/* 默认显示：标题 + 时间 */}
                 <div className="timeline-header-simple">

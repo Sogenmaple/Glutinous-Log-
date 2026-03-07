@@ -75,7 +75,12 @@ export default function Dinosaur() {
     if (gameOver) return
     if (!gameStarted) {
       startGame()
-    } else if (!isPaused && dinoY >= GROUND_Y) {
+      return
+    }
+    if (isPaused) return
+    
+    // 只有在地面或接近地面时才能跳跃
+    if (dinoY >= GROUND_Y - 5) {
       setDinoVelocity(JUMP_STRENGTH)
       createParticles(DINO_X + 30, dinoY - 10, 'rgba(255,149,0,0.5)')
     }
@@ -135,12 +140,21 @@ export default function Dinosaur() {
       if (deltaTime >= 16) {
         lastTimeRef.current = now
         
-        // 更新恐龙位置
-        setDinoY(y => {
-          const newY = y + dinoVelocity
-          return newY >= GROUND_Y ? GROUND_Y : newY
+        // 更新恐龙位置和速度（使用函数式更新确保同步）
+        setDinoY(prevY => {
+          const newY = prevY + dinoVelocity
+          const onGround = newY >= GROUND_Y
+          
+          // 如果在地面上，速度归零
+          if (onGround) {
+            setDinoVelocity(0)
+            return GROUND_Y
+          } else {
+            // 在空中时应用重力
+            setDinoVelocity(v => v + GRAVITY)
+            return newY
+          }
         })
-        setDinoVelocity(v => (dinoY >= GROUND_Y ? 0 : v + GRAVITY))
 
         // 更新障碍物速度和生成
         setObstacles(current => {

@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Header from '../components/Header'
 import '../styles/Dinosaur.css'
 
-const GRAVITY = 0.6
-const JUMP_STRENGTH = -13
+const GRAVITY = 0.7
+const JUMP_STRENGTH = 14
 const BASE_SPEED = 8
 const CANVAS_HEIGHT = 450
 const GROUND_HEIGHT = 60
@@ -100,7 +100,7 @@ export default function Dinosaur() {
     }
     if (isPaused) return
     
-    if (dinoY >= 0) {
+    if (dinoY === 0) {
       dinoVelocityRef.current = JUMP_STRENGTH
       const groundY = canvasHeightRef.current - GROUND_HEIGHT
       createParticles(DINO_X + 20, groundY - 10, 6)
@@ -163,7 +163,7 @@ export default function Dinosaur() {
             dinoVelocityRef.current = 0
             return 0
           }
-          dinoVelocityRef.current += GRAVITY
+          dinoVelocityRef.current -= GRAVITY
           return Math.max(0, newY)
         })
 
@@ -233,8 +233,8 @@ export default function Dinosaur() {
     const dinoHeight = isDucking ? 25 : 45
     const dinoLeft = DINO_X + 5
     const dinoRight = DINO_X + dinoWidth - 5
-    const dinoTop = groundY - dinoY - dinoHeight + 5
-    const dinoBottom = groundY - dinoY - 3
+    const dinoTop = groundY + dinoY - dinoHeight + 5
+    const dinoBottom = groundY + dinoY - 3
 
     for (const obs of obstacles) {
       const obsWidth = obs.type === 'bird' ? 35 : 25
@@ -250,7 +250,7 @@ export default function Dinosaur() {
           dinoBottom > obsTop && 
           dinoTop < obsBottom) {
         setGameOver(true)
-        createParticles(DINO_X + 20, groundY - dinoY - dinoHeight / 2, 12)
+        createParticles(DINO_X + 20, groundY + dinoY - dinoHeight / 2, 12)
         return
       }
     }

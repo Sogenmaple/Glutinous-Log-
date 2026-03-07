@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Header from '../components/Header'
 import '../styles/Dinosaur.css'
 
-const GRAVITY = 0.7
-const JUMP_STRENGTH = -15
+const GRAVITY = 0.8
+const JUMP_STRENGTH = -16
 const BASE_SPEED = 8
-const GROUND_OFFSET = 80
-const DINO_X = 80
+const GROUND_Y = 320
+const DINO_X = 100
 
 export default function Dinosaur() {
   const [gameStarted, setGameStarted] = useState(false)
@@ -25,7 +25,6 @@ export default function Dinosaur() {
   const gameLoopRef = useRef(null)
   const lastTimeRef = useRef(0)
   const scoreRef = useRef(0)
-  const canvasHeightRef = useRef(400)
 
   useEffect(() => {
     const saved = localStorage.getItem('dinosaur_highscore')
@@ -89,18 +88,21 @@ export default function Dinosaur() {
   }, [])
 
   const jump = useCallback(() => {
-    if (gameOver) return
+    if (gameOver) {
+      resetGame()
+      return
+    }
     if (!gameStarted) {
       startGame()
       return
     }
     if (isPaused) return
     
-    if (dinoY <= 5) {
+    if (dinoY === 0) {
       dinoVelocityRef.current = JUMP_STRENGTH
-      createParticles(DINO_X + 20, canvasHeightRef.current - GROUND_OFFSET - dinoY + 10, 6)
+      createParticles(DINO_X + 20, GROUND_Y - 10, 6)
     }
-  }, [gameStarted, gameOver, isPaused, dinoY, startGame, createParticles])
+  }, [gameStarted, gameOver, isPaused, dinoY, startGame, resetGame, createParticles])
 
   const duck = useCallback((ducking) => {
     if (gameStarted && !gameOver && !isPaused) {
@@ -154,7 +156,7 @@ export default function Dinosaur() {
         
         setDinoY(prevY => {
           const newY = prevY + dinoVelocityRef.current
-          if (newY <= 0) {
+          if (newY >= 0) {
             dinoVelocityRef.current = 0
             return 0
           }
@@ -170,14 +172,14 @@ export default function Dinosaur() {
           newObstacles = newObstacles.filter(obs => obs.x > -50)
           
           const lastObs = newObstacles[newObstacles.length - 1]
-          const minGap = 280 + speedRef.current * 10
+          const minGap = 300 + speedRef.current * 10
           
           if (!lastObs || lastObs.x < 750 - minGap) {
             const type = Math.random() > 0.6 ? 'bird' : 'cactus'
             newObstacles.push({
               x: 800,
               type,
-              y: type === 'bird' ? 70 : 0
+              y: type === 'bird' ? 65 : 0
             })
           }
           
@@ -190,7 +192,7 @@ export default function Dinosaur() {
               ...p,
               x: p.x + p.vx,
               y: p.y + p.vy,
-              vy: p.vy + 0.2,
+              vy: p.vy + 0.25,
               life: p.life - 0.03
             }))
             .filter(p => p.life > 0)
@@ -203,7 +205,7 @@ export default function Dinosaur() {
           const newLevel = Math.floor(currentScore / 300) + 1
           if (newLevel !== speedLevel) {
             setSpeedLevel(newLevel)
-            speedRef.current = Math.min(BASE_SPEED + (newLevel - 1) * 0.6, 12)
+            speedRef.current = Math.min(BASE_SPEED + (newLevel - 1) * 0.5, 11)
           }
         }
       }
@@ -225,39 +227,30 @@ export default function Dinosaur() {
 
     const dinoWidth = isDucking ? 50 : 40
     const dinoHeight = isDucking ? 25 : 45
-    const groundY = canvasHeightRef.current - GROUND_OFFSET
     const dinoLeft = DINO_X + 5
     const dinoRight = DINO_X + dinoWidth - 5
-    const dinoTop = groundY - dinoY - dinoHeight + 5
-    const dinoBottom = groundY - dinoY - 3
+    const dinoTop = GROUND_Y + dinoY - dinoHeight + 5
+    const dinoBottom = GROUND_Y + dinoY - 3
 
     for (const obs of obstacles) {
       const obsWidth = obs.type === 'bird' ? 35 : 25
       const obsHeight = obs.type === 'bird' ? 20 : 35
-      const obsGroundY = obs.type === 'bird' ? groundY - 70 : groundY
+      const obsY = obs.type === 'bird' ? GROUND_Y - 65 : GROUND_Y
       const obsLeft = obs.x + 3
       const obsRight = obs.x + obsWidth - 3
-      const obsTop = obsGroundY - obs.y - obsHeight + 3
-      const obsBottom = obsGroundY - obs.y - 3
+      const obsTop = obsY + obs.y - obsHeight + 3
+      const obsBottom = obsY + obs.y - 3
 
       if (dinoRight > obsLeft && 
           dinoLeft < obsRight && 
           dinoBottom > obsTop && 
           dinoTop < obsBottom) {
         setGameOver(true)
-        createParticles(DINO_X + 20, groundY - dinoY - dinoHeight / 2, 12)
+        createParticles(DINO_X + 20, GROUND_Y + dinoY - dinoHeight / 2, 12)
         return
       }
     }
   }, [dinoY, obstacles, gameStarted, gameOver, isPaused, isDucking, createParticles])
-
-  const handleCanvasClick = useCallback(() => {
-    if (gameOver) {
-      resetGame()
-    } else {
-      jump()
-    }
-  }, [gameOver, resetGame, jump])
 
   return (
     <div className="dinosaur-page">
@@ -267,67 +260,49 @@ export default function Dinosaur() {
       <div className="tape-grid"></div>
       <div className="tape-scanlines"></div>
 
-      <div className="dino-layout">
-        <aside className="dino-sidebar-left">
-          <div className="logo-section">
-            <svg width="60" height="60" viewBox="0 0 100 100" fill="none" stroke="#fff" strokeWidth="3">
-              <ellipse cx="50" cy="50" rx="35" ry="20"/>
-              <circle cx="70" cy="40" r="12"/>
-              <path d="M80 35l15-5M82 40l15-3M80 45l15-2"/>
-              <path d="M30 55l-8 15M40 58l-5 18"/>
-              <path d="M60 65q5 10 15 10"/>
-            </svg>
-            <h1 className="logo-title">恐龙快跑</h1>
-            <p className="logo-subtitle">DINO RUN</p>
+      <div className="dino-newspaper">
+        {/* 报头 */}
+        <div className="newspaper-header">
+          <div className="header-date">
+            <span className="date">{new Date().toLocaleDateString('zh-CN')}</span>
+            <span className="issue">VOL.2024.NO.12</span>
           </div>
-
-          <div className="status-panel">
-            <div className="panel-header">
-              <span>SYSTEM STATUS</span>
-            </div>
-            <div className="panel-content">
-              <div className="status-row">
-                <span className="label">状态</span>
-                <span className={`value ${gameOver ? 'danger' : gameStarted ? 'active' : 'ready'}`}>
-                  {gameOver ? 'GAME OVER' : gameStarted ? 'RUNNING' : 'READY'}
-                </span>
-              </div>
-              <div className="status-row">
-                <span className="label">等级</span>
-                <span className="value level">{speedLevel}</span>
-              </div>
-              <div className="status-row">
-                <span className="label">速度</span>
-                <span className="value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
-              </div>
-              <div className="status-row">
-                <span className="label">得分</span>
-                <span className="value">{score}</span>
-              </div>
-            </div>
+          <div className="header-title">
+            <h1>恐龙快跑</h1>
+            <p className="subtitle">DINO RUN · 磁带未来风</p>
           </div>
-        </aside>
+          <div className="header-status">
+            <span className={`status-badge ${gameOver ? 'danger' : gameStarted ? 'active' : 'ready'}`}>
+              {gameOver ? 'GAME OVER' : gameStarted ? 'RUNNING' : 'READY'}
+            </span>
+          </div>
+        </div>
 
-        <main className="dino-main">
-          <div className="top-bar">
-            <div className="top-info">
+        {/* 主内容区 */}
+        <div className="newspaper-content">
+          {/* 左侧边栏 */}
+          <aside className="news-sidebar-left">
+            <div className="score-box">
+              <span className="score-label">SCORE</span>
+              <span className="score-value">{String(score).padStart(6, '0')}</span>
+            </div>
+            <div className="score-box">
+              <span className="score-label">BEST</span>
+              <span className="score-value highlight">{String(highScore).padStart(6, '0')}</span>
+            </div>
+            <div className="info-box">
               <span className="info-label">LEVEL</span>
               <span className="info-value">{speedLevel}</span>
             </div>
-            <div className="top-divider"></div>
-            <div className="top-info">
+            <div className="info-box">
               <span className="info-label">SPEED</span>
               <span className="info-value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
             </div>
-            <div className="top-divider"></div>
-            <div className="top-info">
-              <span className="info-label">SCORE</span>
-              <span className="info-value">{String(score).padStart(6, '0')}</span>
-            </div>
-          </div>
+          </aside>
 
-          <div className="game-section">
-            <div className="game-canvas" onClick={handleCanvasClick}>
+          {/* 中央游戏区 */}
+          <main className="news-game-area">
+            <div className="game-canvas" onClick={jump}>
               <div className="bg-lines"></div>
               
               {particles.map(p => (
@@ -345,10 +320,10 @@ export default function Dinosaur() {
                 />
               ))}
 
-              {/* 恐龙 - 简约线条风格 */}
+              {/* 恐龙 */}
               <div 
                 className={`dino ${isDucking ? 'ducking' : ''}`}
-                style={{ bottom: GROUND_OFFSET + dinoY, left: DINO_X }}
+                style={{ top: GROUND_Y + dinoY - 45, left: DINO_X }}
               >
                 <svg viewBox="0 0 50 45" fill="none" stroke="#fff" strokeWidth="2">
                   <ellipse cx="25" cy="30" rx="18" ry="12"/>
@@ -370,7 +345,7 @@ export default function Dinosaur() {
                   className={`obstacle ${obs.type}`}
                   style={{ 
                     left: obs.x, 
-                    bottom: GROUND_OFFSET + (obs.type === 'bird' ? 70 + obs.y : obs.y)
+                    top: obs.type === 'bird' ? GROUND_Y - 65 + obs.y - 20 : GROUND_Y + obs.y - 35
                   }}
                 >
                   {obs.type === 'bird' ? (
@@ -415,7 +390,7 @@ export default function Dinosaur() {
                   <div className="overlay-content">
                     {gameOver ? (
                       <>
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2">
                           <circle cx="12" cy="12" r="10"/>
                           <line x1="15" y1="9" x2="9" y2="15"/>
                           <line x1="9" y1="9" x2="15" y2="15"/>
@@ -467,70 +442,66 @@ export default function Dinosaur() {
               )}
             </div>
 
-            <div className="dino-sidebar-right">
-              <div className="stat-card">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                  <line x1="18" y1="20" x2="18" y2="10"/>
-                  <line x1="12" y1="20" x2="12" y2="4"/>
-                  <line x1="6" y1="20" x2="6" y2="14"/>
-                </svg>
-                <span className="stat-label">得分</span>
-                <span className="stat-value">{score}</span>
+            {/* 操作说明 */}
+            <div className="controls-panel">
+              <div className="controls-header">
+                <span>操作说明</span>
+                <div className="header-line"></div>
               </div>
-              <div className="stat-card">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                  <circle cx="12" cy="8" r="6"/>
-                  <path d="M15.477 12.89 17 13l.523-.11a.5.5 0 0 1 .581.374l1.708 6.83a.5.5 0 0 1-.374.581l-.175.043a2 2 0 0 1-2.414-1.442L16.5 18l-1.023.286a2 2 0 0 1-2.414-1.442l-.42-1.686a2 2 0 0 1 1.442-2.414l.392-.098Z"/>
-                </svg>
-                <span className="stat-label">最佳</span>
-                <span className="stat-value highlight">{highScore}</span>
-              </div>
-              <div className="stat-card">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-                <span className="stat-label">等级</span>
-                <span className="stat-value">{speedLevel}</span>
-              </div>
-              <div className="stat-card">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                  <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/>
-                </svg>
-                <span className="stat-label">速度</span>
-                <span className="stat-value">{Math.round(speedRef.current / BASE_SPEED * 100)}%</span>
+              <div className="controls-grid">
+                <div className="control-item">
+                  <span className="key-icon">␣</span>
+                  <span className="key-label">空格</span>
+                  <span className="key-action">跳跃</span>
+                </div>
+                <div className="control-item">
+                  <span className="key-icon">↑</span>
+                  <span className="key-label">上箭头</span>
+                  <span className="key-action">跳跃</span>
+                </div>
+                <div className="control-item">
+                  <span className="key-icon">↓</span>
+                  <span className="key-label">下箭头</span>
+                  <span className="key-action">蹲下</span>
+                </div>
+                <div className="control-item">
+                  <span className="key-icon">P</span>
+                  <span className="key-label">P 键</span>
+                  <span className="key-action">暂停</span>
+                </div>
               </div>
             </div>
-          </div>
+          </main>
 
-          <div className="controls-panel">
-            <div className="controls-header">
-              <span>操作说明</span>
-              <div className="header-line"></div>
-            </div>
-            <div className="controls-grid">
-              <div className="control-item">
-                <span className="key-icon">␣</span>
-                <span className="key-label">空格</span>
-                <span className="key-action">跳跃</span>
-              </div>
-              <div className="control-item">
-                <span className="key-icon">↑</span>
-                <span className="key-label">上箭头</span>
-                <span className="key-action">跳跃</span>
-              </div>
-              <div className="control-item">
-                <span className="key-icon">↓</span>
-                <span className="key-label">下箭头</span>
-                <span className="key-action">蹲下</span>
-              </div>
-              <div className="control-item">
-                <span className="key-icon">P</span>
-                <span className="key-label">P 键</span>
-                <span className="key-action">暂停</span>
+          {/* 右侧边栏 */}
+          <aside className="news-sidebar-right">
+            <div className="wave-box">
+              <span className="wave-label">SIGNAL</span>
+              <div className="wave-bars">
+                {[1,2,3,4,5,4,3,2].map((h, i) => (
+                  <div key={i} className="wave-bar" style={{ '--bar-height': h * 15 }}></div>
+                ))}
               </div>
             </div>
-          </div>
-        </main>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">TAPE</span>
+            </div>
+            <div className="deco-box">
+              <div className="deco-circle"></div>
+              <span className="deco-text">FUTURE</span>
+            </div>
+          </aside>
+        </div>
+
+        {/* 报尾 */}
+        <div className="newspaper-footer">
+          <span>DINO RUN © 2024</span>
+          <span>◆</span>
+          <span>TAPE FUTURISM</span>
+          <span>◆</span>
+          <span>MINIMALIST DESIGN</span>
+        </div>
       </div>
     </div>
   )

@@ -677,58 +677,45 @@ body :not(code):not(pre) {
   height: 28px;
 }
 
-/* Enhanced Timeline Card */
-.timeline-card {
-  background: rgba(10, 10, 15, 0.8);
-  border: 1px solid rgba(255, 149, 0, 0.2);
-  border-radius: 10px;
-  padding: 1.6rem;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
-
-/* 卡片边角装饰 */
-.timeline-card::after {
-  content: '';
+/* 连接线 */
+.timeline-connector {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 16px;
-  height: 16px;
-  border-top: 2px solid rgba(255, 149, 0, 0.4);
-  border-right: 2px solid rgba(255, 149, 0, 0.4);
-  border-radius: 0 10px 0 0;
+  top: 24px;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 149, 0, 0.4), rgba(255, 149, 0, 0.9));
   transition: all 0.3s ease;
 }
 
-.timeline-card:hover::after {
-  border-color: #ff9500;
-  opacity: 1;
-  width: 24px;
-  height: 24px;
+.timeline-item.left .timeline-connector {
+  right: 100%;
+  margin-right: 8px;
 }
 
-.timeline-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.15), transparent);
-  transition: left 0.6s ease;
-}
-
-.timeline-card:hover::before {
+.timeline-item.right .timeline-connector {
   left: 100%;
+  margin-left: 8px;
+}
+
+.timeline-item:hover .timeline-connector {
+  background: linear-gradient(90deg, rgba(255, 149, 0, 0.9), rgba(255, 149, 0, 1));
+  box-shadow: 0 0 12px rgba(255, 149, 0, 0.8);
+  height: 3px;
+}
+
+/* Timeline Card - 无容器背景 */
+.timeline-card {
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .timeline-card:hover {
-  border-color: #ff9500;
-  box-shadow: 0 0 40px rgba(255, 149, 0, 0.5), inset 0 0 60px rgba(255, 149, 0, 0.08);
-  transform: translateY(-10px) scale(1.03);
+  transform: translateX(-5px);
+}
+
+.timeline-item.right .timeline-card:hover {
+  transform: translateX(5px);
 }
 
 /* 开发中状态脉冲光环 */
@@ -816,7 +803,7 @@ body :not(code):not(pre) {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  padding: 1rem 0;
+  padding: 0.5rem 0;
 }
 
 .timeline-date-simple {
@@ -904,41 +891,18 @@ body :not(code):not(pre) {
 .timeline-tag {
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  padding: 0.25rem 0.65rem;
-  border: 1px solid rgba(255, 149, 0, 0.3);
-  color: #ff9500;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.08em;
-  background: rgba(255, 149, 0, 0.08);
-  border-radius: 4px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
   cursor: default;
-  position: relative;
-  overflow: hidden;
   font-weight: 500;
-}
-
-.timeline-tag::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.25), transparent);
-  transition: left 0.5s ease;
-}
-
-.timeline-tag:hover::before {
-  left: 100%;
+  transition: all 0.3s ease;
 }
 
 .timeline-tag:hover {
-  background: rgba(255, 149, 0, 0.18);
-  border-color: #ff9500;
   color: #ff9500;
   text-shadow: 0 0 8px rgba(255, 149, 0, 0.5);
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3);
 }
 
 .timeline-links {
@@ -959,25 +923,20 @@ body :not(code):not(pre) {
   gap: 0.4rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #ff9500;
+  color: #06b6d4;
   text-decoration: none;
-  padding: 0.35rem 0.75rem;
-  border: 1px solid rgba(255, 149, 0, 0.3);
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  background: rgba(255, 149, 0, 0.08);
+  padding: 0;
+  background: transparent;
   cursor: pointer;
+  transition: all 0.3s ease;
   font-weight: 500;
   letter-spacing: 0.08em;
 }
 
 .timeline-link:hover {
-  color: #ff9500;
-  border-color: #ff9500;
-  background: rgba(255, 149, 0, 0.18);
-  text-shadow: 0 0 10px rgba(255, 149, 0, 0.6);
-  box-shadow: 0 0 18px rgba(255, 149, 0, 0.4);
-  transform: translateY(-3px);
+  color: #06b6d4;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+  transform: translateX(3px);
 }
 
 .link-icon-svg {

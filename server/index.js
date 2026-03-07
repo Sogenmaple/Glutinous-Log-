@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs'
 import fs from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import multer from 'multer'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -13,9 +14,41 @@ const app = express()
 const PORT = 3001
 const JWT_SECRET = 'tangyuan-blog_secret_key_2026'
 
+// 文件上传配置
+const UPLOAD_DIR = path.join(__dirname, '../uploads')
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    try {
+      await fs.access(UPLOAD_DIR)
+    } catch {
+      await fs.mkdir(UPLOAD_DIR, { recursive: true })
+    }
+    cb(null, UPLOAD_DIR)
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + path.extname(file.originalname))
+  }
+})
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase())
+    const mimetype = allowedTypes.test(file.mimetype)
+    if (extname && mimetype) {
+      cb(null, true)
+    } else {
+      cb(new Error('只支持图片文件 (jpeg, jpg, png, gif, webp)'))
+    }
+  }
+})
+
 // 中间件
 app.use(cors())
 app.use(express.json())
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 // 数据文件路径
 const DATA_DIR = path.join(__dirname, '../src/data')
@@ -366,6 +399,28 @@ app.put('/api/users/:id/role', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('更新用户角色错误:', error)
     res.status(500).json({ error: '更新用户角色失败' })
+  }
+})
+
+// ============ 文件上传 ============
+
+// 上传图片
+app.post('/api/upload', authenticateToken, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: '请选择要上传的图片' })
+    }
+    
+    const imageUrl = `/uploads/${req.file.filename}`
+    res.json({
+      message: '上传成功',
+      url: imageUrl,
+      filename: req.file.filename,
+      size: req.file.size
+    })
+  } catch (error) {
+    console.error('上传错误:', error)
+    res.status(500).json({ error: error.message || '上传失败' })
   }
 })
 

@@ -16,6 +16,8 @@ export default function PostEditor({ post, onBack }) {
   const [message, setMessage] = useState('')
   const [charCount, setCharCount] = useState(0)
   const [wordCount, setWordCount] = useState(0)
+  const [uploading, setUploading] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
 
   useEffect(() => {
     if (post) {
@@ -56,6 +58,161 @@ export default function PostEditor({ post, onBack }) {
       textarea.focus()
       textarea.selectionStart = textarea.selectionEnd = start + text.length
     }, 0)
+  }
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    
+    setUploading(true)
+    setMessage('')
+    
+    const token = localStorage.getItem('token')
+    const formDataUpload = new FormData()
+    formDataUpload.append('image', file)
+    
+    try {
+      const response = await fetch('http://36.151.149.117:3001/api/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formDataUpload
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        // 将图片 URL 插入到内容中
+        const imageUrl = `\n![${file.name}](${data.url})\n`
+        handleQuickInsert(imageUrl)
+        setMessage('✓ 图片上传成功')
+      } else {
+        const data = await response.json()
+        setMessage('× ' + (data.error || '上传失败'))
+      }
+    } catch (error) {
+      setMessage('× 网络错误')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleCoverImageUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    
+    setUploading(true)
+    setMessage('')
+    
+    const token = localStorage.getItem('token')
+    const formDataUpload = new FormData()
+    formDataUpload.append('image', file)
+    
+    try {
+      const response = await fetch('http://36.151.149.117:3001/api/upload', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formDataUpload
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setFormData({ ...formData, coverImage: data.url })
+        setMessage('✓ 封面图上传成功')
+      } else {
+        const data = await response.json()
+        setMessage('× ' + (data.error || '上传失败'))
+      }
+    } catch (error) {
+      setMessage('× 网络错误')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // Markdown 渲染函数
+  const renderMarkdown = (text) => {
+    if (!text) return null
+    
+    const lines = text.split('\n')
+    const elements = []
+    let inCodeBlock = false
+    let codeLines = []
+    let listItems = []
+
+    const flushList = () => {
+      if (listItems.length > 0) {
+        elements.push(
+          <ul key={`list-${elements.length}`}>
+            {listItems.map((item, i) => <li key={i}>{renderInline(item)}</li>)}
+          </ul>
+        )
+        listItems = []
+      }
+    }
+
+    const renderInline = (str) => {
+      // 粗体
+      str = str.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      // 斜体
+      str = str.replace(/\*(.+?)\*/g, '<em>$1</em>')
+      // 行内代码
+      str = str.replace(/`(.+?)`/g, '<code>$1</code>')
+      // 图片
+      str = str.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:8px;margin:8px 0;" />')
+      // 链接
+      str = str.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      return <span dangerouslySetInnerHTML={{ __html: str }} />
+    }
+
+    lines.forEach((line, index) => {
+      if (line.startsWith('```')) {
+        if (inCodeBlock) {
+          flushList()
+          elements.push(
+            <pre key={index} className="code-block">
+              <code>{codeLines.join('\n')}</code>
+            </pre>
+          )
+          codeLines = []
+          inCodeBlock = false
+        } else {
+          flushList()
+          inCodeBlock = true
+        }
+        return
+      }
+
+      if (inCodeBlock) {
+        codeLines.push(line)
+        return
+      }
+
+      if (line.startsWith('## ')) {
+        flushList()
+        elements.push(<h2 key={index}>{line.slice(3)}</h2>)
+      } else if (line.startsWith('### ')) {
+        flushList()
+        elements.push(<h3 key={index}>{line.slice(4)}</h3>)
+      } else if (line.startsWith('#### ')) {
+        flushList()
+        elements.push(<h4 key={index}>{line.slice(5)}</h4>)
+      } else if (line.startsWith('- ')) {
+        listItems.push(line.slice(2))
+      } else if (line.startsWith('> ')) {
+        flushList()
+        elements.push(<blockquote key={index}>{line.slice(2)}</blockquote>)
+      } else if (line.trim() === '---') {
+        flushList()
+        elements.push(<hr key={index} />)
+      } else if (line.trim()) {
+        flushList()
+        elements.push(<p key={index}>{renderInline(line)}</p>)
+      } else {
+        flushList()
+      }
+    })
+
+    flushList()
+    return elements
   }
 
   const handleSubmit = async (e) => {
@@ -213,6 +370,48 @@ export default function PostEditor({ post, onBack }) {
           <div className="char-hint">{formData.excerpt.length}/200</div>
         </div>
 
+        {/* 封面图 */}
+        <div className="form-group">
+          <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.3rem'}}>
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            封面图片
+          </label>
+          <div className="cover-upload">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleCoverImageUpload}
+              disabled={uploading}
+              id="cover-upload"
+              style={{display: 'none'}}
+            />
+            <label htmlFor="cover-upload" className="upload-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight: '0.5rem'}}>
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              {uploading ? '上传中...' : '上传图片'}
+            </label>
+            {formData.coverImage && (
+              <div className="cover-preview">
+                <img src={`http://36.151.149.117:3001${formData.coverImage}`} alt="封面预览" />
+                <button type="button" onClick={() => setFormData({...formData, coverImage: ''})} className="remove-cover">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="form-hint">建议尺寸：1200x630px，支持 JPG/PNG/GIF/WebP</div>
+        </div>
+
         {/* 标签 */}
         <div className="form-group">
           <label>
@@ -247,6 +446,18 @@ export default function PostEditor({ post, onBack }) {
             <div className="content-stats">
               <span className="stat">字数：{charCount}</span>
               <span className="stat">词数：{wordCount}</span>
+              <button 
+                type="button" 
+                className="preview-toggle"
+                onClick={() => setShowPreview(!showPreview)}
+                title={showPreview ? '编辑模式' : '预览模式'}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                {showPreview ? '编辑' : '预览'}
+              </button>
             </div>
           </div>
           
@@ -260,14 +471,38 @@ export default function PostEditor({ post, onBack }) {
             <button type="button" onClick={() => handleQuickInsert('\n> ')} title="插入引用">❝ 引用</button>
             <button type="button" onClick={() => handleQuickInsert('```\n\n```')} title="插入代码块">{`</>`}</button>
             <button type="button" onClick={() => handleQuickInsert('\n---\n')} title="插入分隔线">━ 分隔</button>
+            <div className="upload-divider"></div>
+            <label className="upload-image-btn" title="上传图片">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                style={{display: 'none'}}
+              />
+            </label>
           </div>
           
-          <textarea
-            name="content"
-            value={formData.content}
-            onChange={handleChange}
-            rows="20"
-            placeholder={`使用 Markdown 格式编写文章内容...
+          {showPreview ? (
+            <div className="markdown-preview">
+              <div className="preview-content">
+                {formData.content ? renderMarkdown(formData.content) : (
+                  <p className="preview-empty">暂无内容，请在左侧编辑</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <textarea
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              rows="20"
+              placeholder={`使用 Markdown 格式编写文章内容...
 
 提示：
 ## 标题
@@ -277,9 +512,10 @@ export default function PostEditor({ post, onBack }) {
 \`\`\`
 代码块
 \`\`\``}
-            className="content-textarea"
-          />
-          <div className="form-hint">支持 Markdown 格式，预览功能即将上线</div>
+              className="content-textarea"
+            />
+          )}
+          <div className="form-hint">支持 Markdown 格式，可点击"预览"按钮查看效果</div>
         </div>
 
         {/* 操作按钮 */}

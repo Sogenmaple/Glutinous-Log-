@@ -3182,6 +3182,240 @@ body :not(code):not(pre) {
   cursor: not-allowed;
 }
 
+/* 封面图上传 */
+.cover-upload {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-btn:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.cover-preview {
+  position: relative;
+  display: inline-block;
+}
+
+.cover-preview img {
+  max-width: 200px;
+  max-height: 120px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  object-fit: cover;
+}
+
+.remove-cover {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.remove-cover:hover {
+  transform: scale(1.1);
+}
+
+/* 快捷插入工具栏 */
+.quick-insert {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.quick-insert button {
+  padding: 0.25rem 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-insert button:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.upload-divider {
+  width: 1px;
+  background: var(--border-subtle);
+  margin: 0 0.5rem;
+}
+
+.upload-image-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-image-btn:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+/* Markdown 预览 */
+.preview-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.preview-toggle:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.markdown-preview {
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 1.5rem;
+  min-height: 300px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.preview-content {
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.preview-content h2 {
+  font-size: 1.5rem;
+  margin: 1.5rem 0 1rem;
+  color: var(--amber);
+}
+
+.preview-content h3 {
+  font-size: 1.25rem;
+  margin: 1.25rem 0 0.75rem;
+}
+
+.preview-content h4 {
+  font-size: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.preview-content p {
+  margin: 0.75rem 0;
+}
+
+.preview-content ul {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.preview-content li {
+  margin: 0.25rem 0;
+}
+
+.preview-content blockquote {
+  border-left: 3px solid var(--amber);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.preview-content pre {
+  background: var(--bg-deep);
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.preview-content code {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  background: var(--bg-tertiary);
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+}
+
+.preview-content pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.preview-content hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 1.5rem 0;
+}
+
+.preview-empty {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.content-textarea {
+  width: 100%;
+  min-height: 400px;
+  padding: 1rem;
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.content-textarea:focus {
+  outline: none;
+  border-color: var(--amber);
+}
+
 /* Post Detail Page */
 .post-detail-page {
   min-height: 100vh;

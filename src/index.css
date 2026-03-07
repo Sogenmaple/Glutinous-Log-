@@ -644,7 +644,7 @@ body :not(code):not(pre) {
 
 .timeline-dot {
   position: absolute;
-  top: 0;
+  top: 1.6rem;
   width: 48px;
   height: 48px;
   background: rgba(10, 10, 15, 0.9);

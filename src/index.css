@@ -578,40 +578,7 @@ body :not(code):not(pre) {
   padding: 0;
 }
 
-.timeline-line {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(255, 149, 0, 0.3) 5%,
-    #ff9500 50%,
-    rgba(255, 149, 0, 0.3) 95%,
-    transparent 100%
-  );
-  transform: translateX(-50%);
-  box-shadow: 0 0 30px rgba(255, 149, 0, 0.5);
-}
-
-.timeline-line::before,
-.timeline-line::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #ff9500;
-  box-shadow: 0 0 20px #ff9500, 0 0 40px rgba(255, 149, 0, 0.5);
-  z-index: 2;
-  animation: timeline-marker-pulse 3s ease-in-out infinite;
-}
-.timeline-line::before { top: -7px; }
-.timeline-line::after { bottom: -7px; }
+/* 时间轴线已删除 */
 
 .timeline-item {
   position: relative;

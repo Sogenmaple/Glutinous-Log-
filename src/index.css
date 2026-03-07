@@ -577,10 +577,9 @@ body :not(code):not(pre) {
 
 /* 时间轴项目 - 左右交替 */
 .timeline-item {
-  display: flex;
-  justify-content: flex-end;
-  padding-right: 50%;
   position: relative;
+  width: 50%;
+  padding-right: 40px;
   margin-bottom: 3.5rem;
   opacity: 0;
   transform: translateX(-40px);
@@ -593,9 +592,9 @@ body :not(code):not(pre) {
 }
 
 .timeline-item:nth-child(even) {
-  justify-content: flex-start;
+  left: 50%;
   padding-right: 0;
-  padding-left: 50%;
+  padding-left: 40px;
   transform: translateX(40px);
 }
 
@@ -606,7 +605,7 @@ body :not(code):not(pre) {
 /* 时间轴点 */
 .timeline-dot {
   position: absolute;
-  left: 50%;
+  right: -24px;
   top: 0;
   width: 48px;
   height: 48px;
@@ -616,7 +615,6 @@ body :not(code):not(pre) {
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translateX(-50%);
   z-index: 2;
   box-shadow: 
     0 0 25px rgba(255, 149, 0, 0.6),
@@ -624,8 +622,13 @@ body :not(code):not(pre) {
   transition: all 0.3s ease;
 }
 
+.timeline-item:nth-child(even) .timeline-dot {
+  right: auto;
+  left: -24px;
+}
+
 .timeline-item:hover .timeline-dot {
-  transform: translateX(-50%) scale(1.15);
+  transform: scale(1.15);
   box-shadow: 
     0 0 35px rgba(255, 149, 0, 0.8),
     0 0 0 12px rgba(255, 149, 0, 0.12);
@@ -640,7 +643,6 @@ body :not(code):not(pre) {
 /* 内容卡片 */
 .timeline-content {
   width: 100%;
-  max-width: 450px;
   padding: 1.5rem;
   background: linear-gradient(
     135deg,

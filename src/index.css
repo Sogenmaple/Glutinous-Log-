@@ -796,6 +796,7 @@ body :not(code):not(pre) {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0;
+  background: transparent;
 }
 
 .timeline-date-simple {

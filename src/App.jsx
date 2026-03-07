@@ -26,6 +26,7 @@ import Dinosaur from './pages/Dinosaur'
 import Snake from './pages/Snake'
 import Pacman from './pages/Pacman'
 import ScreenSaver from './pages/ScreenSaver'
+import ScreenSaverSettings from './pages/ScreenSaverSettings'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import CursorEffect from './components/CursorEffect'
@@ -50,12 +51,18 @@ function AppContent() {
   // 屏保页面不激活屏保
   const isScreenSaverRoute = location.pathname === '/special/screensaver'
   
-  // 5 分钟无操作自动激活屏保
+  // 无操作自动激活屏保
   useEffect(() => {
     if (isAdminRoute || isScreenSaverRoute) return
     
+    // 从 localStorage 读取配置
+    const saved = localStorage.getItem('screensaver_settings')
+    const config = saved ? JSON.parse(saved) : { enabled: true, timeout: 5 }
+    
+    if (!config.enabled || config.timeout === 0) return
+    
     let idleTimer = null
-    const IDLE_TIMEOUT = 5 * 60 * 1000 // 5 分钟
+    const IDLE_TIMEOUT = config.timeout * 60 * 1000 // 转换为毫秒
     
     const resetTimer = () => {
       if (idleTimer) clearTimeout(idleTimer)
@@ -245,7 +252,10 @@ function AppContent() {
           {/* 吃豆人 */}
           <Route path="/special/pacman" element={<Pacman />} />
           
-          {/* 屏保 */}
+          {/* 屏保设置 */}
+          <Route path="/special/screensaver-settings" element={<ScreenSaverSettings />} />
+          
+          {/* 屏保预览 */}
           <Route path="/special/screensaver" element={<ScreenSaver />} />
           
           {/* 文章详情 */}

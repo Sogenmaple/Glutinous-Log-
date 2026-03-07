@@ -5,15 +5,26 @@ import '../styles/ScreenSaver.css'
 
 /**
  * 屏保页面 - 开屏动画作为屏保
- * 超过 5 分钟无操作自动激活
+ * 从 localStorage 读取配置
  */
 export default function ScreenSaver() {
   const navigate = useNavigate()
   const [mounted, setMounted] = useState(false)
   const [showExitHint, setShowExitHint] = useState(false)
+  const [settings, setSettings] = useState({
+    style: 'tangyuan',
+    showClock: false,
+    showHint: true
+  })
 
   useEffect(() => {
     setMounted(true)
+    
+    // 加载配置
+    const saved = localStorage.getItem('screensaver_settings')
+    if (saved) {
+      setSettings(JSON.parse(saved))
+    }
     
     // 显示退出提示
     const timer = setTimeout(() => {

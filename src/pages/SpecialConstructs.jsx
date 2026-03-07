@@ -100,12 +100,12 @@ export default function SpecialConstructs() {
     },
     {
       id: 'screensaver',
-      title: '屏保模式',
+      title: '屏保设置',
       subtitle: 'SCREEN SAVER',
-      description: '开屏动画屏保，5 分钟无操作自动激活，沉浸式视觉体验',
+      description: '自定义屏保样式、激活时间和显示效果',
       icon: TangyuanIcon,
       color: 'amber',
-      path: '/special/screensaver',
+      path: '/special/screensaver-settings',
       status: 'active'
     },
     {

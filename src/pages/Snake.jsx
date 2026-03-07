@@ -104,8 +104,18 @@ export default function Snake() {
   useEffect(() => {
     if (gameState !== 'playing') return
 
-    gameLoopRef.current = setInterval(moveSnake, speed)
-    return () => clearInterval(gameLoopRef.current)
+    const gameLoop = () => {
+      moveSnake()
+      gameLoopRef.current = setTimeout(gameLoop, speed)
+    }
+    
+    gameLoopRef.current = setTimeout(gameLoop, speed)
+    
+    return () => {
+      if (gameLoopRef.current) {
+        clearTimeout(gameLoopRef.current)
+      }
+    }
   }, [gameState, speed, moveSnake])
 
   useEffect(() => {
@@ -228,17 +238,7 @@ export default function Snake() {
                     width: CELL_SIZE - 2,
                     height: CELL_SIZE - 2
                   }}
-                >
-                  {index === 0 && (
-                    <svg viewBox="0 0 20 20" fill="none">
-                      <circle cx="8" cy="6" r="2" fill="#fff"/>
-                      <circle cx="14" cy="6" r="2" fill="#fff"/>
-                      <circle cx="8" cy="6" r="1" fill="#0a0a0a"/>
-                      <circle cx="14" cy="6" r="1" fill="#0a0a0a"/>
-                      <path d="M9 12q2 2 4 0" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
-                  )}
-                </div>
+                />
               ))}
 
               {/* 食物 */}
@@ -250,24 +250,17 @@ export default function Snake() {
                   width: CELL_SIZE - 2,
                   height: CELL_SIZE - 2
                 }}
-              >
-                <svg viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="7" fill="#f87171"/>
-                  <circle cx="10" cy="10" r="4" fill="#fbbf24"/>
-                  <path d="M10 3v-3" stroke="#4ade80" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </div>
+              />
 
               {/* 开始界面 */}
               {gameState === 'start' && (
                 <div className="overlay">
                   <div className="overlay-content">
-                    <svg width="60" height="60" viewBox="0 0 20 20" fill="none">
-                      <rect x="2" y="8" width="6" height="6" fill="#4ade80" rx="1"/>
-                      <rect x="8" y="8" width="6" height="6" fill="#4ade80" rx="1"/>
-                      <rect x="14" y="8" width="6" height="6" fill="#4ade80" rx="1"/>
-                      <circle cx="17" cy="11" r="2" fill="#fff"/>
-                      <circle cx="17" cy="11" r="1" fill="#0a0a0a"/>
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+                      <rect x="10" y="25" width="12" height="12" fill="#4ade80" rx="2"/>
+                      <rect x="24" y="25" width="12" height="12" fill="#4ade80" rx="2"/>
+                      <rect x="38" y="25" width="12" height="12" fill="#4ade80" rx="2"/>
+                      <circle cx="45" cy="31" r="5" fill="#f87171"/>
                     </svg>
                     <h2>贪吃蛇</h2>
                     <p className="subtitle">经典休闲游戏</p>

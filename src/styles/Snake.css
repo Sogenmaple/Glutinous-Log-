@@ -238,7 +238,6 @@
   border-radius: 3px;
   box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
   z-index: 10;
-  transition: all 0.05s ease;
 }
 
 .snake-segment.head {
@@ -248,22 +247,14 @@
   z-index: 11;
 }
 
-.snake-segment.head svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* 食物 */
+/* 食物 - 简单圆形 */
 .food {
   position: absolute;
   z-index: 10;
+  background: radial-gradient(circle at 30% 30%, #fca5a5, #f87171);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(248, 117, 102, 0.6);
   animation: food-pulse 1s ease-in-out infinite;
-}
-
-.food svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
 }
 
 @keyframes food-pulse {

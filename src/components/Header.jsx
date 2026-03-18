@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { UserIcon, LoginIcon } from './icons/SiteIcons'
+import { UserIcon, LoginIcon, SettingsIcon, TomatoIcon, AdminToolsIcon, ReturnIcon } from './icons/SiteIcons'
 
 export default function Header() {
   const [expanded, setExpanded] = useState(false)
@@ -19,17 +19,25 @@ export default function Header() {
 
   // 检查登录状态
   useEffect(() => {
-    const userData = localStorage.getItem('user')
-    if (userData) {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
-      setIsAdmin(parsedUser.role === 'admin')
+    const loadUser = () => {
+      const userData = localStorage.getItem('user')
+      if (userData) {
+        const parsedUser = JSON.parse(userData)
+        setUser(parsedUser)
+        setIsAdmin(parsedUser.role === 'admin')
+      }
     }
+    loadUser()
+    
+    // 监听头像更新事件
+    window.addEventListener('avatar-updated', loadUser)
+    return () => window.removeEventListener('avatar-updated', loadUser)
   }, [])
 
   const navItems = [
     { id: 'home', label: '小窝', path: '/' },
     { id: 'games', label: '游戏', path: '/games' },
+    { id: 'special', label: '构造', path: '/special' },
     { id: 'blog', label: '博客', path: '/blog' },
     { id: 'about', label: '关于', path: '/about' },
   ]
@@ -73,22 +81,33 @@ export default function Header() {
                 className="user-btn"
                 onClick={() => setShowUserMenu(!showUserMenu)}
               >
-                <UserIcon size={16} />
+                {user.avatar ? (
+                  <img src={user.avatar} alt="头像" className="header-avatar" />
+                ) : (
+                  <UserIcon size={16} />
+                )}
               </button>
               
               {showUserMenu && (
                 <div className="user-dropdown">
+                  {user.avatar && (
+                    <div className="dropdown-avatar">
+                      <img src={user.avatar} alt="头像" />
+                    </div>
+                  )}
                   <div className="dropdown-item" onClick={() => {
                     navigate('/profile')
                     setShowUserMenu(false)
                   }}>
-                    👤 个人中心
+                    <UserIcon size={18} />
+                    <span>个人中心</span>
                   </div>
                   <div className="dropdown-item" onClick={() => {
                     navigate('/special/pomodoro')
                     setShowUserMenu(false)
                   }}>
-                    🍅 番茄钟
+                    <TomatoIcon size={18} />
+                    <span>番茄钟</span>
                   </div>
                   {isAdmin && (
                     <>
@@ -96,19 +115,22 @@ export default function Header() {
                         navigate('/admin/dashboard')
                         setShowUserMenu(false)
                       }}>
-                        🔧 后台管理
+                        <AdminToolsIcon size={18} />
+                        <span>后台管理</span>
                       </div>
                       <div className="dropdown-item" onClick={() => {
                         navigate('/')
                         setShowUserMenu(false)
                       }}>
-                        🏠 返回前端
+                        <ReturnIcon size={18} />
+                        <span>返回前端</span>
                       </div>
                     </>
                   )}
                   <div className="dropdown-divider"></div>
                   <div className="dropdown-item" onClick={handleLogout}>
-                    退出登录
+                    <LoginIcon size={18} />
+                    <span>退出登录</span>
                   </div>
                 </div>
               )}

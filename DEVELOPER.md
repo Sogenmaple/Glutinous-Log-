@@ -24,12 +24,28 @@ tangyuan-games/
 │   │   ├── PostCard.jsx    # 文章卡片
 │   │   └── admin/          # 后台管理
 │   ├── styles/             # CSS 样式
-│   │   ├── pomodoro.css    # 番茄钟样式 (2300+ 行)
-│   │   └── ...
+│   │   ├── manga-common.css    # ⭐ 漫画风格通用样式 (新增)
+│   │   ├── responsive.css      # ⭐ 全局响应式样式
+│   │   ├── NewspaperHome.css   # 首页 (精简后 180 行)
+│   │   ├── GamesCollection.css # 游戏宇宙 (精简后 340 行)
+│   │   ├── MangaBlog.css       # 博客页面
+│   │   ├── pomodoro.css        # 番茄钟 (2300+ 行)
+│   │   ├── header.css          # 导航栏
+│   │   ├── Profile.css         # 个人资料
+│   │   ├── auth.css            # 登录注册
+│   │   ├── AdminDashboard.css  # 后台管理
+│   │   ├── Snake.css           # 贪吃蛇
+│   │   ├── Tetris.css          # 俄罗斯方块
+│   │   ├── Pacman.css          # 吃豆人
+│   │   ├── FlyBird.css         # 飞鸟
+│   │   ├── Dinosaur.css        # 恐龙
+│   │   └── Minesweeper.css     # 扫雷
 │   └── App.jsx             # 路由配置
 ├── server/
 │   └── index.js            # 后端 API (Express)
 ├── index.html              # 入口 HTML
+├── DEVELOPER.md            # 开发者文档
+├── CSS_CLEANUP_REPORT.md   # CSS 清理报告
 └── package.json
 ```
 
@@ -99,29 +115,232 @@ tangyuan-games/
 
 ## 🎨 样式规范
 
-### 设计系统
-- **主色**: 琥珀色 `#ff9500` + 青色 `#06b6d4`
-- **背景**: `--bg-deep: #050508`
-- **文字**: `--text: #d4d4d8`
-- **风格**: 赛博朋克 + 复古磁带
+### 📚 CSS 文件结构大纲
 
-### 统一元素
+```
+src/styles/
+├── 📖 通用样式库 (必须优先导入)
+│   ├── manga-common.css    # ⭐ 漫画风格通用样式 (664 行)
+│   │   ├── 网点背景 (.manga-halftone)
+│   │   ├── 报头样式 (.manga-masthead)
+│   │   ├── 环形钟 (.manga-ring-clock)
+│   │   ├── 统计卡片 (.manga-stat-card)
+│   │   ├── 卡片悬停 (.manga-card-hover)
+│   │   ├── 角落装饰 (.manga-corner)
+│   │   └── 社交链接/页脚
+│   │
+│   ├── game-common.css     # ⭐ 游戏页面通用样式 (350 行)
+│   │   ├── 游戏布局 (.manga-game-layout)
+│   │   ├── 侧边栏 (.manga-sidebar)
+│   │   ├── 信息面板 (.manga-info-panel)
+│   │   ├── 控制按钮 (.manga-control-btn)
+│   │   ├── 游戏结束覆盖层 (.manga-game-over)
+│   │   ├── 说明面板 (.manga-instructions)
+│   │   └── 响应式断点
+│   │
+│   └── responsive.css      # ⭐ 全局响应式样式
+│       ├── 通用断点 (@media)
+│       ├── 容器宽度 (.container)
+│       ├── 网格系统 (.grid)
+│       └── 工具类 (.hidden-sm, .visible-md)
+│
+├── 📄 页面样式 (导入通用样式后定义特定样式)
+│   ├── NewspaperHome.css   # 首页 (180 行，精简 76%)
+│   ├── GamesCollection.css # 游戏宇宙 (340 行，精简 58%)
+│   ├── MangaBlog.css       # 博客页面 (884 行，精简 32%)
+│   ├── MangaGames.css      # 游戏大厅 (723 行)
+│   │
+│   ├── Snake.css           # 贪吃蛇 (330 行，精简 45%)
+│   ├── Tetris.css          # 俄罗斯方块 (722 行，待精简)
+│   ├── Pacman.css          # 吃豆人 (626 行，待精简)
+│   ├── FlyBird.css         # 飞鸟 (627 行，待精简)
+│   ├── Dinosaur.css        # 恐龙 (690 行，待精简)
+│   └── Minesweeper.css     # 扫雷 (641 行，待精简)
+│
+├── 🎯 功能模块样式
+│   ├── pomodoro.css        # 番茄钟 (2897 行，独立风格)
+│   ├── Profile.css         # 个人资料 (828 行)
+│   ├── auth.css            # 登录注册 (785 行)
+│   └── AdminDashboard.css  # 后台管理 (1127 行)
+│
+└── 🔧 组件样式
+    ├── header.css          # 导航栏
+    └── PostCard.css        # 文章卡片
+```
+
+---
+
+### 🎨 设计系统
+
+#### 1️⃣ 黑白漫画风格 (2026-03 新增)
+**适用**: 博客、游戏页面、首页
+
+| 元素 | 值 | 说明 |
+|------|-----|------|
+| **背景** | `#ffffff` + 漫画网点 | `radial-gradient` 点状网格 |
+| **主色** | `#1a1a1a` (纯黑) | 边框、文字、阴影 |
+| **辅色** | `#f0f0f0` (浅灰) | 卡片背景、按钮 |
+| **阴影** | `#444444` / `#666666` | 硬阴影 (无模糊) |
+| **字体** | `Georgia`, `Courier New` | 衬线 + 等宽 |
+| **风格** | 硬朗线条 + 强烈阴影 | 漫画分镜感 |
+
+**核心视觉元素**:
 ```css
-/* 输入框 */
+/* 漫画网点背景 */
+background-image: radial-gradient(#cccccc 1px, transparent 1px);
+background-size: 24px 24px;
+
+/* 硬阴影效果 */
+box-shadow: 10px 10px 0 #1a1a1a, 16px 16px 0 #444444;
+
+/* 装饰角 */
+border-top: 6px solid #f0f0f0;
+border-left: 6px solid #f0f0f0;
+```
+
+#### 2️⃣ 赛博朋克风格 (原有)
+**适用**: 番茄钟、登录注册、后台管理
+
+| 元素 | 值 | 说明 |
+|------|-----|------|
+| **主色** | 琥珀色 `#ff9500` | 强调色 |
+| **辅色** | 青色 `#06b6d4` | 次要强调 |
+| **背景** | `--bg-deep: #050508` | 深色背景 |
+| **文字** | `--text: #d4d4d8` | 浅灰文字 |
+| **风格** | 赛博朋克 + 复古磁带 | 科技感 |
+
+---
+
+### 📐 统一元素规范
+
+#### 输入框
+```css
 background: rgba(255,255,255,0.05);
 border: 1px solid rgba(255,149,0,0.2);
 font-family: var(--font-mono);
+```
 
-/* 按钮 */
+#### 按钮
+```css
 background: rgba(255,149,0,0.15);
 border: 1px solid var(--amber);
 color: var(--amber);
-
-/* 鼠标状态 */
-可点击：pointer
-可拖拽：grab/grabbing
-默认：default
 ```
+
+#### 鼠标状态
+- **可点击**: `cursor: pointer`
+- **可拖拽**: `cursor: grab` / `grabbing`
+- **默认**: `cursor: default`
+
+---
+
+### ♻️ CSS 复用规范 (⭐ 新增)
+
+#### 漫画风格页面开发流程
+
+**步骤 1**: 文件开头导入通用样式
+```css
+/* 文件顶部 */
+@import './manga-common.css';
+/* 或 */
+@import './game-common.css';
+```
+
+**步骤 2**: 定义页面特定样式
+```css
+/* 只写本页面独有的样式 */
+.manga-page-specific {
+  /* ... */
+}
+```
+
+**步骤 3**: 避免重复定义
+```css
+/* ❌ 错误：重复定义通用样式 */
+.manga-halftone { ... }  /* 已在 manga-common.css 中定义 */
+
+/* ✅ 正确：只写特定样式 */
+.manga-snake-page .custom-canvas { ... }
+```
+
+#### 通用样式清单
+
+**manga-common.css 已包含**:
+- ✅ `.manga-halftone` - 漫画网点背景
+- ✅ `.manga-masthead` - 报头样式
+- ✅ `.manga-ring-clock` - 环形钟
+- ✅ `.manga-stat-card` - 统计卡片
+- ✅ `.manga-card-hover` - 卡片悬停效果
+- ✅ `.manga-corner` - 角落装饰
+- ✅ `.manga-social-links` - 社交链接
+- ✅ `.manga-footer` - 页脚
+- ✅ 响应式断点
+
+**game-common.css 已包含**:
+- ✅ `.manga-game-layout` - 游戏布局
+- ✅ `.manga-sidebar` - 侧边栏
+- ✅ `.manga-info-panel` - 信息面板
+- ✅ `.manga-control-btn` - 控制按钮
+- ✅ `.manga-game-over` - 游戏结束覆盖层
+- ✅ `.manga-instructions` - 说明面板
+- ✅ 响应式断点
+
+#### 响应式设计规范
+
+**使用 responsive.css 中的通用类**:
+```css
+/* ❌ 错误：重复定义断点 */
+@media (max-width: 768px) { }
+
+/* ✅ 正确：使用通用响应式类 */
+.container { }  /* responsive.css 已处理 */
+```
+
+**使用 clamp() 实现平滑缩放**:
+```css
+/* 字体大小 */
+font-size: clamp(1rem, 2vw, 1.5rem);
+
+/* 容器宽度 */
+max-width: clamp(300px, 80vw, 1400px);
+
+/* 间距 */
+padding: clamp(1rem, 3vw, 3rem);
+```
+
+---
+
+### 🎯 CSS 开发检查清单
+
+开发新页面时，按顺序检查：
+
+- [ ] **1. 选择基础样式库**
+  - 漫画风格 → `@import './manga-common.css'`
+  - 游戏页面 → `@import './game-common.css'`
+  - 番茄钟风格 → 独立样式
+
+- [ ] **2. 检查通用样式**
+  - 需要的样式是否已在通用文件中？
+  - 避免重复定义
+
+- [ ] **3. 定义页面特定样式**
+  - 只写本页面独有的样式
+  - 使用语义化类名
+
+- [ ] **4. 响应式适配**
+  - 使用 `responsive.css` 通用类
+  - 使用 `clamp()` 平滑缩放
+  - 测试 768px / 480px 断点
+
+- [ ] **5. 性能优化**
+  - 删除未使用的样式
+  - 合并重复选择器
+  - 使用 CSS 变量
+
+- [ ] **6. 编译测试**
+  - `npm run build`
+  - 检查编译错误
+  - 测试页面显示
 
 ---
 
@@ -180,6 +399,10 @@ ps aux | grep node
 git log --oneline -10
 git status
 git diff [文件]
+
+# CSS 分析
+wc -l src/styles/*.css
+grep -r "\.manga-" src/styles/ --include="*.css"
 ```
 
 ---
@@ -192,6 +415,7 @@ git diff [文件]
 | 博客 | v3.0 | ✅ 基础功能 |
 | 后台 | v2.0 | ✅ 管理功能 |
 | 用户系统 | v1.0 | ✅ 注册登录 |
+| 漫画风格 | v2.0 | ✅ 已优化 (精简 30%) |
 
 ---
 
@@ -218,6 +442,8 @@ git diff [文件]
 3. **图标复用**: 检查 `SiteIcons.jsx` 已有图标
 4. **状态管理**: 使用 `useState` + `localStorage`
 5. **事件系统**: 使用 `CustomEvent` 实现跨组件通信
+6. **CSS 复用**: 先检查 `manga-common.css` 是否已有样式
+7. **响应式**: 优先使用 `responsive.css` 中的通用类
 
 ---
 
@@ -226,9 +452,21 @@ git diff [文件]
 **编译错误**: 检查 JSX 语法、导入语句、重复声明  
 **黑屏问题**: 检查组件导入、localStorage 解析  
 **样式无效**: 检查类名匹配、CSS 优先级  
-**拖拽失效**: 检查 `draggable`、`onDragStart`、`onDrop`
+**拖拽失效**: 检查 `draggable`、`onDragStart`、`onDrop`  
+**CSS 重复**: 检查是否已存在于 `manga-common.css`
 
 ---
 
-**最后更新**: 2025-01-04  
+## 🧹 CSS 清理记录
+
+**2026-03-31**: CSS 代码清理优化
+- 创建 `manga-common.css` 提取通用样式
+- `NewspaperHome.css`: 739 行 → 180 行 (-76%)
+- `GamesCollection.css`: 800 行 → 340 行 (-58%)
+- 总减少：约 1000 行重复代码
+- 详见：`CSS_CLEANUP_REPORT.md`
+
+---
+
+**最后更新**: 2026-03-31  
 **维护者**: AI Assistant

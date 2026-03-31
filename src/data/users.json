@@ -10,8 +10,127 @@
     "id": "1772902689573",
     "username": "汤圆",
     "email": "2778910072@qq.com",
-    "password": "$2a$10$NpMEnQwLiBeD/qON5f7wDecpDAyPG1EK.0b5.QA63Ku5STkiIodDS",
+    "password": "$2a$10$WKF/WvEc/kE.rgPbQ2goGOGBWzkv/UsGsq7T3bDQD1qSZglZZW3WG",
+    "role": "admin",
+    "createdAt": "2026-03-07T16:58:09.573Z",
+    "updatedAt": "2026-03-20T08:06:34.309Z",
+    "displayName": "汤圆",
+    "bio": "",
+    "avatar": "/uploads/1773993988896-940394028.jpg"
+  },
+  {
+    "id": "1772937755427",
+    "username": "枫素琴",
+    "email": "jhr2778910072@outlook.com",
+    "password": "$2a$10$89LbPf4VETNetN5VmfVg3.fQbq7V7HGBaU2XW6qwXmpoyyVcF9w0u",
+    "role": "admin",
+    "createdAt": "2026-03-08T02:42:35.427Z",
+    "updatedAt": "2026-03-08T05:34:18.179Z"
+  },
+  {
+    "id": "1773741366271",
+    "username": "DEAT0",
+    "email": "ovo.hello@qq.com",
+    "password": "$2a$10$VpcFmy/T8CnliFTaxIF9U.ccW5OyuGrgwEKTt30zsjS2J0FsVIcxW",
     "role": "user",
-    "createdAt": "2026-03-07T16:58:09.573Z"
+    "createdAt": "2026-03-17T09:56:06.271Z",
+    "displayName": "DEAT0",
+    "bio": "",
+    "updatedAt": "2026-03-18T09:54:49.407Z",
+    "avatar": "/uploads/1773806402540-518897585.jpg"
+  },
+  {
+    "id": "guest_1773797297146_16cbckgm8",
+    "username": "Guest_MMVD41YY",
+    "email": "Guest_MMVD41YY@guest.local",
+    "password": "",
+    "role": "guest",
+    "displayName": "Guest_MMVD41YY",
+    "bio": "游客用户",
+    "avatar": "",
+    "createdAt": "2026-03-18T01:28:17.146Z"
+  },
+  {
+    "id": "guest_1773797333293_oxu0f5hw1",
+    "username": "Guest_MMVD4TV1",
+    "email": "Guest_MMVD4TV1@guest.local",
+    "password": "",
+    "role": "guest",
+    "displayName": "Guest_MMVD4TV1",
+    "bio": "游客用户",
+    "avatar": "",
+    "createdAt": "2026-03-18T01:28:53.293Z"
+  },
+  {
+    "id": "guest_1773826242533_0r3r88wwo",
+    "username": "Guest_MMVUCGDH",
+    "email": "Guest_MMVUCGDH@guest.local",
+    "password": "",
+    "role": "guest",
+    "displayName": "Guest",
+    "bio": "游客用户",
+    "avatar": "",
+    "createdAt": "2026-03-18T09:30:42.533Z",
+    "updatedAt": "2026-03-18T09:31:13.192Z"
+  },
+  {
+    "id": "guest_1773826852211_9o1km5dof",
+    "username": "Guest_MMVUPISZ",
+    "email": "Guest_MMVUPISZ@guest.local",
+    "password": "",
+    "role": "guest",
+    "displayName": "Guest_MMVUPISZ",
+    "bio": "游客用户",
+    "avatar": "",
+    "createdAt": "2026-03-18T09:40:52.211Z"
+  },
+  {
+    "id": "guest_1773845356559_gsobbtast",
+    "username": "Guest_MMW5Q4UN",
+    "email": "Guest_MMW5Q4UN@guest.local",
+    "password": "",
+    "role": "guest",
+    "displayName": "Guest_MMW5Q4UN",
+    "bio": "游客用户",
+    "avatar": "",
+    "createdAt": "2026-03-18T14:49:16.559Z"
+  },
+  {
+    "id": "guest_1773920774409_39r0ax6h3",
+    "username": "Guest_MMXEMLMX",
+    "email": "Guest_MMXEMLMX@guest.local",
+    "password": "",
+    "role": "guest",
+    "displayName": "Guest_MMXEMLMX",
+    "bio": "游客用户",
+    "avatar": "",
+    "createdAt": "2026-03-19T11:46:14.409Z"
+  },
+  {
+    "id": "1774654934502",
+    "username": "柑橘",
+    "email": "bianka1314@qq.com",
+    "password": "$2a$10$7S7va8q/nbBwWKRba4ptfuqox3zw7YFCMg0vo9bgquc2t5.qsEQjq",
+    "role": "user",
+    "createdAt": "2026-03-27T23:42:14.502Z"
+  },
+  {
+    "id": "1774873531763",
+    "username": "潮光",
+    "email": "3514106978@qq.com",
+    "password": "$2a$10$WRrkHd0tqK4fEs/ORzqg5.iPfwvQHJSnttSuTzF325r9majwXv5ni",
+    "role": "user",
+    "createdAt": "2026-03-30T12:25:31.763Z"
+  },
+  {
+    "id": "guest_1774939950646_u60cge1s7",
+    "username": "Guest_MNE9F31Y",
+    "email": "Guest_MNE9F31Y@guest.local",
+    "password": "",
+    "role": "guest",
+    "displayName": "Guest_MNE9F31Y",
+    "bio": "游客用户",
+    "avatar": "",
+    "createdAt": "2026-03-31T06:52:30.646Z"
   }
 ]

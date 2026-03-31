@@ -1,0 +1,505 @@
+/* ============================================
+   游戏页面通用样式 - 黑白漫画风格
+   适用于：贪吃蛇/俄罗斯方块/吃豆人/飞鸟/恐龙/扫雷
+   ============================================ */
+
+/* ========== 页面基础 ========== */
+.manga-snake-page,
+.manga-tetris-page,
+.manga-pacman-page,
+.manga-flybird-page,
+.manga-dinosaur-page,
+.manga-minesweeper-page {
+  min-height: 100vh;
+  width: 100%;
+  background: #f8f8f8;
+  background-image: 
+    radial-gradient(#cccccc 1px, transparent 1px),
+    radial-gradient(#cccccc 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  padding-top: 80px;
+  position: relative;
+}
+
+/* ========== 漫画网点背景 ========== */
+.manga-halftone {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(#000000 1px, transparent 1px),
+    radial-gradient(#000000 1px, transparent 1px);
+  background-size: 6px 6px, 12px 12px;
+  background-position: 0 0, 3px 3px;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ========== 容器 ========== */
+.manga-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+  box-sizing: border-box;
+}
+
+/* ========== 报头 ========== */
+.manga-masthead {
+  margin-bottom: 2.5rem;
+  padding: 2rem;
+  background: #ffffff;
+  border: 5px solid #1a1a1a;
+  box-shadow: 10px 10px 0 #1a1a1a, 16px 16px 0 #444444;
+  position: relative;
+}
+
+.manga-masthead-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid #1a1a1a;
+}
+
+.manga-issue {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #666666;
+  letter-spacing: 0.15em;
+}
+
+.manga-date {
+  font-family: 'Georgia', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.manga-main-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.manga-main-title h1 {
+  font-family: 'Georgia', serif;
+  font-size: 3rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: 0.2em;
+}
+
+.manga-subtitle {
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #666666;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+/* ========== 游戏主布局 ========== */
+.manga-game-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== 侧边栏 ========== */
+.manga-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.manga-info-panel {
+  background: #ffffff;
+  border: 4px solid #1a1a1a;
+  padding: 1.5rem;
+  box-shadow: 8px 8px 0 #1a1a1a, 12px 12px 0 #444444;
+  position: relative;
+}
+
+.manga-info-panel::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border: 3px solid #444444;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.manga-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid #1a1a1a;
+}
+
+.manga-panel-header svg {
+  color: #1a1a1a;
+  width: 24px;
+  height: 24px;
+}
+
+.manga-panel-title {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+/* ========== 统计信息 ========== */
+.manga-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.manga-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.manga-stat-item:last-child {
+  border-bottom: none;
+}
+
+.manga-stat-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.manga-stat-value {
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+/* ========== 游戏画布容器 ========== */
+.manga-game-area {
+  background: #ffffff;
+  border: 5px solid #1a1a1a;
+  padding: 2rem;
+  box-shadow: 10px 10px 0 #1a1a1a, 16px 16px 0 #444444;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.manga-game-area::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 3px solid #444444;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ========== 控制按钮 ========== */
+.manga-controls {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.manga-control-btn {
+  flex: 1;
+  min-width: 120px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 1rem 1.5rem;
+  background: #f0f0f0;
+  border: 4px solid #1a1a1a;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 6px 6px 0 #1a1a1a, 10px 10px 0 #444444;
+  position: relative;
+}
+
+.manga-control-btn::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 12px;
+  height: 12px;
+  border-top: 3px solid #444444;
+  border-left: 3px solid #444444;
+  pointer-events: none;
+}
+
+.manga-control-btn:hover {
+  background: #1a1a1a;
+  color: #f0f0f0;
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #444444, 14px 14px 0 #666666;
+}
+
+.manga-control-btn:active {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 #444444;
+}
+
+.manga-control-btn.primary {
+  background: #1a1a1a;
+  color: #f0f0f0;
+}
+
+.manga-control-btn.primary:hover {
+  background: #333333;
+}
+
+/* ========== 游戏结束覆盖层 ========== */
+.manga-game-over {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 26, 26, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.manga-game-over-title {
+  font-family: 'Georgia', serif;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #f0f0f0;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: 0.2em;
+  text-shadow: 4px 4px 0 #444444;
+}
+
+.manga-game-over-score {
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+  color: #f0f0f0;
+  margin: 0 0 2rem 0;
+  letter-spacing: 0.1em;
+}
+
+.manga-game-over-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* ========== 说明面板 ========== */
+.manga-instructions {
+  background: #ffffff;
+  border: 4px solid #1a1a1a;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 8px 8px 0 #1a1a1a, 12px 12px 0 #444444;
+  position: relative;
+}
+
+.manga-instructions::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border: 3px solid #444444;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.manga-instructions h3 {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.manga-instructions h3 svg {
+  color: #1a1a1a;
+  width: 24px;
+  height: 24px;
+}
+
+.manga-instructions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.manga-instructions li {
+  font-family: 'Georgia', serif;
+  font-size: 0.95rem;
+  color: #444444;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.manga-instructions li::before {
+  content: '▸';
+  color: #1a1a1a;
+  font-weight: 900;
+  font-size: 1.2rem;
+}
+
+.manga-key {
+  display: inline-block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #f0f0f0;
+  border: 2px solid #1a1a1a;
+  padding: 0.25rem 0.5rem;
+  box-shadow: 2px 2px 0 #444444;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 1100px) {
+  .manga-game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .manga-sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .manga-info-panel {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .manga-container {
+    padding: 1.5rem;
+  }
+
+  .manga-masthead {
+    padding: 1.5rem;
+  }
+
+  .manga-main-title h1 {
+    font-size: 2rem;
+  }
+
+  .manga-game-layout {
+    gap: 1rem;
+  }
+
+  .manga-sidebar {
+    flex-direction: column;
+  }
+
+  .manga-info-panel {
+    width: 100%;
+  }
+
+  .manga-game-area {
+    padding: 1rem;
+    min-height: 400px;
+  }
+
+  .manga-controls {
+    flex-direction: column;
+  }
+
+  .manga-control-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .manga-main-title h1 {
+    font-size: 1.6rem;
+  }
+
+  .manga-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .manga-game-area {
+    min-height: 300px;
+  }
+
+  .manga-stat-value {
+    font-size: 1.2rem;
+  }
+
+  .manga-game-over-title {
+    font-size: 2rem;
+  }
+}
+
+/* ========== 大屏优化 ========== */
+@media (min-width: 1920px) {
+  .manga-container {
+    max-width: 1800px;
+  }
+
+  .manga-main-title h1 {
+    font-size: 4rem;
+  }
+
+  .manga-game-layout {
+    grid-template-columns: 320px 1fr 320px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .manga-container {
+    max-width: 2200px;
+  }
+
+  .manga-main-title h1 {
+    font-size: 5rem;
+  }
+}

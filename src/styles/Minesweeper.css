@@ -99,7 +99,7 @@
   font-family: var(--font-display);
   font-size: 2.5rem;
   font-weight: 700;
-  color: #f87171;
+  color: #333333;
   margin: 0;
   text-shadow: 0 0 20px rgba(248, 117, 102, 0.5);
 }
@@ -132,18 +132,18 @@
 }
 
 .status-badge.active {
-  color: #fbbf24;
+  color: #000000;
   background: rgba(251, 191, 36, 0.1);
   animation: pulse 2s ease-in-out infinite;
 }
 
 .status-badge.success {
-  color: #4ade80;
+  color: #000000;
   background: rgba(74, 222, 128, 0.1);
 }
 
 .status-badge.danger {
-  color: #f87171;
+  color: #333333;
   background: rgba(248, 117, 102, 0.1);
 }
 
@@ -218,8 +218,8 @@
 
 .difficulty-btn.active {
   background: rgba(248, 117, 102, 0.2);
-  border-color: #f87171;
-  color: #f87171;
+  border-color: #333333;
+  color: #333333;
   font-weight: 700;
 }
 
@@ -251,16 +251,16 @@
   font-family: var(--font-mono);
   font-size: 1.25rem;
   font-weight: 700;
-  color: #fbbf24;
+  color: #000000;
 }
 
 .info-value.highlight {
-  color: #f87171;
+  color: #333333;
   text-shadow: 0 0 10px rgba(248, 117, 102, 0.5);
 }
 
 .info-value.best {
-  color: #4ade80;
+  color: #000000;
   text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
 }
 
@@ -276,7 +276,7 @@
   background: rgba(248, 117, 102, 0.15);
   border: 1px solid rgba(248, 117, 102, 0.3);
   border-radius: 4px;
-  color: #f87171;
+  color: #333333;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -433,12 +433,12 @@
 }
 
 .result-title.win {
-  color: #4ade80;
+  color: #000000;
   text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
 }
 
 .result-title.lose {
-  color: #f87171;
+  color: #333333;
   text-shadow: 0 0 20px rgba(248, 117, 102, 0.5);
 }
 
@@ -467,7 +467,7 @@
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fbbf24;
+  color: #000000;
 }
 
 .new-record {
@@ -475,7 +475,7 @@
   align-items: center;
   gap: 0.5rem;
   justify-content: center;
-  color: #fbbf24;
+  color: #000000;
   font-family: var(--font-mono);
   font-size: 0.8rem;
   margin: 1rem 0;
@@ -490,7 +490,7 @@
   font-size: 1rem;
   font-weight: 700;
   color: #000;
-  background: #f87171;
+  background: #333333;
   border: none;
   padding: 0.75rem 2rem;
   border-radius: 4px;
@@ -546,7 +546,7 @@
 
 .wave-bar {
   width: 6px;
-  background: linear-gradient(to top, #22d3ee, #f87171);
+  background: linear-gradient(to top, #22d3ee, #333333);
   border-radius: 2px;
   animation: wave 1s ease-in-out infinite;
 }

@@ -276,20 +276,20 @@ export default function FlyBird() {
                 >
                   <svg viewBox="0 0 30 30" fill="none">
                     {/* 身体 - 琥珀色渐变 */}
-                    <ellipse cx="15" cy="15" rx="14" ry="11" fill="url(#birdBody)" stroke="#f59e0b" strokeWidth="2"/>
+                    <ellipse cx="15" cy="15" rx="14" ry="11" fill="url(#birdBody)" stroke="#000000" strokeWidth="2"/>
                     {/* 眼睛 */}
                     <circle cx="22" cy="11" r="4" fill="#fff"/>
                     <circle cx="23" cy="11" r="2" fill="#0a0a0a"/>
                     {/* 嘴巴 */}
                     <path d="M26 14l4 2" stroke="#f97316" strokeWidth="3" strokeLinecap="round"/>
                     {/* 翅膀 */}
-                    <path d="M8 18l-6-4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
-                    <path d="M8 12l-6 4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                    <path d="M8 18l-6-4" stroke="#000000" strokeWidth="3" strokeLinecap="round"/>
+                    <path d="M8 12l-6 4" stroke="#000000" strokeWidth="3" strokeLinecap="round"/>
                     {/* 渐变定义 */}
                     <defs>
                       <linearGradient id="birdBody" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#fbbf24"/>
-                        <stop offset="100%" stopColor="#f59e0b"/>
+                        <stop offset="0%" stopColor="#000000"/>
+                        <stop offset="100%" stopColor="#000000"/>
                       </linearGradient>
                     </defs>
                   </svg>
@@ -352,7 +352,7 @@ export default function FlyBird() {
                         </div>
                         {score >= highScore && score > 0 && (
                           <div className="new-record">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2">
                               <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
                               <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
                               <path d="M4 22h16"/>
@@ -367,16 +367,16 @@ export default function FlyBird() {
                     ) : (
                       <>
                         <svg width="60" height="60" viewBox="0 0 30 30" fill="none">
-                          <ellipse cx="15" cy="15" rx="14" ry="11" fill="url(#birdBody2)" stroke="#f59e0b" strokeWidth="2"/>
+                          <ellipse cx="15" cy="15" rx="14" ry="11" fill="url(#birdBody2)" stroke="#000000" strokeWidth="2"/>
                           <circle cx="22" cy="11" r="4" fill="#fff"/>
                           <circle cx="23" cy="11" r="2" fill="#0a0a0a"/>
                           <path d="M26 14l4 2" stroke="#f97316" strokeWidth="3" strokeLinecap="round"/>
-                          <path d="M8 18l-6-4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
-                          <path d="M8 12l-6 4" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round"/>
+                          <path d="M8 18l-6-4" stroke="#000000" strokeWidth="3" strokeLinecap="round"/>
+                          <path d="M8 12l-6 4" stroke="#000000" strokeWidth="3" strokeLinecap="round"/>
                           <defs>
                             <linearGradient id="birdBody2" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#fbbf24"/>
-                              <stop offset="100%" stopColor="#f59e0b"/>
+                              <stop offset="0%" stopColor="#000000"/>
+                              <stop offset="100%" stopColor="#000000"/>
                             </linearGradient>
                           </defs>
                         </svg>

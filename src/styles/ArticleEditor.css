@@ -1,0 +1,237 @@
+/* ============================================
+   文章编辑器 - 黑白漫画风格
+   ============================================ */
+
+.editor-page {
+  min-height: 100vh;
+  background: #f8f8f8;
+  background-image: 
+    radial-gradient(#cccccc 1px, transparent 1px),
+    radial-gradient(#cccccc 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  position: relative;
+}
+
+.editor-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(#000000 1px, transparent 1px),
+    radial-gradient(#000000 1px, transparent 1px);
+  background-size: 6px 6px, 12px 12px;
+  background-position: 0 0, 3px 3px;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.editor-container {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 3px solid #1a1a1a;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1.5rem;
+  background: #f0f0f0;
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.back-btn:hover {
+  background: #ffffff;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #666666;
+}
+
+.editor-header h1 {
+  color: #1a1a1a;
+  font-size: 1.75rem;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #1a1a1a;
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 1rem;
+  background: #f0f0f0;
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+  font-family: 'Courier New', monospace;
+  transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  background: #ffffff;
+  box-shadow: 5px 5px 0 #666666;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #999999;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.6;
+}
+
+.form-group textarea.content-editor {
+  min-height: 400px;
+  font-family: 'Courier New', monospace;
+  line-height: 1.8;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 3px solid #1a1a1a;
+}
+
+.cancel-btn {
+  padding: 0.75rem 2rem;
+  background: #ffffff;
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.cancel-btn:hover {
+  background: #f0f0f0;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #666666;
+}
+
+.save-btn {
+  padding: 0.75rem 2rem;
+  background: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  box-shadow: 4px 4px 0 #444444;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #000000;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #666666;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #666666;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .editor-container {
+    padding: 1rem;
+  }
+
+  .editor-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .editor-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    width: 100%;
+  }
+}

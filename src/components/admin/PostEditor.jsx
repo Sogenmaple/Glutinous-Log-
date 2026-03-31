@@ -72,7 +72,7 @@ export default function PostEditor({ post, onBack }) {
     formDataUpload.append('image', file)
     
     try {
-      const response = await fetch('http://36.151.149.117:3001/api/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formDataUpload
@@ -107,7 +107,7 @@ export default function PostEditor({ post, onBack }) {
     formDataUpload.append('image', file)
     
     try {
-      const response = await fetch('http://36.151.149.117:3001/api/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formDataUpload
@@ -229,8 +229,8 @@ export default function PostEditor({ post, onBack }) {
 
     try {
       const url = post 
-        ? `http://36.151.149.117:3001/api/posts/${post.id}`
-        : 'http://36.151.149.117:3001/api/posts'
+        ? `/api/posts/${post.id}`
+        : '/api/posts'
       
       const response = await fetch(url, {
         method: post ? 'PUT' : 'POST',
@@ -399,7 +399,7 @@ export default function PostEditor({ post, onBack }) {
             </label>
             {formData.coverImage && (
               <div className="cover-preview">
-                <img src={`http://36.151.149.117:3001${formData.coverImage}`} alt="封面预览" />
+                <img src={`${formData.coverImage}`} alt="封面预览" />
                 <button type="button" onClick={() => setFormData({...formData, coverImage: ''})} className="remove-cover">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <line x1="18" y1="6" x2="6" y2="18"/>

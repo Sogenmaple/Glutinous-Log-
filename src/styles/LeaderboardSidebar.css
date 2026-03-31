@@ -1,0 +1,541 @@
+/* 侧边栏排行榜容器 - 黑白漫画风格 */
+.leaderboard-sidebar {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 4px solid #1a1a1a;
+  box-shadow: 8px 8px 0 #1a1a1a;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  min-width: 280px;
+  max-width: 350px;
+}
+
+/* 全局盒模型 */
+.leaderboard-sidebar *,
+.leaderboard-sidebar *::before,
+.leaderboard-sidebar *::after {
+  box-sizing: border-box;
+}
+
+/* 报头 */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #1a1a1a;
+  color: #ffffff;
+  border-bottom: 3px solid #1a1a1a;
+  flex-shrink: 0;
+}
+
+.header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  border: 2px solid #ffffff;
+  box-shadow: 2px 2px 0 #444444;
+  flex-shrink: 0;
+}
+
+.header-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.header-title h3 {
+  margin: 0 !important;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 900;
+  color: #ffffff !important;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 2px 2px 0 #444444;
+}
+
+.header-title .subtitle {
+  margin: 4px 0 0 0;
+  font-family: 'Georgia', serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: #cccccc;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* 用户排名卡片 */
+.user-rank-card {
+  margin: 12px;
+  padding: 12px;
+  background: #f0f0f0;
+  border: 3px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+  flex-shrink: 0;
+}
+
+.user-rank-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.user-avatar-small,
+.user-avatar-placeholder-small {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #1a1a1a;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.user-avatar-placeholder-small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+}
+
+.user-rank-header span {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.user-rank-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.rank-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 2px solid #1a1a1a;
+  box-shadow: 2px 2px 0 #666666;
+}
+
+.rank-number {
+  font-family: 'Courier New', monospace;
+  font-size: 16px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.rank-score {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.score-value {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+.score-unit {
+  font-size: 10px;
+  font-family: 'Georgia', serif;
+  color: #666666;
+}
+
+.rank-total {
+  font-family: 'Georgia', serif;
+  font-size: 10px;
+  color: #666666;
+  text-align: right;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* 分隔线 */
+.sidebar-divider {
+  height: 3px;
+  background: #1a1a1a;
+  margin: 0 12px;
+  flex-shrink: 0;
+}
+
+/* 排行榜标题 */
+.leaderboard-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px 8px;
+  flex-shrink: 0;
+}
+
+.leaderboard-section-title span {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* 内容区 */
+.leaderboard-content {
+  flex: 1;
+  padding: 8px 12px 12px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.leaderboard-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.leaderboard-content::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-left: 2px solid #1a1a1a;
+}
+
+.leaderboard-content::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border: 1px solid #ffffff;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 16px;
+  text-align: center;
+}
+
+.loading-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.loading-bar {
+  height: 20px;
+  background: #f0f0f0;
+  border: 2px solid #1a1a1a;
+  box-shadow: 2px 2px 0 #444444;
+}
+
+.loading-bar:nth-child(1) { width: 100%; }
+.loading-bar:nth-child(2) { width: 90%; }
+.loading-bar:nth-child(3) { width: 85%; }
+.loading-bar:nth-child(4) { width: 95%; }
+.loading-bar:nth-child(5) { width: 80%; }
+
+.loading-state p {
+  color: #666666;
+  margin: 0;
+  font-family: 'Georgia', serif;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+/* 错误状态 */
+.error-state {
+  padding: 30px 16px;
+  text-align: center;
+}
+
+.error-state p {
+  color: #1a1a1a;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.empty-state p {
+  color: #666666;
+  margin: 6px 0;
+  font-family: 'Georgia', serif;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.empty-state .hint {
+  font-size: 10px;
+  color: #999999;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
+}
+
+/* 排行榜列表 */
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background: #f0f0f0;
+  border: 2px solid #1a1a1a;
+  box-shadow: 2px 2px 0 #444444;
+  transition: all 0.2s;
+}
+
+.leaderboard-item:hover {
+  background: #ffffff;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 #666666;
+}
+
+.leaderboard-item.current-user {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  box-shadow: 2px 2px 0 #666666;
+}
+
+.leaderboard-item.current-user .rank-num,
+.leaderboard-item.current-user .player-name {
+  color: #ffffff;
+}
+
+.leaderboard-item.current-user .item-score {
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+.leaderboard-item.current-user .player-time {
+  color: #cccccc;
+}
+
+/* 排名样式 */
+.leaderboard-item.rank-1,
+.leaderboard-item.rank-2,
+.leaderboard-item.rank-3 {
+  border-left-width: 4px;
+}
+
+.leaderboard-item.rank-normal {
+  border-left-width: 2px;
+}
+
+/* 排名数字 */
+.item-rank {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 2px solid #1a1a1a;
+  box-shadow: 2px 2px 0 #444444;
+  flex-shrink: 0;
+}
+
+.rank-num {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+/* 玩家信息 */
+.item-player {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.player-avatar,
+.player-avatar-placeholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #1a1a1a;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 2px 2px 0 #444444;
+}
+
+.player-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1a1a;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.player-name {
+  font-family: 'Georgia', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.player-time {
+  font-size: 10px;
+  font-family: 'Courier New', monospace;
+  color: #666666;
+  letter-spacing: 0.3px;
+}
+
+/* 分数 */
+.item-score {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 900;
+  color: #1a1a1a;
+  min-width: 50px;
+  text-align: right;
+  background: #ffffff;
+  padding: 4px 8px;
+  border: 2px solid #1a1a1a;
+  box-shadow: 2px 2px 0 #444444;
+  flex-shrink: 0;
+}
+
+/* 报尾 */
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f0f0f0;
+  border-top: 3px solid #1a1a1a;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #666666;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.sidebar-footer .separator {
+  color: #1a1a1a;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .leaderboard-sidebar {
+    min-width: 260px;
+    max-width: 300px;
+  }
+  
+  .header-title h3 {
+    font-size: 13px;
+  }
+  
+  .item-score {
+    min-width: 45px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .leaderboard-sidebar {
+    min-width: 240px;
+    max-width: 280px;
+  }
+  
+  .sidebar-header {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  
+  .header-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .header-title h3 {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+  }
+  
+  .user-rank-card {
+    margin: 10px;
+    padding: 10px;
+  }
+  
+  .rank-number {
+    font-size: 14px;
+  }
+  
+  .score-value {
+    font-size: 13px;
+  }
+  
+  .item-rank {
+    width: 30px;
+    height: 30px;
+    margin-right: 6px;
+  }
+  
+  .player-avatar,
+  .player-avatar-placeholder {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .player-name {
+    font-size: 11px;
+  }
+  
+  .item-score {
+    min-width: 42px;
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+}

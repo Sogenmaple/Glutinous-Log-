@@ -15,9 +15,8 @@ export default function PostList() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch('http://36.151.149.117:3001/api/posts')
+      const response = await fetch('/api/posts')
       const data = await response.json()
-      console.log('获取到的文章:', data)
       setPosts(data)
     } catch (error) {
       console.error('获取文章失败:', error)
@@ -57,9 +56,10 @@ export default function PostList() {
   return (
     <section id="posts" className="section posts-section">
       <div className="section-container">
-        <h2 className="section-title cassette-title">
-          <span className="cassette-label">BLOG</span>
-          <span className="title-text">博客 & 项目</span>
+        <h2 className="section-title manga-section-title">
+          <span className="manga-section-label">BLOG</span>
+          <span className="manga-title-line"></span>
+          <span className="manga-section-text">博客 & 项目</span>
         </h2>
 
         {/* 类型筛选 */}

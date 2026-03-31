@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getTypeIcon } from '../components/icons/TypeIcons'
-import Header from '../components/Header'
+import '../styles/MangaBlog.css'
 
 export default function PostDetail() {
   const { id } = useParams()
@@ -15,7 +15,7 @@ export default function PostDetail() {
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`http://36.151.149.117:3001/api/posts/${id}`)
+      const response = await fetch(`/api/posts/${id}`)
       const data = await response.json()
       setPost(data)
     } catch (error) {
@@ -29,8 +29,7 @@ export default function PostDetail() {
   if (!post) return <div className="not-found">文章不存在</div>
 
   return (
-    <article className="post-detail-page">
-      <Header />
+    <article className="post-detail-page manga-page">
       <div className="post-detail-wrapper">
         <button onClick={() => navigate(-1)} className="back-btn">
           ← 返回

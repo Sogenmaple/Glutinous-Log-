@@ -441,7 +441,7 @@ export default function Pacman() {
                     }deg)`
                   }}
                 >
-                  <svg viewBox="0 0 20 20" fill="#fbbf24">
+                  <svg viewBox="0 0 20 20" fill="#000000">
                     {mouthOpen ? (
                       <path d="M10 0A10 10 0 1 1 10 20A10 10 0 1 1 10 0L10 10Z" />
                     ) : (
@@ -477,7 +477,7 @@ export default function Pacman() {
               {gameState === 'start' && (
                 <div className="overlay">
                   <div className="overlay-content">
-                    <svg width="60" height="60" viewBox="0 0 20 20" fill="#fbbf24">
+                    <svg width="60" height="60" viewBox="0 0 20 20" fill="#000000">
                       <path d="M10 0A10 10 0 1 1 10 20A10 10 0 1 1 10 0L10 10Z" />
                     </svg>
                     <h2>吃豆人</h2>
@@ -517,7 +517,7 @@ export default function Pacman() {
                     </div>
                     {score >= highScore && score > 0 && (
                       <div className="new-record">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="2">
                           <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
                           <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
                           <path d="M4 22h16"/>

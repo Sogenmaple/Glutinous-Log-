@@ -32,14 +32,15 @@ export default function CursorEffect() {
     let lastX = 0
     let lastY = 0
 
-    // 创建优雅粒子
+    // 创建优雅粒子 - 黑白配色
     function createParticle(x, y, size = 'normal') {
       const particle = document.createElement('div')
-      const colors = ['#ff9500', '#ffffff', '#ffe0b2', '#06b6d4']
+      // 黑白两色随机，黑色为主
+      const colors = ['#000000', '#000000', '#000000', '#ffffff']
       const color = colors[Math.floor(Math.random() * colors.length)]
       
       const particleSize = size === 'large' ? 
-        (Math.random() * 4 + 4) : 
+        (Math.random() * 5 + 5) : 
         (Math.random() * 3 + 2)
       
       particle.style.cssText = `
@@ -51,8 +52,9 @@ export default function CursorEffect() {
         background: ${color};
         border-radius: 50%;
         pointer-events: none;
-        box-shadow: 0 0 ${particleSize * 2}px ${color};
-        opacity: 0.6;
+        border: 2px solid ${color === '#000000' ? '#ffffff' : '#000000'};
+        box-shadow: 0 0 ${particleSize}px ${color};
+        opacity: 0.8;
         transform: translate(-50%, -50%);
         will-change: transform, opacity;
       `
@@ -123,12 +125,12 @@ export default function CursorEffect() {
       lastY = mouseY
     }
 
-    // 点击时创建优雅波纹和粒子
+    // 点击时创建优雅波纹和粒子 - 所有页面启用黑白粒子
     function handleClick(e) {
-      // 少量精致粒子
-      for (let i = 0; i < 8; i++) {
-        const angle = (i / 8) * Math.PI * 2
-        const radius = 20
+      // 黑白粒子爆发效果
+      for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2
+        const radius = 25
         createParticle(
           e.clientX + Math.cos(angle) * radius,
           e.clientY + Math.sin(angle) * radius,
@@ -148,14 +150,15 @@ export default function CursorEffect() {
       }, 500)
     }
 
-    // 悬停可交互元素
+    // 悬停可交互元素 - 所有页面启用黑白粒子
     function handleMouseOver(e) {
       const target = e.target
-      if (target.matches('a, button, .nav-item, .post-card, [role="button"]')) {
+      
+      if (target.matches('a, button, .nav-item, .post-card, [role="button"], .manga-home-channel')) {
         // 创建光环粒子
-        for (let i = 0; i < 6; i++) {
-          const angle = (i / 6) * Math.PI * 2
-          const radius = 25
+        for (let i = 0; i < 8; i++) {
+          const angle = (i / 8) * Math.PI * 2
+          const radius = 30
           createParticle(
             e.clientX + Math.cos(angle) * radius,
             e.clientY + Math.sin(angle) * radius

@@ -19,6 +19,10 @@
   filter: contrast(20) brightness(1.1) invert(1);
 }
 
+.intro-page-wrapper .intro-overlay {
+  position: fixed;
+}
+
 .intro-overlay.expanding {
   opacity: 0;
   pointer-events: none;
@@ -36,4 +40,48 @@
   width: 100%;
   height: 100%;
   transition: transform 1.5s cubic-bezier(0.7, 0, 0.3, 1), opacity 1s ease;
+}
+
+/* Intro 独立页面样式 */
+.intro-page-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ========== 增强响应式 - 修复比例失调 ========== */
+/* Intro 动画响应式 */
+.intro-text {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+}
+
+.intro-subtext {
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+}
+
+/* Canvas 响应式 */
+.intro-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .intro-text {
+    font-size: 1.8rem;
+  }
+  
+  .intro-subtext {
+    font-size: 1rem;
+  }
+}
+
+/* 超大屏优化 */
+@media (min-width: 2560px) {
+  .intro-text {
+    font-size: 3.5rem;
+  }
 }

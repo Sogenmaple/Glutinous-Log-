@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, TangyuanIcon, GameIcon } from '../components/icons/SiteIcons'
+import { ToolIcon, ClockIcon, CodeIcon, ExperimentIcon, BombIcon, CalculatorIcon, GameIcon, TangyuanIcon } from '../components/icons/SiteIcons'
 
 /**
  * 特殊构造 - 工具与实验页面
@@ -19,13 +19,13 @@ export default function SpecialConstructs() {
 
   const specialTools = [
     {
-      id: 'games',
-      title: '休闲小游戏',
-      subtitle: 'CASUAL GAMES',
+      id: 'minigames',
+      title: '小游戏',
+      subtitle: 'MINI GAMES',
       description: '经典休闲小游戏集合，扫雷/贪吃蛇/吃豆人等',
       icon: GameIcon,
-      color: 'amber',
-      path: '/games',
+      color: 'manga',
+      path: '/special/minigames',
       status: 'active',
       featured: true
     },
@@ -35,7 +35,7 @@ export default function SpecialConstructs() {
       subtitle: 'POMODORO TODO',
       description: '专注工作与休息的番茄钟时间管理法，搭配待办事项清单',
       icon: ClockIcon,
-      color: 'red',
+      color: 'manga',
       path: '/special/pomodoro',
       status: 'active'
     },
@@ -45,18 +45,18 @@ export default function SpecialConstructs() {
       subtitle: 'CALCULATOR',
       description: '功能齐全的科学计算器，支持历史记录和键盘输入',
       icon: CalculatorIcon,
-      color: 'cyan',
+      color: 'manga',
       path: '/special/calculator',
       status: 'active'
     },
     {
-      id: 'prefix',
+      id: 'intro',
       title: '风格化前缀',
       subtitle: 'STYLED PREFIX',
-      description: '自定义进场动画、屏保效果和视觉前缀',
+      description: '沉浸式开场动画体验，代码雨与神秘眼眸',
       icon: TangyuanIcon,
-      color: 'amber',
-      path: '/special/prefix-settings',
+      color: 'manga',
+      path: '/special/intro',
       status: 'active'
     },
     {
@@ -65,7 +65,7 @@ export default function SpecialConstructs() {
       subtitle: 'CODE SNIPPETS',
       description: '常用代码片段收藏与分类管理',
       icon: CodeIcon,
-      color: 'cyan',
+      color: 'manga',
       path: '/special/snippets',
       status: 'coming-soon'
     },
@@ -75,7 +75,7 @@ export default function SpecialConstructs() {
       subtitle: 'DEV TOOLS',
       description: '实用开发小工具集合',
       icon: ToolIcon,
-      color: 'amber',
+      color: 'manga',
       path: '/special/tools',
       status: 'coming-soon'
     },
@@ -85,7 +85,7 @@ export default function SpecialConstructs() {
       subtitle: 'CREATIVE EXPERIMENTS',
       description: '各种奇思妙想的实验性项目',
       icon: ExperimentIcon,
-      color: 'purple',
+      color: 'manga',
       path: '/special/experiments',
       status: 'coming-soon'
     }
@@ -98,7 +98,7 @@ export default function SpecialConstructs() {
         <div className="page-header">
           <h1 className="page-title">
             <span className="title-icon">
-              <ToolIcon size={40} color="#ff9500" />
+              <ToolIcon size={40} color="#000000" />
             </span>
             <span className="title-text">特殊构造</span>
           </h1>

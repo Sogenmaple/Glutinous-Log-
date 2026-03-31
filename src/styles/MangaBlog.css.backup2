@@ -1,0 +1,1308 @@
+/* ============================================
+   汤圆的博客 - 纯黑白漫画风格
+   经典黑白 | 点状网格背景 | 硬朗线条 | 强烈阴影
+   ============================================ */
+
+/* 禁用全局扫描线效果 */
+.manga-blog-page ~ .scanlines,
+.post-detail-page ~ .scanlines {
+  display: none !important;
+}
+
+/* 禁用漫画页面的光标粒子效果（琥珀色） */
+.manga-page #cursor-particles {
+  display: none !important;
+}
+
+/* ============================================
+   点状网格背景
+   ============================================ */
+.manga-blog-page {
+  min-height: 100vh;
+  background: #f8f8f8 !important;
+  background-image: 
+    radial-gradient(#cccccc 1px, transparent 1px),
+    radial-gradient(#cccccc 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  padding-top: 80px;
+  position: relative;
+}
+
+/* 覆盖 App.css 中的白色背景 */
+.manga-blog-page .section {
+  background: transparent !important;
+}
+
+/* ============================================
+   页面头部
+   ============================================ */
+.manga-page-header {
+  background: #1a1a1a;
+  padding: 6rem 3rem;
+  margin: 0;
+  border-bottom: 6px solid #1a1a1a;
+  text-align: center;
+  position: relative;
+  background-image: 
+    radial-gradient(#444444 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.manga-page-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin: 0 0 2rem 0;
+  position: relative;
+}
+
+.manga-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 130px;
+  height: 130px;
+  background: #f0f0f0;
+  border: 6px solid #1a1a1a;
+  border-radius: 0;
+  box-shadow: 10px 10px 0 #1a1a1a, 15px 15px 0 #444444;
+  position: relative;
+}
+
+.manga-title-icon svg {
+  color: #1a1a1a;
+  width: 70px;
+  height: 70px;
+  position: relative;
+  z-index: 1;
+}
+
+.manga-title-text {
+  font-family: 'Georgia', serif;
+  font-size: 5rem;
+  font-weight: 900;
+  color: #f0f0f0;
+  letter-spacing: 0.3em;
+  position: relative;
+}
+
+.manga-page-subtitle {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  color: #f0f0f0;
+  letter-spacing: 0.4em;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+  background: #1a1a1a;
+  display: inline-block;
+  padding: 1rem 2rem;
+  border: 4px solid #f0f0f0;
+  box-shadow: 8px 8px 0 #444444;
+  position: relative;
+}
+
+/* ============================================
+   文章列表容器
+   ============================================ */
+.manga-blog-page .section {
+  padding: 5rem 3rem;
+  background: transparent;
+  position: relative;
+}
+
+/* 容器两侧装饰线 */
+.manga-blog-page .section::before,
+.manga-blog-page .section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  background: #1a1a1a;
+  box-shadow: 3px 0 0 #444444;
+}
+
+.manga-blog-page .section::before {
+  left: 0;
+}
+
+.manga-blog-page .section::after {
+  right: 0;
+}
+
+.manga-blog-page .section-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #f8f8f8;
+  border: 6px solid #1a1a1a;
+  box-shadow: 12px 12px 0 #1a1a1a, 18px 18px 0 #444444;
+  padding: 3rem;
+  position: relative;
+}
+
+/* 容器四角装饰 */
+.manga-blog-page .section-container::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  border: 4px solid #444444;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ============================================
+   章节标题
+   ============================================ */
+.manga-blog-page .manga-section-title,
+.manga-blog-page .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin: 0 0 4rem 0;
+  padding: 2rem 3rem;
+  background: #1a1a1a !important;
+  border: 6px solid #1a1a1a !important;
+  border-radius: 0 !important;
+  box-shadow: 10px 10px 0 #444444, 15px 15px 0 #666666 !important;
+  position: relative;
+}
+
+/* 章节标题装饰角 */
+.manga-blog-page .manga-section-title::before,
+.manga-blog-page .section-title::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 30px;
+  height: 30px;
+  border-top: 6px solid #f0f0f0;
+  border-left: 6px solid #f0f0f0;
+}
+
+.manga-blog-page .manga-section-title::after,
+.manga-blog-page .section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  border-bottom: 6px solid #f0f0f0;
+  border-right: 6px solid #f0f0f0;
+}
+
+.manga-blog-page .manga-section-label {
+  font-family: 'Courier New', monospace;
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #f0f0f0 !important;
+  letter-spacing: 0.3em;
+  position: relative;
+  z-index: 1;
+}
+
+.manga-blog-page .manga-title-line {
+  flex: 1;
+  height: 6px;
+  background: #f0f0f0;
+  max-width: 300px;
+  box-shadow: 0 3px 0 #444444;
+  position: relative;
+  z-index: 1;
+}
+
+.manga-blog-page .manga-section-text {
+  font-family: 'Georgia', serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #f0f0f0 !important;
+  letter-spacing: 0.15em;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================
+   筛选按钮
+   ============================================ */
+.manga-blog-page .type-filter,
+.manga-blog-page .category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 4rem;
+  justify-content: center;
+  position: relative;
+}
+
+/* 筛选器装饰框 */
+.manga-blog-page .type-filter::before,
+.manga-blog-page .category-filter::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  border: 3px dashed #444444;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.manga-blog-page .type-btn,
+.manga-blog-page .category-btn {
+  font-family: 'Courier New', monospace !important;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.9rem 1.7rem;
+  background: #f0f0f0 !important;
+  border: 4px solid #1a1a1a !important;
+  color: #1a1a1a !important;
+  cursor: pointer;
+  transition: all 0.15s !important;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 0 !important;
+  box-shadow: 6px 6px 0 #1a1a1a, 10px 10px 0 #444444 !important;
+  position: relative;
+}
+
+/* 按钮装饰角 */
+.manga-blog-page .type-btn::before,
+.manga-blog-page .category-btn::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 15px;
+  height: 15px;
+  border-top: 3px solid #444444;
+  border-left: 3px solid #444444;
+  pointer-events: none;
+}
+
+.manga-blog-page .type-btn:hover,
+.manga-blog-page .category-btn:hover {
+  background: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+  color: #f0f0f0 !important;
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #444444, 14px 14px 0 #666666 !important;
+}
+
+.manga-blog-page .type-btn.active,
+.manga-blog-page .category-btn.active {
+  background: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+  color: #f0f0f0 !important;
+  box-shadow: 6px 6px 0 #444444, 11px 11px 0 #666666 !important;
+}
+
+.manga-blog-page .category-btn .count {
+  background: #1a1a1a;
+  color: #f0f0f0;
+  padding: 0.3rem 0.65rem;
+  border-radius: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-left: 0.65rem;
+  border: 2px solid #f0f0f0;
+  box-shadow: 3px 3px 0 #444444;
+}
+
+.manga-blog-page .category-btn.active .count {
+  background: #f0f0f0 !important;
+  color: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+}
+
+/* ============================================
+   文章网格
+   ============================================ */
+.manga-blog-page .posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2.5rem;
+  position: relative;
+}
+
+/* 网格装饰线 */
+.manga-blog-page .posts-grid::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #1a1a1a;
+  box-shadow: 0 3px 0 #444444;
+}
+
+/* ============================================
+   文章卡片
+   ============================================ */
+.manga-blog-page .post-card,
+.manga-blog-page .post-card.cassette-card {
+  background: #f8f8f8 !important;
+  border: 5px solid #1a1a1a !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  cursor: pointer;
+  transition: all 0.2s !important;
+  position: relative;
+  overflow: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  box-shadow: 10px 10px 0 #1a1a1a, 15px 15px 0 #444444 !important;
+}
+
+/* 卡片左侧装饰条 */
+.manga-blog-page .post-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 100%;
+  background: #1a1a1a;
+  z-index: 1;
+  box-shadow: 3px 0 0 #444444;
+}
+
+/* 卡片四角装饰 */
+.manga-blog-page .post-card::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border: 3px solid #444444;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.manga-blog-page .post-card:hover {
+  background: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+  transform: translate(-5px, -5px);
+  box-shadow: 15px 15px 0 #444444, 22px 22px 0 #666666 !important;
+}
+
+.manga-blog-page .post-card:hover::after {
+  border-color: #666666;
+}
+
+/* 禁用卡片装饰角 */
+.manga-blog-page .card-corner {
+  display: none !important;
+}
+
+/* ============================================
+   卡片内容区域
+   ============================================ */
+.manga-blog-page .post-content {
+  padding: 2rem !important;
+  background: #f8f8f8;
+  position: relative;
+}
+
+.manga-blog-page .post-card:hover .post-content {
+  background: #1a1a1a;
+}
+
+.manga-blog-page .post-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.4rem;
+  flex-wrap: wrap;
+  border-bottom: 3px solid #1a1a1a;
+  padding-bottom: 1.2rem;
+  position: relative;
+}
+
+.manga-blog-page .post-header::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #444444;
+}
+
+.manga-blog-page .post-card:hover .post-header {
+  border-bottom-color: #f0f0f0;
+}
+
+.manga-blog-page .post-card:hover .post-header::after {
+  background: #666666;
+}
+
+.manga-blog-page .post-type-icon {
+  width: 55px;
+  height: 55px;
+  background: #1a1a1a !important;
+  border: 4px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 #444444;
+}
+
+.manga-blog-page .post-type-icon svg {
+  color: #f0f0f0;
+  width: 30px;
+  height: 30px;
+}
+
+.manga-blog-page .post-card:hover .post-type-icon {
+  background: #f0f0f0 !important;
+  border-color: #1a1a1a;
+  box-shadow: 4px 4px 0 #666666;
+}
+
+.manga-blog-page .post-card:hover .post-type-icon svg {
+  color: #1a1a1a;
+}
+
+.manga-blog-page .post-category {
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f0f0f0 !important;
+  background: #1a1a1a;
+  padding: 0.45rem 0.9rem;
+  border: 3px solid #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 3px 3px 0 #444444;
+}
+
+.manga-blog-page .post-card:hover .post-category {
+  background: #f0f0f0 !important;
+  border-color: #1a1a1a;
+  color: #1a1a1a !important;
+  box-shadow: 3px 3px 0 #666666;
+}
+
+.manga-blog-page .post-date {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #888888;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin-left: auto;
+  background: #f0f0f0;
+  padding: 0.35rem 0.7rem;
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+}
+
+.manga-blog-page .post-card:hover .post-date {
+  color: #aaaaaa;
+  background: #1a1a1a;
+  border-color: #f0f0f0;
+}
+
+.manga-blog-page .post-title {
+  font-family: 'Georgia', serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #1a1a1a !important;
+  margin: 1.3rem 0 1.6rem 0;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+}
+
+.manga-blog-page .post-card:hover .post-title {
+  color: #f0f0f0 !important;
+}
+
+.manga-blog-page .post-excerpt {
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  color: #444444 !important;
+  line-height: 1.7;
+  margin: 0 0 1.6rem 0;
+}
+
+.manga-blog-page .post-card:hover .post-excerpt {
+  color: #bbbbbb !important;
+}
+
+.manga-blog-page .post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1.6rem;
+}
+
+.manga-blog-page .post-tags .tag {
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #1a1a1a !important;
+  background: #f0f0f0 !important;
+  padding: 0.45rem 0.9rem;
+  border: 2px solid #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 3px 3px 0 #444444;
+}
+
+.manga-blog-page .post-card:hover .post-tags .tag {
+  background: #1a1a1a !important;
+  border-color: #f0f0f0;
+  color: #f0f0f0 !important;
+  box-shadow: 3px 3px 0 #666666;
+}
+
+.manga-blog-page .post-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.3rem;
+  border-top: 3px solid #1a1a1a;
+  position: relative;
+}
+
+.manga-blog-page .post-footer::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #444444;
+}
+
+.manga-blog-page .post-card:hover .post-footer {
+  border-top-color: #f0f0f0;
+}
+
+.manga-blog-page .post-card:hover .post-footer::before {
+  background: #666666;
+}
+
+.manga-blog-page .read-time {
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  color: #888888;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  background: #f0f0f0;
+  padding: 0.3rem 0.6rem;
+  border: 2px solid #1a1a1a;
+  box-shadow: 2px 2px 0 #444444;
+}
+
+.manga-blog-page .post-card:hover .read-time {
+  color: #aaaaaa;
+  background: #1a1a1a;
+  border-color: #f0f0f0;
+}
+
+.manga-blog-page .team-badge {
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.7rem;
+  color: #f0f0f0 !important;
+  font-weight: 600;
+  background: #1a1a1a;
+  padding: 0.35rem 0.7rem;
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+}
+
+.manga-blog-page .post-card:hover .team-badge {
+  background: #f0f0f0 !important;
+  border-color: #1a1a1a;
+  color: #1a1a1a !important;
+  box-shadow: 3px 3px 0 #666666;
+}
+
+.manga-blog-page .read-more-btn {
+  display: none !important;
+}
+
+/* ============================================
+   空状态 & 加载状态
+   ============================================ */
+.manga-blog-page .empty-state {
+  text-align: center;
+  padding: 5rem 2.5rem;
+  background: #f8f8f8;
+  border: 5px solid #1a1a1a;
+  box-shadow: 10px 10px 0 #1a1a1a, 16px 16px 0 #444444;
+  position: relative;
+}
+
+.manga-blog-page .empty-state::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 3px solid #444444;
+  pointer-events: none;
+}
+
+.manga-blog-page .empty-state p {
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  position: relative;
+  z-index: 1;
+}
+
+.manga-blog-page .loading {
+  text-align: center;
+  padding: 4rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  color: #1a1a1a;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  background: #f8f8f8;
+  border: 5px solid #1a1a1a;
+  box-shadow: 10px 10px 0 #1a1a1a, 16px 16px 0 #444444;
+  position: relative;
+}
+
+.manga-blog-page .loading::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  border: 3px solid #444444;
+  pointer-events: none;
+}
+
+/* ============================================
+   博客详情页面
+   ============================================ */
+
+.post-detail-page {
+  min-height: 100vh !important;
+  background: #f8f8f8;
+  background-image: 
+    radial-gradient(#cccccc 1px, transparent 1px),
+    radial-gradient(#cccccc 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  padding-top: 80px;
+  position: relative;
+}
+
+.post-detail-page .post-detail-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem;
+  background: transparent;
+}
+
+.post-detail-page .back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.9rem 1.7rem;
+  background: #f0f0f0 !important;
+  border: 4px solid #1a1a1a;
+  color: #1a1a1a !important;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 2.5rem;
+  box-shadow: 6px 6px 0 #1a1a1a, 10px 10px 0 #444444;
+  position: relative;
+}
+
+.post-detail-page .back-btn::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 12px;
+  height: 12px;
+  border-top: 3px solid #444444;
+  border-left: 3px solid #444444;
+  pointer-events: none;
+}
+
+.post-detail-page .back-btn:hover {
+  background: #1a1a1a !important;
+  color: #f0f0f0 !important;
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #444444, 14px 14px 0 #666666;
+}
+
+.post-detail-page .post-detail {
+  background: #f8f8f8 !important;
+  border: 6px solid #1a1a1a;
+  padding: 4rem;
+  box-shadow: 15px 15px 0 #1a1a1a, 22px 22px 0 #444444;
+  position: relative;
+}
+
+/* 文章容器装饰框 */
+.post-detail-page .post-detail::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  border: 4px solid #444444;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* 文章容器角标 */
+.post-detail-page .post-detail::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-top: 4px solid #1a1a1a;
+  border-right: 4px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+}
+
+.post-detail-page .post-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  border-bottom: 4px solid #1a1a1a;
+  padding-bottom: 2rem;
+  position: relative;
+}
+
+.post-detail-page .post-detail-header::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #444444;
+}
+
+.post-detail-page .post-type-badge,
+.post-detail-page .post-category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.55rem 1.1rem;
+  background: #1a1a1a !important;
+  border: 3px solid #1a1a1a;
+  color: #f0f0f0 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 4px 4px 0 #444444;
+}
+
+.post-detail-page .post-type-badge svg {
+  color: #f0f0f0;
+  width: 18px;
+  height: 18px;
+}
+
+.post-detail-page .post-category-badge {
+  background: #f0f0f0 !important;
+  border-color: #1a1a1a;
+  color: #1a1a1a !important;
+  box-shadow: 4px 4px 0 #444444;
+}
+
+.post-detail-page .post-detail-title {
+  font-family: 'Georgia', serif;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: #1a1a1a !important;
+  margin: 0 0 2.2rem 0;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  position: relative;
+}
+
+.post-detail-page .post-meta {
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+  padding-bottom: 2.2rem;
+  border-bottom: 4px solid #1a1a1a;
+  margin-bottom: 2.2rem;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.post-detail-page .post-meta::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #444444;
+}
+
+.post-detail-page .post-meta .meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #666666;
+  background: #f0f0f0;
+  padding: 0.5rem 0.9rem;
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+}
+
+.post-detail-page .post-meta .meta-item svg {
+  color: #1a1a1a;
+  width: 18px;
+  height: 18px;
+}
+
+.post-detail-page .post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-bottom: 2.5rem;
+}
+
+.post-detail-page .post-tags .tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  background: #f0f0f0;
+  padding: 0.5rem 1rem;
+  border: 3px solid #1a1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 4px 4px 0 #444444;
+}
+
+.post-detail-page .post-detail-content {
+  line-height: 2;
+}
+
+.post-detail-page .post-excerpt-large {
+  font-family: 'Georgia', serif;
+  font-size: 1.4rem;
+  color: #333333 !important;
+  line-height: 1.9;
+  margin: 0 0 3rem 0;
+  padding: 2.2rem;
+  background: #f0f0f0 !important;
+  border-left: 6px solid #1a1a1a;
+  border: 3px solid #1a1a1a;
+  box-shadow: 6px 6px 0 #444444;
+  position: relative;
+}
+
+.post-detail-page .post-excerpt-large::before {
+  content: '"';
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  font-size: 4rem;
+  color: #444444;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.post-detail-page .post-content {
+  font-family: 'Georgia', serif;
+  font-size: 1.15rem;
+  color: #222222 !important;
+  line-height: 2;
+  background: transparent !important;
+}
+
+.post-detail-page .post-content h2 {
+  font-family: 'Georgia', serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 3.5rem 0 1.8rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 4px solid #1a1a1a;
+  position: relative;
+}
+
+.post-detail-page .post-content h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #444444;
+}
+
+.post-detail-page .post-content h3 {
+  font-family: 'Georgia', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 2.8rem 0 1.3rem 0;
+  border-left: 5px solid #1a1a1a;
+  padding-left: 1.2rem;
+}
+
+.post-detail-page .post-content h4 {
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #444444;
+  margin: 2.2rem 0 1rem 0;
+}
+
+.post-detail-page .post-content p {
+  margin: 0 0 1.3rem 0;
+  position: relative;
+}
+
+.post-detail-page .post-content ul {
+  margin: 0 0 1.5rem 0;
+  padding-left: 2rem;
+}
+
+.post-detail-page .post-content li {
+  margin-bottom: 0.7rem;
+  position: relative;
+}
+
+.post-detail-page .post-content blockquote {
+  margin: 2rem 0;
+  padding: 1.5rem 2rem;
+  background: #f0f0f0;
+  border-left: 6px solid #1a1a1a;
+  border: 3px solid #1a1a1a;
+  box-shadow: 5px 5px 0 #444444;
+  font-style: italic;
+  color: #444444;
+  position: relative;
+}
+
+.post-detail-page .post-content hr {
+  margin: 2.5rem 0;
+  border: none;
+  border-top: 3px solid #1a1a1a;
+  position: relative;
+}
+
+.post-detail-page .post-content hr::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #444444;
+}
+
+.post-detail-page .post-content .code-block {
+  background: #1a1a1a;
+  color: #f0f0f0;
+  padding: 2.2rem;
+  margin: 2.2rem 0;
+  border: 4px solid #1a1a1a;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  line-height: 1.75;
+  box-shadow: 8px 8px 0 #444444, 12px 12px 0 #666666;
+  position: relative;
+}
+
+.post-detail-page .post-content .code-block::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border: 2px dashed #444444;
+  pointer-events: none;
+}
+
+.post-detail-page .post-content strong {
+  font-weight: 800;
+  color: #1a1a1a;
+}
+
+.post-detail-page .post-content em {
+  font-style: italic;
+  color: #444444;
+}
+
+/* ============================================
+   响应式设计
+   ============================================ */
+
+@media (min-width: 2560px) {
+  .manga-blog-page .section-container {
+    max-width: 2000px;
+  }
+  .post-detail-wrapper {
+    max-width: 1400px;
+  }
+  .manga-blog-page .posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 3.5rem;
+  }
+}
+
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .manga-blog-page .section-container {
+    max-width: 1600px;
+  }
+  .post-detail-wrapper {
+    max-width: 1200px;
+  }
+  .manga-blog-page .posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 3rem;
+  }
+}
+
+@media (min-width: 1366px) and (max-width: 1919px) {
+  .manga-blog-page .section-container {
+    max-width: 1400px;
+  }
+  .post-detail-wrapper {
+    max-width: 1100px;
+  }
+  .manga-blog-page .posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2.2rem;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1365px) {
+  .manga-blog-page .section {
+    padding: 4rem 2rem;
+  }
+  .manga-blog-page .posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.8rem;
+  }
+  .manga-page-header {
+    padding: 4rem 2rem;
+  }
+  .manga-title-text {
+    font-size: 3.5rem;
+  }
+  .manga-title-icon {
+    width: 90px;
+    height: 90px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .manga-blog-page .section {
+    padding: 3rem 1.5rem;
+  }
+  .manga-blog-page .posts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.6rem;
+  }
+  .manga-page-header {
+    padding: 3rem 1.5rem;
+  }
+  .manga-title-text {
+    font-size: 2.8rem;
+  }
+  .post-detail {
+    padding: 2.5rem;
+  }
+  .post-detail-title {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .manga-blog-page {
+    padding-top: 60px;
+  }
+  .manga-blog-page .section {
+    padding: 2.5rem 1rem;
+  }
+  .manga-blog-page .posts-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .manga-page-header {
+    padding: 2.5rem 1rem;
+  }
+  .manga-page-title {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .manga-title-text {
+    font-size: 2.2rem;
+  }
+  .manga-title-icon {
+    width: 60px;
+    height: 60px;
+  }
+  .post-detail-wrapper {
+    padding: 1.5rem 1rem;
+  }
+  .post-detail {
+    padding: 2rem;
+  }
+  .post-detail-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .manga-page-header {
+    padding: 2rem 0.75rem;
+  }
+  .manga-title-text {
+    font-size: 1.8rem;
+  }
+  .manga-title-icon {
+    width: 50px;
+    height: 50px;
+  }
+  .post-detail {
+    padding: 1.5rem;
+  }
+  .post-detail-title {
+    font-size: 1.6rem;
+  }
+}
+
+/* ========== 增强响应式 - 修复比例失调 ========== */
+/* 使用 clamp 实现平滑字体缩放 */
+.manga-page-title {
+  font-size: clamp(2rem, 5vw, 5rem);
+}
+
+.manga-title-text {
+  font-size: clamp(2rem, 6vw, 5rem);
+}
+
+.manga-title-icon {
+  width: clamp(80px, 10vw, 130px);
+  height: clamp(80px, 10vw, 130px);
+}
+
+.manga-page-subtitle {
+  font-size: clamp(0.7rem, 1.5vw, 1rem);
+}
+
+/* 容器响应式 */
+.manga-blog-page .section-container {
+  padding: clamp(1.5rem, 3vw, 3rem);
+  margin: 0 clamp(0.5rem, 1vw, 1rem);
+}
+
+/* 章节标题响应式 */
+.manga-blog-page .manga-section-title,
+.manga-blog-page .section-title {
+  padding: clamp(1rem, 2vw, 2rem) clamp(1.5rem, 3vw, 3rem);
+}
+
+.manga-blog-page .manga-section-label {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* 筛选按钮响应式 */
+.manga-blog-page .type-btn,
+.manga-blog-page .category-btn {
+  font-size: clamp(0.8rem, 1.2vw, 1rem);
+  padding: clamp(0.6rem, 1vw, 0.9rem) clamp(1rem, 1.5vw, 1.7rem);
+}
+
+/* 文章卡片响应式 */
+.manga-post-card {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.manga-post-title {
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+}
+
+.manga-post-excerpt {
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+}
+
+/* 网格自适应 */
+.manga-posts-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* 内边距响应式 */
+.manga-page-header {
+  padding: clamp(3rem, 6vw, 6rem) clamp(1rem, 2vw, 3rem);
+}
+
+.manga-blog-page .section {
+  padding: clamp(2rem, 4vw, 5rem) clamp(1rem, 2vw, 3rem);
+}
+
+/* 超大屏优化 */
+@media (min-width: 2560px) {
+  .manga-blog-page .section-container {
+    max-width: 2000px;
+  }
+  
+  html {
+    font-size: 18px;
+  }
+}
+
+/* 超宽屏优化 */
+@media (min-aspect-ratio: 21/9) {
+  .manga-blog-page .section-container {
+    max-width: 70vw;
+  }
+}
+
+/* 触摸设备优化 */
+@media (pointer: coarse) {
+  .manga-blog-page .type-btn,
+  .manga-blog-page .category-btn,
+  .manga-post-card {
+    min-height: 44px;
+  }
+}

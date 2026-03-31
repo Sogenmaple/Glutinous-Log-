@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import jwt from 'jsonwebtoken'
@@ -7,13 +8,21 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import multer from 'multer'
 import { sendVerificationCode, verifyCode } from './services/emailService.js'
+import { 
+  initLeaderboardFile,
+  getGameLeaderboard, 
+  submitScore, 
+  getUserRank,
+  deleteLeaderboardEntry,
+  clearGameLeaderboard 
+} from './services/leaderboardService.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const app = express()
-const PORT = 3001
-const JWT_SECRET = 'tangyuan-blog_secret_key_2026'
+const PORT = process.env.PORT || 3001
+const JWT_SECRET = process.env.JWT_SECRET || 'tangyuan-blog_secret_key_2026_change_in_production'
 
 // 文件上传配置
 const UPLOAD_DIR = path.join(__dirname, '../uploads')
@@ -210,6 +219,56 @@ app.post('/api/login', async (req, res) => {
   } catch (error) {
     console.error('登录错误:', error)
     res.status(500).json({ error: '登录失败' })
+  }
+})
+
+// 游客登录
+app.post('/api/guest-login', async (req, res) => {
+  try {
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    const users = JSON.parse(usersData)
+    
+    // 生成游客用户名
+    const guestUsername = `Guest_${Date.now().toString(36).toUpperCase()}`
+    const guestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
+    // 创建游客用户
+    const guestUser = {
+      id: guestId,
+      username: guestUsername,
+      email: `${guestUsername}@guest.local`,
+      password: '',
+      role: 'guest',
+      displayName: guestUsername,
+      bio: '游客用户',
+      avatar: '',
+      createdAt: new Date().toISOString()
+    }
+    
+    // 保存到用户列表
+    users.push(guestUser)
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    
+    const token = jwt.sign(
+      { id: guestUser.id, username: guestUser.username, role: guestUser.role },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    )
+    
+    res.json({
+      message: '游客登录成功',
+      token,
+      user: {
+        id: guestUser.id,
+        username: guestUser.username,
+        email: guestUser.email,
+        role: guestUser.role,
+        displayName: guestUser.displayName
+      }
+    })
+  } catch (error) {
+    console.error('游客登录错误:', error)
+    res.status(500).json({ error: '游客登录失败' })
   }
 })
 
@@ -486,6 +545,332 @@ app.post('/api/verify-code', async (req, res) => {
   }
 })
 
+// 重置密码
+app.post('/api/reset-password', async (req, res) => {
+  try {
+    const { email, newPassword } = req.body
+    
+    if (!email || !newPassword) {
+      return res.status(400).json({ error: '邮箱和新密码不能为空' })
+    }
+    
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: '密码长度至少为 6 位' })
+    }
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    let users = JSON.parse(usersData)
+    const index = users.findIndex(u => u.email === email)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    // 更新密码
+    users[index].password = await bcrypt.hash(newPassword, 10)
+    users[index].updatedAt = new Date().toISOString()
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    
+    console.log(`✓ 密码已重置：${email}`)
+    res.json({ message: '密码重置成功' })
+  } catch (error) {
+    console.error('重置密码错误:', error)
+    res.status(500).json({ error: '重置失败' })
+  }
+})
+
+// ============ 管理员路由 ============
+
+// 管理员中间件
+function authenticateAdmin(req, res, next) {
+  authenticateToken(req, res, () => {
+    if (req.user && req.user.role === 'admin') {
+      next()
+    } else {
+      res.status(403).json({ error: '需要管理员权限' })
+    }
+  })
+}
+
+// 获取管理概览
+app.get('/api/admin/overview', authenticateAdmin, async (req, res) => {
+  try {
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    const users = JSON.parse(usersData)
+    
+    // 读取文章数据
+    let totalPosts = 0
+    try {
+      const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
+      const posts = JSON.parse(postsData)
+      totalPosts = posts.length
+    } catch (e) {
+      totalPosts = 0
+    }
+    
+    // 计算总访问量（从文章阅读量累加）
+    let totalViews = 0
+    try {
+      const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
+      const posts = JSON.parse(postsData)
+      totalViews = posts.reduce((sum, post) => sum + (post.views || 0), 0)
+    } catch (e) {
+      totalViews = 0
+    }
+    
+    res.json({
+      totalUsers: users.length,
+      onlineUsers: Math.floor(Math.random() * 10) + 1,
+      totalPosts: totalPosts,
+      totalViews: totalViews,
+      uptime: '正常运行中'
+    })
+  } catch (error) {
+    console.error('获取概览错误:', error)
+    res.status(500).json({ error: '获取概览失败' })
+  }
+})
+
+// 获取所有用户
+app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
+  try {
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    const users = JSON.parse(usersData)
+    
+    const userList = users.map(u => ({
+      id: u.id,
+      username: u.username,
+      email: u.email,
+      displayName: u.displayName,
+      role: u.role,
+      createdAt: u.createdAt
+    }))
+    
+    res.json({ users: userList })
+  } catch (error) {
+    console.error('获取用户列表错误:', error)
+    res.status(500).json({ error: '获取用户列表失败' })
+  }
+})
+
+// 更新用户角色
+app.put('/api/admin/users/:userId/role', authenticateAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params
+    const { role } = req.body
+    
+    if (!['admin', 'user'].includes(role)) {
+      return res.status(400).json({ error: '无效的角色' })
+    }
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    let users = JSON.parse(usersData)
+    const index = users.findIndex(u => u.id === userId)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    users[index].role = role
+    users[index].updatedAt = new Date().toISOString()
+    
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    
+    res.json({ message: '角色更新成功' })
+  } catch (error) {
+    console.error('更新角色错误:', error)
+    res.status(500).json({ error: '更新角色失败' })
+  }
+})
+
+// 删除用户
+app.delete('/api/admin/users/:userId', authenticateAdmin, async (req, res) => {
+  try {
+    const { userId } = req.params
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    let users = JSON.parse(usersData)
+    const index = users.findIndex(u => u.id === userId)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    // 不允许删除自己
+    if (userId === req.user.id) {
+      return res.status(400).json({ error: '不能删除自己的账户' })
+    }
+    
+    users.splice(index, 1)
+    
+    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2))
+    
+    res.json({ message: '用户删除成功' })
+  } catch (error) {
+    console.error('删除用户错误:', error)
+    res.status(500).json({ error: '删除用户失败' })
+  }
+})
+
+// 获取所有文章
+app.get('/api/admin/articles', authenticateAdmin, async (req, res) => {
+  try {
+    const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
+    const posts = JSON.parse(postsData)
+    
+    res.json({ articles: posts || [] })
+  } catch (error) {
+    console.error('获取文章列表错误:', error)
+    res.json({ articles: [] })
+  }
+})
+
+// 创建文章（管理员）
+app.post('/api/admin/articles', authenticateAdmin, async (req, res) => {
+  try {
+    const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
+    const posts = JSON.parse(postsData)
+    
+    const newPost = {
+      id: Date.now().toString(),
+      ...req.body,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+    
+    posts.push(newPost)
+    await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 2))
+    
+    console.log(`✓ 文章已创建：${newPost.title}`)
+    res.status(201).json(newPost)
+  } catch (error) {
+    console.error('创建文章错误:', error)
+    res.status(500).json({ error: '创建文章失败' })
+  }
+})
+
+// 更新文章（管理员）
+app.put('/api/admin/articles/:articleId', authenticateAdmin, async (req, res) => {
+  try {
+    const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
+    let posts = JSON.parse(postsData)
+    const index = posts.findIndex(p => p.id === req.params.articleId)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '文章不存在' })
+    }
+    
+    posts[index] = {
+      ...posts[index],
+      ...req.body,
+      updatedAt: new Date().toISOString()
+    }
+    
+    await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 2))
+    console.log(`✓ 文章已更新：${posts[index].title}`)
+    res.json(posts[index])
+  } catch (error) {
+    console.error('更新文章错误:', error)
+    res.status(500).json({ error: '更新文章失败' })
+  }
+})
+
+// 删除文章
+app.delete('/api/admin/articles/:articleId', authenticateAdmin, async (req, res) => {
+  try {
+    const { articleId } = req.params
+    
+    const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
+    let posts = JSON.parse(postsData)
+    const index = posts.findIndex(p => p.id === articleId)
+    
+    if (index === -1) {
+      return res.status(404).json({ error: '文章不存在' })
+    }
+    
+    posts.splice(index, 1)
+    
+    await fs.writeFile(POSTS_FILE, JSON.stringify(posts, null, 2))
+    
+    res.json({ message: '文章删除成功' })
+  } catch (error) {
+    console.error('删除文章错误:', error)
+    res.status(500).json({ error: '删除文章失败' })
+  }
+})
+
+// 获取操作日志
+app.get('/api/admin/logs', authenticateAdmin, async (req, res) => {
+  try {
+    // 模拟日志数据
+    const logs = [
+      { id: 1, action: '管理员登录', user: 'admin', time: new Date().toISOString(), ip: '127.0.0.1' },
+      { id: 2, action: '查看用户列表', user: 'admin', time: new Date().toISOString(), ip: '127.0.0.1' },
+      { id: 3, action: '更新用户角色', user: 'admin', time: new Date().toISOString(), ip: '127.0.0.1' },
+      { id: 4, action: '查看系统概览', user: 'admin', time: new Date().toISOString(), ip: '127.0.0.1' },
+      { id: 5, action: '刷新统计数据', user: 'admin', time: new Date().toISOString(), ip: '127.0.0.1' }
+    ]
+    
+    res.json({ logs })
+  } catch (error) {
+    console.error('获取日志错误:', error)
+    res.status(500).json({ error: '获取日志失败' })
+  }
+})
+
+// 获取统计数据
+app.get('/api/admin/stats', authenticateAdmin, async (req, res) => {
+  try {
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    const users = JSON.parse(usersData)
+    
+    res.json({
+      totalUsers: users.length,
+      totalPosts: 0,
+      totalGames: 5,
+      popularGames: [
+        { name: '飞扬的小鸟', plays: Math.floor(Math.random() * 5000) + 1000 },
+        { name: '俄罗斯方块', plays: Math.floor(Math.random() * 4000) + 1000 },
+        { name: '吃豆人', plays: Math.floor(Math.random() * 3000) + 1000 },
+        { name: '贪吃蛇', plays: Math.floor(Math.random() * 2000) + 1000 },
+        { name: '扫雷', plays: Math.floor(Math.random() * 1000) + 100 }
+      ]
+    })
+  } catch (error) {
+    console.error('获取统计数据错误:', error)
+    res.status(500).json({ error: '获取统计数据失败' })
+  }
+})
+
+// 验证当前密码
+app.post('/api/verify-current-password', authenticateToken, async (req, res) => {
+  try {
+    const { currentPassword } = req.body
+    
+    if (!currentPassword) {
+      return res.status(400).json({ error: '请输入当前密码' })
+    }
+    
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    const users = JSON.parse(usersData)
+    const user = users.find(u => u.id === req.user.id)
+    
+    if (!user) {
+      return res.status(404).json({ error: '用户不存在' })
+    }
+    
+    const validPassword = await bcrypt.compare(currentPassword, user.password)
+    if (!validPassword) {
+      return res.status(401).json({ error: '当前密码错误' })
+    }
+    
+    res.json({ message: '验证成功' })
+  } catch (error) {
+    console.error('验证当前密码错误:', error)
+    res.status(500).json({ error: '验证失败' })
+  }
+})
+
 // ============ 个人资料路由 ============
 
 // 获取当前用户资料
@@ -589,9 +974,114 @@ app.put('/api/profile/change-password', authenticateToken, async (req, res) => {
   }
 })
 
+// ============ 游戏排行榜 API ============
+
+// 获取用户头像辅助函数
+async function getUserAvatar(userId) {
+  try {
+    const usersData = await fs.readFile(USERS_FILE, 'utf-8')
+    const users = JSON.parse(usersData)
+    const user = users.find(u => u.id === userId)
+    return user ? (user.avatar || null) : null
+  } catch {
+    return null
+  }
+}
+
+// 获取游戏排行榜
+app.get('/api/leaderboard/:gameId', async (req, res) => {
+  try {
+    const { gameId } = req.params
+    const { limit = 10 } = req.query
+    const leaderboard = await getGameLeaderboard(gameId, parseInt(limit))
+    
+    // 为每个排行榜条目添加头像
+    const leaderboardWithAvatars = await Promise.all(
+      leaderboard.map(async (entry) => ({
+        ...entry,
+        avatar: await getUserAvatar(entry.userId)
+      }))
+    )
+    
+    res.json({ success: true, data: leaderboardWithAvatars })
+  } catch (error) {
+    console.error('获取排行榜错误:', error)
+    res.status(400).json({ error: error.message })
+  }
+})
+
+// 提交游戏分数
+app.post('/api/leaderboard/:gameId/score', authenticateToken, async (req, res) => {
+  try {
+    const { gameId } = req.params
+    const { score } = req.body
+    
+    if (typeof score !== 'number' || score < 0) {
+      return res.status(400).json({ error: '无效的分数' })
+    }
+    
+    const result = await submitScore(gameId, req.user.id, req.user.username, score)
+    res.json(result)
+  } catch (error) {
+    console.error('提交分数错误:', error)
+    res.status(400).json({ error: error.message })
+  }
+})
+
+// 获取用户排名
+app.get('/api/leaderboard/:gameId/rank', authenticateToken, async (req, res) => {
+  try {
+    const { gameId } = req.params
+    const rank = await getUserRank(gameId, req.user.id)
+    if (rank) {
+      // 添加用户头像
+      const avatar = req.user.avatar || null
+      res.json({ success: true, data: { ...rank, avatar, userId: req.user.id } })
+    } else {
+      res.json({ success: true, data: null })
+    }
+  } catch (error) {
+    console.error('获取排名错误:', error)
+    res.status(400).json({ error: error.message })
+  }
+})
+
+// 管理员：删除排行榜记录
+app.delete('/api/leaderboard/:gameId/:userId', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: '权限不足' })
+    }
+    
+    const { gameId, userId } = req.params
+    const success = await deleteLeaderboardEntry(gameId, userId)
+    res.json({ success })
+  } catch (error) {
+    console.error('删除记录错误:', error)
+    res.status(400).json({ error: error.message })
+  }
+})
+
+// 管理员：清空游戏排行榜
+app.delete('/api/leaderboard/:gameId', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: '权限不足' })
+    }
+    
+    const { gameId } = req.params
+    const success = await clearGameLeaderboard(gameId)
+    res.json({ success })
+  } catch (error) {
+    console.error('清空排行榜错误:', error)
+    res.status(400).json({ error: error.message })
+  }
+})
+
 // 启动服务器
 initDataFiles().then(() => {
-  app.listen(PORT, () => {
-    console.log(`🚀 服务器运行在 http://localhost:${PORT}`)
+  initLeaderboardFile()
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 服务器运行在 http://0.0.0.0:${PORT}`)
   })
 })

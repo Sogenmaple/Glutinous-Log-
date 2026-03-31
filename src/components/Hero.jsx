@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import CassetteClock from './CassetteClock'
 
 export default function Hero() {
   const [text, setText] = useState('')
@@ -50,7 +49,6 @@ export default function Hero() {
           <span className="cta-bracket">]</span>
         </a>
       </div>
-      <CassetteClock />
     </section>
   )
 }

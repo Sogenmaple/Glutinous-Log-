@@ -1,573 +1,420 @@
 /* ============================================
-   贪吃蛇 - 报纸风格 + 磁带未来风
-   铺满屏幕 + 风格化统一
+   贪吃蛇 - 黑白漫画风格
+   精简版 - 复用 game-common.css 通用样式
    ============================================ */
 
-.snake-page {
-  min-height: 100vh;
-  position: relative;
-  padding-top: 80px;
-  background: #050505;
-  overflow-x: hidden;
-}
+/* 引入通用样式 */
+@import './game-common.css';
 
-.tape-bg {
+/* ========== 页面特定样式 ========== */
+/* 背景装饰 */
+.manga-concentration {
   position: fixed;
-  inset: 0;
-  background: radial-gradient(
-    ellipse at 50% 30%,
-    rgba(255, 255, 255, 0.04) 0%,
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: 0;
-}
-
-.tape-grid {
-  position: fixed;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-  background-size: 60px 60px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.tape-scanlines {
-  position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15) 0px,
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.4;
-}
-
-/* ========== 报纸布局 ========== */
-.snake-newspaper {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 80px);
-  margin: 0;
-  padding: 0;
-}
-
-/* 报头 */
-.newspaper-header {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
-  gap: 1rem;
-}
-
-.header-date {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.header-date .date {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #888;
-  letter-spacing: 0.1em;
-}
-
-.header-date .issue {
-  font-family: var(--font-display);
-  font-size: 0.65rem;
-  color: #666;
-  letter-spacing: 0.2em;
-}
-
-.header-title {
-  text-align: center;
-}
-
-.header-title h1 {
-  font-family: var(--font-display);
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #4ade80;
-  margin: 0;
-  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
-}
-
-.header-title .subtitle {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #666;
-  letter-spacing: 0.15em;
-  margin: 0.25rem 0 0 0;
-}
-
-.header-status {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.status-badge {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid currentColor;
-  letter-spacing: 0.1em;
-}
-
-.status-badge.ready {
-  color: #22d3ee;
-  background: rgba(34, 211, 238, 0.1);
-}
-
-.status-badge.active {
-  color: #4ade80;
-  background: rgba(74, 222, 128, 0.1);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.status-badge.danger {
-  color: #f87171;
-  background: rgba(248, 117, 102, 0.1);
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(74, 222, 128, 0.3); }
-  50% { opacity: 0.7; box-shadow: 0 0 20px rgba(74, 222, 128, 0.6); }
-}
-
-/* 主内容区 */
-.newspaper-content {
-  display: grid;
-  grid-template-columns: 200px 1fr 160px;
-  gap: 1rem;
-  padding: 1rem;
-  flex: 1;
-  overflow: hidden;
-}
-
-/* 左侧边栏 */
-.news-sidebar-left {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  height: 100%;
-}
-
-.score-box, .info-box {
-  display: flex;
-  flex-direction: column;
-  padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-}
-
-.score-label, .info-label {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #666;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.25rem;
-}
-
-.score-value, .info-value {
-  font-family: var(--font-mono);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #4ade80;
-}
-
-.score-value.highlight {
-  color: #22d3ee;
-  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
-}
-
-/* 中央游戏区 */
-.news-game-area {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
-}
-
-.game-canvas {
-  position: relative;
-  background: rgba(10, 10, 10, 0.8);
-  border: 2px solid rgba(74, 222, 128, 0.3);
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: 0 0 40px rgba(74, 222, 128, 0.15);
-}
-
-.snake-canvas {
-  width: calc(20 * 22px);
-  height: calc(20 * 22px);
-}
-
-.bg-grid {
-  position: absolute;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(74, 222, 128, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(74, 222, 128, 0.05) 1px, transparent 1px);
-  background-size: 22px 22px;
-  pointer-events: none;
-}
-
-/* 蛇身 */
-.snake-segment {
-  position: absolute;
-  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-  border: 1px solid rgba(74, 222, 128, 0.5);
-  border-radius: 3px;
-  box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
-  z-index: 10;
-}
-
-.snake-segment.head {
-  background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
-  border: 2px solid rgba(134, 239, 172, 0.6);
-  box-shadow: 0 0 12px rgba(74, 222, 128, 0.6);
-  z-index: 11;
-}
-
-/* 食物 - 简单圆形 */
-.food {
-  position: absolute;
-  z-index: 10;
-  background: radial-gradient(circle at 30% 30%, #fca5a5, #f87171);
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(248, 117, 102, 0.6);
-  animation: food-pulse 1s ease-in-out infinite;
-}
-
-@keyframes food-pulse {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% { 
-    transform: scale(1.1);
-    opacity: 0.9;
-  }
-}
-
-/* 覆盖层 */
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 30;
-  backdrop-filter: blur(4px);
-}
-
-.overlay-content {
-  text-align: center;
-  padding: 2rem;
-}
-
-.overlay-content h2 {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  color: #4ade80;
-  margin: 1rem 0 0.5rem 0;
-  text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
-}
-
-.overlay-content .subtitle {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: #666;
-  letter-spacing: 0.1em;
-  margin-bottom: 1.5rem;
-}
-
-.result-title {
-  color: #f87171 !important;
-  text-shadow: 0 0 20px rgba(248, 117, 102, 0.5) !important;
-}
-
-.score-board {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  margin: 1.5rem 0;
-}
-
-.score-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.score-item .label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: #666;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.25rem;
-}
-
-.score-item .value {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #4ade80;
-}
-
-.score-item .value.highlight {
-  color: #22d3ee;
-  text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
-}
-
-.new-record {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  justify-content: center;
-  color: #fbbf24;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  margin: 1rem 0;
-  padding: 0.5rem 1rem;
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.3);
-  border-radius: 4px;
-}
-
-.start-btn {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
-  color: #000;
-  background: #4ade80;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 1rem;
-  transition: all 0.2s;
-  box-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
-}
-
-.start-btn:hover {
-  background: #22c55e;
-  transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(74, 222, 128, 0.6);
-}
-
-.controls-hint {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  color: #666;
-  margin-top: 1rem;
-}
-
-.controls-hint .key-badge {
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-  margin: 0 0.25rem;
-  color: #4ade80;
-}
-
-/* 右侧边栏 */
-.news-sidebar-right {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  height: 100%;
-}
-
-.wave-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-}
-
-.wave-label {
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  color: #666;
-  letter-spacing: 0.2em;
-  margin-bottom: 0.5rem;
-}
-
-.wave-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 60px;
-  justify-content: center;
-}
-
-.wave-bar {
-  width: 6px;
-  background: linear-gradient(to top, #22d3ee, #4ade80);
-  border-radius: 2px;
-  animation: wave 1s ease-in-out infinite;
-}
-
-.wave-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
-.wave-bar:nth-child(2) { height: 35px; animation-delay: 0.1s; }
-.wave-bar:nth-child(3) { height: 50px; animation-delay: 0.2s; }
-.wave-bar:nth-child(4) { height: 60px; animation-delay: 0.3s; }
-.wave-bar:nth-child(5) { height: 50px; animation-delay: 0.4s; }
-.wave-bar:nth-child(6) { height: 35px; animation-delay: 0.5s; }
-.wave-bar:nth-child(7) { height: 20px; animation-delay: 0.6s; }
-.wave-bar:nth-child(8) { height: 15px; animation-delay: 0.7s; }
-
-@keyframes wave {
-  0%, 100% { 
-    opacity: 0.5; 
-    transform: scaleY(0.5);
-  }
-  50% { 
-    opacity: 1; 
-    transform: scaleY(1.2);
-  }
-}
-
-.deco-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
-  gap: 0.5rem;
-}
-
-.deco-circle {
-  width: 30px;
-  height: 30px;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  position: relative;
-}
-
-.deco-circle::after {
-  content: '';
-  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 8px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.3);
+  width: 60vw;
+  height: 60vw;
   border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle at center,
+    transparent 0,
+    transparent 20px,
+    rgba(0, 0, 0, 0.03) 20px,
+    rgba(0, 0, 0, 0.03) 40px
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
-.deco-text {
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  color: #666;
+/* ========== 标题 ========== */
+.manga-title-cn {
+  font-family: 'Georgia', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0;
   letter-spacing: 0.2em;
+  text-transform: uppercase;
 }
 
-/* 操作说明 */
-.controls-mini {
-  margin-top: auto;
-  padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 4px;
+.manga-title-en {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+  font-weight: 700;
+  color: #666666;
+  letter-spacing: 0.4em;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
 }
 
-.controls-mini-header {
-  font-family: var(--font-mono);
-  font-size: 0.55rem;
-  color: #666;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
-
-.controls-mini-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.4rem;
-}
-
-.control-mini {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.mini-key {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  background: rgba(74, 222, 128, 0.15);
-  border: 1px solid rgba(74, 222, 128, 0.3);
-  border-radius: 3px;
-  font-size: 0.8rem;
-  color: #4ade80;
-}
-
-.mini-label {
-  font-family: var(--font-mono);
-  font-size: 0.5rem;
-  color: #666;
-}
-
-/* 报尾 */
-.newspaper-footer {
+.manga-tagline {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: #666;
+  flex-wrap: wrap;
+}
+
+.manga-tagline span {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  background: #1a1a1a;
+  padding: 0.5rem 1rem;
+  border: 3px solid #ffffff;
+  box-shadow: 4px 4px 0 #444444;
+}
+
+.manga-sep {
+  color: #1a1a1a;
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+/* ========== 游戏主区域 ========== */
+.manga-snake-main {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.manga-snake-main > aside:first-child {
+  flex: 0 0 240px;
+}
+
+.manga-snake-main > .manga-game-section {
+  flex: 0 0 auto;
+}
+
+.manga-snake-main > aside:last-child {
+  flex: 0 0 320px;
+}
+
+/* ========== 侧边面板 ========== */
+.manga-side-panel {
+  background: #ffffff;
+  border: 4px solid #1a1a1a;
+  box-shadow: 8px 8px 0 #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.manga-panel-header {
+  padding: 1rem;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-align: center;
+  border-bottom: 3px solid #1a1a1a;
+}
+
+.manga-panel-content {
+  padding: 1rem;
+  flex: 1;
+}
+
+/* ========== 统计行 ========== */
+.manga-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.manga-stat-row:last-child {
+  border-bottom: none;
+}
+
+.manga-stat-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.manga-stat-value {
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+/* ========== 游戏画布 ========== */
+.manga-game-canvas {
+  position: relative;
+  background: #1a1a1a;
+  border: 4px solid #1a1a1a;
+  box-shadow: 8px 8px 0 #444444;
+}
+
+#snake-canvas {
+  display: block;
+  background: #0a0a0a;
+}
+
+/* ========== 控制按钮 ========== */
+.manga-control-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.manga-control-btn {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  background: #f0f0f0;
+  border: 3px solid #1a1a1a;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 4px 4px 0 #1a1a1a;
+}
+
+.manga-control-btn:hover {
+  background: #1a1a1a;
+  color: #f0f0f0;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #444444;
+}
+
+.manga-control-btn.primary {
+  background: #1a1a1a;
+  color: #f0f0f0;
+}
+
+/* ========== 游戏结束覆盖层 ========== */
+.manga-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 26, 26, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.manga-overlay-title {
+  font-family: 'Georgia', serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.15em;
+}
+
+.manga-overlay-subtitle {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #666666;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.manga-start-btn {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #ffffff;
+  background: #1a1a1a;
+  border: 4px solid #1a1a1a;
+  padding: 0.8rem 2.5rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 6px 6px 0 #444444;
+  letter-spacing: 0.15em;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+}
+
+.manga-start-btn:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0 #666666;
+}
+
+.manga-button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  justify-content: center;
+}
+
+.manga-controls-hint {
+  font-size: 0.75rem;
+  color: #666666;
+  margin-top: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.manga-key-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 2px solid #1a1a1a;
+  margin: 0 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+/* ========== 分数板 ========== */
+.manga-score-board {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem;
+  background: #f0f0f0;
+  border: 3px solid #1a1a1a;
+  box-shadow: 5px 5px 0 #444444;
+}
+
+.manga-score-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.manga-score-label {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #666666;
   letter-spacing: 0.1em;
 }
 
-/* 响应式 */
+.manga-score-value {
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+.manga-score-value.highlight {
+  color: #1a1a1a;
+}
+
+.manga-new-record {
+  padding: 0.75rem 1.5rem;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  border: 3px solid #1a1a1a;
+  box-shadow: 4px 4px 0 #666666;
+}
+
+/* ========== 底部 ========== */
+.manga-footer {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #ffffff;
+  border: 5px solid #1a1a1a;
+  box-shadow: 10px 10px 0 #1a1a1a, 16px 16px 0 #444444;
+}
+
+.manga-footer-content {
+  text-align: center;
+}
+
+.manga-footer-line {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #666666;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.manga-icp a {
+  display: inline-block;
+  font-family: 'Georgia', serif;
+  font-size: 0.75rem;
+  color: #1a1a1a;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  background: #f0f0f0;
+  border: 2px solid #1a1a1a;
+  transition: all 0.2s;
+}
+
+.manga-icp a:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+/* ========== 响应式 ========== */
 @media (max-width: 1200px) {
-  .newspaper-content {
+  .manga-snake-main {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   
-  .news-sidebar-left,
-  .news-sidebar-right {
-    display: none;
+  .manga-side-panel {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .manga-panel-content {
+    flex: 1;
+  }
+  
+  .manga-game-container {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .manga-container {
+    padding: 1rem;
+  }
+  
+  .manga-masthead {
+    padding: 1.5rem;
+  }
+  
+  .manga-title-cn {
+    font-size: 2rem;
+  }
+  
+  .manga-game-container {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1;
+  }
+  
+  .manga-side-panel {
+    flex-direction: column;
   }
 }

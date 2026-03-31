@@ -20,11 +20,18 @@ export default function Header() {
   // 检查登录状态
   useEffect(() => {
     const loadUser = () => {
-      const userData = localStorage.getItem('user')
-      if (userData) {
-        const parsedUser = JSON.parse(userData)
-        setUser(parsedUser)
-        setIsAdmin(parsedUser.role === 'admin')
+      try {
+        const userData = localStorage.getItem('user')
+        if (userData) {
+          const parsedUser = JSON.parse(userData)
+          console.log('Header: 从 localStorage 加载用户:', parsedUser)
+          setUser(parsedUser)
+          setIsAdmin(parsedUser.role === 'admin')
+        } else {
+          console.log('Header: localStorage 中没有用户数据')
+        }
+      } catch (err) {
+        console.error('Header: 解析用户数据失败:', err)
       }
     }
     loadUser()
@@ -36,7 +43,7 @@ export default function Header() {
 
   const navItems = [
     { id: 'home', label: '小窝', path: '/' },
-    { id: 'games', label: '游戏', path: '/games' },
+    { id: 'games', label: '游戏宇宙', path: '/games' },
     { id: 'special', label: '构造', path: '/special' },
     { id: 'blog', label: '博客', path: '/blog' },
     { id: 'about', label: '关于', path: '/about' },

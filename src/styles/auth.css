@@ -1,14 +1,14 @@
 /* ============================================
-   AUTH PAGES (Login/Register)
+   AUTH PAGES (Login/Register) - 黑白漫画风格
    ============================================ */
 
 .auth-page {
   min-height: 100vh;
-  background: var(--bg-deep);
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 0.5rem;
   position: relative;
   overflow: hidden;
 }
@@ -20,10 +20,9 @@
   width: 100%;
   height: 100%;
   background-image: 
-    linear-gradient(rgba(255,149,0,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,149,0,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  animation: grid-pulse 8s ease-in-out infinite;
+    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
 }
 
 .auth-bg-glow {
@@ -33,8 +32,7 @@
   transform: translate(-50%, -50%);
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(255,149,0,0.08) 0%, transparent 70%);
-  animation: glow-breathe 6s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(0,0,0,0.03) 0%, transparent 70%);
 }
 
 .auth-container {
@@ -45,252 +43,408 @@
 }
 
 .auth-card {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,149,0,0.2);
-  border-radius: 12px;
-  padding: 3rem 2.5rem;
-  box-shadow: 0 0 40px rgba(255,149,0,0.1);
+  background: #ffffff;
+  border: 5px solid #000000;
+  border-radius: 0;
+  padding: 1.5rem 1.2rem;
+  box-shadow: 8px 8px 0 #000000;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-.auth-card::before {
-  content: '';
+/* 边角装饰 */
+.corner-decor {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,149,0,0.05) 0%, transparent 70%);
-  animation: rotate-bg 20s linear infinite;
+  width: 12px;
+  height: 12px;
+  background: #000000;
+  border-radius: 0;
+  box-shadow: 2px 2px 0 #cccccc;
+}
+
+.corner-decor.corner-tl {
+  top: -8px;
+  left: -8px;
+}
+
+.corner-decor.corner-tr {
+  top: -8px;
+  right: -8px;
+}
+
+.corner-decor.corner-bl {
+  bottom: -8px;
+  left: -8px;
+}
+
+.corner-decor.corner-br {
+  bottom: -8px;
+  right: -8px;
 }
 
 .auth-header {
   text-align: center;
-  margin-bottom: 2.5rem;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 1rem;
 }
 
 .auth-icon {
-  margin-bottom: 1rem;
-  animation: icon-float 3s ease-in-out infinite;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.auth-icon svg {
+  width: 48px;
+  height: 48px;
+  stroke: #000000;
+  fill: none;
 }
 
 .auth-title {
-  font-family: var(--font-display);
-  font-size: 2rem;
+  font-family: 'Courier New', monospace !important;
+  font-size: 1.5rem;
   font-weight: 900;
-  color: var(--text);
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.05em;
+  color: #000000 !important;
+  margin: 0 0 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .auth-subtitle {
-  font-family: var(--font-mono);
+  font-family: 'Courier New', monospace !important;
   font-size: 0.75rem;
-  color: var(--cyan);
+  color: #666666 !important;
+  margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  opacity: 0.8;
 }
 
 .auth-form {
-  position: relative;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .form-label {
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #000000 !important;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  gap: 0.4rem;
+}
+
+.form-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.form-input-wrapper svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
 }
 
 .form-input {
   width: 100%;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,149,0,0.2);
-  border-radius: 6px;
-  padding: 0.9rem 1rem;
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  outline: none;
-  transition: all 0.3s ease;
+  padding: 0.6rem 0.8rem 0.6rem 2.5rem !important;
+  background: #ffffff !important;
+  border: 3px solid #000000 !important;
+  border-radius: 0 !important;
+  color: #000000 !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.85rem !important;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 3px 3px 0 #999999 !important;
 }
 
 .form-input:focus {
-  border-color: var(--amber);
-  box-shadow: 0 0 15px rgba(255,149,0,0.2);
-  background: rgba(255,255,255,0.07);
+  outline: none !important;
+  border-color: #000000 !important;
+  box-shadow: 3px 3px 0 #000000 !important;
+  transform: translate(-1px, -1px);
 }
 
 .form-input::placeholder {
-  color: var(--text-dim);
+  color: #999999;
 }
 
-.captcha-wrapper {
-  display: flex;
-  gap: 0.8rem;
-  align-items: center;
+.form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: 2px 2px 0 #999999 !important;
 }
 
-.captcha-input {
+/* 密码容器特殊处理 */
+.password-container .form-input-wrapper {
   flex: 1;
 }
 
-.captcha-canvas {
-  cursor: pointer;
-  border: 1px solid rgba(255,149,0,0.3);
-  border-radius: 4px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-}
-
-.captcha-canvas:hover {
-  border-color: var(--amber);
-  box-shadow: 0 0 10px rgba(255,149,0,0.3);
-  transform: scale(1.05);
-}
-
-.captcha-canvas canvas {
-  display: block;
-  background: rgba(255,255,255,0.05);
-}
-
-.form-error {
-  background: rgba(255,69,58,0.1);
-  border: 1px solid rgba(255,69,58,0.3);
-  color: #ff453a;
-  padding: 0.8rem 1rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  text-align: center;
+.password-container .form-input {
+  padding-left: 2.5rem !important;
 }
 
 .auth-btn {
   width: 100%;
-  background: rgba(255,149,0,0.15);
-  border: 1px solid var(--amber);
-  color: var(--amber);
-  padding: 1rem;
-  border-radius: 6px;
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 700;
+  padding: 0.7rem !important;
+  background: #ffffff !important;
+  border: 4px solid #000000 !important;
+  border-radius: 0 !important;
+  color: #000000 !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 1.5rem;
+  transition: all 0.15s ease;
+  box-shadow: 4px 4px 0 #999999 !important;
+  margin-top: 0.3rem;
 }
 
 .auth-btn:hover:not(:disabled) {
-  background: rgba(255,149,0,0.25);
-  box-shadow: 0 0 25px rgba(255,149,0,0.4);
-  transform: translateY(-2px);
+  background: #000000 !important;
+  color: #ffffff !important;
+  box-shadow: 4px 4px 0 #666666 !important;
+  transform: translate(-1px, -1px);
 }
 
 .auth-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  box-shadow: 2px 2px 0 #cccccc !important;
 }
 
 .auth-footer {
   text-align: center;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-secondary);
+  margin-top: 1rem;
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.8rem;
+  color: #666666 !important;
 }
 
 .auth-link {
-  color: var(--cyan);
+  color: #000000 !important;
+  font-weight: 700;
   text-decoration: none;
-  margin-left: 0.3rem;
-  transition: all 0.3s ease;
+  border-bottom: 2px solid #000000;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 0 #999999;
 }
 
 .auth-link:hover {
-  color: var(--amber);
-  text-decoration: underline;
+  background: #000000;
+  color: #ffffff !important;
+  box-shadow: 2px 2px 0 #666666;
 }
 
-.auth-divider {
+.form-error {
+  background: #ffffff !important;
+  border: 3px solid #000000 !important;
+  border-left: 8px solid #ef4444 !important;
+  color: #000000 !important;
+  padding: 0.8rem 1rem !important;
+  border-radius: 0 !important;
+  margin-bottom: 1rem;
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.85rem !important;
+  box-shadow: 3px 3px 0 #cccccc;
+}
+
+.form-hint {
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.75rem;
+  color: #666666 !important;
+}
+
+/* 密码容器 - 包含输入框和手电筒按钮 */
+.password-container {
   position: relative;
-  z-index: 1;
-  text-align: center;
-  margin: 2rem 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
-.auth-divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
+/* 手电筒圆点按钮 - 在输入框外部右侧 */
+.password-toggle {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  background: #000000;
+  border: 3px solid #000000;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 1;
+  transition: all 0.15s ease;
+  border-radius: 50%;
+  box-shadow: 3px 3px 0 #999999;
+  margin-left: 12px;
+}
+
+.password-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 3px 3px 0 #000000;
+  background: #ffffff;
+}
+
+.password-toggle:active {
+  transform: scale(0.95);
+  box-shadow: 2px 2px 0 #666666;
+}
+
+/* 手电筒效果 - 第一层：整个页面反相 */
+.flashlight-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  /* 确保反相生效 */
+  -webkit-backdrop-filter: invert(1);
+  backdrop-filter: invert(1);
+}
+
+.flashlight-overlay.active {
+  opacity: 1;
+}
+
+/* 光束三角形区域 - 第二层：在反相基础上再次反相，抵消显示原色 */
+.flashlight-cone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  /* clip-path 由 JS 动态设置，创建三角形区域 */
+  -webkit-backdrop-filter: invert(1);
+  backdrop-filter: invert(1);
+}
+
+.flashlight-cone.active {
+  opacity: 1;
+}
+
+/* 忘记密码模态框应该在手筒效果之上 */
+.auth-modal-overlay {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 1rem;
 }
 
-.auth-divider span {
-  background: var(--bg-deep);
-  padding: 0 1rem;
-  position: relative;
-  z-index: 1;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-}
-
-.auth-guest {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-}
-
-.guest-btn {
-  display: inline-block;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--text-secondary);
-  padding: 0.8rem 2rem;
-  border-radius: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.guest-btn:hover {
-  border-color: var(--text);
-  color: var(--text);
-  background: rgba(255,255,255,0.1);
-}
-
-/* 边角装饰 */
-.auth-card::after {
-  content: '';
+/* 光源点 */
+.flashlight-source {
   position: absolute;
-  top: 12px;
-  left: 12px;
-  right: 12px;
-  bottom: 12px;
-  border: 1px solid rgba(255,149,0,0.1);
-  border-radius: 8px;
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+  z-index: 10001;
+  transition: none;
+}
+
+/* 手电筒激活时的页面反转效果 - 由 backdrop-filter 实现，不需要手动反相 */
+.auth-page.inverted {
+  /* 背景色保持不变，反相由 .flashlight-overlay 的 backdrop-filter 处理 */
+}
+
+/* 验证码相关样式 */
+.input-with-btn {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+}
+
+.input-with-btn .form-input-wrapper {
+  flex: 1;
+}
+
+.send-code-btn,
+.verify-btn {
+  padding: 0.6rem 0.8rem !important;
+  font-family: 'Courier New', monospace !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  border: 3px solid #000000 !important;
+  border-radius: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+  text-transform: uppercase !important;
+  box-shadow: 3px 3px 0 #999999 !important;
+}
+
+.send-code-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.send-code-btn:hover:not(:disabled) {
+  background: #000000 !important;
+  color: #ffffff !important;
+  box-shadow: 3px 3px 0 #666666 !important;
+  transform: translate(-1px, -1px);
+}
+
+.send-code-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  box-shadow: 2px 2px 0 #cccccc !important;
+}
+
+.verify-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.verify-btn:hover:not(.verified):not(:disabled) {
+  background: #22c55e !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+  box-shadow: 3px 3px 0 #666666 !important;
+  transform: translate(-1px, -1px);
+}
+
+.verify-btn.verified {
+  background: #22c55e !important;
+  color: #ffffff !important;
+  border-color: #000000 !important;
+  cursor: default;
+  box-shadow: 2px 2px 0 #000000 !important;
 }
 
 /* 响应式 */
@@ -306,5 +460,326 @@
   .auth-icon svg {
     width: 48px;
     height: 48px;
+  }
+  
+  .input-with-btn {
+    flex-direction: column;
+  }
+  
+  .send-code-btn,
+  .verify-btn {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   忘记密码模态框
+   ============================================ */
+
+.auth-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001 !important;
+  padding: 1rem;
+  animation: modalFadeIn 0.2s ease;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.auth-modal {
+  background: #ffffff;
+  border: 5px solid #000000;
+  border-radius: 0;
+  box-shadow: 8px 8px 0 #000000;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  z-index: 10002;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.auth-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.2rem;
+  border-bottom: 3px solid #000000;
+  background: #f5f5f5;
+}
+
+.auth-modal-header h2 {
+  font-family: 'Courier New', monospace;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #000000;
+  margin: 0;
+}
+
+.auth-modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #000000;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-modal-close:hover {
+  color: #666666;
+}
+
+.auth-modal-body {
+  padding: 1.2rem;
+}
+
+.auth-modal-body .form-group {
+  margin-bottom: 1rem;
+}
+
+.auth-modal-body .auth-btn {
+  width: 100%;
+}
+
+/* 忘记密码按钮 */
+.auth-form-footer {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 2px dashed #000000;
+}
+
+.forgot-password-btn {
+  background: #f9f9f9;
+  border: 2px solid #000000;
+  border-radius: 0;
+  color: #000000;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 #000000;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.forgot-password-btn:hover {
+  background: #000000;
+  color: #ffffff;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #666666;
+}
+
+.forgot-password-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000000;
+}
+
+/* 大屏幕自适应 - 1920px+ */
+@media (min-width: 1920px) {
+  .auth-container {
+    padding: 4rem 2rem;
+  }
+
+  .auth-card {
+    max-width: 32rem;
+    padding: 3rem;
+  }
+
+  .auth-title {
+    font-size: 2.5rem;
+  }
+
+  .auth-subtitle {
+    font-size: 1rem;
+  }
+
+  .form-input {
+    font-size: 1rem;
+    padding: 0.875rem;
+  }
+
+  .submit-btn {
+    padding: 0.875rem;
+    font-size: 1rem;
+  }
+
+  .auth-modal {
+    max-width: 30rem;
+    padding: 2.5rem;
+  }
+
+  .auth-modal-title {
+    font-size: 1.8rem;
+  }
+}
+
+/* 大屏幕自适应 - 2560px+ */
+@media (min-width: 2560px) {
+  .auth-container {
+    padding: 6rem 3rem;
+  }
+
+  .auth-card {
+    max-width: 38rem;
+    padding: 4rem;
+  }
+
+  .auth-title {
+    font-size: 3rem;
+  }
+
+  .auth-subtitle {
+    font-size: 1.2rem;
+  }
+
+  .form-input {
+    font-size: 1.1rem;
+    padding: 1rem;
+  }
+
+  .submit-btn {
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .auth-modal {
+    max-width: 36rem;
+    padding: 3.5rem;
+  }
+
+  .auth-modal-title {
+    font-size: 2.2rem;
+  }
+}
+
+/* 大屏幕自适应 - 3840px+ */
+@media (min-width: 3840px) {
+  .auth-container {
+    padding: 8rem 4rem;
+  }
+
+  .auth-card {
+    max-width: 48rem;
+    padding: 5rem;
+  }
+
+  .auth-title {
+    font-size: 4rem;
+  }
+
+  .auth-subtitle {
+    font-size: 1.5rem;
+  }
+
+  .form-input {
+    font-size: 1.3rem;
+    padding: 1.25rem;
+  }
+
+  .submit-btn {
+    padding: 1.25rem;
+    font-size: 1.3rem;
+  }
+
+  .auth-modal {
+    max-width: 45rem;
+    padding: 4.5rem;
+  }
+
+  .auth-modal-title {
+    font-size: 2.8rem;
+  }
+}
+
+/* ========== 增强响应式 - 修复比例失调 ========== */
+/* 使用 clamp 实现平滑字体和尺寸缩放 */
+.auth-container {
+  padding: clamp(2rem, 4vw, 6rem) clamp(1rem, 2vw, 2rem);
+}
+
+.auth-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+
+.auth-subtitle {
+  font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+}
+
+.auth-modal {
+  padding: clamp(2rem, 4vw, 4rem);
+  max-width: clamp(90%, 95vw, 500px);
+}
+
+.auth-modal-title {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+
+/* 表单响应式 */
+.form-input {
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  padding: clamp(0.7rem, 1vw, 1rem);
+}
+
+.submit-btn {
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  padding: clamp(0.7rem, 1vw, 1rem) clamp(1.5rem, 2vw, 2.5rem);
+}
+
+/* 链接响应式 */
+.auth-link {
+  font-size: clamp(0.85rem, 1vw, 0.95rem);
+}
+
+/* 移动端优化 */
+@media (max-width: 480px) {
+  .auth-modal {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .auth-title {
+    font-size: 1.8rem;
+  }
+  
+  .form-input {
+    min-height: 44px;
+  }
+  
+  .submit-btn {
+    min-height: 48px;
+  }
+}
+
+/* 超大屏优化 */
+@media (min-width: 2560px) {
+  .auth-modal {
+    max-width: 550px;
   }
 }

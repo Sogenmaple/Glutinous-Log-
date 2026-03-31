@@ -162,21 +162,36 @@
   flex-direction: column;
   gap: 0.25rem;
   min-width: 0;
+  position: relative;
+  padding: 0.5rem;
+  background: #ffffff;
+  border: 2px solid #000000;
 }
 
 .stat-value {
   font-family: 'Courier New', monospace !important;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.65rem !important;
+  font-weight: 900 !important;
   color: #000000 !important;
-  word-break: break-all;
+  word-break: break-all !important;
+  line-height: 1.3 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  white-space: pre-wrap !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
 }
 
 .stat-label {
   font-family: 'Courier New', monospace !important;
-  font-size: 0.55rem;
+  font-size: 0.5rem !important;
+  font-weight: 700 !important;
   color: #666666 !important;
-  text-transform: uppercase;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  display: block;
+  padding-top: 0.25rem;
+  border-top: 1px dashed #cccccc;
 }
 
 /* 角色徽章 */
@@ -311,15 +326,28 @@
   gap: 1rem;
 }
 
-.section-title {
+/* 使用更具体的选择器覆盖 MangaBlog.css 的样式 */
+.profile-page .profile-content .section-title,
+.profile-page .section-title {
   font-family: 'Courier New', monospace !important;
-  font-size: 1.1rem;
-  font-weight: 900;
+  font-size: 1.1rem !important;
+  font-weight: 900 !important;
   color: #000000 !important;
-  margin: 0;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #000000;
-  text-transform: uppercase;
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 2px solid #000000 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  text-transform: uppercase !important;
+  display: block !important;
+  align-items: normal !important;
+  justify-content: normal !important;
+  gap: 0 !important;
+  border-radius: 0 !important;
+  position: static !important;
 }
 
 .form-row {
@@ -648,5 +676,153 @@
   .save-btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* 大屏幕自适应 - 类似博客页面的方式 */
+@media (min-width: 2560px) {
+  .profile-container {
+    max-width: 2000px;
+  }
+
+  .profile-sidebar {
+    width: 22rem;
+  }
+
+  .avatar-wrapper {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  .user-name {
+    font-size: 1.8rem;
+  }
+
+  .profile-content {
+    padding: 4rem;
+  }
+
+  .profile-header h1 {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .profile-container {
+    max-width: 1600px;
+  }
+
+  .profile-sidebar {
+    width: 20rem;
+  }
+
+  .avatar-wrapper {
+    width: 8rem;
+    height: 8rem;
+  }
+
+  .user-name {
+    font-size: 1.5rem;
+  }
+
+  .profile-content {
+    padding: 3rem;
+  }
+
+  .profile-header h1 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1366px) and (max-width: 1919px) {
+  .profile-container {
+    max-width: 1400px;
+  }
+
+  .profile-sidebar {
+    width: 18rem;
+  }
+}
+
+/* ========== 增强响应式 - 修复比例失调 ========== */
+/* 使用 clamp 实现平滑字体和尺寸缩放 */
+.profile-sidebar {
+  width: clamp(200px, 20vw, 280px);
+}
+
+.avatar-wrapper {
+  width: clamp(100px, 12vw, 160px);
+  height: clamp(100px, 12vw, 160px);
+}
+
+.user-name {
+  font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+}
+
+.profile-header h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.profile-content {
+  padding: clamp(1.5rem, 3vw, 4rem);
+}
+
+/* 容器响应式 */
+.profile-container {
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+/* 卡片响应式 */
+.profile-card {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.profile-card h2 {
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+}
+
+/* 表单响应式 */
+.profile-form input,
+.profile-form textarea {
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  padding: clamp(0.6rem, 1vw, 0.8rem);
+}
+
+/* 按钮响应式 */
+.profile-btn {
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
+  padding: clamp(0.6rem, 1vw, 0.8rem) clamp(1.2rem, 2vw, 2rem);
+}
+
+/* 网格布局响应式 */
+.profile-stats-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* 超大屏优化 */
+@media (min-width: 2560px) {
+  .profile-container {
+    max-width: 2000px;
+  }
+  
+  .profile-sidebar {
+    width: 320px;
+  }
+}
+
+/* 超宽屏优化 */
+@media (min-aspect-ratio: 21/9) {
+  .profile-container {
+    max-width: 70vw;
+  }
+}
+
+/* 触摸设备优化 */
+@media (pointer: coarse) {
+  .profile-btn,
+  .profile-form input,
+  .profile-form textarea {
+    min-height: 44px;
   }
 }

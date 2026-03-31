@@ -84,5 +84,53 @@
     "date": "2026-03-07",
     "createdAt": "2026-03-07T05:16:22.202Z",
     "updatedAt": "2026-03-07T06:13:39.960Z"
+  },
+  {
+    "id": "1772987842319",
+    "title": "测试发布",
+    "content": "测试内容",
+    "excerpt": "测试摘要",
+    "type": "project",
+    "category": "游戏项目",
+    "tags": [
+      "测试"
+    ],
+    "status": "published",
+    "date": "2026-03-09",
+    "readTime": "1 分钟",
+    "createdAt": "2026-03-08T16:37:22.319Z",
+    "updatedAt": "2026-03-08T16:37:22.319Z"
+  },
+  {
+    "id": "1773016628056",
+    "title": "丰富",
+    "excerpt": "等等",
+    "content": "飞飞飞的",
+    "type": "project",
+    "category": "游戏项目",
+    "tags": [],
+    "status": "draft",
+    "date": "2026-03-09",
+    "readTime": "5 分钟",
+    "author": "admin",
+    "updatedAt": "2026-03-09T00:37:08.056Z",
+    "createdAt": "2026-03-09T00:37:08.056Z"
+  },
+  {
+    "id": "1773033232463",
+    "title": "影子先生",
+    "excerpt": "一首小诗",
+    "content": "　　瞧，影子！\n\n　那是谁的影子？\n\n我的穹顶撒下万仗的光\n\n　　无疑\n\n　这是我的影子！\n\n　　可它并不像我\n\n　　我越看越气！\n\n光照彻了目视的一切\n\n　　将我照得透明\n\n　　照得破碎\n\n　此后我变得扁平\n\n此后的我便被称作\n\n　　影子先生！\n\n不同方向的光击中了我\n\n　　地上侧写着其一\n\n而我摆出不同的姿态\n\n　投射出不同形状的\n\n　　影子先生！\n\n　　啊哈\n\n世上有多少个人看我\n\n　　就有多少个\n\n　　影子先生！\n\n  2024.4.20 08:33",
+    "type": "life",
+    "category": "小诗",
+    "tags": [
+      "现代诗"
+    ],
+    "status": "published",
+    "date": "2026-03-09",
+    "readTime": "5 分钟",
+    "author": "admin",
+    "updatedAt": "2026-03-09T05:18:43.089Z",
+    "createdAt": "2026-03-09T05:13:52.463Z"
   }
 ]

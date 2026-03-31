@@ -11,7 +11,7 @@ export default function AboutPage() {
         <div className="page-header">
           <h1 className="page-title">
             <span className="title-icon">
-              <UserIcon size={40} color="#bd00ff" />
+              <UserIcon size={40} color="#000000" />
             </span>
             <span className="title-text">关于汤圆</span>
           </h1>

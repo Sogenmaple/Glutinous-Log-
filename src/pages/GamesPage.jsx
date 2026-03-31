@@ -1,143 +1,132 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
-import Footer from '../components/Footer'
-import { 
-  GameIcon, 
-  BombIcon, 
-  SnakeIcon, 
-  PacmanIcon, 
-  DinosaurIcon, 
-  BirdIcon,
-  BlockIcon,
-  PlayIcon
-} from '../components/icons/SiteIcons'
-import '../styles/GamesCollection.css'
+import { SnakeIcon } from '../components/icons/SiteIcons'
+import '../styles/MangaGames.css'
 
 /**
- * 休闲小游戏集合页面 - 磁带未来主义风格
+ * 游戏宇宙 - 只保留贪吃蛇
  */
 export default function GamesPage() {
   const navigate = useNavigate()
-  const [hoveredGame, setHoveredGame] = useState(null)
-  const [mounted, setMounted] = useState(false)
+  const [currentTime, setCurrentTime] = useState(new Date())
 
   useEffect(() => {
-    setMounted(true)
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000)
+    return () => clearInterval(timer)
   }, [])
 
   const games = [
     {
-      id: 'minesweeper',
-      title: '扫雷',
-      subtitle: 'MINESWEEPER',
-      description: '经典益智游戏，在磁带未来风格的网格中找出所有地雷',
-      icon: BombIcon,
-      color: 'red',
-      path: '/special/minesweeper',
-      featured: true
-    },
-    {
       id: 'snake',
       title: '贪吃蛇',
       subtitle: 'SNAKE',
-      description: '磁带未来风格贪吃蛇，收集光点不断成长',
+      description: '经典益智游戏，控制蛇吃掉所有食物，注意不要撞到自己',
       icon: SnakeIcon,
-      color: 'green',
       path: '/special/snake',
-      featured: true
-    },
-    {
-      id: 'pacman',
-      title: '吃豆人',
-      subtitle: 'PACMAN',
-      description: '报纸风格吃豆人，在迷宫中吃掉所有豆子',
-      icon: PacmanIcon,
-      color: 'amber',
-      path: '/special/pacman',
-      featured: true
-    },
-    {
-      id: 'dinosaur',
-      title: '恐龙快跑',
-      subtitle: 'DINOSAUR',
-      description: '休闲跑酷游戏，躲避障碍物跑得越远越好',
-      icon: DinosaurIcon,
-      color: 'cyan',
-      path: '/special/dinosaur',
-      featured: true
-    },
-    {
-      id: 'flybird',
-      title: '飞扬的小鸟',
-      subtitle: 'FLY BIRD',
-      description: '穿越管道障碍，挑战你的反应速度',
-      icon: BirdIcon,
-      color: 'purple',
-      path: '/special/flybird',
-      featured: true
-    },
-    {
-      id: 'tetris',
-      title: '俄罗斯方块',
-      subtitle: 'TETRIS',
-      description: '经典消除游戏，排列方块消除得分',
-      icon: BlockIcon,
-      color: 'cyan',
-      path: '/special/tetris',
-      featured: true
+      tags: ['休闲', '经典', '挑战']
     }
   ]
 
   return (
     <>
       <Header />
-      <main className="special-constructs-page">
-        <div className="page-header">
-          <h1 className="page-title">
-            <span className="title-icon">
-              <GameIcon size={40} color="#ff9500" />
-            </span>
-            <span className="title-text">休闲小游戏</span>
-          </h1>
-          <p className="page-subtitle">CASUAL GAMES // CLASSIC FUN</p>
-        </div>
+      <div className="manga-games-page">
+        {/* 背景装饰 */}
+        <div className="manga-halftone"></div>
+        <div className="manga-concentration"></div>
+        
+        <div className="manga-container">
+          {/* 报头 */}
+          <header className="manga-masthead">
+            <div className="manga-masthead-top">
+              <span className="manga-issue">VOL.2024.NO.12</span>
+              <span className="manga-date">
+                {currentTime.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </span>
+            </div>
+            
+            <div className="manga-main-title">
+              <h1 className="manga-title-cn">小游戏</h1>
+              <span className="manga-title-en">MINI GAMES</span>
+            </div>
+            
+            <div className="manga-tagline">
+              <span>RETRO GAMES</span>
+              <span className="manga-sep">◆</span>
+              <span>PIXEL ART</span>
+              <span className="manga-sep">◆</span>
+              <span>INFINITE FUN</span>
+            </div>
+          </header>
 
-        <div className="special-grid">
-          {games.map((game, index) => {
-            const IconComponent = game.icon
-            return (
-              <div
-                key={game.id}
-                className={`special-card ${game.color} ${game.featured ? 'featured' : ''} ${hoveredGame === game.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
-                style={{ animationDelay: `${index * 0.1}s` }}
-                onMouseEnter={() => setHoveredGame(game.id)}
-                onMouseLeave={() => setHoveredGame(null)}
-                onClick={() => navigate(game.path)}
-              >
-                <div className="card-icon">
-                  <IconComponent size={48} color="currentColor" />
+          {/* 游戏网格 */}
+          <div className="manga-games-grid">
+            {games.map((game, index) => {
+              const IconComponent = game.icon
+              return (
+                <div
+                  key={game.id}
+                  className="manga-game-card wide"
+                  onClick={() => navigate(game.path)}
+                >
+                  {/* 角落装饰 */}
+                  <div className="manga-corner tl"></div>
+                  <div className="manga-corner tr"></div>
+                  <div className="manga-corner bl"></div>
+                  <div className="manga-corner br"></div>
+                  
+                  {/* 状态徽章 */}
+                  <span className="manga-status">PLAYABLE</span>
+                  
+                  {/* 图标 */}
+                  <div className="manga-card-icon">
+                    <IconComponent size={48} />
+                  </div>
+                  
+                  {/* 内容 */}
+                  <div className="manga-card-content">
+                    <h3 className="manga-card-title-cn">{game.title}</h3>
+                    <span className="manga-card-title-en">{game.subtitle}</span>
+                    
+                    <div className="manga-divider"></div>
+                    
+                    <p className="manga-card-desc">{game.description}</p>
+                    
+                    <div className="manga-tags">
+                      {game.tags.map((tag, i) => (
+                        <span key={i} className="manga-tag">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
+              )
+            })}
+          </div>
 
-                <div className="card-content">
-                  <h3 className="card-title">{game.title}</h3>
-                  <p className="card-subtitle">{game.subtitle}</p>
-                  <p className="card-description">{game.description}</p>
-                </div>
-
-                <span className="status-badge active">可用</span>
-
-                <div className="card-corner tl"></div>
-                <div className="card-corner tr"></div>
-                <div className="card-corner bl"></div>
-                <div className="card-corner br"></div>
+          {/* 底部 */}
+          <footer className="manga-footer">
+            <div className="manga-footer-content">
+              <div className="manga-footer-line">
+                <span>EST.2024</span>
+                <span className="manga-sep">◆</span>
+                <span>MADE WITH ♥ BY TANGYUAN</span>
+                <span className="manga-sep">◆</span>
+                <span>ALL RIGHTS RESERVED</span>
               </div>
-            )
-          })}
+              <div className="manga-icp">
+                <a
+                  href="https://beian.miit.gov.cn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  鄂 ICP 备 2026010257 号
+                </a>
+              </div>
+            </div>
+          </footer>
         </div>
-
-        <Footer />
-      </main>
+      </div>
     </>
   )
 }

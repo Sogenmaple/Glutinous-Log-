@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { LoginIcon, LockIcon, MailIcon, UserIcon, CheckIcon } from '../components/icons/SiteIcons'
+import { LoginIcon, LockIcon, MailIcon, UserIcon, CheckIcon, EyeIcon, EyeOffIcon } from '../components/icons/SiteIcons'
 
 /**
  * 注册页面 - 带验证码
@@ -8,6 +8,8 @@ import { LoginIcon, LockIcon, MailIcon, UserIcon, CheckIcon } from '../component
 export default function Register() {
   const navigate = useNavigate()
   const timerRef = useRef(null)
+  const passwordRef = useRef(null)
+  const confirmPasswordRef = useRef(null)
   
   const [formData, setFormData] = useState({
     username: '',
@@ -23,6 +25,11 @@ export default function Register() {
   const [codeSent, setCodeSent] = useState(false)
   const [countdown, setCountdown] = useState(0)
   const [verified, setVerified] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [flashlightActive, setFlashlightActive] = useState(false)
+  const [activePasswordField, setActivePasswordField] = useState('')
+  const [sourcePos, setSourcePos] = useState({ x: 0, y: 0 })
 
   // 发送验证码
   const handleSendCode = async () => {
@@ -41,7 +48,7 @@ export default function Register() {
     setError('')
 
     try {
-      const response = await fetch('http://36.151.149.117:3001/api/send-code', {
+      const response = await fetch('/api/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, type: 'register' })
@@ -53,7 +60,6 @@ export default function Register() {
         setCodeSent(true)
         setCountdown(60)
         
-        // 倒计时
         timerRef.current = setInterval(() => {
           setCountdown(prev => {
             if (prev <= 1) {
@@ -63,9 +69,6 @@ export default function Register() {
             return prev - 1
           })
         }, 1000)
-
-        // 开发环境：在控制台显示验证码
-        console.log('📧 注册验证码:', data.code)
       } else {
         setError(data.error || '发送失败')
       }
@@ -86,7 +89,7 @@ export default function Register() {
     setError('')
 
     try {
-      const response = await fetch('http://36.151.149.117:3001/api/verify-code', {
+      const response = await fetch('/api/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, code: formData.code, type: 'register' })
@@ -96,23 +99,135 @@ export default function Register() {
 
       if (response.ok) {
         setVerified(true)
+        setError('')
       } else {
-        setError(data.error || '验证失败')
+        setError(data.error || '验证码错误')
       }
     } catch (err) {
       setError('网络错误，请重试')
     }
   }
 
-  // 提交注册
+  // 更新光束位置和角度
+  const updateBeam = (sourceX, sourceY, angleDeg) => {
+    const cone = document.querySelector('.flashlight-cone')
+    const overlay = document.querySelector('.flashlight-overlay')
+    
+    const halfAngle = 10 * Math.PI / 180
+    const angleRad = (angleDeg - 180) * Math.PI / 180
+    
+    const topAngle = angleRad - halfAngle
+    const bottomAngle = angleRad + halfAngle
+    const tanTop = Math.tan(topAngle)
+    const tanBottom = Math.tan(bottomAngle)
+    const leftY1 = sourceY + tanTop * sourceX
+    const leftY2 = sourceY + tanBottom * sourceX
+    
+    // 更新光束三角形
+    if (cone) {
+      cone.style.clipPath = `polygon(${sourceX}px ${sourceY}px, 0 ${leftY1}px, 0 ${leftY2}px)`
+      const source = cone.querySelector('.flashlight-source')
+      if (source) {
+        source.style.left = `${sourceX}px`
+        source.style.top = `${sourceY}px`
+      }
+      cone.classList.add('active')
+    }
+    
+    // 更新遮罩 - 全屏反相
+    if (overlay) {
+      overlay.style.clipPath = 'none'
+      overlay.classList.add('active')
+    }
+  }
+
+  // 手电筒查看密码
+  const togglePasswordView = (field) => {
+    if (field === 'password') {
+      const newState = !showPassword
+      // 如果开启新的手电筒，先关闭另一个
+      if (newState && showConfirmPassword) {
+        setShowConfirmPassword(false)
+      }
+      setShowPassword(newState)
+      setActivePasswordField(newState ? 'password' : '')
+      
+      if (newState) {
+        setFlashlightActive(true)
+        
+        setTimeout(() => {
+          const toggleBtn = document.querySelector('.password-toggle')
+          if (toggleBtn) {
+            const rect = toggleBtn.getBoundingClientRect()
+            const sourceX = rect.left + rect.width / 2
+            const sourceY = rect.top + rect.height / 2
+            setSourcePos({ x: sourceX, y: sourceY })
+            updateBeam(sourceX, sourceY, 180)
+          }
+        }, 50)
+      } else {
+        setFlashlightActive(false)
+      }
+    } else if (field === 'confirm') {
+      const newState = !showConfirmPassword
+      // 如果开启新的手电筒，先关闭另一个
+      if (newState && showPassword) {
+        setShowPassword(false)
+      }
+      setShowConfirmPassword(newState)
+      setActivePasswordField(newState ? 'confirm' : '')
+      
+      if (newState) {
+        setFlashlightActive(true)
+        
+        setTimeout(() => {
+          const toggleBtns = document.querySelectorAll('.password-toggle')
+          const toggleBtn = toggleBtns[1]
+          if (toggleBtn) {
+            const rect = toggleBtn.getBoundingClientRect()
+            const sourceX = rect.left + rect.width / 2
+            const sourceY = rect.top + rect.height / 2
+            setSourcePos({ x: sourceX, y: sourceY })
+            updateBeam(sourceX, sourceY, 180)
+          }
+        }, 50)
+      } else {
+        setFlashlightActive(false)
+      }
+    }
+  }
+
+  // 鼠标移动处理
+  useEffect(() => {
+    if (!flashlightActive) return
+    
+    const handleMouseMove = (e) => {
+      const dx = e.clientX - sourcePos.x
+      const dy = e.clientY - sourcePos.y
+      
+      // 计算角度（相对于水平向左，反转 Y 轴使方向正确）
+      let angle = Math.atan2(-dy, -dx) * 180 / Math.PI
+      
+      // 限制在±5 度范围内（相对于水平向左 180 度）
+      if (angle < 0) angle += 360
+      let relativeAngle = angle - 180
+      if (relativeAngle < -180) relativeAngle += 360
+      if (relativeAngle > 180) relativeAngle -= 360
+      if (relativeAngle < -5) relativeAngle = -5
+      if (relativeAngle > 5) relativeAngle = 5
+      
+      updateBeam(sourcePos.x, sourcePos.y, 180 + relativeAngle)
+    }
+    
+    document.addEventListener('mousemove', handleMouseMove)
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [flashlightActive, sourcePos])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-
-    if (!verified) {
-      setError('请先验证邮箱')
-      return
-    }
 
     if (formData.password !== formData.confirmPassword) {
       setError('两次输入的密码不一致')
@@ -124,17 +239,18 @@ export default function Register() {
       return
     }
 
+    if (!verified) {
+      setError('请先验证邮箱')
+      return
+    }
+
     setLoading(true)
 
     try {
-      const response = await fetch('http://36.151.149.117:3001/api/register', {
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password
-        })
+        body: JSON.stringify(formData)
       })
 
       const data = await response.json()
@@ -144,60 +260,65 @@ export default function Register() {
         localStorage.setItem('user', JSON.stringify(data.user))
         navigate('/')
       } else {
-        setError(data.message || '注册失败')
+        setError(data.error || '注册失败')
       }
     } catch (err) {
-      setError('网络错误，请稍后重试')
+      setError('网络错误，请重试')
     } finally {
       setLoading(false)
     }
   }
 
-  // 清理定时器
-  React.useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-  }, [])
-
   return (
-    <div className="auth-page">
+    <div className={`auth-page ${flashlightActive ? 'inverted' : ''}`}>
       <div className="auth-bg-grid"></div>
       <div className="auth-bg-glow"></div>
 
+      {/* 手电筒效果 */}
+      {flashlightActive && (
+        <>
+          <div className="flashlight-overlay active"></div>
+          <div className="flashlight-cone active">
+            <div className="flashlight-source"></div>
+          </div>
+        </>
+      )}
+
       <div className="auth-container">
         <div className="auth-card">
+          <div className="corner-decor corner-tl"></div>
+          <div className="corner-decor corner-tr"></div>
+          <div className="corner-decor corner-bl"></div>
+          <div className="corner-decor corner-br"></div>
+          
           <div className="auth-header">
             <div className="auth-icon">
-              <LoginIcon size={64} color="#06b6d4" />
+              <LoginIcon size={64} color="#000000" />
             </div>
             <h1 className="auth-title">创建账号</h1>
             <p className="auth-subtitle">JOIN TANGYUAN'S WORLD</p>
           </div>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label className="form-label">
-                <UserIcon size={18} />
-                <span>用户名</span>
-              </label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="请输入用户名"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                required
-                disabled={sendingCode || loading}
-              />
+              <label className="form-label">用户名</label>
+              <div className="form-input-wrapper">
+                <UserIcon size={20} color="#666666" />
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="请输入用户名"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  required
+                />
+              </div>
             </div>
 
             <div className="form-group">
-              <label className="form-label">
-                <MailIcon size={18} />
-                <span>邮箱</span>
-              </label>
-              <div className="input-with-btn">
+              <label className="form-label">邮箱</label>
+              <div className="form-input-wrapper">
+                <MailIcon size={20} color="#666666" />
                 <input
                   type="email"
                   className="form-input"
@@ -205,100 +326,112 @@ export default function Register() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
-                  disabled={codeSent || sendingCode || loading}
                 />
-                {!codeSent ? (
-                  <button
-                    type="button"
-                    className="send-code-btn"
-                    onClick={handleSendCode}
-                    disabled={sendingCode}
-                  >
-                    {sendingCode ? '发送中...' : '获取验证码'}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="send-code-btn disabled"
-                    disabled
-                  >
-                    {countdown}s 后重发
-                  </button>
-                )}
               </div>
             </div>
 
-            {codeSent && (
-              <div className="form-group">
-                <label className="form-label">
-                  <CheckIcon size={18} />
-                  <span>验证码</span>
-                </label>
-                <div className="input-with-btn">
+            <div className="form-group">
+              <label className="form-label">验证码</label>
+              <div className="input-with-btn">
+                <div className="form-input-wrapper">
+                  <CheckIcon size={20} color="#666666" />
                   <input
                     type="text"
                     className="form-input"
-                    placeholder="请输入 6 位验证码"
+                    placeholder="请输入验证码"
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                    maxLength="6"
-                    disabled={verified || loading}
+                    disabled={!codeSent}
+                    required
                   />
-                  <button
-                    type="button"
-                    className={`verify-btn ${verified ? 'verified' : ''}`}
-                    onClick={handleVerifyCode}
-                    disabled={verified}
-                  >
-                    {verified ? '✓ 已验证' : '验证'}
-                  </button>
                 </div>
+                <button
+                  type="button"
+                  className="send-code-btn"
+                  onClick={handleSendCode}
+                  disabled={sendingCode || countdown > 0 || !formData.email}
+                >
+                  {countdown > 0 ? `${countdown}s` : (codeSent ? '重发' : '发送')}
+                </button>
               </div>
-            )}
-
-            <div className="form-group">
-              <label className="form-label">
-                <LockIcon size={18} />
-                <span>密码</span>
-              </label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="请输入密码（至少 6 位）"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                disabled={!verified || loading}
-              />
+              {codeSent && (
+                <button
+                  type="button"
+                  className="verify-btn"
+                  onClick={handleVerifyCode}
+                  disabled={verified}
+                  style={{ width: '100%', marginTop: '0.5rem' }}
+                >
+                  {verified ? '✓ 已验证' : '验证'}
+                </button>
+              )}
             </div>
 
             <div className="form-group">
-              <label className="form-label">
-                <LockIcon size={18} />
-                <span>确认密码</span>
-              </label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="请再次输入密码"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                required
-                disabled={!verified || loading}
-              />
+              <label className="form-label">密码</label>
+              <div className="password-container">
+                <div className="form-input-wrapper">
+                  <LockIcon size={20} color="#666666" />
+                  <input
+                    ref={passwordRef}
+                    type={showPassword ? 'text' : 'password'}
+                    className="form-input"
+                    placeholder="请输入密码"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onFocus={() => activePasswordField === 'password' && setFlashlightActive(true)}
+                    onBlur={() => activePasswordField === 'password' && setFlashlightActive(false)}
+                    required
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => togglePasswordView('password')}
+                  tabIndex={-1}
+                  title="手电筒查看密码"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">确认密码</label>
+              <div className="password-container">
+                <div className="form-input-wrapper">
+                  <LockIcon size={20} color="#666666" />
+                  <input
+                    ref={confirmPasswordRef}
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    className="form-input"
+                    placeholder="请再次输入密码"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    onFocus={() => activePasswordField === 'confirm' && setFlashlightActive(true)}
+                    onBlur={() => activePasswordField === 'confirm' && setFlashlightActive(false)}
+                    required
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => togglePasswordView('confirm')}
+                  tabIndex={-1}
+                  title="手电筒查看密码"
+                />
+              </div>
             </div>
 
             {error && <div className="form-error">{error}</div>}
 
-            <button type="submit" className="auth-btn" disabled={loading || !verified}>
-              {loading ? '注册中...' : verified ? '完成注册' : '请先验证邮箱'}
+            <button type="submit" className="auth-btn" disabled={loading}>
+              {loading ? '注册中...' : '注册'}
             </button>
-
-            <div className="auth-footer">
-              <span>已有账号？</span>
-              <Link to="/login" className="auth-link">立即登录</Link>
-            </div>
           </form>
+
+          <div className="auth-footer">
+            <span>已有账号？</span>
+            <Link to="/login" className="auth-link">立即登录</Link>
+          </div>
         </div>
       </div>
     </div>

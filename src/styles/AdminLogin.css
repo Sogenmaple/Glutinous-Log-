@@ -1,0 +1,162 @@
+/* ============================================
+   管理后台登录 - 黑白漫画风格
+   ============================================ */
+
+.admin-login-page {
+  min-height: 100vh;
+  background: #f8f8f8;
+  background-image: 
+    radial-gradient(#cccccc 1px, transparent 1px),
+    radial-gradient(#cccccc 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* 背景装饰 */
+.admin-login-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(#000000 1px, transparent 1px),
+    radial-gradient(#000000 1px, transparent 1px);
+  background-size: 6px 6px, 12px 12px;
+  background-position: 0 0, 3px 3px;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem;
+}
+
+.login-title {
+  margin: 0 0 2rem 0;
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 3px 3px 0 #cccccc;
+}
+
+.login-form {
+  background: #ffffff;
+  border: 4px solid #1a1a1a;
+  box-shadow: 10px 10px 0 #1a1a1a;
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  background: #f0f0f0;
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #444444;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group input::placeholder {
+  color: #999999;
+  font-family: 'Courier New', monospace;
+}
+
+.form-group input:focus {
+  outline: none;
+  background: #ffffff;
+  box-shadow: 5px 5px 0 #666666;
+}
+
+.error-message {
+  background: #1a1a1a;
+  color: #ffffff;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  border: 2px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #666666;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #ffffff;
+  background: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  box-shadow: 4px 4px 0 #444444;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.login-btn:hover {
+  background: #000000;
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #666666;
+}
+
+.login-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #666666;
+}
+
+.login-tip {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e0e0e0;
+  text-align: center;
+  font-family: 'Georgia', serif;
+  font-size: 0.85rem;
+  color: #666666;
+  letter-spacing: 0.5px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 1rem;
+  }
+  
+  .login-form {
+    padding: 1.5rem;
+  }
+  
+  .login-title {
+    font-size: 1.25rem;
+  }
+}

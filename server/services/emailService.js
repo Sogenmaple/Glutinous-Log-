@@ -78,11 +78,11 @@ export const sendVerificationCode = async (to, type = 'register') => {
         <body>
           <div class="container">
             <div class="header">
-              <h1>🎮 汤圆的小窝</h1>
+              <h1>(=^ェ^=) 汤圆的小窝</h1>
               <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">TAPE FUTURISM · CREATIVE CORNER</p>
             </div>
             <div class="content">
-              <h2 style="color: #333; margin-top: 0;">${type === 'register' ? '欢迎加入！' : type === 'login' ? '欢迎回来！' : '重置密码'}</h2>
+              <h2 style="color: #333; margin-top: 0;">${type === 'register' ? '欢迎加入～' : type === 'login' ? '欢迎回来～' : '重置密码'}</h2>
               <p class="info">
                 亲爱的玩家，您好！<br><br>
                 您正在${type === 'register' ? '注册' : type === 'login' ? '登录' : '重置密码'}汤圆的小窝账号，
@@ -90,16 +90,16 @@ export const sendVerificationCode = async (to, type = 'register') => {
               </p>
               <div class="code-box">
                 <div class="code">${code}</div>
-                <p style="color: #999; font-size: 12px; margin: 10px 0 0;">验证码 5 分钟内有效</p>
+                <p style="color: #999; font-size: 12px; margin: 10px 0 0;">验证码 5 分钟内有效 (｡•́︿•̀｡)</p>
               </div>
               <div class="warning">
-                <strong>⚠️ 安全提示：</strong><br>
+                <strong>安全提示 (｡•́︿•̀｡)：</strong><br>
                 • 请勿将验证码泄露给他人<br>
                 • 如非本人操作，请忽略此邮件<br>
                 • 验证码 5 分钟后自动失效
               </div>
               <p class="info">
-                祝您游戏愉快！<br>
+                祝您游戏愉快～ (=^ェ^=)<br>
                 汤圆的小窝 团队
               </p>
             </div>

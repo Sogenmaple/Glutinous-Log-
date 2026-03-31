@@ -15,7 +15,7 @@ export default function PostListAdmin({ onEdit }) {
   const fetchPosts = async () => {
     const token = localStorage.getItem('token')
     try {
-      const response = await fetch('http://36.151.149.117:3001/api/posts', {
+      const response = await fetch('/api/posts', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       const data = await response.json()
@@ -32,7 +32,7 @@ export default function PostListAdmin({ onEdit }) {
 
     const token = localStorage.getItem('token')
     try {
-      const response = await fetch(`http://36.151.149.117:3001/api/posts/${id}`, {
+      const response = await fetch(`/api/posts/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       })

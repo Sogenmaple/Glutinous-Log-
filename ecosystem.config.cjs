@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 module.exports = {
   apps: [
     {
@@ -10,7 +12,10 @@ module.exports = {
       max_memory_restart: '500M',
       env: {
         NODE_ENV: 'development',
-        PORT: 3001
+        PORT: process.env.PORT || 3001,
+        EMAIL_USER: process.env.EMAIL_USER,
+        EMAIL_PASS: process.env.EMAIL_PASS,
+        JWT_SECRET: process.env.JWT_SECRET
       },
       error_file: '/tmp/tangyuan-server-error.log',
       out_file: '/tmp/tangyuan-server-out.log',
@@ -19,16 +24,15 @@ module.exports = {
     },
     {
       name: 'tangyuan-frontend',
-      script: 'npm',
-      args: 'run dev',
+      script: 'npx',
+      args: 'vite preview --port 3000 --host 0.0.0.0',
       cwd: '/root/tangyuan-games',
       instances: 1,
       autorestart: true,
       watch: false,
       max_memory_restart: '1G',
       env: {
-        NODE_ENV: 'development',
-        PORT: 3000
+        NODE_ENV: 'production'
       },
       error_file: '/tmp/tangyuan-frontend-error.log',
       out_file: '/tmp/tangyuan-frontend-out.log',

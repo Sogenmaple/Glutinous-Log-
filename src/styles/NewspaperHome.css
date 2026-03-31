@@ -1,0 +1,188 @@
+/* ============================================
+   汤圆的小窝 - 黑白漫画风格首页
+   精简版 - 复用 manga-common.css 通用样式
+   ============================================ */
+
+/* 引入通用样式 */
+@import './manga-common.css';
+
+/* ========== 页面特定样式 ========== */
+/* 页面基础已在 manga-common.css 中定义 */
+
+/* ========== 主布局 - 三栏 ========== */
+.manga-home-main {
+  display: grid;
+  grid-template-columns: 180px 1fr 200px;
+  gap: 1.5rem;
+  flex: 1;
+  margin-bottom: 2rem;
+}
+
+/* ========== 左侧栏 - 统计数据 ========== */
+.manga-home-sidebar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ========== 中央 - 四个核心版块 ========== */
+.manga-home-central {
+  min-width: 0;
+}
+
+.manga-home-channels {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+/* 频道卡片动画 */
+.manga-home-channel {
+  opacity: 0;
+  transform: translateY(15px);
+}
+
+.manga-home-channel.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 卡片内容 */
+.manga-home-channel-content {
+  margin-bottom: 1rem;
+}
+
+/* 卡片底部 */
+.manga-home-channel-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.7rem;
+  border-top: 2px solid #000000;
+  transition: all 0.15s;
+}
+
+/* ========== 右侧栏 - 社交链接 ========== */
+.manga-home-sidebar-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.manga-home-social-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.manga-home-tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* ========== 响应式 - 中等屏幕 ========== */
+@media (max-width: 1100px) {
+  .manga-home-main {
+    grid-template-columns: 160px 1fr;
+  }
+
+  .manga-home-sidebar-right {
+    display: none;
+  }
+
+  .manga-home-channels {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== 响应式 - 平板 ========== */
+@media (max-width: 800px) {
+  .manga-home-main {
+    grid-template-columns: 1fr;
+  }
+
+  .manga-home-sidebar-left {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .manga-home-stat-card {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .manga-home-channels {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========== 响应式 - 大屏优化 ========== */
+@media (min-width: 1920px) {
+  .manga-home-channel {
+    padding: 3rem;
+    min-height: 280px;
+  }
+
+  .manga-home-channel-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .manga-home-channel-title-cn {
+    font-size: 2.5rem;
+  }
+
+  .manga-home-channel-title-en {
+    font-size: 1.1rem;
+  }
+
+  .manga-home-channel-desc {
+    font-size: 1.2rem;
+  }
+
+  .manga-home-stat-card {
+    padding: 2rem;
+  }
+
+  .manga-home-stat-num {
+    font-size: 4rem;
+  }
+
+  .manga-home-social-card,
+  .manga-home-tech-card {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 2560px) {
+  .manga-home-channel {
+    padding: 4rem;
+    min-height: 320px;
+  }
+
+  .manga-home-channel-icon {
+    width: 100px;
+    height: 100px;
+  }
+
+  .manga-home-channel-title-cn {
+    font-size: 3rem;
+  }
+
+  .manga-home-channel-title-en {
+    font-size: 1.3rem;
+  }
+
+  .manga-home-channel-desc {
+    font-size: 1.4rem;
+  }
+
+  .manga-home-stat-num {
+    font-size: 5rem;
+  }
+
+  .manga-home-tag {
+    font-size: 1rem;
+    padding: 0.5rem 1.2rem;
+  }
+}

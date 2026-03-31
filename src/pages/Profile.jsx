@@ -31,7 +31,7 @@ export default function Profile() {
     avatar: ''
   }))
   
-  const [passwordStep, setPasswordStep] = useState(1) // 1: 输入当前密码，2: 邮箱验证，3: 新密码
+  const [passwordStep, setPasswordStep] = useState(1) // 1: 邮箱验证，2: 设置新密码
   const [passwordForm, setPasswordForm] = useState(() => getSavedState('passwordForm', {
     currentPassword: '',
     email: '',
@@ -149,18 +149,25 @@ export default function Profile() {
 
       if (response.ok) {
         const data = await response.json()
-        setFormData(prev => ({ ...prev, avatar: data.url }))
-        setPreviewAvatar(data.url)
+        const fullAvatarUrl = data.url.startsWith('http') ? data.url : data.url
+        setFormData(prev => ({ ...prev, avatar: fullAvatarUrl }))
+        setPreviewAvatar(fullAvatarUrl)
         
-        // 更新 localStorage 中的用户头像
+        // 更新 localStorage 中的用户头像 - 确保完整更新 user 对象
         const currentUser = JSON.parse(localStorage.getItem('user') || '{}')
-        if (currentUser) {
-          currentUser.avatar = data.url
+        if (currentUser && currentUser.id) {
+          currentUser.avatar = fullAvatarUrl
           localStorage.setItem('user', JSON.stringify(currentUser))
+          console.log('Profile: 已更新 localStorage 头像:', fullAvatarUrl)
+        } else {
+          console.log('Profile: localStorage 中 user 对象不完整，尝试从服务器重新加载')
+          // 重新加载用户信息
+          loadProfile()
         }
         
         // 触发自定义事件，通知 Header 组件更新
         window.dispatchEvent(new CustomEvent('avatar-updated'))
+        console.log('Profile: 已触发 avatar-updated 事件')
         
         setMessage({ type: 'success', text: '头像上传成功！(≧∇≦) ﾉ' })
       } else {
@@ -371,8 +378,9 @@ export default function Profile() {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
-          currentPassword: passwordForm.currentPassword,
-          newPassword: passwordForm.newPassword 
+          newPassword: passwordForm.newPassword,
+          email: passwordForm.email,
+          code: passwordForm.code
         })
       })
 
@@ -570,16 +578,11 @@ export default function Profile() {
               <div className="steps-indicator">
                 <div className={`step ${passwordStep >= 1 ? 'active' : ''}`}>
                   <div className="step-number">1</div>
-                  <span>验证密码</span>
+                  <span>验证邮箱</span>
                 </div>
                 <div className="step-line"></div>
                 <div className={`step ${passwordStep >= 2 ? 'active' : ''}`}>
                   <div className="step-number">2</div>
-                  <span>验证邮箱</span>
-                </div>
-                <div className="step-line"></div>
-                <div className={`step ${passwordStep >= 3 ? 'active' : ''}`}>
-                  <div className="step-number">3</div>
                   <span>设置新密码</span>
                 </div>
               </div>
@@ -587,41 +590,8 @@ export default function Profile() {
               <div className="form-section">
                 <h3 className="section-title">修改密码</h3>
                 
-                {/* 步骤 1: 验证当前密码 */}
+                {/* 步骤 1: 邮箱验证 */}
                 {passwordStep === 1 && (
-                  <>
-                    <div className="form-group">
-                      <label className="form-label">
-                        <LockIcon size={16} />
-                        当前密码
-                      </label>
-                      <input
-                        type="password"
-                        className="form-input"
-                        value={passwordForm.currentPassword}
-                        onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                        placeholder="请输入当前密码"
-                      />
-                    </div>
-
-                    {error && <div className="form-error">{error}</div>}
-
-                    <div className="form-actions">
-                      <button 
-                        type="button" 
-                        className="save-btn" 
-                        onClick={handleVerifyCurrentPassword}
-                        disabled={saving}
-                      >
-                        <LockIcon size={18} />
-                        {saving ? '验证中...' : '验证当前密码'}
-                      </button>
-                    </div>
-                  </>
-                )}
-
-                {/* 步骤 2: 邮箱验证 */}
-                {passwordStep === 2 && (
                   <>
                     <div className="form-group">
                       <label className="form-label">
@@ -679,18 +649,19 @@ export default function Profile() {
                     <div className="form-actions">
                       <button 
                         type="button" 
-                        className="save-btn secondary"
-                        onClick={() => setPasswordStep(1)}
+                        className="save-btn"
+                        onClick={() => verified && setPasswordStep(2)}
+                        disabled={!verified}
                       >
-                        <ReturnIcon size={18} />
-                        返回上一步
+                        <CheckIcon size={18} />
+                        {verified ? '验证成功，继续设置密码' : '请先验证邮箱'}
                       </button>
                     </div>
                   </>
                 )}
 
-                {/* 步骤 3: 设置新密码 */}
-                {passwordStep === 3 && (
+                {/* 步骤 2: 设置新密码 */}
+                {passwordStep === 2 && (
                   <>
                     <div className="form-group">
                       <label className="form-label">
@@ -726,10 +697,10 @@ export default function Profile() {
                       <button 
                         type="button" 
                         className="save-btn secondary"
-                        onClick={() => setPasswordStep(2)}
+                        onClick={() => setPasswordStep(1)}
                       >
                         <ReturnIcon size={18} />
-                        返回上一步
+                        返回验证邮箱
                       </button>
                       <button 
                         type="submit" 

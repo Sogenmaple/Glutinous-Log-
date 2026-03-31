@@ -474,7 +474,7 @@ function ActiveTodoCard({ todo, onMoveBack, onComplete, onUpdateTime }) {
           <div className="circular-timer-compact">
             <svg viewBox="0 0 100 100" className="circular-svg">
               <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,149,0,0.2)" strokeWidth="8" />
-              <circle cx="50" cy="50" r="42" fill="none" stroke="#ff9500" strokeWidth="8" strokeLinecap="round"
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#000000" strokeWidth="8" strokeLinecap="round"
                 strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset={`${2 * Math.PI * 42 * (1 - progress / 100)}`}
                 transform="rotate(-90 50 50)" />
             </svg>
@@ -553,7 +553,7 @@ function TimelineView() {
           trackId,
           startHour: hour,
           duration: 2,
-          color: todo.priority === 'high' ? '#ff453a' : todo.priority === 'medium' ? '#ff9500' : '#06b6d4',
+          color: todo.priority === 'high' ? '#000000' : todo.priority === 'medium' ? '#000000' : '#000000',
           priority: todo.priority || 'medium',
           repeat: todo.repeat || 'none'
         }
@@ -1256,7 +1256,7 @@ function StatsView() {
                 <svg viewBox="0 0 400 200" className="line-svg">
                   <polyline
                     fill="none"
-                    stroke="#ff9500"
+                    stroke="#000000"
                     strokeWidth="2"
                     points={filtered.data.map((value, i) => {
                       const x = (i / (filtered.data.length - 1 || 1)) * 380 + 10
@@ -1268,7 +1268,7 @@ function StatsView() {
                     const x = (i / (filtered.data.length - 1 || 1)) * 380 + 10
                     const y = 190 - (value / maxValue) * 160
                     return (
-                      <circle key={i} cx={x} cy={y} r="4" fill="#ff9500" />
+                      <circle key={i} cx={x} cy={y} r="4" fill="#000000" />
                     )
                   })}
                 </svg>
@@ -1294,7 +1294,7 @@ function StatsView() {
                     const x2 = 50 + 40 * Math.cos((endAngle - 90) * Math.PI / 180)
                     const y2 = 50 + 40 * Math.sin((endAngle - 90) * Math.PI / 180)
                     const largeArc = percentage > 0.5 ? 1 : 0
-                    const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
+                    const colors = ['#000000', '#000000', '#333333', '#666666', '#000000', '#000000']
                     const actualIndex = filtered.data.indexOf(value)
                     return (
                       <path
@@ -1307,7 +1307,7 @@ function StatsView() {
                 </svg>
                 <div className="pie-legend">
                   {filtered.data.filter((value, i) => value > 0).map((value, i) => {
-                    const colors = ['#ff9500', '#06b6d4', '#8b5cf6', '#22c55e', '#ff453a', '#f59e0b']
+                    const colors = ['#000000', '#000000', '#333333', '#666666', '#000000', '#000000']
                     const actualIndex = filtered.data.indexOf(value)
                     return (
                       <div key={actualIndex} className="legend-item">

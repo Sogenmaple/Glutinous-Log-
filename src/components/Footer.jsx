@@ -2,14 +2,6 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="footer-content">
-        <div className="footer-divider">
-          {'═'.repeat(40)}
-        </div>
-        <div className="footer-info">
-          <span className="footer-logo">[汤圆]</span>
-          <span className="footer-separator">///</span>
-          <span className="footer-text">GAME PORTFOLIO SYSTEM</span>
-        </div>
         <div className="footer-links">
           <a
             href="https://github.com/Sogenmaple"
@@ -17,38 +9,35 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="footer-link"
           >
-            [GITHUB]
+            GITHUB
           </a>
+          <span className="footer-separator">|</span>
           <a
             href="https://space.bilibili.com/389369217"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link"
           >
-            [BILIBILI]
+            BILIBILI
           </a>
+          <span className="footer-separator">|</span>
           <a
             href="https://www.taptap.cn/developer/338837"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link"
           >
-            [TAPTAP]
+            TAPTAP
           </a>
+          <span className="footer-separator">|</span>
           <a
             href="https://qm.qq.com/q/AxbQpuKKsK"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link"
           >
-            [QQ 群：950087304]
+            QQ 群
           </a>
-        </div>
-        <div className="footer-copyright">
-          &copy; {new Date().getFullYear()} 汤圆 // ALL RIGHTS RESERVED
-        </div>
-        <div className="footer-decoration">
-          ▂▃▅▆▇ END OF TRANSMISSION ▇▆▅▃▂
         </div>
       </div>
     </footer>

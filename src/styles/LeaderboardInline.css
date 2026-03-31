@@ -1,0 +1,297 @@
+/* 内嵌式排行榜容器 - 报纸排版风格 */
+.leaderboard-inline {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 149, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+/* 报头 */
+.leaderboard-inline-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 149, 0, 0.1);
+  border-bottom: 2px solid #000000;
+}
+
+.leaderboard-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.leaderboard-title-block {
+  flex: 1;
+}
+
+.leaderboard-title-block h3 {
+  margin: 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 18px;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.leaderboard-subtitle {
+  margin: 4px 0 0 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: #888;
+  letter-spacing: 1px;
+}
+
+.leaderboard-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 用户排名卡片 */
+.user-rank-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.15) 0%, rgba(255, 149, 0, 0.05) 100%);
+  border-bottom: 1px solid rgba(255, 149, 0, 0.2);
+}
+
+.user-rank-number {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 24px;
+  font-weight: bold;
+  color: #000000;
+  text-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+}
+
+.user-rank-score {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  color: #fff;
+}
+
+.user-rank-total {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 内容区 */
+.leaderboard-inline-content {
+  padding: 12px 16px;
+}
+
+/* 加载状态 */
+.loading-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  background: #000000;
+  border-radius: 50%;
+  animation: loadingBounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes loadingBounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+.loading-inline p {
+  color: #888;
+  margin: 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+}
+
+/* 错误状态 */
+.error-inline {
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.error-inline p {
+  color: #f87171;
+  margin: 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+}
+
+/* 空状态 */
+.empty-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-inline p {
+  color: #888;
+  margin: 8px 0;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.empty-hint {
+  font-size: 12px;
+  color: #666;
+}
+
+/* 排行榜列表 */
+.leaderboard-inline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.leaderboard-inline-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255, 149, 0, 0.05);
+  border: 1px solid rgba(255, 149, 0, 0.15);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.leaderboard-inline-item:hover {
+  background: rgba(255, 149, 0, 0.1);
+  border-color: #000000;
+  transform: translateX(4px);
+}
+
+.leaderboard-inline-item.current-user {
+  background: rgba(255, 149, 0, 0.15);
+  border-color: #000000;
+  box-shadow: 0 0 12px rgba(255, 149, 0, 0.3);
+}
+
+/* 排名 */
+.inline-rank {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+.inline-rank-number {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000;
+}
+
+/* 玩家信息 */
+.inline-player {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inline-player-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.inline-player-date {
+  font-size: 11px;
+  color: #666;
+}
+
+/* 分数 */
+.inline-score {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000;
+  min-width: 70px;
+  text-align: right;
+  text-shadow: 0 0 8px rgba(255, 149, 0, 0.4);
+}
+
+/* 报尾 */
+.leaderboard-inline-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px;
+  background: rgba(255, 149, 0, 0.05);
+  border-top: 1px solid rgba(255, 149, 0, 0.2);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: #888;
+  letter-spacing: 1px;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .leaderboard-inline-header {
+    padding: 10px 12px;
+  }
+  
+  .leaderboard-title-block h3 {
+    font-size: 16px;
+  }
+  
+  .user-rank-inline {
+    padding: 10px 12px;
+  }
+  
+  .user-rank-number {
+    font-size: 20px;
+  }
+  
+  .user-rank-score {
+    font-size: 14px;
+  }
+  
+  .leaderboard-inline-content {
+    padding: 10px 12px;
+  }
+  
+  .inline-player-name {
+    font-size: 13px;
+  }
+  
+  .inline-score {
+    font-size: 14px;
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import '../styles/AdminLogin.css'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
@@ -10,7 +11,7 @@ export default function AdminLogin() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      navigate('/admin/dashboard')
+      navigate('/admin')
     }
   }, [navigate])
 
@@ -19,7 +20,7 @@ export default function AdminLogin() {
     setError('')
 
     try {
-      const response = await fetch('http://36.151.149.117:3001/api/login', {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -30,7 +31,7 @@ export default function AdminLogin() {
       if (response.ok) {
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
-        navigate('/admin/dashboard')
+        navigate('/admin')
       } else {
         setError(data.error || '登录失败')
       }

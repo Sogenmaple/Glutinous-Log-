@@ -1,7 +1,17 @@
 /* ============================================
    汤圆的小窝 - 全局响应式适配样式
-   修复多端比例失调问题
+   多端完美适配：手机 / 平板 / 笔记本 / 台式机 / 大屏
    ============================================ */
+
+/* ========== 设备断点定义 ==========
+手机：< 768px
+平板：768px - 1024px
+小屏笔记本：1024px - 1366px
+标准笔记本：1366px - 1920px
+台式机：1920px - 2560px
+大屏：> 2560px
+4K 屏：> 3840px
+============================================ */
 
 /* ========== 根元素响应式字体 ========== */
 html {
@@ -510,6 +520,153 @@ select,
   .game-card:hover,
   .post-card:hover {
     transform: none;
+  }
+}
+
+/* ========== 移动端优化 (< 768px) ========== */
+@media (max-width: 767px) {
+  /* 触摸优化 */
+  button,
+  .btn,
+  .card,
+  .nav-item {
+    min-height: 44px; /* iOS 推荐触摸区域大小 */
+    min-width: 44px;
+  }
+  
+  /* 禁用悬停效果 (移动端无悬停) */
+  .card:hover,
+  .btn:hover {
+    transform: none;
+  }
+  
+  /* 优化滚动 */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 防止长按选中文本 */
+  button,
+  a {
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+  
+  /* 输入框字体放大 (防止 iOS 自动缩放) */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* ========== 平板优化 (768px - 1024px) ========== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .home-container,
+  .page-content {
+    max-width: 100%;
+    padding: 0 2rem;
+  }
+  
+  /* 网格系统优化 */
+  .home-nav-grid,
+  .games-grid,
+  .posts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+  
+  /* 侧边栏调整 */
+  .manga-sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+/* ========== 小屏笔记本优化 (1024px - 1366px) ========== */
+@media (min-width: 1024px) and (max-width: 1365px) {
+  .home-container,
+  .page-content {
+    max-width: 1200px;
+  }
+  
+  /* 网格系统 */
+  .home-nav-grid,
+  .games-grid,
+  .posts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+/* ========== 标准笔记本优化 (1366px - 1920px) ========== */
+@media (min-width: 1366px) and (max-width: 1919px) {
+  .home-container,
+  .page-content {
+    max-width: 1400px;
+  }
+}
+
+/* ========== 台式机优化 (1920px - 2560px) ========== */
+@media (min-width: 1920px) and (max-width: 2559px) {
+  .home-container,
+  .page-content {
+    max-width: 1600px;
+  }
+  
+  .home-nav-grid,
+  .games-grid,
+  .posts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  }
+}
+
+/* ========== 大屏优化 (> 2560px) ========== */
+@media (min-width: 2560px) and (max-width: 3839px) {
+  html {
+    font-size: 18px;
+  }
+  
+  .home-container,
+  .page-content {
+    max-width: 1800px;
+  }
+  
+  .home-nav-grid,
+  .games-grid,
+  .posts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  }
+}
+
+/* ========== 4K 超清屏优化 (> 3840px) ========== */
+@media (min-width: 3840px) {
+  html {
+    font-size: 20px;
+  }
+  
+  .home-container,
+  .page-content {
+    max-width: 2200px;
+  }
+  
+  .home-nav-grid,
+  .games-grid,
+  .posts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  }
+}
+
+/* ========== 超宽屏适配 (21:9 等) ========== */
+@media (min-aspect-ratio: 21/9) {
+  .home-container,
+  .page-content {
+    max-width: 50%; /* 防止内容过宽 */
+  }
+}
+
+/* ========== 折叠屏/双屏设备 ========== */
+@media (spanning: single-fold) {
+  .header {
+    fold-fallback: separated;
   }
 }
 

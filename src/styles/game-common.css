@@ -402,6 +402,7 @@
 }
 
 /* ========== 响应式 ========== */
+/* 平板横屏/小屏笔记本 (≤ 1100px) */
 @media (max-width: 1100px) {
   .manga-game-layout {
     grid-template-columns: 1fr;
@@ -418,6 +419,7 @@
   }
 }
 
+/* 平板竖屏 (≤ 768px) */
 @media (max-width: 768px) {
   .manga-container {
     padding: 1.5rem;
@@ -457,6 +459,20 @@
   }
 }
 
+/* 手机横屏 (≤ 600px) */
+@media (max-width: 600px) {
+  .manga-game-area {
+    padding: 0.5rem;
+    min-height: 350px;
+  }
+
+  .manga-control-btn {
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* 手机竖屏 (≤ 480px) */
 @media (max-width: 480px) {
   .manga-main-title h1 {
     font-size: 1.6rem;
@@ -476,6 +492,31 @@
 
   .manga-game-over-title {
     font-size: 2rem;
+  }
+
+  /* 触摸优化 */
+  .manga-control-btn {
+    min-height: 48px;
+  }
+}
+
+/* 小屏手机 (≤ 375px) */
+@media (max-width: 375px) {
+  .manga-main-title h1 {
+    font-size: 1.4rem;
+  }
+
+  .manga-subtitle {
+    font-size: 0.65rem;
+  }
+
+  .manga-game-area {
+    min-height: 280px;
+  }
+
+  .manga-control-btn {
+    font-size: 0.7rem;
+    padding: 0.6rem;
   }
 }
 

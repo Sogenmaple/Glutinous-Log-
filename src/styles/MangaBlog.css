@@ -839,6 +839,7 @@
 }
 
 /* ========== 响应式 ========== */
+/* 平板 (≤ 768px) */
 @media (max-width: 768px) {
   .manga-blog-page .section {
     padding: 3rem 1.5rem;
@@ -870,6 +871,24 @@
   }
 }
 
+/* 手机横屏 (≤ 600px) */
+@media (max-width: 600px) {
+  .manga-blog-page .section-container {
+    padding: 1.5rem;
+  }
+
+  .manga-blog-page .post-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .manga-blog-page .post-date {
+    margin-left: 0;
+  }
+}
+
+/* 手机竖屏 (≤ 480px) */
 @media (max-width: 480px) {
   .manga-blog-page .type-filter,
   .manga-blog-page .category-filter {
@@ -880,5 +899,50 @@
   .manga-blog-page .category-btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .manga-blog-page .manga-section-label {
+    font-size: 1.5rem;
+  }
+
+  .manga-blog-page .post-title {
+    font-size: 1.5rem;
+  }
+
+  .manga-blog-page .post-detail-title {
+    font-size: 1.8rem;
+  }
+
+  /* 触摸优化 */
+  .manga-blog-page .type-btn,
+  .manga-blog-page .category-btn {
+    min-height: 48px;
+  }
+}
+
+/* 小屏手机 (≤ 375px) */
+@media (max-width: 375px) {
+  .manga-blog-page .section {
+    padding: 2rem 1rem;
+  }
+
+  .manga-blog-page .section-container {
+    padding: 1rem;
+  }
+
+  .manga-blog-page .manga-section-label {
+    font-size: 1.3rem;
+  }
+
+  .manga-blog-page .post-title {
+    font-size: 1.3rem;
+  }
+
+  .manga-blog-page .post-detail-title {
+    font-size: 1.6rem;
+  }
+
+  .manga-blog-page .post-content {
+    font-size: 0.95rem;
   }
 }

@@ -28,8 +28,8 @@ export default function NewspaperHome() {
   const mainChannels = [
     {
       id: 'games',
-      title: '汤圆的游戏',
-      subtitle: "TANGYUAN'S GAMES",
+      title: '汤圆的作品集',
+      subtitle: "TANGYUAN'S PORTFOLIO",
       desc: '创意是生活的燃料 · 独立游戏作品展示',
       icon: GameIcon,
       path: '/games',

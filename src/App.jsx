@@ -19,6 +19,7 @@ import SpecialConstructs from './pages/SpecialConstructs'
 import PomodoroTodo from './pages/PomodoroTodo'
 import Snake from './pages/Snake'
 import GamesCollection from './pages/GamesCollection'
+import GameDetail from './pages/GameDetail'
 import IntroPage from './pages/IntroPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -161,6 +162,9 @@ function AppContent() {
           
           {/* 游戏宇宙 - 展示你的游戏作品 */}
           <Route path="/games" element={<GamesCollection />} />
+          
+          {/* 作品详情 */}
+          <Route path="/games/:id" element={<GameDetail />} />
           
           {/* 博客页面 */}
           <Route path="/blog" element={<BlogPage />} />

@@ -42,8 +42,8 @@ export default function Header() {
   }, [])
 
   const navItems = [
-    { id: 'home', label: '小窝', path: '/' },
-    { id: 'games', label: '游戏宇宙', path: '/games' },
+    { id: 'home', label: '首页', path: '/' },
+    { id: 'games', label: '作品集', path: '/games' },
     { id: 'special', label: '构造', path: '/special' },
     { id: 'blog', label: '博客', path: '/blog' },
     { id: 'about', label: '关于', path: '/about' },
@@ -63,7 +63,7 @@ export default function Header() {
         {/* Logo */}
         <div className="logo" onClick={() => navigate('/')}>
           <span className="logo-bracket">[</span>
-          <span className="logo-text">汤圆的小窝</span>
+          <span className="logo-text">汤圆的作品集</span>
           <span className="logo-bracket">]</span>
         </div>
 

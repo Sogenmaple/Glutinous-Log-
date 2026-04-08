@@ -459,93 +459,6 @@
   border-width: 3px;
 }
 
-/* ========== 页脚 ========== */
-.manga-footer {
-  background: #000000;
-  padding: 2.5rem 3rem;
-  margin: 0 -3rem -2rem -3rem;
-  border-top: 4px solid #000000;
-  position: relative;
-  overflow: hidden;
-}
-
-.manga-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.1), 
-    transparent
-  );
-  animation: footerShine 3s ease-in-out infinite;
-}
-
-@keyframes footerShine {
-  0%, 100% { left: -100%; }
-  50% { left: 100%; }
-}
-
-.manga-footer-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  position: relative;
-  z-index: 1;
-}
-
-.manga-footer-line {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  font-family: 'Courier New', monospace;
-  font-size: 0.8rem;
-  color: #ffffff;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.manga-sep {
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 900;
-  animation: sepPulse 2s ease-in-out infinite;
-}
-
-@keyframes sepPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.2); }
-}
-
-.manga-icp {
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
-}
-
-.manga-icp a {
-  color: #000000;
-  text-decoration: none;
-  font-weight: 900;
-  padding: 0.35rem 0.8rem;
-  background: #ffffff;
-  border: 2px solid #ffffff;
-  transition: all 0.2s;
-  display: inline-block;
-}
-
-.manga-icp a:hover {
-  background: #000000;
-  color: #ffffff;
-  border-color: #ffffff;
-}
-
 /* ========== 响应式 - 平板 (900px) ========== */
 @media (max-width: 900px) {
   .manga-container {
@@ -650,15 +563,6 @@
     height: 50px;
   }
 
-  .manga-footer {
-    padding: 2rem 1.5rem;
-    margin: 0 -1rem -1rem -1rem;
-  }
-
-  .manga-footer-line {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
 }
 
 /* ========== 大屏优化 (1400px) ========== */

@@ -484,102 +484,6 @@
   transform: translate(6px, -6px);
 }
 
-/* ========== 页脚 ========== */
-.manga-footer {
-  background: #000000;
-  padding: 3rem 3rem;
-  margin: 0 -3rem -2rem -3rem;
-  border-top: 5px solid #000000;
-  position: relative;
-  overflow: hidden;
-}
-
-.manga-footer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.1), 
-    transparent
-  );
-  animation: footerShine 4s ease-in-out infinite;
-  animation-delay: 1s;
-}
-
-@keyframes footerShine {
-  0%, 100% { left: -100%; }
-  50% { left: 100%; }
-}
-
-.manga-footer-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.manga-footer-line {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-  color: #ffffff;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.manga-sep {
-  color: #ffffff;
-  font-size: 1.1rem;
-  font-weight: 900;
-  animation: sepPulse 2.5s ease-in-out infinite;
-}
-
-@keyframes sepPulse {
-  0%, 100% { 
-    opacity: 1; 
-    transform: scale(1) rotate(0deg); 
-  }
-  50% { 
-    opacity: 0.5; 
-    transform: scale(1.3) rotate(180deg); 
-  }
-}
-
-.manga-icp {
-  font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
-}
-
-.manga-icp a {
-  color: #000000;
-  text-decoration: none;
-  font-weight: 900;
-  padding: 0.4rem 0.9rem;
-  background: #ffffff;
-  border: 2px solid #ffffff;
-  transition: all 0.3s;
-  display: inline-block;
-}
-
-.manga-icp a:hover {
-  background: #000000;
-  color: #ffffff;
-  border-color: #ffffff;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 0 rgba(255, 255, 255, 0.3);
-}
-
 /* ========== 错误页面 ========== */
 .manga-error {
   text-align: center;
@@ -742,16 +646,6 @@
 
   .manga-links-grid {
     gap: 0.75rem;
-  }
-
-  .manga-footer {
-    padding: 2rem 1.5rem;
-    margin: 0 -1rem -1rem -1rem;
-  }
-
-  .manga-footer-line {
-    flex-direction: column;
-    gap: 1rem;
   }
 
   .manga-back-btn {

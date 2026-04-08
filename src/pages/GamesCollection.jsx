@@ -437,23 +437,6 @@ export default function GamesCollection() {
           })}
         </main>
 
-        {/* 底部 */}
-        <footer className="manga-footer">
-          <div className="manga-footer-content">
-            <div className="manga-footer-line">
-              <span>EST.2023</span>
-              <span className="manga-sep">◆</span>
-              <span>13 GAME JAM PROJECTS</span>
-              <span className="manga-sep">◆</span>
-              <span>MADE WITH ♥ BY TANGYUAN</span>
-            </div>
-            <div className="manga-icp">
-              <a href="https://beian.miit.gov.cn" target="_blank" rel="noopener noreferrer">
-                鄂 ICP 备 2026010257 号
-              </a>
-            </div>
-          </div>
-        </footer>
       </div>
     </div>
   )

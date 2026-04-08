@@ -570,6 +570,41 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 **代码统计**:
 - `GamesCollection.css`: 精简约 40 行，优化结构
 
+### 2026-04-08: 作品集智能字体缩放排版 v3.0
+
+**设计理念**:
+- ✅ 字体跟随容器大小智能缩放
+- ✅ 使用 container query + clamp() 组合
+- ✅ 确保文字不溢出容器
+- ✅ 更大的基础字体，更好的可读性
+
+**字体调整** (`GamesCollection.css` v3.0):
+- ✅ 中文标题：`clamp(1.4rem, 4vw, 2rem)` - 更大更醒目
+- ✅ 英文标题：`clamp(0.7rem, 2vw, 0.9rem)` - 精致但不失清晰
+- ✅ 描述文字：`clamp(0.95rem, 2.5vw, 1.1rem)` - 舒适阅读体验
+- ✅ 标签文字：`clamp(0.7rem, 1.8vw, 0.85rem)` - 清晰可点
+- ✅ 统计数字：`clamp(2.5rem, 8vw, 4rem)` - 视觉冲击力强
+- ✅ 社交链接：`clamp(0.8rem, 2vw, 0.95rem)` - 易于点击
+
+**容器优化**:
+- ✅ 游戏卡片：`container-type: inline-size` 启用容器查询
+- ✅ 侧边栏：独立容器，字体自适应宽度
+- ✅ 网格布局：`minmax(320px, 1fr)` 保证最小可读宽度
+- ✅ 内边距：`clamp(1.5rem, 4vw, 2.5rem)` 呼吸感更强
+
+**布局调整**:
+- ✅ 主布局三栏：`clamp(180px, 18vw, 240px) 1fr clamp(200px, 18vw, 260px)`
+- ✅ 卡片间距：`clamp(1.5rem, 3vw, 2.5rem)` 更宽松
+- ✅ 悬停效果：`translate(-6px, -6px)` + 更大阴影
+
+**响应式增强**:
+- ✅ 容器查询：`@container main-container` 智能适配
+- ✅ 传统媒体查询：兼容旧浏览器
+- ✅ 触摸优化：最小点击区域提升至 48px
+
+**代码统计**:
+- `GamesCollection.css`: 11190 字节，结构更清晰
+
 **域名记录**:
 - ✅ 记录用户域名 `ovo-ovo.cn` 到 USER.md
 

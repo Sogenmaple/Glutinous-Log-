@@ -454,6 +454,7 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 | 博客 | v3.0 | ✅ 基础功能 + 漫画风格 |
 | 后台 | v2.0 | ✅ 管理功能 + 漫画风格 |
 | 用户系统 | v1.0 | ✅ 注册登录 + 漫画风格 |
+| 作品集 | v2.0 | ✅ 统一风格化排版 |
 | 漫画风格 | v3.0 | ✅ 全站统一 (100% 覆盖) |
 
 ---
@@ -552,7 +553,27 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 - ✅ `MangaBlog.css` - 4 个断点 (768px/600px/480px/375px)
 - ✅ 触摸按钮优化 (最小高度 48px)
 
+### 2026-04-08: 作品集页面风格统一
+
+**页面更名**:
+- ✅ "汤圆的游戏" → "汤圆的作品集" (GamesCollection.jsx)
+- ✅ 英文副标题 "TANGYUAN'S GAMES" → "TANGYUAN'S PORTFOLIO"
+
+**样式优化** (`GamesCollection.css`):
+- ✅ 移除所有 `!important` 声明
+- ✅ 使用 `clamp()` 实现平滑响应式缩放
+- ✅ 统一卡片样式类名 (`.manga-card-title-cn`, `.manga-card-desc` 等)
+- ✅ 优化信息卡片/技术标签样式
+- ✅ 精简响应式断点 (1100px/800px/600px/480px/1920px/2560px)
+- ✅ 添加触摸设备优化 (最小点击区域 44px)
+
+**代码统计**:
+- `GamesCollection.css`: 精简约 40 行，优化结构
+
+**域名记录**:
+- ✅ 记录用户域名 `ovo-ovo.cn` 到 USER.md
+
 ---
 
-**最后更新**: 2026-03-31  
+**最后更新**: 2026-04-08  
 **维护者**: AI Assistant

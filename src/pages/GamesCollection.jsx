@@ -221,8 +221,8 @@ export default function GamesCollection() {
                 </svg>
               </div>
               <div className="manga-masthead-text">
-                <h1 className="manga-main-title">汤圆的游戏</h1>
-                <span className="manga-subtitle">TANGYUAN'S GAMES</span>
+                <h1 className="manga-main-title">汤圆的作品集</h1>
+                <span className="manga-subtitle">TANGYUAN'S PORTFOLIO</span>
               </div>
             </div>
             <div className="manga-masthead-right">

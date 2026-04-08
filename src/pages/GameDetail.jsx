@@ -29,7 +29,26 @@ export default function GameDetail() {
   useEffect(() => {
     setMounted(true)
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
+    
+    // 页面进入动画
+    const elements = document.querySelectorAll('.manga-detail-card, .manga-info-panel, .manga-links-panel')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible')
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+    
+    elements.forEach((el) => observer.observe(el))
+    
+    return () => {
+      clearInterval(timer)
+      observer.disconnect()
+    }
   }, [])
 
   // GameJam 作品数据

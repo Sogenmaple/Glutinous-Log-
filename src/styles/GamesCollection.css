@@ -1,11 +1,12 @@
 /* ============================================
-   汤圆的作品集 - 时间轴排版 v5.0
-   滚动式时间轴 + 黑白漫画风格
+   汤圆的作品集 - 时间轴排版 v5.2
+   滚动式时间轴 + 黑白漫画风格 + 增强动画
    
-   版本：v5.0 (2026-04-08)
-   - 时间轴布局
-   - 13 个 GameJam 作品
-   - 交替左右排列
+   版本：v5.2 (2026-04-08)
+   - 增强滚动视差效果
+   - 卡片进入动画升级
+   - 时间轴脉冲动画
+   - 悬停交互增强
    ============================================ */
 
 /* 引入通用样式 */
@@ -18,6 +19,29 @@
   font-family: 'Georgia', 'Times New Roman', serif;
   padding-top: 80px;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* ========== 半色调背景动画 ========== */
+.manga-halftone {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px, 40px 40px;
+  background-position: 0 0, 10px 10px;
+  pointer-events: none;
+  z-index: 0;
+  animation: halftoneScroll 20s linear infinite;
+}
+
+@keyframes halftoneScroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(40px); }
 }
 
 /* ========== 容器 ========== */
@@ -26,6 +50,7 @@
   margin: 0 auto;
   padding: 2rem 3rem;
   position: relative;
+  z-index: 1;
 }
 
 /* ========== 时间轴主线 ========== */
@@ -41,8 +66,39 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background: #000000;
+  background: linear-gradient(180deg, 
+    #000000 0%, 
+    #000000 20%, 
+    #333333 50%, 
+    #000000 80%, 
+    #000000 100%
+  );
   transform: translateX(-50%);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.manga-timeline-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: #000000;
+  border-radius: 50%;
+  animation: timelinePulse 2s ease-in-out infinite;
+}
+
+@keyframes timelinePulse {
+  0%, 100% { 
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: translateX(-50%) scale(1.5);
+    opacity: 0.5;
+  }
 }
 
 /* ========== 时间轴项目 ========== */
@@ -50,16 +106,21 @@
   position: relative;
   width: 50%;
   padding: 0 3rem;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
   cursor: pointer;
   opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.5s ease;
+  transform: translateY(50px) scale(0.95);
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .manga-timeline-item.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+}
+
+.manga-timeline-item:hover {
+  transform: translateY(-8px) scale(1.02);
+  transition: all 0.3s ease;
 }
 
 .manga-timeline-item.left {
@@ -78,6 +139,7 @@
   top: 0;
   width: 140px;
   text-align: center;
+  z-index: 2;
 }
 
 .manga-timeline-item.left .manga-timeline-marker {
@@ -95,10 +157,38 @@
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
   font-weight: 900;
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.2rem;
   border: 3px solid #000000;
   letter-spacing: 0.1em;
   white-space: nowrap;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.manga-timeline-item:hover .manga-timeline-date {
+  transform: scale(1.1) rotate(-2deg);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* 标记点 */
+.manga-timeline-marker::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border: 4px solid #000000;
+  border-radius: 50%;
+  z-index: 3;
+  transition: all 0.3s ease;
+}
+
+.manga-timeline-item:hover .manga-timeline-marker::after {
+  transform: translate(-50%, -50%) scale(1.3);
+  background: #000000;
 }
 
 /* ========== 时间轴卡片 ========== */
@@ -106,42 +196,79 @@
   position: relative;
   background: #ffffff;
   border: 4px solid #000000;
-  padding: 2rem;
-  transition: all 0.2s;
+  padding: 2.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   color: #000000;
-  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.manga-timeline-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 0, 0, 0.05), 
+    transparent
+  );
+  transition: left 0.6s ease;
+}
+
+.manga-timeline-card:hover::before {
+  left: 100%;
 }
 
 .manga-timeline-card:hover {
-  transform: translate(-6px, -6px);
-  box-shadow: 14px 14px 0 rgba(0, 0, 0, 0.2);
+  transform: translate(-8px, -8px);
+  box-shadow: 20px 20px 0 rgba(0, 0, 0, 0.25);
+  border-color: #000000;
 }
 
 /* 卡片图标 */
 .manga-card-icon {
-  width: 55px;
-  height: 55px;
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 3px solid #000000;
+  border: 4px solid #000000;
   margin: 0 auto 1.5rem auto;
-  transition: all 0.2s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
-.manga-timeline-card:hover .manga-card-icon {
+.manga-card-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 100%;
+  height: 100%;
   background: #000000;
-  border-color: #000000;
+  z-index: -1;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.manga-timeline-card:hover .manga-card-icon::after {
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .manga-card-icon svg {
   color: #000000;
-  transition: all 0.2s;
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .manga-timeline-card:hover .manga-card-icon svg {
   color: #ffffff;
+  transform: scale(1.1);
 }
 
 /* 卡片头部 */
@@ -149,16 +276,37 @@
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 3px solid #000000;
+  position: relative;
+}
+
+.manga-timeline-header::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: #000000;
+  transition: width 0.4s ease;
+}
+
+.manga-timeline-card:hover .manga-timeline-header::after {
+  width: 100%;
 }
 
 .manga-card-title-cn {
   font-family: 'Georgia', serif;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 900;
   color: #000000;
   margin: 0 0 0.5rem 0;
   letter-spacing: 0.1em;
   line-height: 1.3;
+  transition: all 0.3s ease;
+}
+
+.manga-timeline-card:hover .manga-card-title-cn {
+  letter-spacing: 0.15em;
 }
 
 .manga-card-title-en {
@@ -169,6 +317,12 @@
   text-transform: uppercase;
   font-weight: 700;
   display: block;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.manga-timeline-card:hover .manga-card-title-en {
+  opacity: 1;
 }
 
 /* 信息区域 */
@@ -193,6 +347,13 @@
   color: #666666;
   white-space: nowrap;
   flex-shrink: 0;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.manga-timeline-card:hover .manga-info-label {
+  opacity: 1;
+  color: #000000;
 }
 
 .manga-info-value {
@@ -223,18 +384,79 @@
   font-weight: 700;
   color: #000000;
   background: #f0f0f0;
-  padding: 0.35rem 0.75rem;
+  padding: 0.4rem 0.8rem;
   border: 2px solid #000000;
   text-decoration: none;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.manga-link-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  transition: left 0.2s ease;
+  z-index: -1;
+}
+
+.manga-link-btn:hover::before {
+  left: 0;
 }
 
 .manga-link-btn:hover {
-  background: #000000;
   color: #ffffff;
   border-color: #000000;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* ========== 角落装饰 ========== */
+.manga-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #000000;
+  transition: all 0.3s ease;
+}
+
+.manga-corner.tl {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.manga-corner.tr {
+  top: 8px;
+  right: 8px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.manga-corner.bl {
+  bottom: 8px;
+  left: 8px;
+  border-right: none;
+  border-top: none;
+}
+
+.manga-corner.br {
+  bottom: 8px;
+  right: 8px;
+  border-left: none;
+  border-top: none;
+}
+
+.manga-timeline-card:hover .manga-corner {
+  width: 16px;
+  height: 16px;
+  border-width: 3px;
 }
 
 /* ========== 页脚 ========== */
@@ -243,6 +465,28 @@
   padding: 2.5rem 3rem;
   margin: 0 -3rem -2rem -3rem;
   border-top: 4px solid #000000;
+  position: relative;
+  overflow: hidden;
+}
+
+.manga-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent
+  );
+  animation: footerShine 3s ease-in-out infinite;
+}
+
+@keyframes footerShine {
+  0%, 100% { left: -100%; }
+  50% { left: 100%; }
 }
 
 .manga-footer-content {
@@ -250,6 +494,8 @@
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
+  position: relative;
+  z-index: 1;
 }
 
 .manga-footer-line {
@@ -270,6 +516,12 @@
   color: #ffffff;
   font-size: 1rem;
   font-weight: 900;
+  animation: sepPulse 2s ease-in-out infinite;
+}
+
+@keyframes sepPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
 }
 
 .manga-icp {
@@ -373,7 +625,7 @@
 
   .manga-timeline-item {
     padding-left: 50px;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
   }
 
   .manga-timeline-marker {
@@ -382,7 +634,7 @@
 
   .manga-timeline-date {
     font-size: 0.75rem;
-    padding: 0.3rem 0.75rem;
+    padding: 0.35rem 0.85rem;
   }
 
   .manga-timeline-card {
@@ -394,8 +646,8 @@
   }
 
   .manga-card-icon {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
   }
 
   .manga-footer {
@@ -418,6 +670,14 @@
   .manga-timeline-item {
     padding: 0 4rem;
   }
+
+  .manga-timeline-card {
+    padding: 3rem;
+  }
+
+  .manga-card-title-cn {
+    font-size: 1.9rem;
+  }
 }
 
 /* ========== 超大屏优化 (1920px) ========== */
@@ -434,24 +694,39 @@
   }
 
   .manga-link-btn {
-    min-height: 40px;
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
   }
+
+  .manga-timeline-item:hover {
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* ========== 动画 ========== */
+/* ========== 进入动画 ========== */
 @keyframes timelineSlideIn {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(50px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 .manga-timeline-item.visible {
-  animation: timelineSlideIn 0.5s ease forwards;
+  animation: timelineSlideIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ========== 视差滚动效果 ========== */
+.manga-parallax-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
 }

@@ -30,7 +30,29 @@ export default function GamesCollection() {
   useEffect(() => {
     setMounted(true)
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
+    
+    // 滚动视差效果
+    const handleScroll = () => {
+      const items = document.querySelectorAll('.manga-timeline-item')
+      const scrollY = window.scrollY
+      
+      items.forEach((item, index) => {
+        const rect = item.getBoundingClientRect()
+        const isVisible = rect.top < window.innerHeight * 0.85
+        
+        if (isVisible) {
+          item.classList.add('visible')
+        }
+      })
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    handleScroll() // 初始化
+    
+    return () => {
+      clearInterval(timer)
+      window.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   // GameJam 作品数据（按时间排序）

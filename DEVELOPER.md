@@ -784,6 +784,34 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 **提交记录**:
 - `feat: 增强滚动动画 + 详情页大气排版 v5.2`
 
+### 2026-04-08: 删除黑色底栏 v5.3
+
+**删除内容**:
+- ✅ `GamesCollection.jsx`: 移除 `<footer className="manga-footer">` 区块
+- ✅ `GameDetail.jsx`: 移除 `<footer className="manga-footer">` 区块
+- ✅ `GamesCollection.css`: 移除所有 `.manga-footer*` 样式（约 80 行）
+- ✅ `GameDetail.css`: 移除所有 `.manga-footer*` 样式（约 70 行）
+
+**删除的样式**:
+- `.manga-footer` 容器
+- `.manga-footer::before` 光泽动画
+- `.manga-footer-content` 布局
+- `.manga-footer-line` 文本行
+- `.manga-sep` 分隔符脉冲动画
+- `.manga-icp` 备案链接
+
+**代码变化**:
+- 删除 4 个文件中的页脚代码
+- 总计删除约 236 行代码
+
+**视觉效果**:
+- 页面底部更简洁
+- 时间轴/详情页内容结束后直接结束
+- 无黑色底栏干扰
+
+**提交记录**:
+- `style: 删除作品集及详情页黑色底栏 v5.3`
+
 ---
 
 **最后更新**: 2026-04-08  

@@ -714,6 +714,39 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 **提交记录**:
 - `feat: 作品集时间轴排版 v5.0 - 13 个 GameJam 作品`
 
+### 2026-04-08: 作品详情页 + 删除 emoji + 统一标题 v5.1
+
+**新增功能**:
+- ✅ 创建作品详情页 `GameDetail.jsx` (14863 字节)
+- ✅ 创建详情页样式 `GameDetail.css` (8088 字节)
+- ✅ 添加路由 `/games/:id` 支持 13 个作品详情
+
+**详情页设计**:
+- ✅ 黑白漫画风格，与时间轴页面统一
+- ✅ 返回按钮：返回作品集列表
+- ✅ 主卡片：图标 + 标题 + 描述 + 标签
+- ✅ 信息面板：时间/活动/主题/地点/队伍/成员
+- ✅ 链接面板：GmHub / TapTap / Bilibili / 百度网盘
+- ✅ 响应式：平板/手机适配
+
+**删除 emoji**:
+- ✅ 时间轴信息标签：`📅` `🎯` `👥` → 纯文本
+- ✅ 详情页信息面板：纯文本标签
+
+**统一标题**:
+- ✅ `Header.jsx`: Logo "汤圆的小窝" → "汤圆的作品集"
+- ✅ `Header.jsx`: 导航 "小窝" → "首页"，"游戏宇宙" → "作品集"
+- ✅ `NewspaperHome.jsx`: 游戏版块 "汤圆的游戏" → "汤圆的作品集"
+- ✅ `GamesCollection.jsx`: 报头 "汤圆的作品集" (已统一)
+- ✅ `GameDetail.jsx`: 报头 "汤圆的作品集" (已统一)
+
+**代码统计**:
+- 新增 2 个文件：`GameDetail.jsx` + `GameDetail.css`
+- 修改 4 个文件：`App.jsx`, `GamesCollection.jsx`, `Header.jsx`, `NewspaperHome.jsx`
+
+**提交记录**:
+- `feat: 作品详情页 + 删除 emoji + 统一标题为作品集 v5.1`
+
 ---
 
 **最后更新**: 2026-04-08  

@@ -50,10 +50,13 @@ const PATH_MAP = {
 function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, children }) {
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [isResizing, setIsResizing] = useState(false)
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, w: 0, h: 0 })
   const windowRef = useRef(null)
 
+  // 拖动
   const handleMouseDown = useCallback((e) => {
-    if (e.target.closest('.window-controls')) return
+    if (e.target.closest('.window-controls') || e.target.closest('.resize-handle')) return
     e.preventDefault()
     setIsDragging(true)
     const rect = windowRef.current.getBoundingClientRect()
@@ -66,18 +69,11 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, ch
 
   useEffect(() => {
     if (!isDragging) return
-
     const handleMouseMove = (e) => {
-      const x = e.clientX - dragOffset.x
-      const y = e.clientY - dragOffset.y
-      windowRef.current.style.left = Math.max(0, x) + 'px'
-      windowRef.current.style.top = Math.max(0, y) + 'px'
+      windowRef.current.style.left = Math.max(0, e.clientX - dragOffset.x) + 'px'
+      windowRef.current.style.top = Math.max(0, e.clientY - dragOffset.y) + 'px'
     }
-
-    const handleMouseUp = () => {
-      setIsDragging(false)
-    }
-
+    const handleMouseUp = () => setIsDragging(false)
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
     return () => {
@@ -86,20 +82,39 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, ch
     }
   }, [isDragging, dragOffset])
 
-  // ResizeObserver - 监听窗口尺寸变化（用户拖拽拉伸）
+  // 拉伸
+  const handleResizeMouseDown = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const rect = windowRef.current.getBoundingClientRect()
+    setIsResizing(true)
+    setResizeStart({ x: e.clientX, y: e.clientY, w: rect.width, h: rect.height })
+    onFocus(window.id)
+  }, [window.id, onFocus])
+
   useEffect(() => {
-    const el = windowRef.current
-    if (!el) return
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect
-        // 更新窗口状态中的宽高
-        onResize && onResize(window.id, Math.round(width), Math.round(height))
-      }
-    })
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [window.id, onResize])
+    if (!isResizing) return
+    const handleMouseMove = (e) => {
+      const dx = e.clientX - resizeStart.x
+      const dy = e.clientY - resizeStart.y
+      const newW = Math.max(300, resizeStart.w + dx)
+      const newH = Math.max(200, resizeStart.h + dy)
+      windowRef.current.style.width = newW + 'px'
+      windowRef.current.style.height = newH + 'px'
+    }
+    const handleMouseUp = () => {
+      setIsResizing(false)
+      // 更新状态
+      const rect = windowRef.current.getBoundingClientRect()
+      onResize && onResize(window.id, Math.round(rect.width), Math.round(rect.height))
+    }
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isResizing, resizeStart, window.id, onResize])
 
   const icon = DESKTOP_ICONS.find(i => i.id === window.appId)
 
@@ -135,7 +150,7 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, ch
       <div className="window-content">
         {children}
       </div>
-      <div className="resize-handle"></div>
+      <div className="resize-handle" onMouseDown={handleResizeMouseDown}></div>
     </div>
   )
 }

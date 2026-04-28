@@ -970,6 +970,26 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 - `Desktop.jsx`: ~19500 字节
 - `Desktop.css`: ~11100 字节
 
+### 2026-04-28: 桌面系统 v7.6.1 - 窗口拉伸 Bug 修复
+
+**Bug 修复**:
+- ✅ 修复窗口回缩 bug：移除 CSS `resize: both`，改用 JS 自定义拉伸手柄
+- ✅ 修复 iframe 导航栏溢出：Header 在小窗口下按钮/文字出框
+- ✅ `header.css` 新增超小视口适配（< 500px）：隐藏导航、缩小 Logo、紧凑布局
+- ✅ `header.css` 新增小视口适配（500-768px）：紧凑导航按钮
+- ✅ `.header-main` 添加 `min-width: 0` 允许 flex 子元素正确收缩
+
+**技术实现**:
+- ✅ Desktop.jsx 已有 JS 自定义 resize（`handleResizeMouseDown` + `handleMouseMove`）
+- ✅ header.css 新增 `@media (max-width: 499px)` 超小视口规则
+- ✅ header.css 新增 `@media (min-width: 500px) and (max-width: 768px)` 小视口规则
+- ✅ 超小视口下：header 高度 40px、padding 0.5rem、隐藏导航、按钮 32x32
+
+**代码统计**:
+- `Desktop.jsx`: ~19500 字节（无变化）
+- `Desktop.css`: ~11100 字节（无变化）
+- `header.css`: 新增 ~70 行响应式规则
+
 ---
 
 **最后更新**: 2026-04-28  

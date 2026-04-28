@@ -100,8 +100,6 @@
   flex-direction: column;
   min-width: 300px;
   min-height: 200px;
-  resize: both;
-  overflow: hidden;
 }
 
 .desktop-window.minimized {
@@ -168,6 +166,7 @@
   overflow: auto;
   background: #ffffff;
   min-height: 0;
+  position: relative;
 }
 
 /* 窗口 iframe */
@@ -177,6 +176,7 @@
   border: none;
   display: block;
   min-height: 100%;
+  background: #fff;
 }
 
 /* 窗口占位 */
@@ -191,21 +191,19 @@
 }
 
 /* 窗口拉伸手柄（右下角漫画风格三角） */
-.desktop-window::resize {
-  cursor: nwse-resize;
-}
-
-/* 窗口拉伸指示器 */
 .resize-handle {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   cursor: nwse-resize;
-  background: linear-gradient(135deg, transparent 50%, #1a1a1a 50%, #1a1a1a 60%, transparent 60%, transparent 70%, #1a1a1a 70%, #1a1a1a 80%, transparent 80%);
-  opacity: 0.5;
   z-index: 10;
+  background: linear-gradient(135deg, transparent 40%, #1a1a1a 40%, #1a1a1a 48%, transparent 48%, transparent 56%, #1a1a1a 56%, #1a1a1a 64%, transparent 64%, transparent 72%, #1a1a1a 72%, #1a1a1a 80%, transparent 80%);
+}
+
+.resize-handle:hover {
+  opacity: 0.8;
 }
 
 .window-placeholder h2 {

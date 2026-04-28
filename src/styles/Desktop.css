@@ -100,6 +100,8 @@
   flex-direction: column;
   min-width: 300px;
   min-height: 200px;
+  /* 允许拉伸手柄溢出到窗口外部 */
+  overflow: visible;
 }
 
 .desktop-window.minimized {
@@ -160,14 +162,13 @@
   border-color: #ff0000;
 }
 
-/* 窗口内容 - overflow hidden 防止内容覆盖右下角拉伸手柄 */
+/* 窗口内容 - 允许溢出以便拉伸手柄在外部可见 */
 .window-content {
   flex: 1;
   overflow: hidden;
   background: #ffffff;
   min-height: 0;
   position: relative;
-  /* 移除 padding，让 iframe 填满整个区域 */
 }
 
 /* 窗口 iframe - 填满整个内容区域 */
@@ -196,22 +197,47 @@
   text-align: center;
 }
 
-/* 窗口拉伸手柄（右下角小三角） */
+/* 窗口拉伸手柄（放在窗口最外层，带图标和交互反馈） */
 .resize-handle {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 16px;
-  height: 16px;
+  right: -14px;
+  bottom: -14px;
+  width: 24px;
+  height: 24px;
   cursor: nwse-resize;
-  z-index: 9999;
-  background: linear-gradient(135deg, transparent 50%, rgba(26, 26, 26, 0.3) 50%);
-  border-top: 1px solid rgba(26, 26, 26, 0.2);
-  border-left: 1px solid rgba(26, 26, 26, 0.2);
+  z-index: 99999;
+  background: #ffffff;
+  border: 3px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+/* 拉伸手柄图标（对角箭头） */
+.resize-handle::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-right: 3px solid #1a1a1a;
+  border-bottom: 3px solid #1a1a1a;
+  transform: rotate(-45deg);
+  transition: all 0.15s;
 }
 
 .resize-handle:hover {
-  opacity: 0.8;
+  background: #1a1a1a;
+  transform: scale(1.15);
+}
+
+.resize-handle:hover::before {
+  border-color: #ffffff;
+}
+
+.resize-handle:active {
+  transform: scale(0.95);
+  box-shadow: 1px 1px 0 #1a1a1a;
 }
 
 .window-placeholder h2 {

@@ -928,6 +928,48 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 **提交记录**:
 - `fix: 桌面图标修复 - 移除emoji/网格布局/图标拖拽/资源管理器 v7.1`
 
+### 2026-04-28: 桌面系统 v7.5 - iframe 加载真实页面
+
+**架构变更**:
+- ✅ 窗口内容改用 `<iframe>` 加载真实完整页面（非精简版组件）
+- ✅ 解决用户反馈"精简版不是真实页面"的问题
+- ✅ iframe 内显示真正的页面内容（含 Header/Footer/所有交互）
+
+**技术实现**:
+- ✅ `getIframeUrl(route)` 构造 iframe URL（`origin + pathname + '#/' + route`）
+- ✅ `isInIframe()` 检测函数：在 iframe 中 Desktop 返回 null（避免桌面嵌套桌面）
+- ✅ 修复 HashRouter 双斜杠 bug（`route` 去掉开头 `/`，避免 `//#/games`）
+- ✅ App.jsx 路由配合：`/#/games` 匹配 GamesCollection（非 Desktop）
+
+**CSS 优化**:
+- ✅ 清理 `Desktop.css` 中 25 个重复的 `.explorer-content` 块
+- ✅ `.window-content` 添加 `min-height: 0`（flex 布局修复）
+- ✅ `.window-iframe` 添加 `min-height: 100%`（iframe 自适应窗口）
+
+**代码统计**:
+- `Desktop.jsx`: 19193 字节
+- `Desktop.css`: 10927 字节（清理后）
+
+### 2026-04-28: 桌面系统 v7.6 - 窗口自由拉伸 + 内容自适应
+
+**新功能**:
+- ✅ 窗口支持自由拖拽拉伸（CSS `resize: both`）
+- ✅ iframe 内容动态自适应窗口大小
+- ✅ 右下角漫画风格拉伸手柄指示器
+- ✅ ResizeObserver 监听窗口尺寸变化，自动更新状态
+
+**技术实现**:
+- ✅ `.desktop-window` 添加 `resize: both` + `overflow: hidden`
+- ✅ `.window-content` 添加 `min-height: 0`（flex 子元素正确收缩）
+- ✅ `.window-iframe` 添加 `min-height: 100%`（iframe 填满窗口）
+- ✅ 新增 `ResizeObserver` 监听窗口尺寸变化
+- ✅ 新增 `handleResize` 回调更新窗口宽高状态
+- ✅ 新增 `.resize-handle` 漫画风格三角指示器
+
+**代码统计**:
+- `Desktop.jsx`: ~19500 字节
+- `Desktop.css`: ~11100 字节
+
 ---
 
 **最后更新**: 2026-04-28  

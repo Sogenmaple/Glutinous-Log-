@@ -3,29 +3,51 @@ import { useNavigate } from 'react-router-dom'
 import '../styles/Desktop.css'
 
 /**
- * 汤圆的小窝 - 模拟电脑桌面
+ * 汤圆的小窝 - 模拟电脑桌面 v7.5
  * 桌面图标 + 窗口系统 + 任务栏 + 资源管理器
- * 黑白漫画风格，无 emoji
+ * 黑白漫画风格，窗口内用 iframe 加载真实完整页面
  */
 
-// 桌面图标数据（无 emoji，纯文本/CSS 图标）
+// 检测是否在 iframe 中（避免桌面嵌套桌面）
+const isInIframe = () => {
+  try {
+    return window.self !== window.top
+  } catch (e) {
+    return true
+  }
+}
+
+// 桌面图标数据
 const DESKTOP_ICONS = [
-  { id: 'portfolio', name: '作品集', symbol: 'P', path: '/games', type: 'folder' },
-  { id: 'blog', name: '博客', symbol: 'B', path: '/blog', type: 'folder' },
-  { id: 'about', name: '关于我', symbol: 'A', path: '/about', type: 'folder' },
-  { id: 'pomodoro', name: '番茄钟', symbol: 'T', path: '/special/pomodoro', type: 'app' },
-  { id: 'minigames', name: '小游戏', symbol: 'G', path: '/special/minigames', type: 'folder' },
-  { id: 'special', name: '特殊构造', symbol: 'S', path: '/special', type: 'folder' },
-  { id: 'profile', name: '个人中心', symbol: 'U', path: '/profile', type: 'app' },
-  { id: 'login', name: '登录', symbol: 'L', path: '/login', type: 'app' },
-  { id: 'register', name: '注册', symbol: 'R', path: '/register', type: 'app' },
-  { id: 'explorer', name: '资源管理器', symbol: 'E', path: '#explorer', type: 'system' },
-  { id: 'settings', name: '设置', symbol: 'C', path: '#settings', type: 'system' },
-  { id: 'terminal', name: '终端', symbol: '$', path: '#terminal', type: 'system' },
+  { id: 'portfolio', name: '作品集', symbol: 'P', route: '/games' },
+  { id: 'blog', name: '博客', symbol: 'B', route: '/blog' },
+  { id: 'about', name: '关于我', symbol: 'A', route: '/about' },
+  { id: 'pomodoro', name: '番茄钟', symbol: 'T', route: '/special/pomodoro' },
+  { id: 'minigames', name: '小游戏', symbol: 'G', route: '/special/minigames' },
+  { id: 'special', name: '特殊构造', symbol: 'S', route: '/special' },
+  { id: 'profile', name: '个人中心', symbol: 'U', route: '/profile' },
+  { id: 'login', name: '登录', symbol: 'L', route: '/login' },
+  { id: 'register', name: '注册', symbol: 'R', route: '/register' },
+  { id: 'explorer', name: '资源管理器', symbol: 'E', route: null },
+  { id: 'settings', name: '设置', symbol: 'C', route: null },
+  { id: 'terminal', name: '终端', symbol: '$', route: null },
 ]
 
+// 路径映射（资源管理器地址栏）
+const PATH_MAP = {
+  '/games': 'portfolio',
+  '/blog': 'blog',
+  '/about': 'about',
+  '/special/pomodoro': 'pomodoro',
+  '/special/minigames': 'minigames',
+  '/special': 'special',
+  '/profile': 'profile',
+  '/login': 'login',
+  '/register': 'register',
+}
+
 // 窗口组件
-function Window({ window, onClose, onMinimize, onFocus, children }) {
+function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, children }) {
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const windowRef = useRef(null)
@@ -64,6 +86,23 @@ function Window({ window, onClose, onMinimize, onFocus, children }) {
     }
   }, [isDragging, dragOffset])
 
+  // ResizeObserver - 监听窗口尺寸变化（用户拖拽拉伸）
+  useEffect(() => {
+    const el = windowRef.current
+    if (!el) return
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect
+        // 更新窗口状态中的宽高
+        onResize && onResize(window.id, Math.round(width), Math.round(height))
+      }
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [window.id, onResize])
+
+  const icon = DESKTOP_ICONS.find(i => i.id === window.appId)
+
   return (
     <div
       ref={windowRef}
@@ -79,8 +118,16 @@ function Window({ window, onClose, onMinimize, onFocus, children }) {
       <div className="window-titlebar" onMouseDown={handleMouseDown}>
         <span className="window-title">{window.title}</span>
         <div className="window-controls">
+          {icon?.route && (
+            <button
+              className="window-btn jump"
+              onClick={() => onNavigate(icon.route)}
+              title="跳转到完整页面"
+            >
+              &gt;
+            </button>
+          )}
           <button className="window-btn minimize" onClick={() => onMinimize(window.id)} title="最小化">_</button>
-          <button className="window-btn maximize" onClick={() => {}} title="最大化">□</button>
           <button className="window-btn close" onClick={() => onClose(window.id)} title="关闭">X</button>
         </div>
       </div>
@@ -88,45 +135,81 @@ function Window({ window, onClose, onMinimize, onFocus, children }) {
       <div className="window-content">
         {children}
       </div>
+      <div className="resize-handle"></div>
     </div>
   )
 }
 
 // 资源管理器组件
-function Explorer({ navigate, openWindow }) {
-  const [currentPath, setCurrentPath] = useState('/')
+function Explorer({ openWindow }) {
+  const [addressInput, setAddressInput] = useState('/')
   const [selectedItems, setSelectedItems] = useState([])
 
-  const fileSystem = {
-    '/': [
-      { name: '作品集', type: 'folder', action: () => openWindow('portfolio') },
-      { name: '博客', type: 'folder', action: () => openWindow('blog') },
-      { name: '关于我', type: 'folder', action: () => openWindow('about') },
-      { name: '番茄钟', type: 'app', action: () => openWindow('pomodoro') },
-      { name: '小游戏', type: 'folder', action: () => openWindow('minigames') },
-      { name: '特殊构造', type: 'folder', action: () => openWindow('special') },
-      { name: '个人中心', type: 'app', action: () => openWindow('profile') },
-    ],
+  const desktopItems = [
+    { name: '作品集', type: 'folder', appId: 'portfolio' },
+    { name: '博客', type: 'folder', appId: 'blog' },
+    { name: '关于我', type: 'folder', appId: 'about' },
+    { name: '番茄钟', type: 'app', appId: 'pomodoro' },
+    { name: '小游戏', type: 'folder', appId: 'minigames' },
+    { name: '特殊构造', type: 'folder', appId: 'special' },
+    { name: '个人中心', type: 'app', appId: 'profile' },
+    { name: '登录', type: 'app', appId: 'login' },
+    { name: '注册', type: 'app', appId: 'register' },
+  ]
+
+  const handleAddressSubmit = (e) => {
+    if (e.key !== 'Enter') return
+    const value = addressInput.trim().toLowerCase()
+
+    // cmd 命令 → 打开终端
+    if (value === 'cmd' || value === 'terminal') {
+      openWindow('terminal')
+      setAddressInput('/')
+      return
+    }
+
+    // 路径映射
+    const appId = PATH_MAP[value] || PATH_MAP['/' + value.replace(/^\//, '')]
+    if (appId) {
+      openWindow(appId)
+      setAddressInput(value.startsWith('/') ? value : '/' + value)
+      return
+    }
+
+    // 尝试模糊匹配
+    for (const [path, id] of Object.entries(PATH_MAP)) {
+      if (path.includes(value) || value.includes(path)) {
+        openWindow(id)
+        setAddressInput(path)
+        return
+      }
+    }
   }
 
-  const items = fileSystem[currentPath] || []
-
   const handleDoubleClick = (item) => {
-    if (item.action) item.action()
+    openWindow(item.appId)
   }
 
   return (
     <div className="explorer">
       <div className="explorer-toolbar">
-        <button className="explorer-nav-btn" disabled>&lt; 后退</button>
-        <button className="explorer-nav-btn" disabled>前进 &gt;</button>
         <div className="explorer-addressbar">
-          <span className="address-path">{currentPath === '/' ? '桌面' : currentPath}</span>
+          <span className="address-symbol">&gt;</span>
+          <input
+            className="address-input"
+            value={addressInput}
+            onChange={(e) => setAddressInput(e.target.value)}
+            onKeyDown={handleAddressSubmit}
+            placeholder="输入路径（如 /games）或 cmd 打开终端..."
+          />
+          <button className="address-go-btn" onClick={() => handleAddressSubmit({ key: 'Enter' })}>
+            转到
+          </button>
         </div>
       </div>
 
       <div className="explorer-content">
-        {items.map((item, index) => (
+        {desktopItems.map((item, index) => (
           <div
             key={index}
             className={`explorer-item ${selectedItems.includes(index) ? 'selected' : ''}`}
@@ -134,7 +217,7 @@ function Explorer({ navigate, openWindow }) {
             onDoubleClick={() => handleDoubleClick(item)}
           >
             <div className={`explorer-item-icon ${item.type === 'folder' ? 'folder-icon' : 'file-icon'}`}>
-              <span className="icon-symbol">{item.type === 'folder' ? '[]' : '[]'}</span>
+              <span className="icon-symbol">[]</span>
             </div>
             <span className="explorer-item-name">{item.name}</span>
           </div>
@@ -142,7 +225,7 @@ function Explorer({ navigate, openWindow }) {
       </div>
 
       <div className="explorer-statusbar">
-        <span>{items.length} 个项目</span>
+        <span>{desktopItems.length} 个项目</span>
         <span>{selectedItems.length} 个已选中</span>
       </div>
     </div>
@@ -150,7 +233,7 @@ function Explorer({ navigate, openWindow }) {
 }
 
 // 终端组件
-function Terminal() {
+function Terminal({ openWindow }) {
   const [lines, setLines] = useState([
     { text: '汤圆的小窝 终端 v1.0', type: 'info' },
     { text: 'Copyright (c) 2026 TangYuan. All rights reserved.', type: 'info' },
@@ -161,18 +244,9 @@ function Terminal() {
   const [input, setInput] = useState('')
   const inputRef = useRef(null)
 
-  const commands = {
-    help: '可用命令: help, clear, date, whoami, ls, echo [text], exit',
-    date: () => new Date().toLocaleString('zh-CN'),
-    whoami: '汤圆',
-    ls: '作品集/  博客/  关于我/  番茄钟/  小游戏/  特殊构造/  个人中心/',
-    clear: () => { setLines([]); return null },
-    exit: '再见！',
-  }
-
   const handleCommand = (cmd) => {
     const trimmed = cmd.trim().toLowerCase()
-    const newLines = [...lines, { text: `C:\\Users\\TangYuan&gt; ${cmd}`, type: 'input' }]
+    const newLines = [...lines, { text: `C:\\Users\\TangYuan> ${cmd}`, type: 'input' }]
 
     if (trimmed === '') {
       setLines([...newLines, { text: '', type: 'blank' }])
@@ -181,10 +255,29 @@ function Terminal() {
 
     if (trimmed.startsWith('echo ')) {
       newLines.push({ text: cmd.substring(5), type: 'output' })
-    } else if (commands[trimmed]) {
-      const result = typeof commands[trimmed] === 'function' ? commands[trimmed]() : commands[trimmed]
-      if (result !== null) {
-        newLines.push({ text: result, type: 'output' })
+    } else if (trimmed === 'help') {
+      newLines.push({ text: '可用命令: help, clear, date, whoami, ls, open [页面], exit', type: 'output' })
+    } else if (trimmed === 'date') {
+      newLines.push({ text: new Date().toLocaleString('zh-CN'), type: 'output' })
+    } else if (trimmed === 'whoami') {
+      newLines.push({ text: '汤圆', type: 'output' })
+    } else if (trimmed === 'ls') {
+      newLines.push({ text: '作品集/  博客/  关于我/  番茄钟/  小游戏/  特殊构造/  个人中心/', type: 'output' })
+    } else if (trimmed === 'clear') {
+      setLines([])
+      return
+    } else if (trimmed === 'exit') {
+      newLines.push({ text: '再见！', type: 'output' })
+      setLines(newLines)
+      return
+    } else if (trimmed.startsWith('open ')) {
+      const target = trimmed.substring(5).trim()
+      const appId = PATH_MAP['/' + target] || PATH_MAP[target]
+      if (appId) {
+        openWindow(appId)
+        newLines.push({ text: `正在打开 ${target}...`, type: 'output' })
+      } else {
+        newLines.push({ text: `未找到页面: ${target}`, type: 'error' })
       }
     } else {
       newLines.push({ text: `'${trimmed}' 不是内部或外部命令`, type: 'error' })
@@ -240,7 +333,7 @@ function Settings() {
         </div>
         <div className="setting-item">
           <label>版本</label>
-          <span>汤圆的小窝 v7.0</span>
+          <span>汤圆的小窝 v7.5</span>
         </div>
         <div className="setting-item">
           <label>域名</label>
@@ -262,19 +355,30 @@ export default function Desktop() {
   const [selectedIcon, setSelectedIcon] = useState(null)
   const [contextMenu, setContextMenu] = useState(null)
   const [iconPositions, setIconPositions] = useState({})
+  const wasDraggedRef = useRef(false)
 
-  // 初始化图标位置（网格布局：从上到下排满一列，再换到下一列）
+  // 如果在 iframe 中，桌面页面不渲染（避免桌面嵌套桌面）
+  // 但其他页面（如作品集、博客）可以在 iframe 中正常显示
+  if (isInIframe()) {
+    // 只在 hash 为空或 # 时返回 null（即桌面首页被嵌入时）
+    // 如果 hash 指向具体页面（如 #/games），则正常渲染
+    const hash = window.location.hash || '#'
+    if (hash === '#' || hash === '#!/' || hash === '#/') {
+      return null
+    }
+  }
+
+  // 初始化图标位置（网格布局）
   useEffect(() => {
     const positions = {}
-    const iconWidth = 80
-    const iconHeight = 90
+    const iconWidth = 70
+    const iconHeight = 85
     const paddingX = 20
-    const paddingY = 70 // 顶部留空给标题栏
+    const paddingY = 70
     const gapX = 10
     const gapY = 10
 
-    // 计算每列能放几个图标
-    const viewportHeight = window.innerHeight - 48 // 减去任务栏
+    const viewportHeight = window.innerHeight - 48
     const maxIconsPerColumn = Math.floor((viewportHeight - paddingY) / (iconHeight + gapY))
 
     DESKTOP_ICONS.forEach((icon, index) => {
@@ -297,7 +401,6 @@ export default function Desktop() {
 
     if (!icon) return
 
-    // 如果窗口已打开，则聚焦
     const existing = windows.find(w => w.appId === icon.id)
     if (existing) {
       setWindows(prev => prev.map(w =>
@@ -307,7 +410,6 @@ export default function Desktop() {
       return
     }
 
-    // 创建新窗口
     const windowId = `win-${Date.now()}`
     const titleMap = {
       portfolio: '作品集',
@@ -340,25 +442,34 @@ export default function Desktop() {
     setZIndexCounter(prev => prev + 1)
   }, [windows, zIndexCounter])
 
-  // 关闭窗口
   const closeWindow = useCallback((windowId) => {
     setWindows(prev => prev.filter(w => w.id !== windowId))
   }, [])
 
-  // 最小化窗口
   const minimizeWindow = useCallback((windowId) => {
     setWindows(prev => prev.map(w =>
       w.id === windowId ? { ...w, isMinimized: true } : w
     ))
   }, [])
 
-  // 聚焦窗口
   const focusWindow = useCallback((windowId) => {
     setWindows(prev => prev.map(w =>
       w.id === windowId ? { ...w, zIndex: zIndexCounter + 1 } : w
     ))
     setZIndexCounter(prev => prev + 1)
   }, [zIndexCounter])
+
+  // 跳转到完整页面（显示导航栏）
+  const handleNavigate = useCallback((route) => {
+    navigate(route)
+  }, [navigate])
+
+  // 调整窗口尺寸（用户拖拽拉伸后更新状态）
+  const handleResize = useCallback((windowId, width, height) => {
+    setWindows(prev => prev.map(w =>
+      w.id === windowId ? { ...w, width, height } : w
+    ))
+  }, [])
 
   // 右键菜单
   const handleContextMenu = useCallback((e) => {
@@ -373,22 +484,18 @@ export default function Desktop() {
     return () => document.removeEventListener('click', handleClick)
   }, [])
 
-  // 桌面图标双击
-  const handleIconDoubleClick = (icon) => {
-    openWindow(icon)
-  }
-
-  // 桌面图标拖拽
-  const handleIconDragStart = useCallback((e, iconId) => {
+  // 桌面图标拖拽（Windows 风格：按下记录起点，移动超过阈值视为拖拽）
+  const handleIconMouseDown = useCallback((e, iconId) => {
     e.preventDefault()
-    const startPos = { x: e.clientX, y: e.clientY }
-    let hasMoved = false
+    const startX = e.clientX
+    const startY = e.clientY
+    wasDraggedRef.current = false
 
     const handleMouseMove = (e) => {
-      const dx = e.clientX - startPos.x
-      const dy = e.clientY - startPos.y
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-        hasMoved = true
+      const dx = e.clientX - startX
+      const dy = e.clientY - startY
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        wasDraggedRef.current = true
       }
     }
 
@@ -396,25 +503,42 @@ export default function Desktop() {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
 
-      if (hasMoved) {
-        // 更新图标位置
+      if (wasDraggedRef.current) {
+        // 拖拽：更新位置
         setIconPositions(prev => ({
           ...prev,
           [iconId]: {
-            x: Math.max(0, e.clientX - 40),
+            x: Math.max(0, e.clientX - 35),
             y: Math.max(60, e.clientY - 40),
           }
         }))
       }
+      // 否则视为点击，由 onClick 处理
     }
 
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
   }, [])
 
-  // 获取窗口对应的图标
-  const getWindowIcon = (appId) => {
-    return DESKTOP_ICONS.find(i => i.id === appId)
+  // 桌面图标点击
+  const handleIconClick = useCallback((icon) => {
+    if (wasDraggedRef.current) return
+    setSelectedIcon(icon.id)
+  }, [])
+
+  // 桌面图标双击
+  const handleIconDoubleClick = useCallback((icon) => {
+    if (wasDraggedRef.current) return
+    openWindow(icon)
+  }, [openWindow])
+
+  const getWindowIcon = (appId) => DESKTOP_ICONS.find(i => i.id === appId)
+
+  // 获取 iframe URL（当前页面 URL + hash 路由）
+  const getIframeUrl = (route) => {
+    // 去掉 route 开头的 /，避免产生 //#/games 这样的双斜杠
+    const cleanRoute = route.startsWith('/') ? route.slice(1) : route
+    return window.location.origin + window.location.pathname + '#/' + cleanRoute
   }
 
   return (
@@ -431,9 +555,9 @@ export default function Desktop() {
               left: (iconPositions[icon.id]?.x || 20) + 'px',
               top: (iconPositions[icon.id]?.y || 70) + 'px',
             }}
-            onClick={() => setSelectedIcon(icon.id)}
+            onClick={() => handleIconClick(icon)}
             onDoubleClick={() => handleIconDoubleClick(icon)}
-            onMouseDown={(e) => handleIconDragStart(e, icon.id)}
+            onMouseDown={(e) => handleIconMouseDown(e, icon.id)}
           >
             <div className="desktop-icon-img">
               <span className="icon-symbol">{icon.symbol}</span>
@@ -445,30 +569,33 @@ export default function Desktop() {
 
       {/* 窗口区域 */}
       <div className="desktop-windows">
-        {windows.map(window => (
-          <Window
-            key={window.id}
-            window={window}
-            onClose={closeWindow}
-            onMinimize={minimizeWindow}
-            onFocus={focusWindow}
-          >
-            {window.appId === 'explorer' && (
-              <Explorer navigate={navigate} openWindow={(id) => openWindow(id)} />
-            )}
-            {window.appId === 'terminal' && <Terminal />}
-            {window.appId === 'settings' && <Settings />}
-            {['portfolio', 'blog', 'about', 'pomodoro', 'minigames', 'special', 'profile', 'login', 'register'].includes(window.appId) && (
-              <div className="window-placeholder">
-                <h2>{window.title}</h2>
-                <p>正在导航到 {window.title} 页面...</p>
-                <button className="placeholder-btn" onClick={() => navigate(getWindowIcon(window.appId)?.path || '/')}>
-                  立即跳转
-                </button>
-              </div>
-            )}
-          </Window>
-        ))}
+        {windows.map(window => {
+          const icon = getWindowIcon(window.appId)
+          return (
+            <Window
+              key={window.id}
+              window={window}
+              onClose={closeWindow}
+              onMinimize={minimizeWindow}
+              onFocus={focusWindow}
+              onNavigate={handleNavigate}
+              onResize={handleResize}
+            >
+              {window.appId === 'explorer' && <Explorer openWindow={openWindow} />}
+              {window.appId === 'terminal' && <Terminal openWindow={openWindow} />}
+              {window.appId === 'settings' && <Settings />}
+              {icon?.route && (
+                <iframe
+                  src={getIframeUrl(icon.route)}
+                  className="window-iframe"
+                  title={window.title}
+                  frameBorder="0"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                />
+              )}
+            </Window>
+          )
+        })}
       </div>
 
       {/* 右键菜单 */}
@@ -477,28 +604,17 @@ export default function Desktop() {
           className="context-menu"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
-          <div className="context-menu-item" onClick={() => {
-            openWindow('explorer')
-            setContextMenu(null)
-          }}>
+          <div className="context-menu-item" onClick={() => { openWindow('explorer'); setContextMenu(null) }}>
             打开资源管理器
           </div>
-          <div className="context-menu-item" onClick={() => {
-            openWindow('terminal')
-            setContextMenu(null)
-          }}>
+          <div className="context-menu-item" onClick={() => { openWindow('terminal'); setContextMenu(null) }}>
             打开终端
           </div>
           <div className="context-menu-divider"></div>
-          <div className="context-menu-item" onClick={() => {
-            openWindow('settings')
-            setContextMenu(null)
-          }}>
+          <div className="context-menu-item" onClick={() => { openWindow('settings'); setContextMenu(null) }}>
             系统设置
           </div>
-          <div className="context-menu-item" onClick={() => {
-            window.location.reload()
-          }}>
+          <div className="context-menu-item" onClick={() => window.location.reload()}>
             刷新桌面
           </div>
         </div>
@@ -528,9 +644,7 @@ export default function Desktop() {
                   }
                 }}
               >
-                <span className="taskbar-window-icon">
-                  {icon?.symbol || '?'}
-                </span>
+                <span className="taskbar-window-icon">{icon?.symbol || '?'}</span>
                 <span className="taskbar-window-title">{window.title}</span>
               </button>
             )

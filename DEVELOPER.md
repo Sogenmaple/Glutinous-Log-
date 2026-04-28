@@ -992,5 +992,25 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 
 ---
 
+### 2026-04-28: 桌面系统 v7.6.2 - 修复按钮换行 + 缩小拉伸手柄
+
+**Bug 修复**:
+- ✅ 修复弹性容器挤压换行：`.header-main` 和 `.nav` 添加 `flex-wrap: nowrap`
+- ✅ 缩小拉伸手柄：从 24×24px 改为 12×12px，简化为单色三角
+- ✅ 减少 iframe padding：从 24px 减到 12px，增加内容可用空间
+
+**技术实现**:
+- `header.css`: `.header-main` 添加 `flex-wrap: nowrap` 防止换行
+- `header.css`: `.nav` 添加 `flex-wrap: nowrap` 防止按钮换行
+- `Desktop.css`: `.resize-handle` 缩小到 12×12px，背景改为 `linear-gradient(135deg, transparent 50%, #1a1a1a 50%)`
+- `Desktop.css`: `.window-content` padding 从 24px 改为 12px
+- `Desktop.css`: `.window-iframe` calc 从 24px 改为 12px
+
+**代码统计**:
+- `Desktop.css`: 拉伸手柄简化，padding 调整
+- `header.css`: 新增 `flex-wrap: nowrap`（2 处）
+
+---
+
 **最后更新**: 2026-04-28  
 **维护者**: AI Assistant

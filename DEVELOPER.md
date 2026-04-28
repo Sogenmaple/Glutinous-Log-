@@ -1012,5 +1012,22 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 
 ---
 
+### 2026-04-28: 桌面系统 v7.6.3 - 修复白色边框 + 拉伸手柄可见性 + 任务栏溢出
+
+**Bug 修复**:
+- ✅ 修复窗口右侧/底部白色边框：iframe 改用 absolute 定位填满内容区
+- ✅ 提高拉伸手柄可见性：增大到 16×16px，添加半透明边框
+- ✅ 隐藏任务栏窗口列表滚动条：保持可滚动但视觉更整洁
+
+**技术实现**:
+- `Desktop.css`: `.window-iframe` 改为 `width: 100%; height: 100%; position: absolute; top: 0; left: 0`
+- `Desktop.css`: `.resize-handle` 增大到 16×16px，背景改为半透明 + 添加边框
+- `Desktop.css`: `.taskbar-windows` 添加 `scrollbar-width: none` 和 `::-webkit-scrollbar { display: none }`
+
+**代码统计**:
+- `Desktop.css`: iframe 定位重构，拉伸手柄样式优化，任务栏滚动条隐藏
+
+---
+
 **最后更新**: 2026-04-28  
 **维护者**: AI Assistant

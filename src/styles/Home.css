@@ -1,0 +1,250 @@
+/* ============================================
+   汤圆的小窝 - 桌面卡片风格首页
+   黑白漫画风格 + 可拖动卡片 + 翻转交互
+   ============================================ */
+
+@import './manga-common.css';
+
+/* ========== 页面基础 ========== */
+.desktop-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.desktop-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - 60px);
+}
+
+/* ========== 桌面标题 ========== */
+.desktop-title {
+  position: fixed;
+  top: 70px;
+  left: 2rem;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.desktop-title h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.desktop-title span {
+  font-size: 0.85rem;
+  color: #666;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+}
+
+/* ========== 卡片基础 ========== */
+.desktop-card {
+  position: absolute;
+  background: #ffffff;
+  border: 4px solid #1a1a1a;
+  box-shadow: 8px 8px 0 #1a1a1a, 12px 12px 0 #444444;
+  cursor: grab;
+  user-select: none;
+  perspective: 1000px;
+  transition: box-shadow 0.15s, transform 0.15s;
+  transform-style: preserve-3d;
+}
+
+.desktop-card:hover {
+  box-shadow: 10px 10px 0 #1a1a1a, 16px 16px 0 #444444;
+}
+
+.desktop-card.dragging {
+  cursor: grabbing;
+  box-shadow: 12px 12px 0 #1a1a1a, 20px 20px 0 #444444;
+  transition: none;
+}
+
+/* ========== 卡片翻转 ========== */
+.desktop-card.flipped {
+  transform: rotate(var(--rotation, 0deg)) rotateY(180deg) !important;
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 4px solid #1a1a1a;
+}
+
+/* ========== 卡片正面 ========== */
+.card-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  filter: grayscale(100%);
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0.5rem 0 0.25rem;
+  letter-spacing: 0.05em;
+}
+
+.card-subtitle {
+  font-size: 0.7rem;
+  color: #888;
+  letter-spacing: 0.15em;
+  font-family: 'Courier New', monospace;
+}
+
+.card-divider {
+  width: 60%;
+  height: 3px;
+  background: #1a1a1a;
+  margin: 0.75rem 0;
+}
+
+.card-desc {
+  font-size: 0.85rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ========== 卡片背面 ========== */
+.card-back-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.card-back-content h3 {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin: 0;
+}
+
+.card-back-content p {
+  font-size: 0.9rem;
+  color: #cccccc;
+  margin: 0;
+}
+
+.card-back-hint {
+  font-size: 0.8rem;
+  color: #888;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.1em;
+  margin-top: 0.5rem;
+}
+
+/* ========== 角落装饰 ========== */
+.card-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 3px solid #1a1a1a;
+}
+
+.card-corner.tl {
+  top: -3px;
+  left: -3px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.card-corner.tr {
+  top: -3px;
+  right: -3px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.card-corner.bl {
+  bottom: -3px;
+  left: -3px;
+  border-right: none;
+  border-top: none;
+}
+
+.card-corner.br {
+  bottom: -3px;
+  right: -3px;
+  border-left: none;
+  border-top: none;
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+  .desktop-title {
+    top: 65px;
+    left: 1rem;
+  }
+
+  .desktop-title h1 {
+    font-size: 1.8rem;
+  }
+
+  .desktop-title span {
+    font-size: 0.7rem;
+  }
+
+  .desktop-card {
+    border-width: 3px;
+    box-shadow: 6px 6px 0 #1a1a1a, 10px 10px 0 #444444;
+  }
+
+  .card-icon {
+    font-size: 2.5rem;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .desktop-title {
+    top: 60px;
+  }
+
+  .desktop-title h1 {
+    font-size: 1.4rem;
+  }
+
+  .card-front,
+  .card-back {
+    padding: 1rem;
+  }
+
+  .card-icon {
+    font-size: 2rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-desc {
+    font-size: 0.75rem;
+  }
+}

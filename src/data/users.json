@@ -132,5 +132,16 @@
     "bio": "游客用户",
     "avatar": "",
     "createdAt": "2026-03-31T06:52:30.646Z"
+  },
+  {
+    "id": "guest_1777215926636_o62g1an6u",
+    "username": "Guest_MOFWH5D8",
+    "email": "Guest_MOFWH5D8@guest.local",
+    "password": "",
+    "role": "guest",
+    "displayName": "Guest_MOFWH5D8",
+    "bio": "游客用户",
+    "avatar": "",
+    "createdAt": "2026-04-26T15:05:26.636Z"
   }
 ]

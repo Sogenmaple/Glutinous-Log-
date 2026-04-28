@@ -11,7 +11,7 @@ import Intro from './components/Intro'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import ArticleEditor from './pages/ArticleEditor'
-import NewspaperHome from './pages/NewspaperHome'
+import Home from './pages/Home'
 import GamesPage from './pages/GamesPage'
 import BlogPage from './pages/BlogPage'
 import AboutPage from './pages/AboutPage'
@@ -29,7 +29,7 @@ import CursorEffect from './components/CursorEffect'
 import './App.css'
 import './styles/intro.css'
 import './styles/cursor.css'
-import './styles/home.css'
+import './styles/Home.css'
 import './styles/special.css'
 import './styles/auth.css'
 import './styles/header.css'
@@ -157,8 +157,8 @@ function AppContent() {
       {/* ScanLines 已禁用 */}
       <CursorEffect />
       <Routes>
-          {/* 主页 - 汤圆的小窝 (报纸风格) */}
-          <Route path="/" element={<NewspaperHome />} />
+          {/* 主页 - 桌面卡片风格 */}
+          <Route path="/" element={<Home />} />
           
           {/* 游戏宇宙 - 展示你的游戏作品 */}
           <Route path="/games" element={<GamesCollection />} />

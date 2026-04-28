@@ -160,23 +160,29 @@
   border-color: #ff0000;
 }
 
-/* 窗口内容 */
+/* 窗口内容 - overflow hidden 防止内容覆盖右下角拉伸手柄 */
 .window-content {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   background: #ffffff;
   min-height: 0;
   position: relative;
+  /* 留出右下角拉伸手柄空间 */
+  padding-right: 12px;
+  padding-bottom: 12px;
+  box-sizing: border-box;
 }
 
 /* 窗口 iframe */
 .window-iframe {
-  width: 100%;
-  height: 100%;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
   border: none;
   display: block;
-  min-height: 100%;
   background: #fff;
+  /* 防止 iframe 内容溢出窗口 */
+  min-width: 0;
+  min-height: 0;
 }
 
 /* 窗口占位 */
@@ -190,16 +196,16 @@
   text-align: center;
 }
 
-/* 窗口拉伸手柄（右下角漫画风格三角） */
+/* 窗口拉伸手柄（右下角小三角） */
 .resize-handle {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 18px;
-  height: 18px;
+  width: 12px;
+  height: 12px;
   cursor: nwse-resize;
-  z-index: 10;
-  background: linear-gradient(135deg, transparent 40%, #1a1a1a 40%, #1a1a1a 48%, transparent 48%, transparent 56%, #1a1a1a 56%, #1a1a1a 64%, transparent 64%, transparent 72%, #1a1a1a 72%, #1a1a1a 80%, transparent 80%);
+  z-index: 9999;
+  background: linear-gradient(135deg, transparent 50%, #1a1a1a 50%);
 }
 
 .resize-handle:hover {

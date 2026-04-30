@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { UserIcon, LoginIcon, SettingsIcon, TomatoIcon, AdminToolsIcon, ReturnIcon } from './icons/SiteIcons'
+import { UserIcon, LoginIcon, TomatoIcon, AdminToolsIcon, ReturnIcon } from './icons/SiteIcons'
 
 export default function Header() {
-  const [expanded, setExpanded] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [user, setUser] = useState(null)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+
+  const handleNavClick = (path) => {
+    navigate(path)
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50)
@@ -58,7 +61,7 @@ export default function Header() {
   }
 
   return (
-    <header className={`header ${scrolled ? 'scrolled' : ''} ${expanded ? 'expanded' : ''}`}>
+    <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-main">
         {/* Logo */}
         <div className="logo" onClick={() => navigate('/')}>
@@ -73,7 +76,7 @@ export default function Header() {
             <button
               key={item.id}
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
-              onClick={() => navigate(item.path)}
+              onClick={() => handleNavClick(item.path)}
             >
               {item.label}
             </button>
@@ -91,7 +94,7 @@ export default function Header() {
                 {user.avatar ? (
                   <img src={user.avatar} alt="头像" className="header-avatar" />
                 ) : (
-                  <UserIcon size={16} />
+                  <UserIcon />
                 )}
               </button>
               
@@ -106,14 +109,14 @@ export default function Header() {
                     navigate('/profile')
                     setShowUserMenu(false)
                   }}>
-                    <UserIcon size={18} />
+                    <UserIcon />
                     <span>个人中心</span>
                   </div>
                   <div className="dropdown-item" onClick={() => {
                     navigate('/special/pomodoro')
                     setShowUserMenu(false)
                   }}>
-                    <TomatoIcon size={18} />
+                    <TomatoIcon />
                     <span>番茄钟</span>
                   </div>
                   {isAdmin && (
@@ -122,21 +125,21 @@ export default function Header() {
                         navigate('/admin/dashboard')
                         setShowUserMenu(false)
                       }}>
-                        <AdminToolsIcon size={18} />
+                        <AdminToolsIcon />
                         <span>后台管理</span>
                       </div>
                       <div className="dropdown-item" onClick={() => {
                         navigate('/')
                         setShowUserMenu(false)
                       }}>
-                        <ReturnIcon size={18} />
+                        <ReturnIcon />
                         <span>返回前端</span>
                       </div>
                     </>
                   )}
                   <div className="dropdown-divider"></div>
                   <div className="dropdown-item" onClick={handleLogout}>
-                    <LoginIcon size={18} />
+                    <LoginIcon />
                     <span>退出登录</span>
                   </div>
                 </div>
@@ -147,20 +150,10 @@ export default function Header() {
               className="login-btn"
               onClick={() => navigate('/login')}
             >
-              <LoginIcon size={16} />
+              <LoginIcon />
             </button>
           )}
         </div>
-
-        {/* 展开/收起按钮 */}
-        <button 
-          className={`expand-btn ${expanded ? 'active' : ''}`}
-          onClick={() => setExpanded(!expanded)}
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
       </div>
 
       {/* 面包屑 */}

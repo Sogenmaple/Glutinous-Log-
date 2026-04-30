@@ -1027,7 +1027,29 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 **代码统计**:
 - `Desktop.css`: iframe 定位重构，拉伸手柄样式优化，任务栏滚动条隐藏
 
+### 2026-04-30: 导航栏自适应方案 - CSS 冲突修复
+
+**问题描述**:
+- `App.css` 里有一整套旧的导航栏样式（`.header`、`.logo`、`.nav-item`、`.user-btn`、`.login-btn`、`.user-dropdown`、`.dropdown-item`）
+- 和 `header.css` 的新样式完全重叠
+- `App.css` 在 `header.css` 之后导入，旧样式覆盖了新样式
+- 导致导航栏等比缩放方案（`--base` 变量方案）不生效
+
+**修复内容**:
+- ✅ 删除 `App.css` 里整个 HEADER 区块（531 行旧样式）
+- ✅ 导航栏样式统一由 `header.css` 管理
+- ✅ 重新构建部署，CSS 文件名已变更
+
+**涉及文件**:
+- `src/App.css`: 删除 531 行冲突样式（2825 行 → 2294 行）
+- `src/styles/header.css`: 导航栏等比缩放方案（`--base` 变量）
+
+**提交记录**:
+- `fix: 导航栏CSS冲突修复 - 删除App.css中重复的旧导航栏样式(531行)`
+
+**教训**: 修改样式前先检查是否有重复定义的选择器，避免 CSS 冲突
+
 ---
 
-**最后更新**: 2026-04-28  
+**最后更新**: 2026-04-30  
 **维护者**: AI Assistant

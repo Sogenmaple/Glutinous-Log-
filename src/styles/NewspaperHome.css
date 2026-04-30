@@ -116,6 +116,254 @@
   }
 }
 
+/* ========== 响应式 - 移动端（≤ 768px） ========== */
+@media (max-width: 768px) {
+  .manga-home-container {
+    padding: 1.5rem 1.2rem;
+  }
+
+  .manga-home-masthead {
+    padding: 1.2rem 1.5rem;
+    margin: -1.5rem -1.2rem 1.5rem -1.2rem;
+  }
+
+  .manga-home-masthead-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .manga-home-masthead-right {
+    align-items: flex-start;
+  }
+
+  .manga-home-ring-clock {
+    width: 50px;
+    height: 50px;
+  }
+
+  .manga-home-main-title {
+    font-size: 1.6rem !important;
+  }
+
+  .manga-home-subtitle {
+    font-size: 0.65rem !important;
+  }
+
+  .manga-home-date {
+    font-size: 0.7rem !important;
+  }
+
+  .manga-home-issue {
+    font-size: 0.65rem !important;
+  }
+
+  /* 左侧统计栏：横向排列 */
+  .manga-home-sidebar-left {
+    flex-direction: row;
+    gap: 0.6rem;
+  }
+
+  .manga-home-stat-card {
+    flex: 1;
+    min-width: 80px;
+    padding: 0.8rem;
+  }
+
+  .manga-home-stat-num {
+    font-size: 1.8rem !important;
+  }
+
+  .manga-home-stat-label {
+    font-size: 0.65rem !important;
+  }
+
+  .manga-home-card-header {
+    font-size: 0.6rem !important;
+    gap: 0.3rem;
+  }
+
+  /* 中央卡片：单列 */
+  .manga-home-channels {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .manga-home-channel {
+    padding: 1.5rem !important;
+    min-height: 200px !important;
+  }
+
+  .manga-home-channel-icon {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .manga-home-channel-title-cn {
+    font-size: 1.3rem !important;
+  }
+
+  .manga-home-channel-title-en {
+    font-size: 0.6rem !important;
+  }
+
+  .manga-home-channel-desc {
+    font-size: 0.85rem !important;
+  }
+
+  .manga-home-tag {
+    font-size: 0.6rem !important;
+    padding: 0.25rem 0.6rem !important;
+  }
+
+  /* 右侧社交栏：移到卡片下方 */
+  .manga-home-sidebar-right {
+    display: flex;
+    flex-direction: row;
+    gap: 0.8rem;
+  }
+
+  .manga-home-social-card,
+  .manga-home-tech-card {
+    flex: 1;
+    padding: 1rem;
+  }
+
+  .manga-home-social-item {
+    font-size: 0.7rem !important;
+    padding: 0.3rem 0 !important;
+  }
+
+  .manga-home-tech-tag {
+    font-size: 0.6rem !important;
+    padding: 0.2rem 0.5rem !important;
+  }
+
+  /* 底部 */
+  .manga-home-footer-content {
+    padding: 1rem 0;
+  }
+
+  .manga-home-footer-line {
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.6rem !important;
+  }
+
+  .manga-home-sep {
+    display: none;
+  }
+
+  .manga-home-icp a {
+    font-size: 0.6rem !important;
+  }
+}
+
+/* ========== 响应式 - 小屏手机（≤ 480px） ========== */
+@media (max-width: 480px) {
+  .manga-home-container {
+    padding: 1rem 0.8rem;
+  }
+
+  .manga-home-masthead {
+    padding: 1rem 1rem;
+    margin: -1rem -0.8rem 1.2rem -0.8rem;
+  }
+
+  .manga-home-ring-clock {
+    width: 40px;
+    height: 40px;
+  }
+
+  .manga-home-main-title {
+    font-size: 1.3rem !important;
+  }
+
+  .manga-home-subtitle {
+    font-size: 0.55rem !important;
+  }
+
+  .manga-home-date {
+    font-size: 0.6rem !important;
+  }
+
+  /* 统计卡片：纵向堆叠 */
+  .manga-home-sidebar-left {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .manga-home-stat-card {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .manga-home-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .manga-home-stat-num {
+    font-size: 1.5rem !important;
+  }
+
+  .manga-home-stat-label {
+    font-size: 0.6rem !important;
+  }
+
+  /* 卡片更小 */
+  .manga-home-channel {
+    padding: 1.2rem !important;
+    min-height: 180px !important;
+  }
+
+  .manga-home-channel-icon {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .manga-home-channel-title-cn {
+    font-size: 1.1rem !important;
+  }
+
+  .manga-home-channel-title-en {
+    font-size: 0.55rem !important;
+  }
+
+  .manga-home-channel-desc {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.8rem;
+  }
+
+  .manga-home-tag {
+    font-size: 0.55rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+
+  /* 社交和技术卡片：纵向堆叠 */
+  .manga-home-sidebar-right {
+    flex-direction: column;
+  }
+
+  .manga-home-social-card,
+  .manga-home-tech-card {
+    flex: 0 0 auto;
+  }
+
+  /* 底部 */
+  .manga-home-footer-line {
+    font-size: 0.5rem !important;
+  }
+
+  .manga-home-icp a {
+    font-size: 0.5rem !important;
+  }
+}
+
 /* ========== 响应式 - 大屏优化 ========== */
 @media (min-width: 1920px) {
   .manga-home-channel {

@@ -28,6 +28,7 @@ const DESKTOP_ICONS = [
   { id: 'profile', name: '个人中心', symbol: 'U', route: '/profile' },
   { id: 'login', name: '登录', symbol: 'L', route: '/login' },
   { id: 'register', name: '注册', symbol: 'R', route: '/register' },
+  { id: 'spotlight', name: '聚光灯遮罩', symbol: '◎', route: '/downloads/spotlight-overlay.exe', download: true },
   { id: 'explorer', name: '资源管理器', symbol: 'E', route: null },
   { id: 'settings', name: '设置', symbol: 'C', route: null },
   { id: 'terminal', name: '终端', symbol: '$', route: null },
@@ -69,16 +70,29 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, ch
 
   useEffect(() => {
     if (!isDragging) return
+    // 锁定光标并禁用 iframe 鼠标事件，防止光标进入 iframe 内部
+    const iframes = document.querySelectorAll('.window-iframe')
+    iframes.forEach(f => { f.style.pointerEvents = 'none' })
+    document.body.style.cursor = 'move'
+    document.body.style.userSelect = 'none'
     const handleMouseMove = (e) => {
       windowRef.current.style.left = Math.max(0, e.clientX - dragOffset.x) + 'px'
       windowRef.current.style.top = Math.max(0, e.clientY - dragOffset.y) + 'px'
     }
-    const handleMouseUp = () => setIsDragging(false)
+    const handleMouseUp = () => {
+      setIsDragging(false)
+      iframes.forEach(f => { f.style.pointerEvents = '' })
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
+      iframes.forEach(f => { f.style.pointerEvents = '' })
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
     }
   }, [isDragging, dragOffset])
 
@@ -94,6 +108,11 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, ch
 
   useEffect(() => {
     if (!isResizing) return
+    // 锁定光标并禁用 iframe 鼠标事件，防止光标进入 iframe 内部
+    const iframes = document.querySelectorAll('.window-iframe')
+    iframes.forEach(f => { f.style.pointerEvents = 'none' })
+    document.body.style.cursor = 'nwse-resize'
+    document.body.style.userSelect = 'none'
     const handleMouseMove = (e) => {
       const dx = e.clientX - resizeStart.x
       const dy = e.clientY - resizeStart.y
@@ -104,6 +123,9 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, ch
     }
     const handleMouseUp = () => {
       setIsResizing(false)
+      iframes.forEach(f => { f.style.pointerEvents = '' })
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
       // 更新状态
       const rect = windowRef.current.getBoundingClientRect()
       onResize && onResize(window.id, Math.round(rect.width), Math.round(rect.height))
@@ -113,6 +135,9 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, ch
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
+      iframes.forEach(f => { f.style.pointerEvents = '' })
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
     }
   }, [isResizing, resizeStart, window.id, onResize])
 
@@ -416,6 +441,17 @@ export default function Desktop() {
 
     if (!icon) return
 
+    // 处理下载链接
+    if (icon.download && icon.route) {
+      const a = document.createElement('a')
+      a.href = icon.route
+      a.download = icon.route.split('/').pop()
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      return
+    }
+
     const existing = windows.find(w => w.appId === icon.id)
     if (existing) {
       setWindows(prev => prev.map(w =>
@@ -436,6 +472,7 @@ export default function Desktop() {
       profile: '个人中心',
       login: '登录',
       register: '注册',
+      spotlight: '聚光灯遮罩',
       explorer: '资源管理器',
       settings: '设置',
       terminal: '终端',

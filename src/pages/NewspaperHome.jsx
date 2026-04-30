@@ -7,6 +7,7 @@ import {
 } from '../components/icons/SiteIcons'
 import Header from '../components/Header'
 import '../styles/NewspaperHome.css'
+import '../styles/MobileHome.css'
 
 /**
  * 汤圆的小窝 - 黑白漫画风格首页
@@ -17,11 +18,17 @@ export default function NewspaperHome() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [mounted, setMounted] = useState(false)
   const [hoveredChannel, setHoveredChannel] = useState(null)
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
 
   useEffect(() => {
     setMounted(true)
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
-    return () => clearInterval(timer)
+    const handleResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handleResize)
+    return () => {
+      clearInterval(timer)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
   // 四个核心版块 - 汤圆主题
@@ -84,6 +91,69 @@ export default function NewspaperHome() {
   const secondAngle = (seconds / 60) * 360
   const minuteAngle = ((minutes + seconds / 60) / 60) * 360
   const hourAngle = ((hours + minutes / 60) / 12) * 360
+
+  // 移动端布局 - 手机系统风格
+  if (isMobile) {
+    return (
+      <div className="mobile-home-page">
+        <Header />
+        
+        <div className="mobile-home-container">
+          {/* 状态栏 */}
+          <div className="mobile-status-bar">
+            <span className="time">{currentTime.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
+            <span className="date">{currentTime.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' })}</span>
+          </div>
+
+          {/* 标题 */}
+          <div className="mobile-home-title">
+            <h1>湯圓的小窩</h1>
+            <span className="subtitle">TANGYUAN'S CREATIVE CORNER</span>
+          </div>
+
+          {/* App 图标网格 */}
+          <div className="app-grid">
+            {mainChannels.map((channel) => {
+              const IconComp = channel.icon
+              return (
+                <div
+                  key={channel.id}
+                  className="app-icon-wrapper"
+                  onClick={() => navigate(channel.path)}
+                >
+                  <div className="app-icon" style={{ background: channel.color }}>
+                    <IconComp size={36} color="white" />
+                  </div>
+                  <span className="app-name">{channel.title}</span>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Dock 栏 */}
+          <div className="mobile-dock">
+            {socialLinks.map((link, i) => {
+              const LinkIcon = link.icon
+              return (
+                <a
+                  key={i}
+                  href={link.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="dock-item"
+                >
+                  <div className="dock-icon">
+                    <LinkIcon size={24} />
+                  </div>
+                  <span className="dock-name">{link.name}</span>
+                </a>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="manga-home-page">

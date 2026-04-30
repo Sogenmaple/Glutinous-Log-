@@ -387,6 +387,7 @@
 
 /* ========== 社交卡片 ========== */
 .manga-home-social-card,
+.manga-home-tech-card,
 .manga-tech-card {
   background: #f5f5f5;
   border: 4px solid #000000;
@@ -394,6 +395,7 @@
 }
 
 .manga-home-social-card .manga-home-card-header,
+.manga-home-tech-card .manga-home-card-header,
 .manga-tech-card .manga-card-header {
   color: #000000;
   justify-content: flex-start;
@@ -403,6 +405,7 @@
 }
 
 .manga-home-social-card .manga-home-card-header svg,
+.manga-home-tech-card .manga-home-card-header svg,
 .manga-tech-card .manga-card-header svg {
   color: #000000;
 }
@@ -447,6 +450,31 @@
 
 .manga-home-social-item:hover .manga-home-social-arrow {
   transform: translateX(3px);
+}
+
+/* ========== 技术标签 ========== */
+.manga-home-tech-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.manga-home-tech-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #000000 !important;
+  background: #ffffff !important;
+  padding: 0.2rem 0.5rem;
+  border: 2px solid #000000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.15s;
+}
+
+.manga-home-tech-tag:hover {
+  background: #000000 !important;
+  color: #ffffff !important;
 }
 
 /* ========== 页脚 ========== */
@@ -652,6 +680,17 @@
   .manga-home-channel-title-cn,
   .manga-game-card-title {
     font-size: 1.2rem;
+  }
+
+  .manga-home-social-card,
+  .manga-home-tech-card,
+  .manga-tech-card {
+    padding: 0.8rem;
+  }
+
+  .manga-home-social-item {
+    font-size: 0.6rem;
+    padding: 0.4rem 0.5rem;
   }
 }
 

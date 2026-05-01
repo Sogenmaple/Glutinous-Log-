@@ -17,19 +17,7 @@
   overflow-x: hidden;
 }
 
-/* 漫画网点背景 - 更密集 */
-.manga-halftone {
-  position: fixed;
-  inset: 0;
-  background-image: 
-    radial-gradient(#000000 1px, transparent 1px),
-    radial-gradient(#000000 1px, transparent 1px);
-  background-size: 6px 6px, 12px 12px;
-  background-position: 0 0, 3px 3px;
-  opacity: 0.12;
-  pointer-events: none;
-  z-index: 0;
-}
+/* 漫画网点背景 - 已废弃：统一使用 manga-common.css 中的动画网点 */
 
 /* 集中线背景 */
 .manga-concentration {

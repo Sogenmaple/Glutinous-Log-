@@ -16,20 +16,7 @@
   scroll-behavior: smooth;
 }
 
-/* ========== 半色调背景动画 ========== */
-.manga-halftone {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
-  background-size: 30px 30px;
-  pointer-events: none;
-  z-index: 0;
-  animation: halftoneFloat 15s ease-in-out infinite;
-}
+/* 半色调背景 - 已废弃：统一使用 manga-common.css 中的动画网点 */
 
 @keyframes halftoneFloat {
   0%, 100% { transform: translateY(0) rotate(0deg); }

@@ -103,6 +103,48 @@
   /* 允许拉伸手柄溢出到窗口外部 */
   overflow: visible;
   box-sizing: border-box;
+  /* 窗口动画 */
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 最小化动画：缩小到底部 */
+.desktop-window.minimizing {
+  transform: scale(0.3) translateY(100vh);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 打开动画：从底部放大 */
+.desktop-window.opening {
+  animation: windowOpen 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* 关闭动画：缩小消失 */
+.desktop-window.closing {
+  animation: windowClose 0.2s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes windowOpen {
+  0% {
+    transform: scale(0.5) translateY(50px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes windowClose {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
 }
 
 .desktop-window.minimized {

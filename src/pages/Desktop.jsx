@@ -48,7 +48,7 @@ const PATH_MAP = {
 }
 
 // 窗口组件
-function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, children }) {
+function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, animState, children }) {
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [isResizing, setIsResizing] = useState(false)
@@ -146,7 +146,7 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, ch
   return (
     <div
       ref={windowRef}
-      className={`desktop-window ${window.isMinimized ? 'minimized' : ''}`}
+      className={`desktop-window ${window.isMinimized ? 'minimized' : ''} ${animState || ''}`}
       style={{
         left: window.x,
         top: window.y,
@@ -395,6 +395,7 @@ export default function Desktop() {
   const [selectedIcon, setSelectedIcon] = useState(null)
   const [contextMenu, setContextMenu] = useState(null)
   const [iconPositions, setIconPositions] = useState({})
+  const [animatingWindows, setAnimatingWindows] = useState({}) // { windowId: 'opening'|'closing'|'minimizing' }
   const wasDraggedRef = useRef(false)
 
   // 如果在 iframe 中，桌面页面不渲染（避免桌面嵌套桌面）
@@ -492,16 +493,43 @@ export default function Desktop() {
 
     setWindows(prev => [...prev, newWindow])
     setZIndexCounter(prev => prev + 1)
+    // 打开动画
+    setAnimatingWindows(prev => ({ ...prev, [windowId]: 'opening' }))
+    setTimeout(() => {
+      setAnimatingWindows(prev => {
+        const next = { ...prev }
+        delete next[windowId]
+        return next
+      })
+    }, 300)
   }, [windows, zIndexCounter])
 
   const closeWindow = useCallback((windowId) => {
-    setWindows(prev => prev.filter(w => w.id !== windowId))
+    // 关闭动画
+    setAnimatingWindows(prev => ({ ...prev, [windowId]: 'closing' }))
+    setTimeout(() => {
+      setWindows(prev => prev.filter(w => w.id !== windowId))
+      setAnimatingWindows(prev => {
+        const next = { ...prev }
+        delete next[windowId]
+        return next
+      })
+    }, 200)
   }, [])
 
   const minimizeWindow = useCallback((windowId) => {
-    setWindows(prev => prev.map(w =>
-      w.id === windowId ? { ...w, isMinimized: true } : w
-    ))
+    // 最小化动画
+    setAnimatingWindows(prev => ({ ...prev, [windowId]: 'minimizing' }))
+    setTimeout(() => {
+      setWindows(prev => prev.map(w =>
+        w.id === windowId ? { ...w, isMinimized: true } : w
+      ))
+      setAnimatingWindows(prev => {
+        const next = { ...prev }
+        delete next[windowId]
+        return next
+      })
+    }, 250)
   }, [])
 
   const focusWindow = useCallback((windowId) => {
@@ -536,7 +564,22 @@ export default function Desktop() {
     return () => document.removeEventListener('click', handleClick)
   }, [])
 
-  // 桌面图标拖拽（Windows 风格：按下记录起点，移动超过阈值视为拖拽）
+  // 网格吸附参数
+  const GRID_SIZE = 80 // 网格间距
+  const GRID_TOP = 70  // 顶部起始位置
+  const GRID_LEFT = 20 // 左侧起始位置
+
+  // 吸附到网格
+  const snapToGrid = useCallback((x, y) => {
+    const col = Math.round((x - GRID_LEFT) / GRID_SIZE)
+    const row = Math.round((y - GRID_TOP) / GRID_SIZE)
+    return {
+      x: GRID_LEFT + Math.max(0, col) * GRID_SIZE,
+      y: GRID_TOP + Math.max(0, row) * GRID_SIZE,
+    }
+  }, [])
+
+  // 桌面图标拖拽（Windows 风格：按下记录起点，移动超过阈值视为拖拽，松手后吸附到网格）
   const handleIconMouseDown = useCallback((e, iconId) => {
     e.preventDefault()
     const startX = e.clientX
@@ -556,13 +599,11 @@ export default function Desktop() {
       document.removeEventListener('mouseup', handleMouseUp)
 
       if (wasDraggedRef.current) {
-        // 拖拽：更新位置
+        // 拖拽：吸附到网格
+        const snapped = snapToGrid(e.clientX - 35, e.clientY - 40)
         setIconPositions(prev => ({
           ...prev,
-          [iconId]: {
-            x: Math.max(0, e.clientX - 35),
-            y: Math.max(60, e.clientY - 40),
-          }
+          [iconId]: snapped,
         }))
       }
       // 否则视为点击，由 onClick 处理
@@ -570,7 +611,7 @@ export default function Desktop() {
 
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
-  }, [])
+  }, [snapToGrid])
 
   // 桌面图标点击
   const handleIconClick = useCallback((icon) => {
@@ -632,6 +673,7 @@ export default function Desktop() {
               onFocus={focusWindow}
               onNavigate={handleNavigate}
               onResize={handleResize}
+              animState={animatingWindows[window.id]}
             >
               {window.appId === 'explorer' && <Explorer openWindow={openWindow} />}
               {window.appId === 'terminal' && <Terminal openWindow={openWindow} />}
@@ -689,8 +731,18 @@ export default function Desktop() {
                 onClick={() => {
                   if (window.isMinimized) {
                     setWindows(prev => prev.map(w =>
-                      w.id === window.id ? { ...w, isMinimized: false } : w
+                      w.id === window.id ? { ...w, isMinimized: false, zIndex: zIndexCounter + 1 } : w
                     ))
+                    setZIndexCounter(prev => prev + 1)
+                    // 恢复动画
+                    setAnimatingWindows(prev => ({ ...prev, [window.id]: 'opening' }))
+                    setTimeout(() => {
+                      setAnimatingWindows(prev => {
+                        const next = { ...prev }
+                        delete next[window.id]
+                        return next
+                      })
+                    }, 300)
                   } else {
                     minimizeWindow(window.id)
                   }

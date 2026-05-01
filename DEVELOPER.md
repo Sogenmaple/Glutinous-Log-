@@ -121,7 +121,8 @@ tangyuan-games/
 src/styles/
 ├── 📖 通用样式库 (必须优先导入)
 │   ├── manga-common.css    # ⭐ 漫画风格通用样式 (664 行)
-│   │   ├── 网点背景 (.manga-halftone)
+│   │   ├── 网点背景 (.manga-halftone) - 其他页面使用
+│   │   ├── 首页网点已改为 Canvas 粒子系统 (MangaHalftoneCanvas)
 │   │   ├── 报头样式 (.manga-masthead)
 │   │   ├── 环形钟 (.manga-ring-clock)
 │   │   ├── 统计卡片 (.manga-stat-card)
@@ -145,7 +146,7 @@ src/styles/
 │       └── 工具类 (.hidden-sm, .visible-md)
 │
 ├── 📄 页面样式 (已统一为黑白漫画风格 ✅)
-│   ├── NewspaperHome.css   # 首页 (180 行，精简 76%) ✅
+│   ├── NewspaperHome.css   # 首页 (~190 行，含 Canvas 网点样式) ✅
 │   ├── GamesCollection.css # 游戏宇宙 (340 行，精简 58%) ✅
 │   ├── MangaBlog.css       # 博客页面 (884 行，精简 32%) ✅
 │   ├── MangaGames.css      # 游戏大厅 (723 行) ✅
@@ -499,6 +500,16 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 ---
 
 ## 🧹 CSS 清理记录
+
+### 2026-07-10: 首页网点改为 Canvas 粒子系统
+
+**首页网点升级**:
+- ✅ `NewspaperHome.jsx`: 新增 `MangaHalftoneCanvas` 组件，使用 Canvas 粒子系统
+- ✅ 三层随机点阵（大1px/中0.7px/小0.5px），透明度0.15
+- ✅ 对角线流动效果：粒子从左上角随机生成，向右下角移动，3秒穿过屏幕
+- ✅ 响应式：窗口resize时重新调整canvas
+- ✅ 其他页面（GamesPage/Desktop/Home/GameDetail/Snake/GamesCollection）保持原有CSS网点背景
+- ✅ `NewspaperHome.css`: 新增 `.manga-halftone-canvas` 样式（fixed定位，z-index:0）
 
 ### 2026-03-31: 全站风格统一 + 代码清理
 

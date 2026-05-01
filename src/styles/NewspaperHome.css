@@ -9,6 +9,15 @@
 /* ========== 页面特定样式 ========== */
 /* 页面基础已在 manga-common.css 中定义 */
 
+/* ========== 漫画网点 Canvas 动画背景 ========== */
+.manga-halftone-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 1;
+}
+
 /* ========== 主布局 - 三栏 ========== */
 .manga-home-main {
   display: grid;

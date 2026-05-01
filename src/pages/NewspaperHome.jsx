@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { 
   GameIcon, BookIcon, UserIcon, ToolIcon,
@@ -8,6 +8,118 @@ import {
 import Header from '../components/Header'
 import '../styles/NewspaperHome.css'
 import '../styles/MobileHome.css'
+
+/**
+ * 漫画网点 Canvas 粒子系统
+ * 三层随机点阵，对角线流动效果（左上→右下）
+ */
+function MangaHalftoneCanvas() {
+  const canvasRef = useRef(null)
+  const animFrameRef = useRef(null)
+  const particlesRef = useRef([])
+
+  // 粒子大小分类
+  const SIZES = [
+    { size: 1.0, weight: 1 },   // 大点
+    { size: 0.7, weight: 1 },   // 中点
+    { size: 0.5, weight: 1 },   // 小点
+  ]
+  const OPACITY = 0.15
+
+  // 3秒穿过屏幕的速度
+  const CROSS_TIME = 3 // seconds
+
+  const createParticle = useCallback((w, h) => {
+    const sizeEntry = SIZES[Math.floor(Math.random() * SIZES.length)]
+    // 对角线速度：沿 45° 方向，速度由屏幕对角线长度决定
+    const diagonal = Math.sqrt(w * w + h * h)
+    const speed = diagonal / (CROSS_TIME * 60) // pixels per frame at 60fps
+    return {
+      x: Math.random() * (w + 100) - 50,
+      y: Math.random() * (h + 100) - 50,
+      size: sizeEntry.size,
+      speed,
+      opacity: OPACITY,
+    }
+  }, [])
+
+  const initParticles = useCallback((w, h) => {
+    // 密度：每 200px² 一个点
+    const area = w * h
+    const count = Math.floor(area / 200)
+    const particles = []
+    for (let i = 0; i < count; i++) {
+      particles.push(createParticle(w, h))
+    }
+    return particles
+  }, [createParticle])
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const ctx = canvas.getContext('2d')
+
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1
+      canvas.width = window.innerWidth * dpr
+      canvas.height = window.innerHeight * dpr
+      canvas.style.width = `${window.innerWidth}px`
+      canvas.style.height = `${window.innerHeight}px`
+      ctx.scale(dpr, dpr)
+      particlesRef.current = initParticles(window.innerWidth, window.innerHeight)
+    }
+
+    resize()
+    window.addEventListener('resize', resize)
+
+    const animate = () => {
+      const w = window.innerWidth
+      const h = window.innerHeight
+      const particles = particlesRef.current
+
+      ctx.clearRect(0, 0, w, h)
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+        // 沿对角线移动（右下 45°）
+        p.x += p.speed
+        p.y += p.speed
+
+        // 超出右下角区域 → 回收
+        if (p.x > w + 50 || p.y > h + 50) {
+          particles[i] = createParticle(w, h)
+        }
+      }
+
+      // 批量绘制
+      ctx.fillStyle = `rgba(0, 0, 0, ${OPACITY})`
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+      }
+
+      animFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    animFrameRef.current = requestAnimationFrame(animate)
+
+    return () => {
+      window.removeEventListener('resize', resize)
+      cancelAnimationFrame(animFrameRef.current)
+    }
+  }, [initParticles, createParticle])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="manga-halftone-canvas"
+      aria-hidden="true"
+    />
+  )
+}
 
 /**
  * 汤圆的小窝 - 黑白漫画风格首页
@@ -157,8 +269,8 @@ export default function NewspaperHome() {
 
   return (
     <div className="manga-home-page">
-      {/* 漫画网点背景 */}
-      <div className="manga-halftone"></div>
+      {/* 漫画网点 Canvas 动画背景 */}
+      <MangaHalftoneCanvas />
       
       <Header />
       

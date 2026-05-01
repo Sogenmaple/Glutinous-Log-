@@ -4,30 +4,30 @@
    ============================================ */
 
 /* ========== 漫画网点背景 - 通用（动态无缝移动） ========== */
+/* 整齐网格：单一大小圆点，等间距排列 */
 .manga-halftone {
   position: fixed;
   inset: 0;
-  background-image: 
-    radial-gradient(circle, #000000 1px, transparent 1px),
-    radial-gradient(circle, #000000 0.7px, transparent 0.7px),
-    radial-gradient(circle, #000000 0.5px, transparent 0.5px);
-  background-size: 24px 24px, 16px 16px, 8px 8px;
-  background-position: 0 0, 8px 8px, 4px 4px;
-  opacity: 0.15;
+  /* 单一图层，圆点半径 3px，间距 20px */
+  background-image: radial-gradient(circle, #000000 3px, transparent 3px);
+  background-size: 20px 20px;
+  background-position: 0 0;
+  opacity: 0.2;
   pointer-events: none;
   z-index: 0;
-  animation: manga-dot-drift 8s linear infinite;
+  /* 0.8 秒完成一个周期，速度超快 */
+  animation: manga-dot-drift 0.8s linear infinite;
 }
 
 /* 网点向右下角无限循环无缝移动
- * 每层移动距离 = background-size 的整数倍 = LCM(24,16,8) = 48px
- * 这样所有图层同时回到起始位置，完美无缝 */
+ * 移动距离 = background-size 的整数倍 = 20px
+ * 0.8 秒完成一个周期，视觉上快速流动 */
 @keyframes manga-dot-drift {
   0% {
-    background-position: 0 0, 8px 8px, 4px 4px;
+    background-position: 0 0;
   }
   100% {
-    background-position: 48px 48px, 56px 56px, 52px 52px;
+    background-position: 20px 20px;
   }
 }
 

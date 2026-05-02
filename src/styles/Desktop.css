@@ -902,22 +902,6 @@
   white-space: nowrap;
 }
 
-/* 任务栏软体生物 */
-.mascot-container {
-  position: fixed;
-  bottom: 48px;
-  left: 50%;
-  z-index: 9999;
-  pointer-events: none;
-  /* 不用 transition，直接用 JS 设置位置 */
-}
-
-.mascot-canvas {
-  width: 120px;
-  height: 120px;
-  image-rendering: auto;
-}
-
 /* 系统托盘 */
 .taskbar-tray {
   display: flex;

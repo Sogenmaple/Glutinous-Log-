@@ -189,6 +189,102 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, on
   )
 }
 
+// 反相窗口 - 整个窗口容器使用 mix-blend-mode 反相下方内容
+function InvertWindowContainer({ window: win, onClose, onMinimize, onFocus, onResize, onToggleMaximize, animState, children }) {
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [isResizing, setIsResizing] = useState(false)
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, w: 0, h: 0 })
+  const [wasMaximized, setWasMaximized] = useState(false)
+  const windowRef = useRef(null)
+
+  const handleMouseDown = useCallback((e) => {
+    if (e.target.closest('.window-controls') || e.target.closest('.resize-handle')) return
+    e.stopPropagation()
+    setIsDragging(true)
+    const rect = windowRef.current?.getBoundingClientRect()
+    if (rect) setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+    onFocus(win.id)
+  }, [win.id, onFocus])
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      const x = Math.max(0, e.clientX - dragOffset.x)
+      const y = Math.max(0, e.clientY - dragOffset.y)
+      onResize(win.id, x, y, win.width, win.height)
+    }
+    if (isResizing) {
+      const newW = Math.max(200, resizeStart.w + (e.clientX - resizeStart.x))
+      const newH = Math.max(120, resizeStart.h + (e.clientY - resizeStart.y))
+      onResize(win.id, win.x, win.y, newW, newH)
+    }
+  }, [isDragging, isResizing, dragOffset, resizeStart, win, onResize])
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false)
+    setIsResizing(false)
+  }, [])
+
+  const handleResizeMouseDown = useCallback((e) => {
+    e.stopPropagation()
+    setIsResizing(true)
+    const rect = windowRef.current?.getBoundingClientRect()
+    if (rect) setResizeStart({ x: e.clientX, y: e.clientY, w: rect.width, h: rect.height })
+  }, [])
+
+  useEffect(() => {
+    if (isDragging || isResizing) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.userSelect = 'none'
+      document.body.style.cursor = isResizing ? 'nwse-resize' : 'move'
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.userSelect = ''
+      document.body.style.cursor = ''
+    }
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp])
+
+  const handleMaximizeToggle = useCallback(() => {
+    onToggleMaximize(win.id)
+  }, [win.id, onToggleMaximize])
+
+  const animClass = animState ? ` ${animState}` : ''
+  const icon = DESKTOP_ICONS.find(i => i.id === win.appId)
+
+  return (
+    <div
+      ref={windowRef}
+      className={`desktop-window invert-window-container${animClass}${win.isMaximized ? ' maximized' : ''}${win.isMinimized ? ' minimized' : ''}`}
+      style={{
+        left: win.x + 'px',
+        top: win.y + 'px',
+        width: win.width + 'px',
+        height: win.height + 'px',
+        zIndex: win.zIndex,
+        pointerEvents: 'auto',
+      }}
+      onMouseDown={handleMouseDown}
+    >
+      <div className="window-titlebar">
+        <span className="window-icon">{icon?.symbol || '?'}</span>
+        <span className="window-title">{win.title}</span>
+        <div className="window-controls">
+          <button className="window-btn minimize" onClick={() => onMinimize(win.id)} title="最小化">_</button>
+          <button className="window-btn maximize" onClick={handleMaximizeToggle} title={win.isMaximized ? '还原' : '最大化'}>□</button>
+          <button className="window-btn close" onClick={() => onClose(win.id)} title="关闭">X</button>
+        </div>
+      </div>
+      <div className="window-content invert-content">
+        {children}
+      </div>
+      <div className="resize-handle" onMouseDown={handleResizeMouseDown}></div>
+    </div>
+  )
+}
+
 // 资源管理器组件
 function Explorer({ openWindow }) {
   const [addressInput, setAddressInput] = useState('/')
@@ -812,8 +908,9 @@ export default function Desktop() {
       <div className="desktop-windows">
         {windows.map(window => {
           const icon = getWindowIcon(window.appId)
+          const WindowComponent = window.appId === 'invert' ? InvertWindowContainer : Window
           return (
-            <Window
+            <WindowComponent
               key={window.id}
               window={window}
               onClose={closeWindow}
@@ -837,7 +934,7 @@ export default function Desktop() {
                   sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                 />
               )}
-            </Window>
+            </WindowComponent>
           )
         })}
       </div>

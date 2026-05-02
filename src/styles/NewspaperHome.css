@@ -9,6 +9,25 @@
 /* ========== 页面特定样式 ========== */
 /* 页面基础已在 manga-common.css 中定义 */
 
+/* ========== 拖拽排序样式 ========== */
+.manga-home-channel.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+.manga-home-channel.drop-target {
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+.manga-home-channel[draggable="true"] {
+  cursor: grab;
+}
+
+.manga-home-channel[draggable="true"]:active {
+  cursor: grabbing;
+}
+
 /* ========== 漫画网点 Canvas 动画背景 ========== */
 .manga-halftone-canvas {
   position: fixed;

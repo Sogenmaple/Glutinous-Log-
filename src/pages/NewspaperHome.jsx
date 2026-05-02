@@ -131,6 +131,52 @@ export default function NewspaperHome() {
   const [mounted, setMounted] = useState(false)
   const [hoveredChannel, setHoveredChannel] = useState(null)
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+  
+  // 拖拽排序状态
+  const [channels, setChannels] = useState([
+    {
+      id: 'games',
+      title: '汤圆的作品集',
+      subtitle: "TANGYUAN'S PORTFOLIO",
+      desc: '创意是生活的燃料 · 独立游戏作品展示',
+      icon: 'GameIcon',
+      path: '/games',
+      color: 'black',
+      tags: ['CiGA', 'GGJ', '聚光灯', '独立游戏']
+    },
+    {
+      id: 'special',
+      title: '汤圆的工具',
+      subtitle: "TANGYUAN'S TOOLS",
+      desc: '总有些美味的怪诞 · 实用工具与休闲游戏',
+      icon: 'ToolIcon',
+      path: '/special',
+      color: 'black',
+      tags: ['番茄钟', '计算器', '扫雷', '贪吃蛇']
+    },
+    {
+      id: 'blog',
+      title: '汤圆的博客',
+      subtitle: "TANGYUAN'S BLOG",
+      desc: '游戏 · 生活 · 随笔 · 技术分享',
+      icon: 'BookIcon',
+      path: '/blog',
+      color: 'black',
+      tags: ['项目', '技术', '设计', '随笔']
+    },
+    {
+      id: 'about',
+      title: '汤圆的关于',
+      subtitle: 'ABOUT TANGYUAN',
+      desc: '开发者信息 · 联系方式 · 社交网络',
+      icon: 'UserIcon',
+      path: '/about',
+      color: 'black',
+      tags: ['技能', '联系', '社交', '更多']
+    }
+  ])
+  const [dragIndex, setDragIndex] = useState(null)
+  const [dropIndex, setDropIndex] = useState(null)
 
   useEffect(() => {
     setMounted(true)
@@ -142,6 +188,40 @@ export default function NewspaperHome() {
       window.removeEventListener('resize', handleResize)
     }
   }, [])
+
+  // 拖拽处理函数
+  const handleDragStart = (index) => {
+    setDragIndex(index)
+  }
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault()
+    if (index !== dragIndex) {
+      setDropIndex(index)
+    }
+  }
+
+  const handleDragLeave = () => {
+    setDropIndex(null)
+  }
+
+  const handleDrop = (e, dropIdx) => {
+    e.preventDefault()
+    if (dragIndex === null || dragIndex === dropIdx) return
+    
+    // 交换位置
+    const newChannels = [...channels]
+    const [draggedItem] = newChannels.splice(dragIndex, 1)
+    newChannels.splice(dropIdx, 0, draggedItem)
+    setChannels(newChannels)
+    setDragIndex(null)
+    setDropIndex(null)
+  }
+
+  const handleDragEnd = () => {
+    setDragIndex(null)
+    setDropIndex(null)
+  }
 
   // 四个核心版块 - 汤圆主题
   const mainChannels = [
@@ -367,13 +447,21 @@ export default function NewspaperHome() {
           {/* 中央 - 四个核心版块 */}
           <main className="manga-home-central">
             <div className="manga-home-channels">
-              {mainChannels.map((channel, index) => {
-                const IconComp = channel.icon
+              {channels.map((channel, index) => {
+                const IconComp = { GameIcon, BookIcon, UserIcon, ToolIcon }[channel.icon]
+                const isDragging = dragIndex === index
+                const isDropTarget = dropIndex === index
                 return (
                   <article
                     key={channel.id}
-                    className={`manga-home-channel ${hoveredChannel === channel.id ? 'hovered' : ''} ${mounted ? 'visible' : ''}`}
+                    className={`manga-home-channel ${hoveredChannel === channel.id ? 'hovered' : ''} ${mounted ? 'visible' : ''} ${isDragging ? 'dragging' : ''} ${isDropTarget ? 'drop-target' : ''}`}
                     style={{ animationDelay: `${index * 0.1}s` }}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragLeave={handleDragLeave}
+                    onDrop={(e) => handleDrop(e, index)}
+                    onDragEnd={handleDragEnd}
                     onMouseEnter={() => setHoveredChannel(channel.id)}
                     onMouseLeave={() => setHoveredChannel(null)}
                     onClick={() => navigate(channel.path)}

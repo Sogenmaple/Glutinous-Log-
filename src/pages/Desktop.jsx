@@ -451,7 +451,21 @@ export default function Desktop() {
   const [animatingWindows, setAnimatingWindows] = useState({}) // { windowId: 'opening'|'closing'|'minimizing' }
   const [showAvatarMenu, setShowAvatarMenu] = useState(false)
   const [draggingGhost, setDraggingGhost] = useState(null) // { id, x, y } 拖拽中的幽灵图标
+  const [userAvatar, setUserAvatar] = useState('') // 当前用户头像
   const wasDraggedRef = useRef(false)
+
+  // 加载用户头像
+  useEffect(() => {
+    const loadAvatar = () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}')
+        setUserAvatar(user.avatar || '')
+      } catch (e) { /* ignore */ }
+    }
+    loadAvatar()
+    window.addEventListener('avatar-updated', loadAvatar)
+    return () => window.removeEventListener('avatar-updated', loadAvatar)
+  }, [])
 
   // 如果在 iframe 中，桌面页面不渲染（避免桌面嵌套桌面）
   // 但其他页面（如作品集、博客）可以在 iframe 中正常显示
@@ -837,25 +851,34 @@ export default function Desktop() {
       {/* 任务栏 */}
       <div className="taskbar">
         <div className="taskbar-avatar-wrapper" onClick={(e) => { e.stopPropagation(); setShowAvatarMenu(!showAvatarMenu) }}>
-          <img 
-            className="taskbar-avatar" 
-            src="/avatar.jpg" 
-            alt="头像"
-            onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex' }}
-          />
+          {userAvatar ? (
+            <img 
+              className="taskbar-avatar" 
+              src={userAvatar} 
+              alt="头像"
+              onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex' }}
+            />
+          ) : (
+            <img 
+              className="taskbar-avatar" 
+              src="/avatar.jpg" 
+              alt="头像"
+              onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex' }}
+            />
+          )}
           <span className="taskbar-avatar-fallback">汤</span>
         </div>
         {showAvatarMenu && (
           <div className="avatar-dropdown">
             <div className="avatar-dropdown-item" onClick={() => { openWindow('profile'); setShowAvatarMenu(false) }}>
-              <span className="avatar-dropdown-icon">👤</span> 个人中心
+              <span className="avatar-dropdown-icon">[U]</span> 个人中心
             </div>
             <div className="avatar-dropdown-item" onClick={() => { openWindow('explorer'); setShowAvatarMenu(false) }}>
-              <span className="avatar-dropdown-icon">📁</span> 资源管理器
+              <span className="avatar-dropdown-icon">[F]</span> 资源管理器
             </div>
             <div className="avatar-dropdown-divider"></div>
             <div className="avatar-dropdown-item" onClick={() => { navigate('/login'); setShowAvatarMenu(false) }}>
-              <span className="avatar-dropdown-icon">🔄</span> 切换账号
+              <span className="avatar-dropdown-icon">[R]</span> 切换账号
             </div>
           </div>
         )}

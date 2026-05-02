@@ -60,6 +60,7 @@
   border: 0.3vmin solid #1a1a1a;
   background: #ffffff;
   box-shadow: 0.3vmin 0.3vmin 0 #1a1a1a;
+  border-radius: 8px;
 }
 
 .icon-symbol {

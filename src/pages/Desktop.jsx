@@ -32,6 +32,7 @@ const DESKTOP_ICONS = [
   { id: 'explorer', name: '资源管理器', symbol: 'E', route: null },
   { id: 'settings', name: '设置', symbol: 'C', route: null },
   { id: 'terminal', name: '终端', symbol: '$', route: null },
+  { id: 'invert', name: '反相窗口', symbol: '◐', route: null },
 ]
 
 // 路径映射（资源管理器地址栏）
@@ -45,6 +46,7 @@ const PATH_MAP = {
   '/profile': 'profile',
   '/login': 'login',
   '/register': 'register',
+  '/invert': 'invert',
 }
 
 // 窗口组件
@@ -167,8 +169,8 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, on
           {icon?.route && (
             <button
               className="window-btn jump"
-              onClick={() => onNavigate(icon.route)}
-              title="跳转到完整页面"
+              onClick={() => openWindow(icon)}
+              title="在新窗口中打开"
             >
               &gt;
             </button>
@@ -406,6 +408,19 @@ function Terminal({ openWindow }) {
           onKeyDown={handleKeyDown}
           autoFocus
         />
+      </div>
+    </div>
+  )
+}
+
+// 反相窗口组件 - 使用 CSS mix-blend-mode 反相下方内容
+function InvertWindow() {
+  return (
+    <div className="invert-window">
+      <div className="invert-info">
+        <div className="invert-title">◐ 反相窗口</div>
+        <div className="invert-desc">此窗口会将层级下方的所有内容反相显示</div>
+        <div className="invert-hint">拖动窗口查看反相效果</div>
       </div>
     </div>
   )
@@ -686,8 +701,8 @@ export default function Desktop() {
     const startPos = iconPositions[iconId]
     wasDraggedRef.current = false
 
-    // 显示拖拽幽灵图标
-    setDraggingGhost({ id: iconId, x: e.clientX - 35, y: e.clientY - 40 })
+    // 显示拖拽幽灵图标（初始位置在原图标位置，避免点击时偏移）
+    setDraggingGhost({ id: iconId, x: startPos.x, y: startPos.y })
 
     const handleMouseMove = (e) => {
       const dx = e.clientX - startX
@@ -695,7 +710,7 @@ export default function Desktop() {
       if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
         wasDraggedRef.current = true
       }
-      // 更新幽灵图标位置
+      // 更新幽灵图标位置（跟随鼠标）
       setDraggingGhost({ id: iconId, x: e.clientX - 35, y: e.clientY - 40 })
     }
 
@@ -812,6 +827,7 @@ export default function Desktop() {
               {window.appId === 'explorer' && <Explorer openWindow={openWindow} />}
               {window.appId === 'terminal' && <Terminal openWindow={openWindow} />}
               {window.appId === 'settings' && <Settings />}
+              {window.appId === 'invert' && <InvertWindow />}
               {icon?.route && (
                 <iframe
                   src={getIframeUrl(icon.route)}

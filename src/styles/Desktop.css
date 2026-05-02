@@ -806,13 +806,15 @@
 }
 
 .invert-window-container .window-content {
-  background: #ffffff !important;
-  mix-blend-mode: difference;
+  background: rgba(255, 255, 255, 0.01) !important;
+  backdrop-filter: invert(1);
+  -webkit-backdrop-filter: invert(1);
 }
 
 .invert-content {
-  background: #ffffff !important;
-  mix-blend-mode: difference;
+  background: rgba(255, 255, 255, 0.01) !important;
+  backdrop-filter: invert(1);
+  -webkit-backdrop-filter: invert(1);
 }
 
 .invert-window {

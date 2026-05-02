@@ -790,7 +790,7 @@ export default function Desktop() {
 
       {/* 任务栏 */}
       <div className="taskbar">
-        <div className="taskbar-avatar-wrapper" onClick={(e) => { e.stopPropagation(); setShowAvatarMenu(!showAvatarMenu) }} onMouseDown={(e) => e.stopPropagation()}>
+        <div className="taskbar-avatar-wrapper" onClick={(e) => { e.stopPropagation(); setShowAvatarMenu(!showAvatarMenu) }}>
           <img 
             className="taskbar-avatar" 
             src="/avatar.jpg" 

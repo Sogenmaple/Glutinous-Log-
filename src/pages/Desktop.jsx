@@ -404,6 +404,7 @@ export default function Desktop() {
   const [iconPositions, setIconPositions] = useState({})
   const [animatingWindows, setAnimatingWindows] = useState({}) // { windowId: 'opening'|'closing'|'minimizing' }
   const [showAvatarMenu, setShowAvatarMenu] = useState(false)
+  const [draggingIcon, setDraggingIcon] = useState(null) // { id, x, y } 拖拽中的幽灵图标
   const wasDraggedRef = useRef(false)
 
   // 如果在 iframe 中，桌面页面不渲染（避免桌面嵌套桌面）
@@ -625,59 +626,43 @@ export default function Desktop() {
     const startPos = iconPositions[iconId]
     wasDraggedRef.current = false
 
+    // 显示拖拽幽灵图标
+    setDraggingGhost({ id: iconId, x: e.clientX - 35, y: e.clientY - 40 })
+
     const handleMouseMove = (e) => {
       const dx = e.clientX - startX
       const dy = e.clientY - startY
       if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
         wasDraggedRef.current = true
       }
+      // 更新幽灵图标位置
+      setDraggingGhost({ id: iconId, x: e.clientX - 35, y: e.clientY - 40 })
     }
 
     const handleMouseUp = (e) => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
+      setDraggingGhost(null) // 隐藏幽灵图标
 
       if (!wasDraggedRef.current) return
-
-      // 计算拖拽方向
-      const dx = e.clientX - startX
-      const dy = e.clientY - startY
-      const dirX = Math.abs(dx) > 10 ? Math.sign(dx) : 0
-      const dirY = Math.abs(dy) > 10 ? Math.sign(dy) : 0
 
       const snapped = snapToGrid(e.clientX - 35, e.clientY - 40)
 
       setIconPositions(prev => {
         const newPositions = { ...prev }
-        const startPosClone = { ...startPos }
 
-        // 找到拖拽方向上最近的图标
-        let closestId = null
-        let closestDist = Infinity
-        for (const [id, pos] of Object.entries(newPositions)) {
-          if (id === iconId) continue
-          // 判断是否在拖拽方向上
-          const pdx = pos.x - startPosClone.x
-          const pdy = pos.y - startPosClone.y
-          if (dirX > 0 && pdx < -GRID_SIZE / 2) continue
-          if (dirX < 0 && pdx > GRID_SIZE / 2) continue
-          if (dirY > 0 && pdy < -GRID_SIZE / 2) continue
-          if (dirY < 0 && pdy > GRID_SIZE / 2) continue
-          const dist = Math.abs(pdx) + Math.abs(pdy)
-          if (dist < closestDist) {
-            closestDist = dist
-            closestId = id
-          }
-        }
+        // 检查目标位置是否已有图标
+        const targetId = Object.keys(newPositions).find(id => {
+          const pos = newPositions[id]
+          return pos.x === snapped.x && pos.y === snapped.y && id !== iconId
+        })
 
-        if (closestId) {
-          // 推挤模式：将目标图标移到原图标位置
-          newPositions[closestId] = { ...startPosClone }
-          newPositions[iconId] = snapped
-        } else {
-          // 没有图标阻挡，直接移动
-          newPositions[iconId] = snapped
+        if (targetId) {
+          // 目标位置有图标：推挤到原图标位置
+          newPositions[targetId] = { ...startPos }
         }
+        // 拖拽图标放到目标位置（无论是否有阻挡）
+        newPositions[iconId] = snapped
 
         return newPositions
       })
@@ -714,25 +699,39 @@ export default function Desktop() {
 
       {/* 桌面图标 */}
       <div className="desktop-icons">
-        {DESKTOP_ICONS.map((icon) => (
-          <div
-            key={icon.id}
-            className={`desktop-icon ${selectedIcon === icon.id ? 'selected' : ''}`}
-            style={{
-              left: (iconPositions[icon.id]?.x || 20) + 'px',
-              top: (iconPositions[icon.id]?.y || 70) + 'px',
-            }}
-            onClick={() => handleIconClick(icon)}
-            onDoubleClick={() => handleIconDoubleClick(icon)}
-            onMouseDown={(e) => handleIconMouseDown(e, icon.id)}
-          >
-            <div className="desktop-icon-img">
-              <span className="icon-symbol">{icon.symbol}</span>
+        {DESKTOP_ICONS.map((icon) => {
+          const isDragging = draggingGhost?.id === icon.id
+          return (
+            <div
+              key={icon.id}
+              className={`desktop-icon ${selectedIcon === icon.id ? 'selected' : ''}`}
+              style={{
+                left: (iconPositions[icon.id]?.x || 20) + 'px',
+                top: (iconPositions[icon.id]?.y || 70) + 'px',
+                opacity: isDragging ? 0.3 : 1,
+              }}
+              onClick={() => handleIconClick(icon)}
+              onDoubleClick={() => handleIconDoubleClick(icon)}
+              onMouseDown={(e) => handleIconMouseDown(e, icon.id)}
+            >
+              <div className="desktop-icon-img">
+                <span className="icon-symbol">{icon.symbol}</span>
+              </div>
+              <span className="desktop-icon-label">{icon.name}</span>
             </div>
-            <span className="desktop-icon-label">{icon.name}</span>
-          </div>
-        ))}
+          )
+        })}
       </div>
+
+      {/* 拖拽幽灵图标 */}
+      {draggingGhost && (
+        <div className="desktop-icon-ghost" style={{ left: draggingGhost.x, top: draggingGhost.y }}>
+          <div className="desktop-icon-img">
+            <span className="icon-symbol">{DESKTOP_ICONS.find(i => i.id === draggingGhost.id)?.symbol}</span>
+          </div>
+          <span className="desktop-icon-label">{DESKTOP_ICONS.find(i => i.id === draggingGhost.id)?.name}</span>
+        </div>
+      )}
 
       {/* 窗口区域 */}
       <div className="desktop-windows">
@@ -791,7 +790,7 @@ export default function Desktop() {
 
       {/* 任务栏 */}
       <div className="taskbar">
-        <div className="taskbar-avatar-wrapper" onClick={() => setShowAvatarMenu(!showAvatarMenu)}>
+        <div className="taskbar-avatar-wrapper" onClick={(e) => { e.stopPropagation(); setShowAvatarMenu(!showAvatarMenu) }} onMouseDown={(e) => e.stopPropagation()}>
           <img 
             className="taskbar-avatar" 
             src="/avatar.jpg" 

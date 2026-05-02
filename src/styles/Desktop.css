@@ -678,6 +678,7 @@
   transition: border-color 0.15s;
   position: relative;
   flex-shrink: 0;
+  user-select: none;
 }
 
 .taskbar-avatar-wrapper:hover {
@@ -743,6 +744,47 @@
   height: 1px;
   background: #444;
   margin: 0.2rem 0.5rem;
+}
+
+/* 拖拽幽灵图标 */
+.desktop-icon-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.8;
+  width: 70px;
+  padding: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.desktop-icon-ghost .desktop-icon-img {
+  width: 48px;
+  height: 48px;
+  background: rgba(30, 30, 30, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.desktop-icon-ghost .icon-symbol {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+}
+
+.desktop-icon-ghost .desktop-icon-label {
+  font-size: 0.7rem;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* 任务栏窗口列表 */

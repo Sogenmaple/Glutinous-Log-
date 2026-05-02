@@ -132,8 +132,8 @@ export default function NewspaperHome() {
   const [hoveredChannel, setHoveredChannel] = useState(null)
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
   
-  // 拖拽排序状态
-  const [channels, setChannels] = useState([
+  // 默认频道配置
+  const defaultChannels = [
     {
       id: 'games',
       title: '汤圆的作品集',
@@ -174,7 +174,24 @@ export default function NewspaperHome() {
       color: 'black',
       tags: ['技能', '联系', '社交', '更多']
     }
-  ])
+  ]
+  
+  // 从 localStorage 读取保存的排序，如果没有则使用默认顺序
+  const getInitialChannels = () => {
+    try {
+      const saved = localStorage.getItem('newspaper-channel-order')
+      if (saved) {
+        const order = JSON.parse(saved)
+        // 按保存的顺序重新排列
+        return order.map(id => defaultChannels.find(c => c.id === id)).filter(Boolean)
+      }
+    } catch (e) {
+      console.error('读取频道排序失败:', e)
+    }
+    return [...defaultChannels]
+  }
+  
+  const [channels, setChannels] = useState(getInitialChannels)
   const [dragIndex, setDragIndex] = useState(null)
   const [dropIndex, setDropIndex] = useState(null)
 
@@ -214,6 +231,14 @@ export default function NewspaperHome() {
     const [draggedItem] = newChannels.splice(dragIndex, 1)
     newChannels.splice(dropIdx, 0, draggedItem)
     setChannels(newChannels)
+    
+    // 保存排序到 localStorage
+    try {
+      localStorage.setItem('newspaper-channel-order', JSON.stringify(newChannels.map(c => c.id)))
+    } catch (e) {
+      console.error('保存频道排序失败:', e)
+    }
+    
     setDragIndex(null)
     setDropIndex(null)
   }
@@ -222,50 +247,6 @@ export default function NewspaperHome() {
     setDragIndex(null)
     setDropIndex(null)
   }
-
-  // 四个核心版块 - 汤圆主题
-  const mainChannels = [
-    {
-      id: 'games',
-      title: '汤圆的作品集',
-      subtitle: "TANGYUAN'S PORTFOLIO",
-      desc: '创意是生活的燃料 · 独立游戏作品展示',
-      icon: GameIcon,
-      path: '/games',
-      color: 'black',
-      tags: ['CiGA', 'GGJ', '聚光灯', '独立游戏']
-    },
-    {
-      id: 'special',
-      title: '汤圆的工具',
-      subtitle: "TANGYUAN'S TOOLS",
-      desc: '总有些美味的怪诞 · 实用工具与休闲游戏',
-      icon: ToolIcon,
-      path: '/special',
-      color: 'black',
-      tags: ['番茄钟', '计算器', '扫雷', '贪吃蛇']
-    },
-    {
-      id: 'blog',
-      title: '汤圆的博客',
-      subtitle: "TANGYUAN'S BLOG",
-      desc: '游戏 · 生活 · 随笔 · 技术分享',
-      icon: BookIcon,
-      path: '/blog',
-      color: 'black',
-      tags: ['项目', '技术', '设计', '随笔']
-    },
-    {
-      id: 'about',
-      title: '汤圆的关于',
-      subtitle: 'ABOUT TANGYUAN',
-      desc: '开发者信息 · 联系方式 · 社交网络',
-      icon: UserIcon,
-      path: '/about',
-      color: 'black',
-      tags: ['技能', '联系', '社交', '更多']
-    }
-  ]
 
   // 社交链接
   const socialLinks = [
@@ -305,8 +286,8 @@ export default function NewspaperHome() {
 
           {/* App 图标网格 */}
           <div className="app-grid">
-            {mainChannels.map((channel) => {
-              const IconComp = channel.icon
+            {channels.map((channel) => {
+              const IconComp = { GameIcon, BookIcon, UserIcon, ToolIcon }[channel.icon]
               return (
                 <div
                   key={channel.id}

@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../styles/Desktop.css'
+import BongoCat from '../components/BongoCat'
 
 /**
  * 汤圆的小窝 - 模拟电脑桌面 v7.5
@@ -995,6 +996,9 @@ export default function Desktop() {
           </div>
         </div>
       )}
+
+      {/* Bongo Cat - 桌面宠物 */}
+      <BongoCat />
 
       {/* 任务栏 */}
       <div className="taskbar">

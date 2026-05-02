@@ -403,6 +403,7 @@ export default function Desktop() {
   const [contextMenu, setContextMenu] = useState(null)
   const [iconPositions, setIconPositions] = useState({})
   const [animatingWindows, setAnimatingWindows] = useState({}) // { windowId: 'opening'|'closing'|'minimizing' }
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false)
   const wasDraggedRef = useRef(false)
 
   // 如果在 iframe 中，桌面页面不渲染（避免桌面嵌套桌面）
@@ -595,11 +596,12 @@ export default function Desktop() {
     setContextMenu({ x: e.clientX, y: e.clientY })
   }, [])
 
-  // 点击桌面关闭右键菜单 + 取消选中图标
+  // 点击桌面关闭右键菜单 + 取消选中图标 + 关闭头像菜单
   useEffect(() => {
     const handleClick = () => {
       setContextMenu(null)
       setSelectedIcon(null)
+      setShowAvatarMenu(false)
     }
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
@@ -615,11 +617,12 @@ export default function Desktop() {
     }
   }, [])
 
-  // 桌面图标拖拽（Windows 风格：按下记录起点，移动超过阈值视为拖拽，松手后吸附到网格）
+  // 桌面图标拖拽（Windows 风格：推挤模式，拖过去把其他图标推开）
   const handleIconMouseDown = useCallback((e, iconId) => {
     e.preventDefault()
     const startX = e.clientX
     const startY = e.clientY
+    const startPos = iconPositions[iconId]
     wasDraggedRef.current = false
 
     const handleMouseMove = (e) => {
@@ -634,32 +637,55 @@ export default function Desktop() {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
 
-      if (wasDraggedRef.current) {
-        // 拖拽：吸附到网格，如果目标位置已有图标则交换
-        const snapped = snapToGrid(e.clientX - 35, e.clientY - 40)
-        setIconPositions(prev => {
-          // 找到目标位置已存在的图标
-          const targetIconId = Object.keys(prev).find(id => {
-            const pos = prev[id]
-            return pos.x === snapped.x && pos.y === snapped.y && id !== iconId
-          })
-          
-          const newPositions = { ...prev }
-          if (targetIconId) {
-            // 交换位置：目标图标移到原图标的位置
-            newPositions[targetIconId] = { ...prev[iconId] }
+      if (!wasDraggedRef.current) return
+
+      // 计算拖拽方向
+      const dx = e.clientX - startX
+      const dy = e.clientY - startY
+      const dirX = Math.abs(dx) > 10 ? Math.sign(dx) : 0
+      const dirY = Math.abs(dy) > 10 ? Math.sign(dy) : 0
+
+      const snapped = snapToGrid(e.clientX - 35, e.clientY - 40)
+
+      setIconPositions(prev => {
+        const newPositions = { ...prev }
+        const startPosClone = { ...startPos }
+
+        // 找到拖拽方向上最近的图标
+        let closestId = null
+        let closestDist = Infinity
+        for (const [id, pos] of Object.entries(newPositions)) {
+          if (id === iconId) continue
+          // 判断是否在拖拽方向上
+          const pdx = pos.x - startPosClone.x
+          const pdy = pos.y - startPosClone.y
+          if (dirX > 0 && pdx < -GRID_SIZE / 2) continue
+          if (dirX < 0 && pdx > GRID_SIZE / 2) continue
+          if (dirY > 0 && pdy < -GRID_SIZE / 2) continue
+          if (dirY < 0 && pdy > GRID_SIZE / 2) continue
+          const dist = Math.abs(pdx) + Math.abs(pdy)
+          if (dist < closestDist) {
+            closestDist = dist
+            closestId = id
           }
-          // 拖拽图标放到目标位置
+        }
+
+        if (closestId) {
+          // 推挤模式：将目标图标移到原图标位置
+          newPositions[closestId] = { ...startPosClone }
           newPositions[iconId] = snapped
-          return newPositions
-        })
-      }
-      // 否则视为点击，由 onClick 处理
+        } else {
+          // 没有图标阻挡，直接移动
+          newPositions[iconId] = snapped
+        }
+
+        return newPositions
+      })
     }
 
     document.addEventListener('mousemove', handleMouseMove)
     document.addEventListener('mouseup', handleMouseUp)
-  }, [snapToGrid])
+  }, [snapToGrid, iconPositions])
 
   // 桌面图标点击
   const handleIconClick = useCallback((icon) => {
@@ -765,10 +791,29 @@ export default function Desktop() {
 
       {/* 任务栏 */}
       <div className="taskbar">
-        <button className="taskbar-start" onClick={() => openWindow('explorer')}>
-          <span className="start-symbol">[]</span>
-          <span className="start-text">开始</span>
-        </button>
+        <div className="taskbar-avatar-wrapper" onClick={() => setShowAvatarMenu(!showAvatarMenu)}>
+          <img 
+            className="taskbar-avatar" 
+            src="/avatar.jpg" 
+            alt="头像"
+            onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling.style.display = 'flex' }}
+          />
+          <span className="taskbar-avatar-fallback">汤</span>
+        </div>
+        {showAvatarMenu && (
+          <div className="avatar-dropdown">
+            <div className="avatar-dropdown-item" onClick={() => { openWindow('profile'); setShowAvatarMenu(false) }}>
+              <span className="avatar-dropdown-icon">👤</span> 个人中心
+            </div>
+            <div className="avatar-dropdown-item" onClick={() => { openWindow('explorer'); setShowAvatarMenu(false) }}>
+              <span className="avatar-dropdown-icon">📁</span> 资源管理器
+            </div>
+            <div className="avatar-dropdown-divider"></div>
+            <div className="avatar-dropdown-item" onClick={() => { navigate('/login'); setShowAvatarMenu(false) }}>
+              <span className="avatar-dropdown-icon">🔄</span> 切换账号
+            </div>
+          </div>
+        )}
 
         <div className="taskbar-windows">
           {windows.map(window => {

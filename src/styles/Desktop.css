@@ -659,10 +659,90 @@
   background: #555555;
 }
 
-.start-symbol {
-  font-size: 0.9rem;
+/* 任务栏头像 */
+.taskbar-avatar-wrapper {
+  width: 2.5vw;
+  height: 2.5vw;
+  min-width: 30px;
+  min-height: 30px;
+  max-width: 40px;
+  max-height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333;
+  transition: border-color 0.15s;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.taskbar-avatar-wrapper:hover {
+  border-color: #aaa;
+}
+
+.taskbar-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.taskbar-avatar-fallback {
+  display: none;
+  font-size: 1rem;
   font-weight: 900;
-  letter-spacing: -1px;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+}
+
+/* 头像下拉菜单 */
+.avatar-dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0.4rem;
+  background: #1a1a1a;
+  border: 2px solid #555;
+  border-radius: 8px;
+  min-width: 160px;
+  padding: 0.3rem 0;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  animation: dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.avatar-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  color: #ddd;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.1s;
+  font-family: 'Courier New', monospace;
+}
+
+.avatar-dropdown-item:hover {
+  background: #333;
+  color: #fff;
+}
+
+.avatar-dropdown-icon {
+  font-size: 1rem;
+}
+
+.avatar-dropdown-divider {
+  height: 1px;
+  background: #444;
+  margin: 0.2rem 0.5rem;
 }
 
 /* 任务栏窗口列表 */
@@ -774,6 +854,13 @@
     font-size: 0.7rem;
   }
 
+  .taskbar-avatar-wrapper {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
   .taskbar-window-btn {
     min-width: 70px;
     max-width: 120px;
@@ -803,6 +890,23 @@
 
   .taskbar-start .start-text {
     display: none;
+  }
+
+  .taskbar-avatar-wrapper {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+  }
+
+  .avatar-dropdown {
+    min-width: 140px;
+    left: 0.2rem;
+  }
+
+  .avatar-dropdown-item {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
   }
 
   .taskbar-window-title {

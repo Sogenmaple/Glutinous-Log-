@@ -591,6 +591,22 @@ export default function Desktop() {
   const [draggingGhost, setDraggingGhost] = useState(null) // { id, x, y } 拖拽中的幽灵图标
   const [userAvatar, setUserAvatar] = useState('') // 当前用户头像
   const wasDraggedRef = useRef(false)
+  
+  // 软体生物状态
+  const [mascotPos, setMascotPos] = useState({ x: window.innerWidth / 2 - 60, y: window.innerHeight - 180 })
+  const mascotCanvasRef = useRef(null)
+  const mascotPhysicsRef = useRef({
+    x: window.innerWidth / 2 - 60,
+    y: 0, // 相对于任务栏上方的偏移
+    vx: 0,
+    vy: 0,
+    isJumping: false,
+    isMoving: false,
+    direction: 1, // 1=right, -1=left
+    bodyDeform: 0, // 形变值
+    eyeBlink: 0, // 眨眼
+  })
+  const keysRef = useRef({})
 
   // 加载用户头像
   useEffect(() => {
@@ -603,6 +619,147 @@ export default function Desktop() {
     loadAvatar()
     window.addEventListener('avatar-updated', loadAvatar)
     return () => window.removeEventListener('avatar-updated', loadAvatar)
+  }, [])
+
+  // 软体生物物理引擎 + 渲染
+  useEffect(() => {
+    const canvas = mascotCanvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    const W = canvas.width
+    const H = canvas.height
+    let animFrame
+
+    // 键盘监听
+    const onKeyDown = (e) => {
+      if (e.key === 'a' || e.key === 'A' || e.key === 'd' || e.key === 'D') {
+        keysRef.current[e.key.toLowerCase()] = true
+        e.preventDefault()
+      }
+      if (e.key === ' ' && !mascotPhysicsRef.current.isJumping) {
+        mascotPhysicsRef.current.vy = -12
+        mascotPhysicsRef.current.isJumping = true
+        mascotPhysicsRef.current.bodyDeform = 8 // 跳跃时拉长
+        e.preventDefault()
+      }
+    }
+    const onKeyUp = (e) => {
+      keysRef.current[e.key.toLowerCase()] = false
+    }
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
+
+    const loop = () => {
+      const p = mascotPhysicsRef.current
+
+      // 移动
+      if (keysRef.current['a']) { p.vx = -4; p.direction = -1; p.isMoving = true }
+      else if (keysRef.current['d']) { p.vx = 4; p.direction = 1; p.isMoving = true }
+      else { p.vx *= 0.85; p.isMoving = false }
+
+      // 重力
+      p.vy += 0.6
+      p.x += p.vx
+      p.y += p.vy
+
+      // 地面碰撞 (y=0 是任务栏上方)
+      if (p.y >= 0) {
+        p.y = 0
+        p.vy = 0
+        p.isJumping = false
+        // 落地挤压
+        if (Math.abs(p.bodyDeform) < 0.5) p.bodyDeform = -5
+      }
+
+      // 边界
+      if (p.x < 0) p.x = 0
+      if (p.x > window.innerWidth - W) p.x = window.innerWidth - W
+
+      // 形变恢复
+      p.bodyDeform *= 0.9
+
+      // 更新DOM位置
+      const taskbarHeight = 48
+      const baseY = window.innerHeight - taskbarHeight - H
+      setMascotPos({ x: p.x, y: baseY + p.y })
+
+      // 眨眼
+      p.eyeBlink += 0.02
+      const blink = Math.sin(p.eyeBlink) > 0.95 ? 0.2 : 1
+
+      // 移动时轻微摇摆
+      const wobble = p.isMoving ? Math.sin(Date.now() * 0.015) * 2 : 0
+
+      // 绘制
+      ctx.clearRect(0, 0, W, H)
+      const cx = W / 2 + wobble
+      const cy = H / 2 + p.y
+      const stretchX = 1 + p.bodyDeform * 0.01
+      const stretchY = 1 - p.bodyDeform * 0.01
+      const baseRx = 38 * stretchX
+      const baseRy = 35 * stretchY
+
+      // 身体 - 使用贝塞尔曲线绘制光滑软体
+      ctx.save()
+      ctx.translate(cx, cy)
+
+      // 身体路径（光滑贝塞尔曲线 blob）
+      ctx.beginPath()
+      ctx.moveTo(0, -baseRy)
+      // 右上
+      ctx.bezierCurveTo(baseRx * 0.6, -baseRy, baseRx, -baseRy * 0.5, baseRx, 0)
+      // 右下
+      ctx.bezierCurveTo(baseRx, baseRy * 0.5, baseRx * 0.6, baseRy, 0, baseRy)
+      // 左下
+      ctx.bezierCurveTo(-baseRx * 0.6, baseRy, -baseRx, baseRy * 0.5, -baseRx, 0)
+      // 左上
+      ctx.bezierCurveTo(-baseRx, -baseRy * 0.5, -baseRx * 0.6, -baseRy, 0, -baseRy)
+      ctx.closePath()
+
+      ctx.fillStyle = '#1a1a1a'
+      ctx.fill()
+      ctx.strokeStyle = '#ffffff'
+      ctx.lineWidth = 2
+      ctx.stroke()
+
+      // 眼睛 - 胶囊形状（竖长椭圆）
+      const eyeSpacing = 18
+      const eyeY = -baseRy * 0.25
+      const eyeW = 10
+      const eyeH = 16 * blink
+      const pupilH = 10 * blink
+
+      // 左眼
+      ctx.beginPath()
+      ctx.ellipse(-eyeSpacing, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2)
+      ctx.fillStyle = '#ffffff'
+      ctx.fill()
+      ctx.beginPath()
+      ctx.ellipse(-eyeSpacing, eyeY + 2, 6, pupilH, 0, 0, Math.PI * 2)
+      ctx.fillStyle = '#1a1a1a'
+      ctx.fill()
+
+      // 右眼
+      ctx.beginPath()
+      ctx.ellipse(eyeSpacing, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2)
+      ctx.fillStyle = '#ffffff'
+      ctx.fill()
+      ctx.beginPath()
+      ctx.ellipse(eyeSpacing, eyeY + 2, 6, pupilH, 0, 0, Math.PI * 2)
+      ctx.fillStyle = '#1a1a1a'
+      ctx.fill()
+
+      ctx.restore()
+
+      animFrame = requestAnimationFrame(loop)
+    }
+
+    loop()
+    return () => {
+      cancelAnimationFrame(animFrame)
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+    }
   }, [])
 
   // 如果在 iframe 中，桌面页面不渲染（避免桌面嵌套桌面）
@@ -996,6 +1153,19 @@ export default function Desktop() {
         </div>
       )}
 
+      {/* 软体生物 - 在任务栏上方 */}
+      <div
+        className="mascot-container"
+        style={{ left: mascotPos.x + 'px' }}
+      >
+        <canvas
+          ref={mascotCanvasRef}
+          className="mascot-canvas"
+          width={120}
+          height={120}
+        />
+      </div>
+
       {/* 任务栏 */}
       <div className="taskbar">
         <div className="taskbar-avatar-wrapper" onClick={(e) => { e.stopPropagation(); setShowAvatarMenu(!showAvatarMenu) }}>
@@ -1063,45 +1233,6 @@ export default function Desktop() {
               </button>
             )
           })}
-        </div>
-
-        {/* 任务栏软体生物 */}
-        <div className="taskbar-mascot" title="汤圆的小软体">
-          <svg viewBox="0 0 60 40" className="mascot-svg">
-            <defs>
-              <filter id="jelly">
-                <feTurbulence type="fractalNoise" baseFrequency="0.04 0.04" numOctaves="2" result="noise" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G">
-                  <animate attributeName="scale" values="2;4;3;2" dur="2s" repeatCount="indefinite" />
-                </feDisplacementMap>
-              </filter>
-            </defs>
-            <g filter="url(#jelly)" className="mascot-body-group">
-              {/* 身体 - 圆形软体 */}
-              <ellipse cx="30" cy="24" rx="16" ry="13" fill="#1a1a1a" stroke="#fff" strokeWidth="1.5">
-                <animate attributeName="ry" values="13;14;12;13" dur="1.5s" repeatCount="indefinite" />
-                <animate attributeName="rx" values="16;15;17;16" dur="1.5s" repeatCount="indefinite" />
-              </ellipse>
-              {/* 左眼睛 */}
-              <circle cx="23" cy="22" r="4" fill="#fff">
-                <animate attributeName="cy" values="22;21;22" dur="3s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="23" cy="22" r="2" fill="#1a1a1a">
-                <animate attributeName="cy" values="22;21;22" dur="3s" repeatCount="indefinite" />
-              </circle>
-              {/* 右眼睛 */}
-              <circle cx="37" cy="22" r="4" fill="#fff">
-                <animate attributeName="cy" values="22;21;22" dur="3s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="37" cy="22" r="2" fill="#1a1a1a">
-                <animate attributeName="cy" values="22;21;22" dur="3s" repeatCount="indefinite" />
-              </circle>
-              {/* 嘴巴 - 微笑 */}
-              <path d="M26 30 Q30 34 34 30" fill="none" stroke="#fff" strokeWidth="1" strokeLinecap="round">
-                <animate attributeName="d" values="M26 30 Q30 34 34 30;M26 30 Q30 33 34 30;M26 30 Q30 34 34 30" dur="2s" repeatCount="indefinite" />
-              </path>
-            </g>
-          </svg>
         </div>
 
         <div className="taskbar-tray">

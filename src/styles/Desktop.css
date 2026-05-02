@@ -903,31 +903,18 @@
 }
 
 /* 任务栏软体生物 */
-.taskbar-mascot {
-  display: flex;
-  align-items: center;
-  padding: 0 0.3rem;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+.mascot-container {
+  position: fixed;
+  bottom: 48px; /* 任务栏高度 */
+  z-index: 9999;
+  pointer-events: none;
+  transition: left 0.05s linear;
 }
 
-.taskbar-mascot:hover {
-  transform: scale(1.15);
-}
-
-.taskbar-mascot:active {
-  transform: scale(0.9);
-}
-
-.mascot-svg {
-  width: 50px;
-  height: 34px;
-  animation: mascotBounce 2s ease-in-out infinite;
-}
-
-@keyframes mascotBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+.mascot-canvas {
+  width: 120px;
+  height: 120px;
+  image-rendering: auto;
 }
 
 /* 系统托盘 */

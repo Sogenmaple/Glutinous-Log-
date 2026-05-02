@@ -301,6 +301,7 @@
   justify-content: center;
   background: transparent !important;
   border: 3px solid #000000;
+  border-radius: 12px;
   margin-bottom: 1rem;
   transition: all 0.15s;
 }

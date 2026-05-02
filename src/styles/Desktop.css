@@ -806,12 +806,12 @@
 }
 
 .invert-window-container .window-content {
-  background: transparent !important;
+  background: #ffffff !important;
   mix-blend-mode: difference;
 }
 
 .invert-content {
-  background: transparent !important;
+  background: #ffffff !important;
   mix-blend-mode: difference;
 }
 

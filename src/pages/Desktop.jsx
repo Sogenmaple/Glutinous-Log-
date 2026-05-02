@@ -195,57 +195,84 @@ function InvertWindowContainer({ window: win, onClose, onMinimize, onFocus, onDr
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [isResizing, setIsResizing] = useState(false)
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, w: 0, h: 0 })
-  const [wasMaximized, setWasMaximized] = useState(false)
   const windowRef = useRef(null)
 
+  // 拖动窗口
   const handleMouseDown = useCallback((e) => {
     if (e.target.closest('.window-controls') || e.target.closest('.resize-handle')) return
+    e.preventDefault()
     e.stopPropagation()
     setIsDragging(true)
-    const rect = windowRef.current?.getBoundingClientRect()
-    if (rect) setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+    const rect = windowRef.current.getBoundingClientRect()
+    setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top })
     onFocus(win.id)
   }, [win.id, onFocus])
 
-  const handleMouseMove = useCallback((e) => {
-    if (isDragging) {
-      const x = Math.max(0, e.clientX - dragOffset.x)
-      const y = Math.max(0, e.clientY - dragOffset.y)
-      onDrag && onDrag(win.id, x, y)
-    }
-    if (isResizing) {
-      const newW = Math.max(200, resizeStart.w + (e.clientX - resizeStart.x))
-      const newH = Math.max(120, resizeStart.h + (e.clientY - resizeStart.y))
-      onResize(win.id, newW, newH)
-    }
-  }, [isDragging, isResizing, dragOffset, resizeStart, win, onDrag, onResize])
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false)
-    setIsResizing(false)
-  }, [])
-
-  const handleResizeMouseDown = useCallback((e) => {
-    e.stopPropagation()
-    setIsResizing(true)
-    const rect = windowRef.current?.getBoundingClientRect()
-    if (rect) setResizeStart({ x: e.clientX, y: e.clientY, w: rect.width, h: rect.height })
-  }, [])
-
   useEffect(() => {
-    if (isDragging || isResizing) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-      document.body.style.userSelect = 'none'
-      document.body.style.cursor = isResizing ? 'nwse-resize' : 'move'
+    if (!isDragging) return
+    const iframes = document.querySelectorAll('.window-iframe')
+    iframes.forEach(f => { f.style.pointerEvents = 'none' })
+    document.body.style.cursor = 'move'
+    document.body.style.userSelect = 'none'
+    const handleMouseMove = (e) => {
+      windowRef.current.style.left = Math.max(0, e.clientX - dragOffset.x) + 'px'
+      windowRef.current.style.top = Math.max(0, e.clientY - dragOffset.y) + 'px'
     }
+    const handleMouseUp = () => {
+      setIsDragging(false)
+      iframes.forEach(f => { f.style.pointerEvents = '' })
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseup', handleMouseUp)
-      document.body.style.userSelect = ''
+      iframes.forEach(f => { f.style.pointerEvents = '' })
       document.body.style.cursor = ''
+      document.body.style.userSelect = ''
     }
-  }, [isDragging, isResizing, handleMouseMove, handleMouseUp])
+  }, [isDragging, dragOffset])
+
+  // 拉伸窗口
+  const handleResizeMouseDown = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const rect = windowRef.current.getBoundingClientRect()
+    setIsResizing(true)
+    setResizeStart({ x: e.clientX, y: e.clientY, w: rect.width, h: rect.height })
+    onFocus(win.id)
+  }, [win.id, onFocus])
+
+  useEffect(() => {
+    if (!isResizing) return
+    const iframes = document.querySelectorAll('.window-iframe')
+    iframes.forEach(f => { f.style.pointerEvents = 'none' })
+    document.body.style.cursor = 'nwse-resize'
+    document.body.style.userSelect = 'none'
+    const handleMouseMove = (e) => {
+      const newW = Math.max(200, resizeStart.w + (e.clientX - resizeStart.x))
+      const newH = Math.max(120, resizeStart.h + (e.clientY - resizeStart.y))
+      windowRef.current.style.width = newW + 'px'
+      windowRef.current.style.height = newH + 'px'
+    }
+    const handleMouseUp = () => {
+      setIsResizing(false)
+      iframes.forEach(f => { f.style.pointerEvents = '' })
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      iframes.forEach(f => { f.style.pointerEvents = '' })
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [isResizing, resizeStart])
 
   const handleMaximizeToggle = useCallback(() => {
     onToggleMaximize(win.id)

@@ -409,25 +409,23 @@ export default function Desktop() {
     }
   }
 
+  // 网格吸附参数（与下方保持一致）
+  const GRID_SIZE = 80 // 网格间距
+  const GRID_TOP = 70  // 顶部起始位置
+  const GRID_LEFT = 20 // 左侧起始位置
+
   // 初始化图标位置（网格布局）
   useEffect(() => {
     const positions = {}
-    const iconWidth = 70
-    const iconHeight = 85
-    const paddingX = 20
-    const paddingY = 70
-    const gapX = 10
-    const gapY = 10
-
     const viewportHeight = window.innerHeight - 48
-    const maxIconsPerColumn = Math.floor((viewportHeight - paddingY) / (iconHeight + gapY))
+    const maxIconsPerColumn = Math.floor((viewportHeight - GRID_TOP) / GRID_SIZE)
 
     DESKTOP_ICONS.forEach((icon, index) => {
       const col = Math.floor(index / maxIconsPerColumn)
       const row = index % maxIconsPerColumn
       positions[icon.id] = {
-        x: paddingX + col * (iconWidth + gapX),
-        y: paddingY + row * (iconHeight + gapY),
+        x: GRID_LEFT + col * GRID_SIZE,
+        y: GRID_TOP + row * GRID_SIZE,
       }
     })
 
@@ -557,17 +555,15 @@ export default function Desktop() {
     setContextMenu({ x: e.clientX, y: e.clientY })
   }, [])
 
-  // 点击桌面关闭右键菜单
+  // 点击桌面关闭右键菜单 + 取消选中图标
   useEffect(() => {
-    const handleClick = () => setContextMenu(null)
+    const handleClick = () => {
+      setContextMenu(null)
+      setSelectedIcon(null)
+    }
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
   }, [])
-
-  // 网格吸附参数
-  const GRID_SIZE = 80 // 网格间距
-  const GRID_TOP = 70  // 顶部起始位置
-  const GRID_LEFT = 20 // 左侧起始位置
 
   // 吸附到网格
   const snapToGrid = useCallback((x, y) => {

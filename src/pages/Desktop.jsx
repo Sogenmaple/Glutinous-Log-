@@ -592,20 +592,21 @@ export default function Desktop() {
   const [userAvatar, setUserAvatar] = useState('') // 当前用户头像
   const wasDraggedRef = useRef(false)
   
-  // 软体生物状态
-  const [mascotPos, setMascotPos] = useState({ x: window.innerWidth / 2 - 60, y: window.innerHeight - 180 })
+  // 软体生物状态（用 ref 避免 React 重渲染导致卡顿）
+  const mascotContainerRef = useRef(null)
   const mascotCanvasRef = useRef(null)
   const mascotPhysicsRef = useRef({
     x: window.innerWidth / 2 - 60,
-    y: 0, // 相对于任务栏上方的偏移
+    y: 0, // 0=站在地面（任务栏顶），正数=跳起来
     vx: 0,
     vy: 0,
     isJumping: false,
     isMoving: false,
     direction: 1, // 1=right, -1=left
-    bodyDeform: 0, // 形变值
+    bodyDeform: 0, // 形变值（正=拉长，负=压扁）
     eyeBlink: 0, // 眨眼
   })
+  const mascotInitRef = useRef(false) // 防止双重初始化
   const keysRef = useRef({})
 
   // 加载用户头像
@@ -621,30 +622,39 @@ export default function Desktop() {
     return () => window.removeEventListener('avatar-updated', loadAvatar)
   }, [])
 
-  // 软体生物物理引擎 + 渲染
+  // 软体生物物理引擎 + 渲染（直接 DOM 操作，不走 React 渲染）
   useEffect(() => {
+    if (mascotInitRef.current) return // 防止双重初始化
+    mascotInitRef.current = true
+
     const canvas = mascotCanvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
+    const container = mascotContainerRef.current
     const W = canvas.width
     const H = canvas.height
     let animFrame
 
     // 键盘监听
     const onKeyDown = (e) => {
-      if (e.key === 'a' || e.key === 'A' || e.key === 'd' || e.key === 'D') {
-        keysRef.current[e.key.toLowerCase()] = true
+      if (e.key === 'a' || e.key === 'A') {
+        keysRef.current['a'] = true
+        e.preventDefault()
+      }
+      if (e.key === 'd' || e.key === 'D') {
+        keysRef.current['d'] = true
         e.preventDefault()
       }
       if (e.key === ' ' && !mascotPhysicsRef.current.isJumping) {
-        mascotPhysicsRef.current.vy = -12
+        mascotPhysicsRef.current.vy = 10
         mascotPhysicsRef.current.isJumping = true
         mascotPhysicsRef.current.bodyDeform = 8 // 跳跃时拉长
         e.preventDefault()
       }
     }
     const onKeyUp = (e) => {
-      keysRef.current[e.key.toLowerCase()] = false
+      if (e.key === 'a' || e.key === 'A') keysRef.current['a'] = false
+      if (e.key === 'd' || e.key === 'D') keysRef.current['d'] = false
     }
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('keyup', onKeyUp)
@@ -653,100 +663,91 @@ export default function Desktop() {
       const p = mascotPhysicsRef.current
 
       // 移动
-      if (keysRef.current['a']) { p.vx = -4; p.direction = -1; p.isMoving = true }
-      else if (keysRef.current['d']) { p.vx = 4; p.direction = 1; p.isMoving = true }
+      if (keysRef.current['a']) { p.vx = -5; p.direction = -1; p.isMoving = true }
+      else if (keysRef.current['d']) { p.vx = 5; p.direction = 1; p.isMoving = true }
       else { p.vx *= 0.85; p.isMoving = false }
 
-      // 重力
-      p.vy += 0.6
+      // 重力（vy 正数=向上，重力往下所以减）
+      p.vy -= 0.5
       p.x += p.vx
       p.y += p.vy
 
-      // 地面碰撞 (y=0 是任务栏上方)
-      if (p.y >= 0) {
+      // 地面碰撞（y=0 = 任务栏顶部）
+      if (p.y <= 0) {
+        if (p.y < -2) {
+          // 落地瞬间压扁
+          p.bodyDeform = -6
+        }
         p.y = 0
         p.vy = 0
         p.isJumping = false
-        // 落地挤压
-        if (Math.abs(p.bodyDeform) < 0.5) p.bodyDeform = -5
       }
 
       // 边界
-      if (p.x < 0) p.x = 0
-      if (p.x > window.innerWidth - W) p.x = window.innerWidth - W
+      if (p.x < 0) { p.x = 0; p.vx = 0 }
+      if (p.x > window.innerWidth - W) { p.x = window.innerWidth - W; p.vx = 0 }
 
-      // 形变恢复
-      p.bodyDeform *= 0.9
+      // 形变恢复（弹簧效果）
+      p.bodyDeform *= 0.88
 
-      // 更新DOM位置
-      const taskbarHeight = 48
-      const baseY = window.innerHeight - taskbarHeight - H
-      setMascotPos({ x: p.x, y: baseY + p.y })
+      // 直接操作 DOM（不走 React，完全避免重渲染卡顿）
+      const taskbarH = 48
+      container.style.left = p.x + 'px'
+      container.style.bottom = (taskbarH + p.y) + 'px'
 
       // 眨眼
-      p.eyeBlink += 0.02
-      const blink = Math.sin(p.eyeBlink) > 0.95 ? 0.2 : 1
+      p.eyeBlink += 0.015
+      const blink = Math.sin(p.eyeBlink) > 0.97 ? 0.15 : 1
 
-      // 移动时轻微摇摆
-      const wobble = p.isMoving ? Math.sin(Date.now() * 0.015) * 2 : 0
+      // 移动时摇摆
+      const wobble = p.isMoving ? Math.sin(Date.now() * 0.012) * 3 : 0
 
       // 绘制
       ctx.clearRect(0, 0, W, H)
       const cx = W / 2 + wobble
-      const cy = H / 2 + p.y
-      const stretchX = 1 + p.bodyDeform * 0.01
-      const stretchY = 1 - p.bodyDeform * 0.01
+      const stretchX = 1 + p.bodyDeform * 0.012
+      const stretchY = 1 - p.bodyDeform * 0.012
       const baseRx = 38 * stretchX
       const baseRy = 35 * stretchY
 
-      // 身体 - 使用贝塞尔曲线绘制光滑软体
+      // 身体底部在 canvas 底部，所以 cy = H/2 + (H/2 - baseRy)/2 = H - baseRy/2...
+      // 更简单：身体底部紧贴地面，所以 center Y = H - baseRy
+      const cy = H - baseRy + (p.isJumping ? 0 : 0)
+
       ctx.save()
       ctx.translate(cx, cy)
 
       // 身体路径（光滑贝塞尔曲线 blob）
       ctx.beginPath()
       ctx.moveTo(0, -baseRy)
-      // 右上
       ctx.bezierCurveTo(baseRx * 0.6, -baseRy, baseRx, -baseRy * 0.5, baseRx, 0)
-      // 右下
       ctx.bezierCurveTo(baseRx, baseRy * 0.5, baseRx * 0.6, baseRy, 0, baseRy)
-      // 左下
       ctx.bezierCurveTo(-baseRx * 0.6, baseRy, -baseRx, baseRy * 0.5, -baseRx, 0)
-      // 左上
       ctx.bezierCurveTo(-baseRx, -baseRy * 0.5, -baseRx * 0.6, -baseRy, 0, -baseRy)
       ctx.closePath()
 
       ctx.fillStyle = '#1a1a1a'
       ctx.fill()
       ctx.strokeStyle = '#ffffff'
-      ctx.lineWidth = 2
+      ctx.lineWidth = 2.5
       ctx.stroke()
 
-      // 眼睛 - 胶囊形状（竖长椭圆）
-      const eyeSpacing = 18
-      const eyeY = -baseRy * 0.25
-      const eyeW = 10
-      const eyeH = 16 * blink
-      const pupilH = 10 * blink
+      // 眼睛 - 纯白色胶囊（竖长椭圆），无瞳孔
+      const eyeSpacing = 16
+      const eyeY = -baseRy * 0.3
+      const eyeW = 8
+      const eyeH = 14 * blink
 
-      // 左眼
+      // 左眼（纯白胶囊）
       ctx.beginPath()
       ctx.ellipse(-eyeSpacing, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2)
       ctx.fillStyle = '#ffffff'
       ctx.fill()
-      ctx.beginPath()
-      ctx.ellipse(-eyeSpacing, eyeY + 2, 6, pupilH, 0, 0, Math.PI * 2)
-      ctx.fillStyle = '#1a1a1a'
-      ctx.fill()
 
-      // 右眼
+      // 右眼（纯白胶囊）
       ctx.beginPath()
       ctx.ellipse(eyeSpacing, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2)
       ctx.fillStyle = '#ffffff'
-      ctx.fill()
-      ctx.beginPath()
-      ctx.ellipse(eyeSpacing, eyeY + 2, 6, pupilH, 0, 0, Math.PI * 2)
-      ctx.fillStyle = '#1a1a1a'
       ctx.fill()
 
       ctx.restore()
@@ -1155,8 +1156,8 @@ export default function Desktop() {
 
       {/* 软体生物 - 在任务栏上方 */}
       <div
+        ref={mascotContainerRef}
         className="mascot-container"
-        style={{ left: mascotPos.x + 'px' }}
       >
         <canvas
           ref={mascotCanvasRef}

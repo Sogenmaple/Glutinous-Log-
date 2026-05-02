@@ -905,10 +905,11 @@
 /* 任务栏软体生物 */
 .mascot-container {
   position: fixed;
-  bottom: 48px; /* 任务栏高度 */
+  bottom: 48px;
+  left: 50%;
   z-index: 9999;
   pointer-events: none;
-  transition: left 0.05s linear;
+  /* 不用 transition，直接用 JS 设置位置 */
 }
 
 .mascot-canvas {

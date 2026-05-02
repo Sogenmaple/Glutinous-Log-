@@ -404,7 +404,7 @@ export default function Desktop() {
   const [iconPositions, setIconPositions] = useState({})
   const [animatingWindows, setAnimatingWindows] = useState({}) // { windowId: 'opening'|'closing'|'minimizing' }
   const [showAvatarMenu, setShowAvatarMenu] = useState(false)
-  const [draggingIcon, setDraggingIcon] = useState(null) // { id, x, y } 拖拽中的幽灵图标
+  const [draggingGhost, setDraggingGhost] = useState(null) // { id, x, y } 拖拽中的幽灵图标
   const wasDraggedRef = useRef(false)
 
   // 如果在 iframe 中，桌面页面不渲染（避免桌面嵌套桌面）

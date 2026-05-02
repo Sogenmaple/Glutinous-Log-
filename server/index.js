@@ -1104,7 +1104,7 @@ app.post('/api/ovo-chat', async (req, res) => {
       body: JSON.stringify({
         model: 'qwen3.5-plus',
         messages: [
-          { role: 'system', content: '你是汤圆的小窝里的 AI 助手，名叫 ovo。你温暖、友好、略带调皮。用简洁的方式回答用户问题。' },
+          { role: 'system', content: '你是汤圆的小窝里的 AI 助手，名叫 ovo。你温暖、友好、略带调皮。用简洁的方式回答用户问题。【重要】你只能输出纯文本，绝对不能生成图片、不要输出任何图片链接或 Markdown 图片语法。不要使用任何 emoji 表情符号或特殊图标字符。' },
           { role: 'user', content: message }
         ],
         max_tokens: 1024,

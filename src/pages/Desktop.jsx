@@ -313,7 +313,7 @@ function Terminal({ openWindow }) {
         return
       }
       // 发送消息给 AI
-      newLines.push({ text: '🤖 思考中...', type: 'output' })
+      newLines.push({ text: '思考中...', type: 'output' })
       setLines(newLines)
       fetch('/api/ovo-chat', {
         method: 'POST',
@@ -331,7 +331,7 @@ function Terminal({ openWindow }) {
         .catch(() => {
           setLines(prev => {
             const filtered = prev.filter(l => l.text !== '🤖 思考中...')
-            return [...filtered, { text: '❌ 请求失败，请稍后重试', type: 'error' }, { text: '', type: 'blank' }]
+            return [...filtered, { text: '请求失败，请稍后重试', type: 'error' }, { text: '', type: 'blank' }]
           })
         })
       setInput('')
@@ -358,7 +358,7 @@ function Terminal({ openWindow }) {
       return
     } else if (trimmedLower === 'ovo') {
       setChatMode(true)
-      newLines.push({ text: '🤖 ovo 聊天模式已开启（输入 exit 退出）', type: 'output' })
+      newLines.push({ text: 'ovo 聊天模式已开启（输入 exit 退出）', type: 'output' })
       newLines.push({ text: '', type: 'blank' })
       setLines(newLines)
       setInput('')

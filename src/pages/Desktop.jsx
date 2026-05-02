@@ -466,7 +466,7 @@ export default function Desktop() {
 
   // 网格吸附参数（与下方保持一致）
   const GRID_SIZE = 80 // 网格间距
-  const GRID_TOP = 70  // 顶部起始位置
+  const GRID_TOP = 15  // 顶部起始位置
   const GRID_LEFT = 20 // 左侧起始位置
 
   // 初始化图标位置（网格布局）
@@ -753,7 +753,7 @@ export default function Desktop() {
               className={`desktop-icon ${selectedIcon === icon.id ? 'selected' : ''}`}
               style={{
                 left: (iconPositions[icon.id]?.x || 20) + 'px',
-                top: (iconPositions[icon.id]?.y || 70) + 'px',
+                top: (iconPositions[icon.id]?.y || 15) + 'px',
                 opacity: isDragging ? 0.3 : 1,
               }}
               onClick={() => handleIconClick(icon)}

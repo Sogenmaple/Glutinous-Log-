@@ -705,25 +705,30 @@ export default function Desktop() {
       // 绘制
       ctx.clearRect(0, 0, W, H)
       const cx = W / 2 + wobble
-      const stretchX = 1 + p.bodyDeform * 0.012
-      const stretchY = 1 - p.bodyDeform * 0.012
-      const baseRx = 38 * stretchX
-      const baseRy = 35 * stretchY
+      const stretchX = 1 + p.bodyDeform * 0.015
+      const stretchY = 1 - p.bodyDeform * 0.015
+      const bodyW = 70 * stretchX
+      const bodyH = 60 * stretchY
 
-      // 身体底部在 canvas 底部，所以 cy = H/2 + (H/2 - baseRy)/2 = H - baseRy/2...
-      // 更简单：身体底部紧贴地面，所以 center Y = H - baseRy
-      const cy = H - baseRy + (p.isJumping ? 0 : 0)
+      // 身体底部始终贴在 canvas 底部（y = H），所以 body 中心 Y = H - bodyH
+      const bodyTop = H - bodyH
+      const bodyBottom = H
 
       ctx.save()
-      ctx.translate(cx, cy)
+      ctx.translate(cx, 0)
 
-      // 身体路径（光滑贝塞尔曲线 blob）
+      // 身体 - 底部平贴地面 + 顶部圆弧 + 贝塞尔曲线软体
       ctx.beginPath()
-      ctx.moveTo(0, -baseRy)
-      ctx.bezierCurveTo(baseRx * 0.6, -baseRy, baseRx, -baseRy * 0.5, baseRx, 0)
-      ctx.bezierCurveTo(baseRx, baseRy * 0.5, baseRx * 0.6, baseRy, 0, baseRy)
-      ctx.bezierCurveTo(-baseRx * 0.6, baseRy, -baseRx, baseRy * 0.5, -baseRx, 0)
-      ctx.bezierCurveTo(-baseRx, -baseRy * 0.5, -baseRx * 0.6, -baseRy, 0, -baseRy)
+      // 从左下角开始
+      ctx.moveTo(-bodyW / 2, bodyBottom)
+      // 左侧：贝塞尔曲线向上到顶部圆弧
+      ctx.bezierCurveTo(-bodyW / 2, bodyTop + bodyH * 0.3, -bodyW / 2, bodyTop, -bodyW * 0.15, bodyTop)
+      // 顶部圆弧（左到右）
+      ctx.quadraticCurveTo(0, bodyTop - bodyH * 0.15, bodyW * 0.15, bodyTop)
+      // 右侧：贝塞尔曲线向下到右下角
+      ctx.bezierCurveTo(bodyW / 2, bodyTop, bodyW / 2, bodyTop + bodyH * 0.3, bodyW / 2, bodyBottom)
+      // 底部平线
+      ctx.lineTo(-bodyW / 2, bodyBottom)
       ctx.closePath()
 
       ctx.fillStyle = '#1a1a1a'
@@ -732,23 +737,36 @@ export default function Desktop() {
       ctx.lineWidth = 2.5
       ctx.stroke()
 
-      // 眼睛 - 纯白色胶囊（竖长椭圆），无瞳孔
-      const eyeSpacing = 16
-      const eyeY = -baseRy * 0.3
-      const eyeW = 8
-      const eyeH = 14 * blink
+      // 眼睛 - 真正的胶囊形状（矩形 + 两端半圆），纯白色
+      const eyeSpacing = 14
+      const eyeY = bodyTop + bodyH * 0.35
+      const capR = 10 // 胶囊半径（宽度一半）
+      const capH = 18 * blink // 胶囊总高度
 
-      // 左眼（纯白胶囊）
-      ctx.beginPath()
-      ctx.ellipse(-eyeSpacing, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2)
-      ctx.fillStyle = '#ffffff'
-      ctx.fill()
+      function drawCapsule(cx2, cy2, r, h) {
+        // cx2,cy2 = 胶囊中心, r = 半径（宽度一半）, h = 总高度
+        // 上半圆中心
+        const topY = cy2 - (h / 2 - r)
+        // 下半圆中心
+        const bottomY = cy2 + (h / 2 - r)
 
-      // 右眼（纯白胶囊）
-      ctx.beginPath()
-      ctx.ellipse(eyeSpacing, eyeY, eyeW, eyeH, 0, 0, Math.PI * 2)
-      ctx.fillStyle = '#ffffff'
-      ctx.fill()
+        ctx.beginPath()
+        ctx.moveTo(cx2 - r, topY)
+        ctx.lineTo(cx2 - r, bottomY)
+        // 下半圆（顺时针）
+        ctx.arc(cx2, bottomY, r, Math.PI, 0, false)
+        ctx.lineTo(cx2 + r, topY)
+        // 上半圆（顺时针）
+        ctx.arc(cx2, topY, r, 0, Math.PI, false)
+        ctx.closePath()
+        ctx.fillStyle = '#ffffff'
+        ctx.fill()
+      }
+
+      // 左眼
+      drawCapsule(cx - eyeSpacing, eyeY, capR, capH)
+      // 右眼
+      drawCapsule(cx + eyeSpacing, eyeY, capR, capH)
 
       ctx.restore()
 

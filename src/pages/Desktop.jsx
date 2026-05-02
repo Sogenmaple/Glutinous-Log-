@@ -190,7 +190,7 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, on
 }
 
 // 反相窗口 - 整个窗口容器使用 mix-blend-mode 反相下方内容
-function InvertWindowContainer({ window: win, onClose, onMinimize, onFocus, onResize, onToggleMaximize, animState, children }) {
+function InvertWindowContainer({ window: win, onClose, onMinimize, onFocus, onDrag, onResize, onToggleMaximize, animState, children }) {
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [isResizing, setIsResizing] = useState(false)
@@ -211,14 +211,14 @@ function InvertWindowContainer({ window: win, onClose, onMinimize, onFocus, onRe
     if (isDragging) {
       const x = Math.max(0, e.clientX - dragOffset.x)
       const y = Math.max(0, e.clientY - dragOffset.y)
-      onResize(win.id, x, y, win.width, win.height)
+      onDrag && onDrag(win.id, x, y)
     }
     if (isResizing) {
       const newW = Math.max(200, resizeStart.w + (e.clientX - resizeStart.x))
       const newH = Math.max(120, resizeStart.h + (e.clientY - resizeStart.y))
-      onResize(win.id, win.x, win.y, newW, newH)
+      onResize(win.id, newW, newH)
     }
-  }, [isDragging, isResizing, dragOffset, resizeStart, win, onResize])
+  }, [isDragging, isResizing, dragOffset, resizeStart, win, onDrag, onResize])
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false)
@@ -755,6 +755,13 @@ export default function Desktop() {
     navigate(route)
   }, [navigate])
 
+  // 拖动窗口位置
+  const handleDrag = useCallback((windowId, x, y) => {
+    setWindows(prev => prev.map(w =>
+      w.id === windowId ? { ...w, x, y } : w
+    ))
+  }, [])
+
   // 调整窗口尺寸（用户拖拽拉伸后更新状态）
   const handleResize = useCallback((windowId, width, height) => {
     setWindows(prev => prev.map(w =>
@@ -917,6 +924,7 @@ export default function Desktop() {
               onMinimize={minimizeWindow}
               onFocus={focusWindow}
               onNavigate={handleNavigate}
+              onDrag={handleDrag}
               onResize={handleResize}
               onToggleMaximize={toggleMaximizeWindow}
               animState={animatingWindows[window.id]}

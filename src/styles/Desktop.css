@@ -793,7 +793,6 @@
 .invert-window-container {
   background: transparent !important;
   border: 0.3vmin solid rgba(255, 255, 255, 0.3) !important;
-  mix-blend-mode: difference;
   box-shadow: none !important;
 }
 
@@ -808,10 +807,12 @@
 
 .invert-window-container .window-content {
   background: transparent !important;
+  mix-blend-mode: difference;
 }
 
 .invert-content {
   background: transparent !important;
+  mix-blend-mode: difference;
 }
 
 .invert-window {

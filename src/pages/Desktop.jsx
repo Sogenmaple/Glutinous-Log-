@@ -1065,6 +1065,45 @@ export default function Desktop() {
           })}
         </div>
 
+        {/* 任务栏软体生物 */}
+        <div className="taskbar-mascot" title="汤圆的小软体">
+          <svg viewBox="0 0 60 40" className="mascot-svg">
+            <defs>
+              <filter id="jelly">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04 0.04" numOctaves="2" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G">
+                  <animate attributeName="scale" values="2;4;3;2" dur="2s" repeatCount="indefinite" />
+                </feDisplacementMap>
+              </filter>
+            </defs>
+            <g filter="url(#jelly)" className="mascot-body-group">
+              {/* 身体 - 圆形软体 */}
+              <ellipse cx="30" cy="24" rx="16" ry="13" fill="#1a1a1a" stroke="#fff" strokeWidth="1.5">
+                <animate attributeName="ry" values="13;14;12;13" dur="1.5s" repeatCount="indefinite" />
+                <animate attributeName="rx" values="16;15;17;16" dur="1.5s" repeatCount="indefinite" />
+              </ellipse>
+              {/* 左眼睛 */}
+              <circle cx="23" cy="22" r="4" fill="#fff">
+                <animate attributeName="cy" values="22;21;22" dur="3s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="23" cy="22" r="2" fill="#1a1a1a">
+                <animate attributeName="cy" values="22;21;22" dur="3s" repeatCount="indefinite" />
+              </circle>
+              {/* 右眼睛 */}
+              <circle cx="37" cy="22" r="4" fill="#fff">
+                <animate attributeName="cy" values="22;21;22" dur="3s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="37" cy="22" r="2" fill="#1a1a1a">
+                <animate attributeName="cy" values="22;21;22" dur="3s" repeatCount="indefinite" />
+              </circle>
+              {/* 嘴巴 - 微笑 */}
+              <path d="M26 30 Q30 34 34 30" fill="none" stroke="#fff" strokeWidth="1" strokeLinecap="round">
+                <animate attributeName="d" values="M26 30 Q30 34 34 30;M26 30 Q30 33 34 30;M26 30 Q30 34 34 30" dur="2s" repeatCount="indefinite" />
+              </path>
+            </g>
+          </svg>
+        </div>
+
         <div className="taskbar-tray">
           <span className="tray-time">{new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>

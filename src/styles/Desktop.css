@@ -902,6 +902,34 @@
   white-space: nowrap;
 }
 
+/* 任务栏软体生物 */
+.taskbar-mascot {
+  display: flex;
+  align-items: center;
+  padding: 0 0.3rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.taskbar-mascot:hover {
+  transform: scale(1.15);
+}
+
+.taskbar-mascot:active {
+  transform: scale(0.9);
+}
+
+.mascot-svg {
+  width: 50px;
+  height: 34px;
+  animation: mascotBounce 2s ease-in-out infinite;
+}
+
+@keyframes mascotBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
 /* 系统托盘 */
 .taskbar-tray {
   display: flex;

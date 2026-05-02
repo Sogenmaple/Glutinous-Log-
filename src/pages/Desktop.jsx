@@ -289,10 +289,12 @@ function Terminal({ openWindow }) {
     { text: '', type: 'blank' },
   ])
   const [input, setInput] = useState('')
+  const [chatMode, setChatMode] = useState(false)
   const inputRef = useRef(null)
 
   const handleCommand = (cmd) => {
-    const trimmed = cmd.trim().toLowerCase()
+    const trimmed = cmd.trim()
+    const trimmedLower = trimmed.toLowerCase()
     const newLines = [...lines, { text: `C:\\Users\\TangYuan> ${cmd}`, type: 'input' }]
 
     if (trimmed === '') {
@@ -300,24 +302,68 @@ function Terminal({ openWindow }) {
       return
     }
 
-    if (trimmed.startsWith('echo ')) {
+    // 聊天模式下，exit 退出，其他消息发送给 AI
+    if (chatMode) {
+      if (trimmedLower === 'exit') {
+        setChatMode(false)
+        newLines.push({ text: '已退出 ovo 聊天模式', type: 'output' })
+        newLines.push({ text: '', type: 'blank' })
+        setLines(newLines)
+        setInput('')
+        return
+      }
+      // 发送消息给 AI
+      newLines.push({ text: '🤖 思考中...', type: 'output' })
+      setLines(newLines)
+      fetch('/api/ovo-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: trimmed })
+      })
+        .then(r => r.json())
+        .then(data => {
+          setLines(prev => {
+            // 移除"思考中"那行
+            const filtered = prev.filter(l => l.text !== '🤖 思考中...')
+            return [...filtered, { text: `ovo: ${data.reply || data.error || '无回复'}`, type: 'output' }, { text: '', type: 'blank' }]
+          })
+        })
+        .catch(() => {
+          setLines(prev => {
+            const filtered = prev.filter(l => l.text !== '🤖 思考中...')
+            return [...filtered, { text: '❌ 请求失败，请稍后重试', type: 'error' }, { text: '', type: 'blank' }]
+          })
+        })
+      setInput('')
+      return
+    }
+
+    // 普通命令模式
+    if (trimmedLower.startsWith('echo ')) {
       newLines.push({ text: cmd.substring(5), type: 'output' })
-    } else if (trimmed === 'help') {
-      newLines.push({ text: '可用命令: help, clear, date, whoami, ls, open [页面], exit', type: 'output' })
-    } else if (trimmed === 'date') {
+    } else if (trimmedLower === 'help') {
+      newLines.push({ text: '可用命令: help, clear, date, whoami, ls, open [页面], ovo, exit', type: 'output' })
+    } else if (trimmedLower === 'date') {
       newLines.push({ text: new Date().toLocaleString('zh-CN'), type: 'output' })
-    } else if (trimmed === 'whoami') {
+    } else if (trimmedLower === 'whoami') {
       newLines.push({ text: '汤圆', type: 'output' })
-    } else if (trimmed === 'ls') {
+    } else if (trimmedLower === 'ls') {
       newLines.push({ text: '作品集/  博客/  关于我/  番茄钟/  小游戏/  特殊构造/  个人中心/', type: 'output' })
-    } else if (trimmed === 'clear') {
+    } else if (trimmedLower === 'clear') {
       setLines([])
       return
-    } else if (trimmed === 'exit') {
+    } else if (trimmedLower === 'exit') {
       newLines.push({ text: '再见！', type: 'output' })
       setLines(newLines)
       return
-    } else if (trimmed.startsWith('open ')) {
+    } else if (trimmedLower === 'ovo') {
+      setChatMode(true)
+      newLines.push({ text: '🤖 ovo 聊天模式已开启（输入 exit 退出）', type: 'output' })
+      newLines.push({ text: '', type: 'blank' })
+      setLines(newLines)
+      setInput('')
+      return
+    } else if (trimmedLower.startsWith('open ')) {
       const target = trimmed.substring(5).trim()
       const appId = PATH_MAP['/' + target] || PATH_MAP[target]
       if (appId) {
@@ -351,7 +397,7 @@ function Terminal({ openWindow }) {
         ))}
       </div>
       <div className="terminal-input-line">
-        <span className="terminal-prompt">C:\Users\TangYuan&gt;</span>
+        <span className="terminal-prompt">{chatMode ? 'ovo >' : 'C:\\Users\\TangYuan>'}</span>
         <input
           ref={inputRef}
           className="terminal-input"

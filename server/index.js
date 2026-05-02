@@ -1078,6 +1078,57 @@ app.delete('/api/leaderboard/:gameId', authenticateToken, async (req, res) => {
   }
 })
 
+// ============ ovo 聊天 API ============
+
+// ovo 聊天接口（无需认证，只读）
+app.post('/api/ovo-chat', async (req, res) => {
+  try {
+    const { message } = req.body
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ error: '消息不能为空' })
+    }
+
+    const apiKey = process.env.DASHSCOPE_API_KEY
+    const baseUrl = process.env.DASHSCOPE_BASE_URL || 'https://coding.dashscope.aliyuncs.com/v1'
+
+    if (!apiKey) {
+      return res.status(500).json({ error: '服务器未配置 AI 服务' })
+    }
+
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'qwen3.5-plus',
+        messages: [
+          { role: 'system', content: '你是汤圆的小窝里的 AI 助手，名叫 ovo。你温暖、友好、略带调皮。用简洁的方式回答用户问题。' },
+          { role: 'user', content: message }
+        ],
+        max_tokens: 1024,
+        temperature: 0.8,
+        enable_thinking: false
+      })
+    })
+
+    if (!response.ok) {
+      const errText = await response.text()
+      console.error('DashScope API 错误:', response.status, errText)
+      return res.status(502).json({ error: 'AI 服务响应异常' })
+    }
+
+    const data = await response.json()
+    const reply = data.choices?.[0]?.message?.content || '抱歉，我没有收到回复'
+
+    res.json({ reply })
+  } catch (error) {
+    console.error('ovo 聊天错误:', error)
+    res.status(500).json({ error: '请求失败，请稍后重试' })
+  }
+})
+
 // 启动服务器
 initDataFiles().then(() => {
   initLeaderboardFile()

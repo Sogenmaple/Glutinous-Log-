@@ -48,11 +48,12 @@ const PATH_MAP = {
 }
 
 // 窗口组件
-function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, animState, children }) {
+function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, onToggleMaximize, animState, children }) {
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
   const [isResizing, setIsResizing] = useState(false)
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, w: 0, h: 0 })
+  const [wasMaximized, setWasMaximized] = useState(false) // 记录是否从最大化状态还原
   const windowRef = useRef(null)
 
   // 拖动
@@ -143,10 +144,15 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, an
 
   const icon = DESKTOP_ICONS.find(i => i.id === window.appId)
 
+  // 最大化/还原处理
+  const handleMaximizeToggle = useCallback(() => {
+    onToggleMaximize && onToggleMaximize(window.id)
+  }, [window.id, onToggleMaximize])
+
   return (
     <div
       ref={windowRef}
-      className={`desktop-window ${window.isMinimized ? 'minimized' : ''} ${animState || ''}`}
+      className={`desktop-window ${window.isMinimized ? 'minimized' : ''} ${window.isMaximized ? 'maximized' : ''} ${animState || ''}`}
       style={{
         left: window.x,
         top: window.y,
@@ -168,6 +174,7 @@ function Window({ window, onClose, onMinimize, onFocus, onNavigate, onResize, an
             </button>
           )}
           <button className="window-btn minimize" onClick={() => onMinimize(window.id)} title="最小化">_</button>
+          <button className="window-btn maximize" onClick={handleMaximizeToggle} title={window.isMaximized ? '还原' : '最大化'}>□</button>
           <button className="window-btn close" onClick={() => onClose(window.id)} title="关闭">X</button>
         </div>
       </div>
@@ -530,6 +537,39 @@ export default function Desktop() {
     }, 250)
   }, [])
 
+  // 最大化/还原窗口
+  const toggleMaximizeWindow = useCallback((windowId) => {
+    setWindows(prev => prev.map(w => {
+      if (w.id !== windowId) return w
+      
+      if (w.isMaximized) {
+        // 还原：恢复到原始尺寸和位置
+        return {
+          ...w,
+          isMaximized: false,
+          x: w.restoreX || w.x,
+          y: w.restoreY || w.y,
+          width: w.restoreWidth || w.width,
+          height: w.restoreHeight || w.height,
+        }
+      } else {
+        // 最大化：保存当前状态，设置全屏
+        return {
+          ...w,
+          isMaximized: true,
+          restoreX: w.x,
+          restoreY: w.y,
+          restoreWidth: w.width,
+          restoreHeight: w.height,
+          x: 0,
+          y: 0,
+          width: window.innerWidth,
+          height: window.innerHeight - 48, // 减去任务栏高度
+        }
+      }
+    }))
+  }, [])
+
   const focusWindow = useCallback((windowId) => {
     setWindows(prev => prev.map(w =>
       w.id === windowId ? { ...w, zIndex: zIndexCounter + 1 } : w
@@ -595,12 +635,24 @@ export default function Desktop() {
       document.removeEventListener('mouseup', handleMouseUp)
 
       if (wasDraggedRef.current) {
-        // 拖拽：吸附到网格
+        // 拖拽：吸附到网格，如果目标位置已有图标则交换
         const snapped = snapToGrid(e.clientX - 35, e.clientY - 40)
-        setIconPositions(prev => ({
-          ...prev,
-          [iconId]: snapped,
-        }))
+        setIconPositions(prev => {
+          // 找到目标位置已存在的图标
+          const targetIconId = Object.keys(prev).find(id => {
+            const pos = prev[id]
+            return pos.x === snapped.x && pos.y === snapped.y && id !== iconId
+          })
+          
+          const newPositions = { ...prev }
+          if (targetIconId) {
+            // 交换位置：目标图标移到原图标的位置
+            newPositions[targetIconId] = { ...prev[iconId] }
+          }
+          // 拖拽图标放到目标位置
+          newPositions[iconId] = snapped
+          return newPositions
+        })
       }
       // 否则视为点击，由 onClick 处理
     }
@@ -669,6 +721,7 @@ export default function Desktop() {
               onFocus={focusWindow}
               onNavigate={handleNavigate}
               onResize={handleResize}
+              onToggleMaximize={toggleMaximizeWindow}
               animState={animatingWindows[window.id]}
             >
               {window.appId === 'explorer' && <Explorer openWindow={openWindow} />}

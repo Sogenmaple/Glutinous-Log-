@@ -125,6 +125,16 @@
   pointer-events: none;
 }
 
+/* 最大化状态 */
+.desktop-window.maximized {
+  left: 0 !important;
+  top: 0 !important;
+  width: 100vw !important;
+  height: calc(100vh - 48px) !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 @keyframes windowOpen {
   0% {
     transform: scale(0.5) translateY(50px);

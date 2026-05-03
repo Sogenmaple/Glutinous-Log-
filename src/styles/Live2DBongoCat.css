@@ -4,8 +4,6 @@
   bottom: 0;
   right: 0;
   z-index: 9998;
-  width: 512px;
-  height: 512px;
   cursor: grab;
   transition: opacity 0.3s ease;
   pointer-events: auto;
@@ -20,6 +18,13 @@
   pointer-events: none;
 }
 
+/* 键盘包裹层 — 使用键盘原始比例 612x354 */
+.bongo-keyboard-wrapper {
+  width: 612px;
+  height: 354px;
+  position: relative;
+}
+
 /* 🖼️ 背景图片层 — 在 canvas 后面（参照原版 CatViewer 的 NextImage absolute size-full） */
 .bongo-keyboard-bg {
   position: absolute;
@@ -32,7 +37,7 @@
   z-index: 0;
 }
 
-/* 🎭 Live2D Canvas 容器 */
+/* 🎭 Live2D Canvas 容器 — 与背景同尺寸 */
 .live2d-bongo-cat-container {
   width: 100%;
   height: 100%;

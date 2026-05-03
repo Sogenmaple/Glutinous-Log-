@@ -3,11 +3,15 @@ import '../styles/Live2DBongoCat.css'
 
 // keyboard 模型（猫的 model3.json）
 const MODEL_PATH = '/assets/bongocat/models/keyboard/cat.model3.json'
-// 键盘背景图（在猫后面）
+// 键盘背景图（在猫后面）— 原版尺寸 612x354
 const KEYBOARD_BG = '/assets/bongocat/models/keyboard/resources/background.png'
 // 按键贴图目录
 const LEFT_KEY_BASE = '/assets/bongocat/models/keyboard/resources/left-keys'
 const RIGHT_KEY_BASE = '/assets/bongocat/models/keyboard/resources/right-keys'
+
+// 键盘背景原始尺寸（用于保持比例）
+const KB_WIDTH = 612
+const KB_HEIGHT = 354
 
 // 按键映射
 const KEY_CODE_MAP = {
@@ -68,7 +72,8 @@ export default function Live2DBongoCat() {
         if (cancelled) return
         const app = new Application()
         appRef.current = app
-        await app.init({ width:512, height:512, backgroundAlpha:0, antialias:true })
+        // canvas 尺寸与键盘背景一致
+        await app.init({ width: KB_WIDTH, height: KB_HEIGHT, backgroundAlpha:0, antialias:true })
         if (!containerRef.current || cancelled) return
         containerRef.current.appendChild(app.canvas)
         const model = new Live2DSprite({ modelPath:MODEL_PATH, ticker:Ticker.shared })
@@ -76,9 +81,9 @@ export default function Live2DBongoCat() {
         app.stage.addChild(model)
         await model.ready
         if (cancelled) return
-        model.scale.set(0.5)
-        model.x = 256
-        model.y = 256
+        // 模型居中放置
+        model.x = KB_WIDTH / 2
+        model.y = KB_HEIGHT / 2
         setLoaded(true)
       } catch (err) {
         if (!cancelled) setError(err.message || String(err))
@@ -92,7 +97,7 @@ export default function Live2DBongoCat() {
     }
   }, [])
 
-  // 更新模型手部参数（keyboard 模型只有 CatParamLeftHandDown 和 CatParamRightHandDown）
+  // 更新模型手部参数
   const updateModel = useCallback((hasLeft, hasRight) => {
     if (!modelRef.current) return
     try { modelRef.current.setParameterValueById('CatParamLeftHandDown', hasLeft ? 1 : 0) } catch {}
@@ -125,7 +130,7 @@ export default function Live2DBongoCat() {
     return () => { window.removeEventListener('keydown', onDown); window.removeEventListener('keyup', onUp) }
   }, [updateModel])
 
-  // 鼠标事件（keyboard 模型：右手按鼠标 = CatParamRightHandDown）
+  // 鼠标事件
   useEffect(() => {
     const onDown = () => { if (modelRef.current) try { modelRef.current.setParameterValueById('CatParamRightHandDown',1) } catch {} }
     const onUp = () => { if (modelRef.current) try { modelRef.current.setParameterValueById('CatParamRightHandDown',0) } catch {} }
@@ -155,26 +160,24 @@ export default function Live2DBongoCat() {
   // 当前需要显示的按键图片
   const activeKeyPaths = [...pressedKeys].map(code => getKeyPath(code)).filter(Boolean)
 
-  // 原版渲染层级（参照 cat-viewer.tsx）：
-  // 1. 背景图片层（background.png）— absolute size-full
-  // 2. Live2D canvas — absolute size-full
-  // 3. KeyboardVisualization（按键叠加）— 每个按键 absolute size-full
   return (
     <div className={`live2d-bongo-cat ${!visible ? 'hidden' : ''}`} onContextMenu={handleContextMenu} title="右键隐藏/显示">
-      {/* 🖼️ 背景图片层 — 键盘底图 */}
-      <img className="bongo-keyboard-bg" src={KEYBOARD_BG} alt="" draggable={false} />
-      {/* 🎭 Live2D Canvas */}
-      <div ref={containerRef} className="live2d-bongo-cat-container" />
-      {/* ⌨️ 键盘可视化层 — 按下的按键叠加 */}
-      {activeKeyPaths.map((path) => (
-        <img
-          key={path}
-          className="bongo-key-overlay"
-          src={path}
-          alt=""
-          draggable={false}
-        />
-      ))}
+      <div className="bongo-keyboard-wrapper">
+        {/* 🖼️ 背景图片层 — 键盘底图 */}
+        <img className="bongo-keyboard-bg" src={KEYBOARD_BG} alt="" draggable={false} />
+        {/* 🎭 Live2D Canvas */}
+        <div ref={containerRef} className="live2d-bongo-cat-container" />
+        {/* ⌨️ 键盘可视化层 — 按下的按键叠加 */}
+        {activeKeyPaths.map((path) => (
+          <img
+            key={path}
+            className="bongo-key-overlay"
+            src={path}
+            alt=""
+            draggable={false}
+          />
+        ))}
+      </div>
       {!loaded && !error && <div className="bongo-cat-loading">加载中...</div>}
     </div>
   )

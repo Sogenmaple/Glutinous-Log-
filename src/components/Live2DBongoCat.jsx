@@ -32,8 +32,8 @@ export default function Live2DBongoCat() {
         appRef.current = app
 
         await app.init({
-          width: 600,
-          height: 600,
+          width: 512,
+          height: 512,
           backgroundAlpha: 0,
           antialias: true,
         })
@@ -60,10 +60,10 @@ export default function Live2DBongoCat() {
         if (cancelled) return
 
         // 缩放和定位
-        const scale = 1.0
+        const scale = 0.5
         model.scale.set(scale)
-        model.x = 200
-        model.y = 200
+        model.x = 256
+        model.y = 256
 
         setLoaded(true)
       } catch (err) {

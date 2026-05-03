@@ -211,7 +211,7 @@ export default function Live2DBongoCat({ onReply }) {
 
   // ============ 对话气泡功能 ============
 
-  // 显示气泡（3秒后自动消失）
+  // 显示气泡（10秒后自动消失，用户点击任意位置也会立即消失）
   const showBubble = useCallback((text) => {
     if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current)
     setBubbleText(text)
@@ -219,7 +219,33 @@ export default function Live2DBongoCat({ onReply }) {
     bubbleTimerRef.current = setTimeout(() => {
       setBubbleVisible(false)
       setBubbleText('')
-    }, 3000)
+    }, 10000)
+  }, [])
+
+  // 点击任意位置隐藏气泡
+  useEffect(() => {
+    const onClick = () => {
+      if (bubbleVisible) {
+        if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current)
+        setBubbleVisible(false)
+        setBubbleText('')
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [bubbleVisible])
+
+  // Alt/Meta等修饰键可能因系统快捷键导致keyup丢失，窗口失焦时清理卡键
+  useEffect(() => {
+    const onBlur = () => {
+      setPressedKeys({})
+      if (modelRef.current) {
+        try { modelRef.current.setParameterValueById('CatParamLeftHandDown', 0) } catch {}
+        try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 0) } catch {}
+      }
+    }
+    window.addEventListener('blur', onBlur)
+    return () => window.removeEventListener('blur', onBlur)
   }, [])
 
   // 刷新页面时自动打招呼

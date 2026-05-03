@@ -1,4 +1,4 @@
-/* Live2D Bongo Cat */
+/* Live2D Bongo Cat — 参照原版 cat-viewer.tsx 层级结构 */
 .live2d-bongo-cat {
   position: fixed;
   bottom: 0;
@@ -20,7 +20,7 @@
   pointer-events: none;
 }
 
-/* 键盘底图 — 最底层 */
+/* 🖼️ 背景图片层 — 在 canvas 后面（参照原版 CatViewer 的 NextImage absolute size-full） */
 .bongo-keyboard-bg {
   position: absolute;
   top: 0;
@@ -32,6 +32,7 @@
   z-index: 0;
 }
 
+/* 🎭 Live2D Canvas 容器 */
 .live2d-bongo-cat-container {
   width: 100%;
   height: 100%;
@@ -44,7 +45,7 @@
   height: 100% !important;
 }
 
-/* 按键贴图叠加层 — 在猫上面 */
+/* ⌨️ 键盘可视化层 — 在 canvas 上面（参照原版 KeyboardVisualization 的 Image absolute size-full） */
 .bongo-key-overlay {
   position: absolute;
   top: 0;
@@ -54,18 +55,6 @@
   object-fit: contain;
   pointer-events: none;
   z-index: 2;
-}
-
-/* 覆盖层 — 最上层 */
-.bongo-keyboard-cover {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-  z-index: 3;
 }
 
 /* Loading state */

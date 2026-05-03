@@ -1127,7 +1127,7 @@ export default function Desktop() {
                   sendChatMessage()
                 }
               }}
-              placeholder="跟猫说句话..."
+              placeholder="跟汤圆说句话..."
               disabled={chatLoading}
               onClick={(e) => e.stopPropagation()}
             />

@@ -42,7 +42,7 @@ function AppContent() {
   const location = useLocation()
   
   // 后台页面跳过 Intro 动画
-  const isAdminRoute = location.pathname.startsWith('/admin')
+  const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/desktop')
 
   // 全局自定义光标 - 点实时跟随，圈延迟跟随
   useEffect(() => {

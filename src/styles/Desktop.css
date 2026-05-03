@@ -218,6 +218,18 @@
   border-color: #ff0000;
 }
 
+.window-btn.navigate {
+  background: #2a5a2a;
+  border-color: #4a4;
+  color: #8f8;
+}
+
+.window-btn.navigate:hover {
+  background: #3a7a3a;
+  border-color: #6c6;
+  color: #fff;
+}
+
 /* 窗口内容 - 允许溢出以便拉伸手柄在外部可见 */
 .window-content {
   flex: 1;
@@ -736,6 +748,16 @@
 .avatar-dropdown-item:hover {
   background: #333;
   color: #fff;
+}
+
+.avatar-dropdown-item.admin-item {
+  color: #4caf50;
+  font-weight: 700;
+}
+
+.avatar-dropdown-item.admin-item:hover {
+  background: #1a3a1a;
+  color: #6f6;
 }
 
 .avatar-dropdown-icon {

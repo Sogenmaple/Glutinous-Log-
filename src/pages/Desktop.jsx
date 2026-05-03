@@ -301,6 +301,9 @@ function InvertWindowContainer({ window: win, onClose, onMinimize, onFocus, onDr
         <span className="window-icon">{icon?.symbol || '?'}</span>
         <span className="window-title">{win.title}</span>
         <div className="window-controls">
+          {icon?.route && (
+            <button className="window-btn navigate" onClick={() => onNavigate(icon.route)} title="在页面中打开">→</button>
+          )}
           <button className="window-btn minimize" onClick={() => onMinimize(win.id)} title="最小化">_</button>
           <button className="window-btn maximize" onClick={handleMaximizeToggle} title={win.isMaximized ? '还原' : '最大化'}>□</button>
           <button className="window-btn close" onClick={() => onClose(win.id)} title="关闭">X</button>
@@ -592,6 +595,7 @@ export default function Desktop() {
   const [showAvatarMenu, setShowAvatarMenu] = useState(false)
   const [draggingGhost, setDraggingGhost] = useState(null) // { id, x, y } 拖拽中的幽灵图标
   const [userAvatar, setUserAvatar] = useState('') // 当前用户头像
+  const [isAdmin, setIsAdmin] = useState(false) // 是否为管理员
   const wasDraggedRef = useRef(false)
 
   // 猫对话气泡回调
@@ -600,12 +604,13 @@ export default function Desktop() {
   const [chatLoading, setChatLoading] = useState(false)
   const chatInputRef = useRef(null)
 
-  // 加载用户头像
+  // 加载用户头像 + 管理员状态
   useEffect(() => {
     const loadAvatar = () => {
       try {
         const user = JSON.parse(localStorage.getItem('user') || '{}')
         setUserAvatar(user.avatar || '')
+        setIsAdmin(user.role === 'admin')
       } catch (e) { /* ignore */ }
     }
     loadAvatar()
@@ -1072,6 +1077,14 @@ export default function Desktop() {
             <div className="avatar-dropdown-item" onClick={() => { openWindow('explorer'); setShowAvatarMenu(false) }}>
               <span className="avatar-dropdown-icon">[F]</span> 资源管理器
             </div>
+            {isAdmin && (
+              <>
+                <div className="avatar-dropdown-divider"></div>
+                <div className="avatar-dropdown-item admin-item" onClick={() => { navigate('/admin'); setShowAvatarMenu(false) }}>
+                  <span className="avatar-dropdown-icon">[A]</span> 管理后台
+                </div>
+              </>
+            )}
             <div className="avatar-dropdown-divider"></div>
             <div className="avatar-dropdown-item" onClick={() => { navigate('/login'); setShowAvatarMenu(false) }}>
               <span className="avatar-dropdown-icon">[R]</span> 切换账号

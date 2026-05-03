@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { Application, Ticker } from 'pixi.js'
-import { Live2DSprite, Config, Priority } from 'easy-live2d'
 import '../styles/Live2DBongoCat.css'
 
 // Live2D 模型路径
@@ -14,59 +12,73 @@ export default function Live2DBongoCat() {
   const [error, setError] = useState(null)
   const [visible, setVisible] = useState(true)
 
-  // 初始化 PIXI.js + Live2D 模型
+  // 动态加载 PIXI + easy-live2d
   useEffect(() => {
-    if (!containerRef.current) return
+    let cancelled = false
+    let cleanupFns = []
 
-    // 创建 PIXI Application
-    const app = new Application()
-    appRef.current = app
+    async function init() {
+      try {
+        if (!containerRef.current) return
 
-    // 初始化 PIXI
-    app.init({
-      width: 400,
-      height: 400,
-      backgroundAlpha: 0,
-      antialias: true,
-      hello: false,
-    }).then(() => {
-      if (!containerRef.current) return
+        // 动态导入（避免打包冲突）
+        const { Application, Ticker } = await import('pixi.js')
+        const { Live2DSprite } = await import('easy-live2d')
 
-      // 添加 canvas 到容器
-      containerRef.current.appendChild(app.view)
+        if (cancelled) return
 
-      // 创建 Live2DSprite
-      const model = new Live2DSprite({
-        modelPath: MODEL_PATH,
-        ticker: Ticker.shared,
-      })
+        // 创建 PIXI Application
+        const app = new Application()
+        appRef.current = app
 
-      modelRef.current = model
-      app.stage.addChild(model)
+        await app.init({
+          width: 400,
+          height: 400,
+          backgroundAlpha: 0,
+          antialias: true,
+        })
 
-      // 等待模型加载完成
-      model.ready.then(() => {
-        // 设置缩放和位置
-        model.scale.set(0.3)
+        if (!containerRef.current || cancelled) return
+
+        // 添加 canvas
+        if (app.canvas && app.canvas.parentNode !== containerRef.current) {
+          containerRef.current.appendChild(app.canvas)
+        }
+
+        // 创建 Live2DSprite
+        const model = new Live2DSprite({
+          modelPath: MODEL_PATH,
+          ticker: Ticker.shared,
+        })
+
+        modelRef.current = model
+        app.stage.addChild(model)
+
+        // 等待加载完成
+        await model.ready
+
+        if (cancelled) return
+
+        // 缩放和定位
+        const scale = 0.45
+        model.scale.set(scale)
         model.x = 200
         model.y = 200
 
-        // 设置锚点
-        if (model.anchor) {
-          model.anchor.set(0.5)
-        }
-
         setLoaded(true)
-      }).catch(err => {
-        console.error('Live2D 模型加载失败:', err)
-        setError(err.message)
-      })
-    }).catch(err => {
-      console.error('PIXI 初始化失败:', err)
-      setError(err.message)
-    })
+      } catch (err) {
+        console.error('Live2D 初始化失败:', err)
+        if (!cancelled) {
+          setError(err.message || String(err))
+        }
+      }
+    }
+
+    init()
 
     return () => {
+      cancelled = true
+      cleanupFns.forEach(fn => fn())
       if (modelRef.current) {
         modelRef.current.destroy()
         modelRef.current = null
@@ -78,61 +90,40 @@ export default function Live2DBongoCat() {
     }
   }, [])
 
-  // 键盘监听 - 驱动左手
+  // 键盘/鼠标交互
   const handleKeyDown = useCallback((e) => {
     if (!modelRef.current || e.repeat) return
-    try {
-      modelRef.current.setParameterValueById('CatParamLeftHandDown', 1)
-    } catch (err) {
-      // 忽略参数设置错误
-    }
+    try { modelRef.current.setParameterValueById('CatParamLeftHandDown', 1) } catch {}
   }, [])
 
   const handleKeyUp = useCallback((e) => {
     if (!modelRef.current) return
-    try {
-      modelRef.current.setParameterValueById('CatParamLeftHandDown', 0)
-    } catch (err) {
-      // 忽略参数设置错误
-    }
+    try { modelRef.current.setParameterValueById('CatParamLeftHandDown', 0) } catch {}
   }, [])
 
-  // 鼠标监听 - 驱动右手
   const handleMouseDown = useCallback((e) => {
     if (!modelRef.current) return
-    try {
-      modelRef.current.setParameterValueById('CatParamRightHandDown', 1)
-    } catch (err) {
-      // 忽略参数设置错误
-    }
+    try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 1) } catch {}
   }, [])
 
   const handleMouseUp = useCallback((e) => {
     if (!modelRef.current) return
-    try {
-      modelRef.current.setParameterValueById('CatParamRightHandDown', 0)
-    } catch (err) {
-      // 忽略参数设置错误
-    }
+    try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 0) } catch {}
   }, [])
 
-  // 鼠标移动 - 驱动眼睛和头部跟随
   const handleMouseMove = useCallback((e) => {
     if (!modelRef.current || !containerRef.current) return
-
-    const model = modelRef.current
     const rect = containerRef.current.getBoundingClientRect()
-
     const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2)
     const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2)
 
-    const params = ['ParamMouseX', 'ParamMouseY', 'ParamAngleX', 'ParamAngleY', 'ParamEyeBallX', 'ParamEyeBallY']
-    for (const param of params) {
-      try {
-        model.setParameterValueById(param, param.includes('Y') ? y : x)
-      } catch (err) {
-        // 忽略参数设置错误
-      }
+    const params = [
+      ['ParamMouseX', x], ['ParamMouseY', y],
+      ['ParamAngleX', x], ['ParamAngleY', y],
+      ['ParamEyeBallX', x], ['ParamEyeBallY', y]
+    ]
+    for (const [id, val] of params) {
+      try { modelRef.current.setParameterValueById(id, val) } catch {}
     }
   }, [])
 
@@ -142,7 +133,6 @@ export default function Live2DBongoCat() {
     window.addEventListener('mousedown', handleMouseDown)
     window.addEventListener('mouseup', handleMouseUp)
     window.addEventListener('mousemove', handleMouseMove)
-
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
@@ -152,7 +142,6 @@ export default function Live2DBongoCat() {
     }
   }, [handleKeyDown, handleKeyUp, handleMouseDown, handleMouseUp, handleMouseMove])
 
-  // 右键隐藏/显示
   const handleContextMenu = (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -161,14 +150,8 @@ export default function Live2DBongoCat() {
 
   if (error) {
     return (
-      <div
-        className="bongo-cat-error"
-        onContextMenu={handleContextMenu}
-        title="Live2D 加载失败"
-      >
-        <div className="bongo-cat-error-text">
-          加载失败: {error}
-        </div>
+      <div className="bongo-cat-error" onContextMenu={handleContextMenu}>
+        <div className="bongo-cat-error-text">加载失败: {error}</div>
       </div>
     )
   }
@@ -177,12 +160,10 @@ export default function Live2DBongoCat() {
     <div
       className={`live2d-bongo-cat ${!visible ? 'hidden' : ''}`}
       onContextMenu={handleContextMenu}
-      title="右键隐藏/显示 | Live2D Bongo Cat"
+      title="右键隐藏/显示"
     >
       <div ref={containerRef} className="live2d-bongo-cat-container" />
-      {!loaded && !error && (
-        <div className="bongo-cat-loading">加载中...</div>
-      )}
+      {!loaded && !error && <div className="bongo-cat-loading">加载中...</div>}
     </div>
   )
 }

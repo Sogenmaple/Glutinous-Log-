@@ -32,8 +32,8 @@ export default function Live2DBongoCat() {
         appRef.current = app
 
         await app.init({
-          width: 400,
-          height: 400,
+          width: 600,
+          height: 600,
           backgroundAlpha: 0,
           antialias: true,
         })
@@ -60,7 +60,7 @@ export default function Live2DBongoCat() {
         if (cancelled) return
 
         // 缩放和定位
-        const scale = 0.45
+        const scale = 1.0
         model.scale.set(scale)
         model.x = 200
         model.y = 200
@@ -103,12 +103,20 @@ export default function Live2DBongoCat() {
 
   const handleMouseDown = useCallback((e) => {
     if (!modelRef.current) return
-    try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 1) } catch {}
+    if (e.button === 0) {
+      try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 1) } catch {}
+    } else if (e.button === 2) {
+      try { modelRef.current.setParameterValueById('ParamMouseRightDown', 1) } catch {}
+    }
   }, [])
 
   const handleMouseUp = useCallback((e) => {
     if (!modelRef.current) return
-    try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 0) } catch {}
+    if (e.button === 0) {
+      try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 0) } catch {}
+    } else if (e.button === 2) {
+      try { modelRef.current.setParameterValueById('ParamMouseRightDown', 0) } catch {}
+    }
   }, [])
 
   const handleMouseMove = useCallback((e) => {

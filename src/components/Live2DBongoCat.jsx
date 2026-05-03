@@ -17,11 +17,11 @@ const MOUSE_RANGE_Y = 100
 // 猫的人设
 const CAT_NAME = '汤圆三号机'
 const CAT_GREETINGS = [
-  '嗨～我是{NAME}！欢迎来到汤圆的小窝，今天过得怎么样呀？',
-  '喵呜～{NAME}在这里等你哦！有什么想聊的吗？',
-  '呼噜呼噜～你好呀！我是管理这个小窝的{NAME}～',
-  '呀！你终于来啦～{NAME}等了你好久了呢！',
-  '嘿嘿～今天也是元气满满的一天！{NAME}给你加油哦！',
+  '{USERNAME}你好呀～我是{CATNAME}！欢迎来到汤圆的小窝，今天过得怎么样？',
+  '喵呜～{CATNAME}在这里等你哦，{USERNAME}！有什么想聊的吗？',
+  '呼噜呼噜～{USERNAME}你好！我是管理这个小窝的{CATNAME}～',
+  '呀！{USERNAME}你终于来啦～{CATNAME}等了你好久了呢！',
+  '嘿嘿～今天也是元气满满的一天！{CATNAME}给{USERNAME}加油哦！',
 ]
 const CAT_CLICK_REPLIES = [
   '喵？找我有事吗～',
@@ -30,7 +30,7 @@ const CAT_CLICK_REPLIES = [
   '汤圆三号机，随时待命！',
   '喵呜～你摸到我啦！',
   '哎呀～别戳别戳～好啦好啦我在呢～',
-  '嗯嗯！{NAME}在这里哦！',
+  '{USERNAME}在叫我吗～我在这里哦！',
   '有什么我可以帮你的吗～',
 ]
 
@@ -76,8 +76,10 @@ function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
-function formatMessage(template, name) {
-  return template.replace(/\{NAME\}/g, name)
+function formatMessage(template, username, catName) {
+  return template
+    .replace(/\{USERNAME\}/g, username)
+    .replace(/\{CATNAME\}/g, catName)
 }
 
 export default function Live2DBongoCat({ onReply }) {
@@ -226,9 +228,9 @@ export default function Live2DBongoCat({ onReply }) {
     try {
       const user = JSON.parse(localStorage.getItem('user') || '{}')
       const username = user.displayName || user.username || '旅行者'
-      const greeting = formatMessage(pickRandom(CAT_GREETINGS), CAT_NAME)
+      const greeting = formatMessage(pickRandom(CAT_GREETINGS), username, CAT_NAME)
       // 稍微延迟，让模型先加载完
-      const timer = setTimeout(() => showBubble(greeting.replace('你好呀', username + '你好呀').replace('你终于来啦', username + '你终于来啦')), 1500)
+      const timer = setTimeout(() => showBubble(greeting), 1500)
       return () => clearTimeout(timer)
     } catch {}
   }, [loaded, showBubble])
@@ -265,8 +267,14 @@ export default function Live2DBongoCat({ onReply }) {
       window.removeEventListener('mouseup', onMouseUp)
       // 如果不是拖拽，则视为点击
       if (!dragRef.current.dragging) {
-        const reply = formatMessage(pickRandom(CAT_CLICK_REPLIES), CAT_NAME)
-        showBubble(reply)
+        try {
+          const user = JSON.parse(localStorage.getItem('user') || '{}')
+          const username = user.displayName || user.username || '旅行者'
+          const reply = formatMessage(pickRandom(CAT_CLICK_REPLIES), username, CAT_NAME)
+          showBubble(reply)
+        } catch {
+          showBubble(pickRandom(CAT_CLICK_REPLIES))
+        }
       }
     }
     window.addEventListener('mousemove', onMouseMove)

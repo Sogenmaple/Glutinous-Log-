@@ -23,7 +23,6 @@ tangyuan-games/
 │   │   ├── Header.jsx      # 导航栏
 │   │   ├── PostCard.jsx    # 文章卡片
 │   │   ├── Live2DBongoCat.jsx # Live2D 桌面宠物 + 对话气泡 (v7.7)
-│   │   └── admin/          # 后台管理
 │   ├── styles/             # CSS 样式
 │   │   ├── manga-common.css    # ⭐ 漫画风格通用样式 (新增)
 │   │   ├── responsive.css      # ⭐ 全局响应式样式
@@ -36,7 +35,9 @@ tangyuan-games/
 │   │   ├── header.css          # 导航栏
 │   │   ├── Profile.css         # 个人资料
 │   │   ├── auth.css            # 登录注册
-│   │   ├── AdminDashboard.css  # 后台管理
+│   │   ├── AdminLogin.css      # 后台登录
+│   │   ├── AdminDashboard.css  # 后台管理面板
+│   │   ├── ArticleEditor.css   # 文章编辑器
 │   │   ├── Snake.css           # 贪吃蛇
 │   │   ├── Tetris.css          # 俄罗斯方块
 │   │   ├── Pacman.css          # 吃豆人
@@ -72,7 +73,12 @@ tangyuan-games/
 | `番茄样式` | `src/styles/pomodoro.css` | 番茄钟样式 |
 | `导航栏` | `src/components/Header.jsx` | 顶部导航 |
 | `注册` | `src/pages/Register.jsx` | 用户注册 |
-| `后台` | `src/components/admin/` | 后台管理组件 |
+| `后台` | `src/pages/AdminDashboard.jsx` | 后台管理 (v3.0 重构) |
+| `后台登录` | `src/pages/AdminLogin.jsx` | 管理登录页 |
+| `文章编辑` | `src/pages/ArticleEditor.jsx` | 文章新建/编辑 |
+| `后台样式` | `src/styles/AdminDashboard.css` | 后台管理样式 |
+| `登录样式` | `src/styles/AdminLogin.css` | 管理登录样式 |
+| `编辑样式` | `src/styles/ArticleEditor.css` | 文章编辑样式 |
 | `API` | `server/index.js` | 后端接口 |
 
 ---
@@ -164,7 +170,9 @@ src/styles/
 ├── 🎯 功能模块样式 (已统一为黑白漫画风格 ✅)
 │   ├── Profile.css         # 个人资料 (828 行) ✅
 │   ├── auth.css            # 登录注册 (785 行) ✅
-│   ├── AdminDashboard.css  # 后台管理 (1127 行) ✅
+│   ├── AdminLogin.css      # 后台登录 (重构 v3.0, ~200 行) ✅
+│   ├── AdminDashboard.css  # 后台管理面板 (重构 v3.0, ~420 行) ✅
+│   ├── ArticleEditor.css   # 文章编辑器 (新增 v3.0, ~180 行) ✅
 │   └── pomodoro.css        # 番茄钟 (2897 行，⚠️ 待迁移为漫画风格)
 │
 └── 🔧 组件样式
@@ -457,7 +465,7 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 | 首页 | v7.7 | ✅ 模拟电脑桌面（窗口系统+任务栏+猫对话气泡） |
 | 番茄钟 | v8.2 | ✅ 完整功能 + 漫画风格 |
 | 博客 | v3.0 | ✅ 基础功能 + 漫画风格 |
-| 后台 | v2.0 | ✅ 管理功能 + 漫画风格 |
+| 后台 | v3.0 | ✅ 从零重构 + 黑白漫画风格 |
 | 用户系统 | v1.0 | ✅ 注册登录 + 漫画风格 |
 | 作品集 | v5.3 | ✅ 时间轴排版 |
 | 漫画风格 | v3.0 | ✅ 全站统一 (100% 覆盖) |
@@ -503,6 +511,36 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 ---
 
 ## 🧹 CSS 清理记录
+
+### 2026-07-10: 后台管理系统从零重构 v3.0
+
+**删除旧文件**:
+- 删除旧的 `AdminLogin.jsx` / `AdminDashboard.jsx` / `AdminLogin.css` / `AdminDashboard.css` / `src/components/admin/` 目录
+- 旧版 `AdminDashboard.css` 1127 行 → 清理
+
+**新增文件 (黑白漫画风格)**:
+- ✅ `AdminLogin.jsx` (~95 行) — 管理登录页，黑白漫画风格登录卡片
+- ✅ `AdminLogin.css` (~200 行) — 登录页样式（角落装饰 + 硬阴影 + 漫画网点背景）
+- ✅ `AdminDashboard.jsx` (~420 行) — 管理后台主页（系统概览/用户管理/文章管理/操作日志/系统设置 5 个 Tab）
+- ✅ `AdminDashboard.css` (~420 行) — 后台管理样式（侧边栏/表格/开关/按钮）
+- ✅ `ArticleEditor.jsx` (~135 行) — 文章新建/编辑器
+- ✅ `ArticleEditor.css` (~180 行) — 编辑器样式
+
+**后端新增**:
+- ✅ 新增 `GET /api/admin/articles/:articleId` — 获取单篇文章接口
+- ✅ 已有接口复用：`/api/login`, `/api/admin/overview`, `/api/admin/users`, `/api/admin/articles`, `/api/admin/logs`
+
+**风格特点**:
+- ✅ 硬朗黑色线条 + 4px 粗边框 + 硬阴影
+- ✅ 黑色侧边栏 + 白色内容区对比
+- ✅ 表格：黑色表头 + 粗边框分隔
+- ✅ 按钮：黑色背景 + 悬停反色 + 硬阴影位移
+- ✅ 开关：黑白漫画风格 toggle
+
+**代码统计**:
+- 新增 6 个文件：3 个 JSX + 3 个 CSS
+- `AdminDashboard.css`: ~420 行（旧版 1127 行 → 精简 63%）
+- 总计新增约 1450 行，删除约 1200 行旧代码
 
 ### 2026-07-10: 首页网点改为 Canvas 粒子系统
 

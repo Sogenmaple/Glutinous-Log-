@@ -1,23 +1,32 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import '../styles/manga-common.css'
 import '../styles/AdminLogin.css'
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (token) {
-      navigate('/admin')
+    const user = localStorage.getItem('user')
+    if (token && user) {
+      try {
+        const parsed = JSON.parse(user)
+        if (parsed.role === 'admin') {
+          navigate('/admin')
+        }
+      } catch { /* ignore */ }
     }
   }, [navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setLoading(true)
 
     try {
       const response = await fetch('/api/login', {
@@ -29,56 +38,94 @@ export default function AdminLogin() {
       const data = await response.json()
 
       if (response.ok) {
+        if (data.user.role !== 'admin') {
+          setError('需要管理员权限 (´･ω･`)')
+          setLoading(false)
+          return
+        }
         localStorage.setItem('token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
         navigate('/admin')
       } else {
         setError(data.error || '登录失败')
       }
-    } catch (error) {
+    } catch {
       setError('网络错误，请检查服务器是否运行')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
     <div className="admin-login-page">
-      <div className="login-container">
-        <h1 className="login-title">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'middle', marginRight: '0.5rem'}}>
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <polyline points="14 2 14 8 20 8" />
-            <line x1="16" y1="13" x2="8" y2="13" />
-            <line x1="16" y1="17" x2="8" y2="17" />
-          </svg>
-          博客管理后台
-        </h1>
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label>用户名</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin"
-              required
-            />
+      <div className="manga-halftone"></div>
+      <div className="login-wrapper">
+        <div className="login-card">
+          {/* 角落装饰 */}
+          <div className="manga-corner tl"></div>
+          <div className="manga-corner tr"></div>
+          <div className="manga-corner bl"></div>
+          <div className="manga-corner br"></div>
+
+          {/* 标题 */}
+          <div className="login-header">
+            <div className="login-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <h1 className="login-title">管理后台</h1>
+            <p className="login-subtitle">ADMIN DASHBOARD</p>
           </div>
-          <div className="form-group">
-            <label>密码</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
-          </div>
-          {error && <div className="error-message">{error}</div>}
-          <button type="submit" className="login-btn">登录</button>
-          <div className="login-tip">
-            默认账户：admin / admin123
-          </div>
-        </form>
+
+          {/* 表单 */}
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="form-group">
+              <label htmlFor="username">用户名</label>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="admin"
+                autoComplete="username"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">密码</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="error-message">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="15" y1="9" x2="9" y2="15" />
+                  <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+                {error}
+              </div>
+            )}
+
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? '登录中...' : '登录'}
+            </button>
+
+            <div className="login-footer">
+              <span>默认：admin / admin123</span>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )

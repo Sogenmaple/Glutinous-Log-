@@ -725,6 +725,22 @@ app.get('/api/admin/articles', authenticateAdmin, async (req, res) => {
   }
 })
 
+// 获取单篇文章（管理员）
+app.get('/api/admin/articles/:articleId', authenticateAdmin, async (req, res) => {
+  try {
+    const postsData = await fs.readFile(POSTS_FILE, 'utf-8')
+    const posts = JSON.parse(postsData)
+    const post = posts.find(p => p.id === req.params.articleId)
+    if (!post) {
+      return res.status(404).json({ error: '文章不存在' })
+    }
+    res.json(post)
+  } catch (error) {
+    console.error('获取文章错误:', error)
+    res.status(500).json({ error: '获取文章失败' })
+  }
+})
+
 // 创建文章（管理员）
 app.post('/api/admin/articles', authenticateAdmin, async (req, res) => {
   try {

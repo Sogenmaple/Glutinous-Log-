@@ -1,5 +1,5 @@
 /* ============================================
-   管理后台 - 纯黑白漫画风格
+   管理后台 - 黑白漫画风格 v1.0
    ============================================ */
 
 /* ========== 页面容器 ========== */
@@ -10,33 +10,33 @@
   color: #000000;
 }
 
-/* ========== 布局容器 ========== */
-.admin-container {
+/* ========== 布局 ========== */
+.admin-layout {
   display: flex;
-  min-height: 100vh;
-  margin-top: 48px; /* Header 高度 */
+  min-height: calc(100vh - 48px);
+  margin-top: 48px;
 }
 
 /* ========== 侧边栏 ========== */
 .admin-sidebar {
-  width: 280px !important;
+  width: 260px;
   background: #000000;
   color: #ffffff;
   display: flex;
   flex-direction: column;
-  position: fixed !important;
-  left: 0 !important;
-  top: 48px !important; /* Header 高度 */
-  height: calc(100vh - 48px) !important;
+  position: fixed;
+  left: 0;
+  top: 48px;
+  height: calc(100vh - 48px);
   overflow-y: auto;
-  z-index: 40 !important; /* 低于 Header (100)，内容区域 z-index 为 50 */
+  z-index: 40;
   flex-shrink: 0;
   border-right: 4px solid #000000;
   box-shadow: 8px 0 0 #333333, 12px 0 0 #000000;
 }
 
 .admin-logo {
-  padding: 2.5rem 2rem;
+  padding: 2rem 1.5rem;
   border-bottom: 4px solid #000000;
   text-align: center;
   background: linear-gradient(180deg, #1a1a1a 0%, #000000 100%);
@@ -45,42 +45,41 @@
 .admin-logo h1 {
   color: #ffffff;
   font-family: 'Courier New', monospace;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 900;
-  margin: 0;
+  margin: 0.75rem 0 0 0;
   letter-spacing: 3px;
 }
 
 .admin-logo p {
   color: #888888;
   font-family: 'Courier New', monospace;
-  font-size: 0.7rem;
-  margin: 0.5rem 0 0 0;
+  font-size: 0.65rem;
+  margin: 0.4rem 0 0 0;
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
-/* 导航菜单 */
+/* 导航 */
 .admin-nav {
   flex: 1;
   padding: 1rem;
-  overflow-y: auto;
 }
 
 .admin-nav .nav-item {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   width: 100%;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.5rem;
   background: transparent;
   border: 2px solid #333333;
   color: #cccccc;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-align: left;
   text-transform: uppercase;
@@ -91,7 +90,7 @@
   background: #1a1a1a;
   border-color: #666666;
   color: #ffffff;
-  box-shadow: 4px 4px 0 #333333;
+  box-shadow: 3px 3px 0 #333333;
   transform: translate(-2px, -2px);
 }
 
@@ -99,27 +98,23 @@
   background: #ffffff;
   border-color: #ffffff;
   color: #000000;
-  box-shadow: 4px 4px 0 #666666;
+  box-shadow: 3px 3px 0 #666666;
   font-weight: 900;
-}
-
-.admin-nav .nav-item svg {
-  flex-shrink: 0;
 }
 
 /* 用户信息 */
 .admin-user-info {
-  padding: 1.75rem;
+  padding: 1.5rem;
   border-top: 4px solid #000000;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
 }
 
 .admin-user-info .user-avatar {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #ffffff;
   display: flex;
@@ -128,16 +123,6 @@
   flex-shrink: 0;
   border: 3px solid #ffffff;
   box-shadow: 0 0 0 2px #000000, 4px 4px 0 #666666;
-  transition: all 0.2s;
-}
-
-.admin-user-info .user-avatar:hover {
-  box-shadow: 0 0 0 2px #000000, 6px 6px 0 #999999;
-  transform: translate(-1px, -1px);
-}
-
-.admin-user-info .user-avatar svg {
-  color: #000000 !important;
 }
 
 .admin-user-info .user-details {
@@ -148,19 +133,18 @@
 .admin-user-info .user-name {
   display: block;
   font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 900;
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 2px 2px 0 #000000;
 }
 
 .admin-user-info .user-role {
   display: block;
   font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #aaaaaa;
   text-transform: uppercase;
@@ -171,12 +155,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   background: #ffffff;
   border: 3px solid #ffffff;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   flex-shrink: 0;
   box-shadow: 3px 3px 0 #666666;
 }
@@ -198,42 +182,33 @@
 
 /* ========== 主内容区 ========== */
 .admin-main {
-  margin-left: 280px !important; /* 侧边栏宽度 */
-  width: calc(100% - 280px) !important;
-  min-height: calc(100vh - 48px); /* 减去 Header 高度 */
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  min-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
   background: #f5f5f5;
   position: relative;
-  z-index: 50 !important; /* 高于侧边栏 (40)，确保内容在导航栏之上 */
+  z-index: 50;
 }
 
-/* ========== 布局容器 ========== */
-.admin-container {
-  display: flex;
-  min-height: 100vh;
-  margin-top: 48px !important; /* Header 高度 */
-  background: #f5f5f5;
-}
-
-/* 顶部报头 */
 .admin-header {
   background: #ffffff;
   border-bottom: 4px solid #000000;
-  padding: 1.75rem 2.5rem;
+  padding: 1.5rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: sticky;
   top: 0;
   z-index: 60;
-  box-shadow: 0 6px 0 #000000;
+  box-shadow: 0 4px 0 #000000;
 }
 
 .admin-header h2 {
   margin: 0;
   font-family: 'Courier New', monospace;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 900;
   color: #000000;
   letter-spacing: 2px;
@@ -242,16 +217,16 @@
 .refresh-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0.875rem 1.75rem;
+  gap: 6px;
+  padding: 0.75rem 1.5rem;
   background: #ffffff;
   border: 3px solid #000000;
   color: #000000;
   font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   box-shadow: 4px 4px 0 #000000;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -287,36 +262,15 @@
 }
 
 /* 内容区 */
-.admin-content-wrapper {
+.admin-content {
   flex: 1;
-  padding: 2.5rem;
-  max-width: 1600px;
-  margin: 0 auto;
-  width: 100%;
+  padding: 2rem;
 }
 
-/* 标签页内容区 */
-.overview-tab,
-.users-tab,
-.articles-tab,
-.logs-tab,
-.settings-tab {
-  padding: 2.5rem;
-}
-
-/* ========== 标签页容器 ========== */
-.overview-tab,
-.users-tab,
-.articles-tab,
-.games-tab,
-.stats-tab,
-.logs-tab,
-.settings-tab {
+.tab-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  position: relative;
-  z-index: 51; /* 确保内容在侧边栏之上 */
+  gap: 1.5rem;
 }
 
 /* ========== 加载状态 ========== */
@@ -333,22 +287,18 @@
 }
 
 .loading-spinner {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   border: 5px solid #000000;
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 .loading-state p {
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
   font-family: 'Courier New', monospace;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #000000;
   letter-spacing: 2px;
@@ -358,29 +308,29 @@
 /* ========== 统计卡片 ========== */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
 }
 
 .stat-card {
   background: #ffffff;
   border: 4px solid #000000;
-  padding: 1.75rem;
+  padding: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  box-shadow: 8px 8px 0 #000000;
-  transition: all 0.2s;
+  gap: 1.25rem;
+  box-shadow: 6px 6px 0 #000000;
+  transition: all 0.15s;
 }
 
 .stat-card:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 10px 10px 0 #000000;
+  box-shadow: 8px 8px 0 #000000;
 }
 
 .stat-icon {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   background: #000000;
   display: flex;
   align-items: center;
@@ -398,14 +348,14 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
   border-left: 3px solid #000000;
-  padding-left: 1rem;
+  padding-left: 0.75rem;
 }
 
 .stat-label {
   font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: #666666;
   text-transform: uppercase;
@@ -414,107 +364,99 @@
 
 .stat-value {
   font-family: 'Courier New', monospace;
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 900;
   color: #000000;
-  letter-spacing: 3px;
-  position: relative;
+  letter-spacing: 2px;
 }
 
 /* ========== 区块卡片 ========== */
-.overview-section,
-.stats-section {
+.overview-section {
   background: #ffffff;
   border: 4px solid #000000;
-  box-shadow: 8px 8px 0 #000000;
-  transition: all 0.2s;
+  box-shadow: 6px 6px 0 #000000;
 }
 
-.overview-section:hover,
-.stats-section:hover {
-  box-shadow: 10px 10px 0 #666666;
-}
-
-.overview-section h3,
-.stats-section h3 {
+.overview-section h3 {
   margin: 0;
-  padding: 1.5rem 2rem;
+  padding: 1.25rem 1.5rem;
   font-family: 'Courier New', monospace;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 900;
   color: #ffffff;
   background: #000000;
   border-bottom: 4px solid #000000;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   text-transform: uppercase;
 }
 
-.overview-section > div:not(h3),
-.stats-section > div:not(h3) {
-  padding: 2rem;
+.overview-section > .status-list,
+.overview-section > .quick-actions {
+  padding: 1.5rem;
 }
 
 /* 状态列表 */
 .status-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1.5rem;
+  gap: 0.75rem;
 }
 
 .status-item {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 1.25rem 1.5rem;
+  gap: 12px;
+  padding: 1rem 1.25rem;
   background: #ffffff;
   border: 3px solid #000000;
   font-family: 'Courier New', monospace;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #000000;
-  box-shadow: 5px 5px 0 #666666;
-  transition: all 0.2s;
-  position: relative;
+  box-shadow: 4px 4px 0 #666666;
+  transition: all 0.15s;
 }
 
 .status-item:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 #000000;
+  box-shadow: 6px 6px 0 #000000;
 }
 
 .status-indicator {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #000000;
   flex-shrink: 0;
   border: 2px solid #000000;
 }
 
+.status-indicator.online {
+  background: #000000;
+}
+
 /* 快速操作 */
 .quick-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.25rem;
-  padding: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
 }
 
 .quick-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 1.25rem;
+  gap: 10px;
+  padding: 1rem;
   background: #ffffff;
   border: 3px solid #000000;
   color: #000000;
   font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 5px 5px 0 #000000;
+  transition: all 0.15s;
+  box-shadow: 4px 4px 0 #000000;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -522,7 +464,7 @@
 .quick-action-btn:hover {
   background: #000000;
   color: #ffffff;
-  box-shadow: 7px 7px 0 #666666;
+  box-shadow: 6px 6px 0 #666666;
   transform: translate(-2px, -2px);
 }
 
@@ -532,93 +474,91 @@
 
 .quick-action-btn:active {
   transform: translate(2px, 2px);
-  box-shadow: 3px 3px 0 #666666;
-}
-
-/* ========== 表格容器 ========== */
-.users-table,
-.articles-table,
-.logs-table {
-  background: #ffffff;
-  border: 4px solid #000000;
-  box-shadow: 8px 8px 0 #000000;
-  transition: all 0.2s;
-  overflow-x: auto;
-}
-
-.users-table:hover,
-.articles-table:hover,
-.logs-table:hover {
-  box-shadow: 10px 10px 0 #666666;
+  box-shadow: 2px 2px 0 #666666;
 }
 
 /* ========== 表格 ========== */
-.users-table table,
-.articles-table table,
-.logs-table table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: auto;
+.manga-table {
+  background: #ffffff;
+  border: 4px solid #000000;
+  box-shadow: 6px 6px 0 #000000;
+  overflow-x: auto;
 }
 
-.users-table th,
-.users-table td,
-.articles-table th,
-.articles-table td,
-.logs-table th,
-.logs-table td {
-  padding: 1rem 1.25rem;
+.manga-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.manga-table th,
+.manga-table td {
+  padding: 0.875rem 1rem;
   text-align: left;
   border-bottom: 2px solid #000000;
 }
 
-.users-table th,
-.articles-table th,
-.logs-table th {
+.manga-table th {
   background: #000000;
   color: #ffffff;
   font-family: 'Courier New', monospace;
   font-weight: 900;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   letter-spacing: 1px;
   text-transform: uppercase;
   white-space: nowrap;
-  border-bottom: 3px solid #000000;
 }
 
-.users-table td,
-.articles-table td,
-.logs-table td {
+.manga-table td {
   font-family: 'Georgia', serif;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #000000;
   background: #ffffff;
 }
 
-.users-table tr:last-child td,
-.articles-table tr:last-child td,
-.logs-table tr:last-child td {
+.manga-table tr:last-child td {
   border-bottom: none;
 }
 
-/* 表格内元素 */
-.user-email,
-.article-author {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.manga-table tr:hover td {
+  background: #f5f5f5;
+}
+
+.cell-id {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
   color: #666666;
 }
 
+.cell-email {
+  color: #666666;
+}
+
+.cell-date {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.cell-actions {
+  display: flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.cell-title {
+  font-weight: 700;
+}
+
+/* ========== 标签 ========== */
 .role-badge,
 .category-tag,
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0.375rem 0.875rem;
+  gap: 4px;
+  padding: 0.3rem 0.7rem;
   font-family: 'Courier New', monospace;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   background: #000000;
   color: #ffffff;
@@ -626,6 +566,7 @@
   box-shadow: 2px 2px 0 #666666;
   text-transform: uppercase;
   letter-spacing: 1px;
+  white-space: nowrap;
 }
 
 .role-badge.user,
@@ -637,37 +578,18 @@
   box-shadow: 2px 2px 0 #999999;
 }
 
-.role-badge.admin {
-  background: #000000;
-  color: #ffffff;
-  border-color: #000000;
-  box-shadow: 2px 2px 0 #666666;
-}
-
-.status-badge.published {
-  background: #000000;
-  color: #ffffff;
-  border-color: #000000;
-  box-shadow: 2px 2px 0 #666666;
-}
-
-.user-actions,
-.article-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
+/* ========== 操作按钮 ========== */
 .action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   background: #ffffff;
   border: 2px solid #000000;
   color: #000000;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   box-shadow: 3px 3px 0 #000000;
 }
 
@@ -683,238 +605,52 @@
   box-shadow: 1px 1px 0 #666666;
 }
 
-.action-btn.danger:hover {
-  background: #000000;
-  box-shadow: 4px 4px 0 #666666;
-}
-
-.action-btn.success:hover {
-  background: #000000;
-  box-shadow: 4px 4px 0 #666666;
-}
-
-.action-btn.warning:hover {
-  background: #000000;
-  box-shadow: 4px 4px 0 #666666;
-}
-
-.action-btn.primary:hover {
-  background: #000000;
-  box-shadow: 4px 4px 0 #666666;
-}
-
 .no-data {
   text-align: center;
-  padding: 3rem !important;
+  padding: 2.5rem !important;
   font-family: 'Georgia', serif;
   color: #666666;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
-/* ========== 按钮 ========== */
-.articles-header,
-.games-header,
-.logs-header {
+/* ========== Tab Header ========== */
+.tab-header {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 1rem;
 }
 
-.create-article-btn,
-.export-logs-btn {
+.btn-create {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0.875rem 1.75rem;
+  gap: 8px;
+  padding: 0.75rem 1.5rem;
   background: #000000;
   border: 3px solid #000000;
   color: #ffffff;
   font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   box-shadow: 4px 4px 0 #000000;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-.create-article-btn:hover,
-.export-logs-btn:hover {
+.btn-create:hover {
   background: #ffffff;
   color: #000000;
   box-shadow: 6px 6px 0 #666666;
   transform: translate(-2px, -2px);
 }
 
-.create-article-btn:hover svg,
-.export-logs-btn:hover svg {
+.btn-create:hover svg {
   color: #000000 !important;
 }
 
-/* ========== 游戏卡片 ========== */
-.games-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.5rem;
-}
-
-.game-card {
-  background: #ffffff;
-  border: 3px solid #000000;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: 4px 4px 0 #cccccc;
-}
-
-.game-icon {
-  width: 56px;
-  height: 56px;
-  background: #000000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.game-icon svg {
-  color: #ffffff !important;
-}
-
-.game-info h4 {
-  margin: 0;
-  font-family: 'Courier New', monospace;
-  font-size: 1rem;
-  font-weight: 900;
-  color: #000000;
-  letter-spacing: 1px;
-}
-
-.game-plays {
-  font-family: 'Georgia', serif;
-  font-size: 0.85rem;
-  color: #666666;
-}
-
-.game-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Courier New', monospace;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #000000;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #000000;
-}
-
-.game-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: auto;
-}
-
-/* ========== 热门列表 ========== */
-.popular-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1.5rem;
-}
-
-.popular-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 1.25rem 1.5rem;
-  background: #ffffff;
-  border: 3px solid #000000;
-  box-shadow: 5px 5px 0 #666666;
-  transition: all 0.2s;
-}
-
-.popular-item:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0 #000000;
-}
-
-.popular-item .rank {
-  font-family: 'Courier New', monospace;
-  font-weight: 900;
-  color: #ffffff;
-  background: #000000;
-  min-width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  border: 2px solid #000000;
-}
-
-.popular-item .game-name {
-  flex: 1;
-  font-family: 'Courier New', monospace;
-  font-weight: 700;
-  color: #000000;
-  font-size: 1rem;
-  letter-spacing: 1px;
-}
-
-.popular-item .plays {
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #666666;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* ========== 图表占位符 ========== */
-.chart-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5rem 3rem;
-  background: #f5f5f5;
-  border: 3px solid #000000;
-  box-shadow: 6px 6px 0 #000000;
-  text-align: center;
-  gap: 1.5rem;
-}
-
-.chart-placeholder svg {
-  color: #000000;
-}
-
-.chart-placeholder p {
-  margin: 0;
-  font-family: 'Courier New', monospace;
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: #000000;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.chart-placeholder span {
-  font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #666666;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* ========== 设置表单 ========== */
+/* ========== 设置 ========== */
 .settings-section {
   background: #ffffff;
   border: 4px solid #000000;
@@ -938,7 +674,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.25rem 2rem;
+  padding: 1.125rem 1.5rem;
   border-bottom: 3px solid #000000;
 }
 
@@ -946,9 +682,9 @@
   border-bottom: none;
 }
 
-.setting-item label {
+.setting-item > label {
   font-family: 'Courier New', monospace;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #000000;
   text-transform: uppercase;
@@ -957,33 +693,33 @@
 
 .setting-item input[type="text"],
 .setting-item input[type="email"],
-.setting-item input[type="password"],
-.setting-item input[type="url"] {
-  width: 300px;
-  padding: 0.875rem 1.25rem;
+.setting-item input[type="password"] {
+  width: 280px;
+  padding: 0.75rem 1rem;
   font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: #000000;
   background: #ffffff;
   border: 3px solid #000000;
-  transition: all 0.2s;
-  box-shadow: 4px 4px 0 #cccccc;
-  position: relative;
+  transition: all 0.15s;
+  box-shadow: 3px 3px 0 #cccccc;
 }
 
-.setting-item input:focus {
+.setting-item input[type="text"]:focus,
+.setting-item input[type="email"]:focus,
+.setting-item input[type="password"]:focus {
   outline: none;
   border-color: #000000;
-  box-shadow: 6px 6px 0 #666666;
+  box-shadow: 5px 5px 0 #666666;
   transform: translate(-2px, -2px);
 }
 
 /* 开关 */
 .toggle-switch {
   position: relative;
-  width: 64px;
-  height: 34px;
+  width: 56px;
+  height: 30px;
 }
 
 .toggle-switch input {
@@ -992,79 +728,77 @@
   height: 0;
 }
 
-.toggle-switch label {
+.toggle-switch > label {
   position: absolute;
   cursor: pointer;
   inset: 0;
   background: #dddddd;
-  transition: all 0.3s;
+  transition: all 0.2s;
   border: 3px solid #000000;
-  box-shadow: 4px 4px 0 #666666;
+  box-shadow: 3px 3px 0 #666666;
 }
 
-.toggle-switch label:before {
+.toggle-switch > label::before {
   position: absolute;
   content: "";
-  height: 22px;
-  width: 22px;
+  height: 18px;
+  width: 18px;
   left: 3px;
   bottom: 3px;
   background: #ffffff;
-  border: 3px solid #000000;
-  transition: all 0.3s;
+  border: 2px solid #000000;
+  transition: all 0.2s;
   box-shadow: 2px 2px 0 #666666;
 }
 
 .toggle-switch input:checked + label {
   background: #000000;
-  box-shadow: 4px 4px 0 #999999;
+  box-shadow: 3px 3px 0 #999999;
 }
 
-.toggle-switch input:checked + label:before {
-  transform: translateX(30px);
+.toggle-switch input:checked + label::before {
+  transform: translateX(26px);
 }
 
 /* 保存按钮 */
 .settings-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 4px solid #000000;
+  padding-top: 1rem;
 }
 
-.save-settings-btn {
+.save-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 1rem 2.5rem;
+  gap: 8px;
+  padding: 0.875rem 2rem;
   background: #000000;
   border: 3px solid #000000;
   color: #ffffff;
   font-family: 'Courier New', monospace;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 5px 5px 0 #666666;
+  transition: all 0.15s;
+  box-shadow: 4px 4px 0 #666666;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
-.save-settings-btn:hover {
+.save-btn:hover {
   background: #ffffff;
   color: #000000;
-  box-shadow: 7px 7px 0 #000000;
+  box-shadow: 6px 6px 0 #000000;
   transform: translate(-2px, -2px);
 }
 
-.save-settings-btn:hover svg {
+.save-btn:hover svg {
   color: #000000 !important;
 }
 
-.save-settings-btn:active {
+.save-btn:active {
   transform: translate(2px, 2px);
-  box-shadow: 3px 3px 0 #666666;
+  box-shadow: 2px 2px 0 #666666;
 }
 
 /* ========== 响应式 ========== */
@@ -1073,55 +807,59 @@
     width: 100%;
     height: auto;
     position: relative;
+    top: 0;
   }
-  
+
   .admin-main {
     margin-left: 0;
     width: 100%;
   }
-  
+
+  .admin-layout {
+    flex-direction: column;
+  }
+
   .admin-nav {
     display: flex;
     overflow-x: auto;
-    padding: 1rem;
+    padding: 0.75rem;
     gap: 0.5rem;
   }
-  
+
   .admin-nav .nav-item {
     width: auto;
     white-space: nowrap;
     margin-bottom: 0;
   }
-  
+
   .admin-header {
-    padding: 1.5rem;
+    padding: 1.25rem;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
     align-items: flex-start;
   }
-  
-  .admin-content-wrapper {
-    padding: 1.5rem;
+
+  .admin-content {
+    padding: 1.25rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .setting-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.75rem;
   }
-  
+
   .setting-item input[type="text"],
   .setting-item input[type="email"],
-  .setting-item input[type="password"],
-  .setting-item input[type="url"] {
+  .setting-item input[type="password"] {
     width: 100%;
   }
-  
-  .games-grid {
+
+  .quick-actions {
     grid-template-columns: 1fr;
   }
 }

@@ -36,6 +36,8 @@ import './styles/header.css'
 import './styles/pomodoro.css'
 import './styles/Profile.css'
 import './styles/responsive.css'
+import './styles/ArticleEditor.css'
+import './styles/ArticleEditor.css'
 
 function AppContent() {
   const location = useLocation()

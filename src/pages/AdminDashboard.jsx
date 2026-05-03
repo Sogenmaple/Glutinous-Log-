@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Header from '../components/Header'
 import {
   AdminToolsIcon,
   UserIcon,
@@ -167,7 +166,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="admin-dashboard-page">
-      <Header />
       <div className="admin-layout">
         <aside className="admin-sidebar">
           <div className="admin-logo">

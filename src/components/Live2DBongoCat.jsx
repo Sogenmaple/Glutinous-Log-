@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import '../styles/Live2DBongoCat.css'
 
-// Live2D 模型路径
-const MODEL_PATH = '/assets/bongocat/models/standard/cat.model3.json'
+// Live2D 模型路径（键盘版）
+const MODEL_PATH = '/assets/bongocat/models/keyboard/cat.model3.json'
 
 export default function Live2DBongoCat() {
   const containerRef = useRef(null)
@@ -103,20 +103,13 @@ export default function Live2DBongoCat() {
 
   const handleMouseDown = useCallback((e) => {
     if (!modelRef.current) return
-    if (e.button === 0) {
-      try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 1) } catch {}
-    } else if (e.button === 2) {
-      try { modelRef.current.setParameterValueById('ParamMouseRightDown', 1) } catch {}
-    }
+    // 键盘版模型：右手 = 鼠标点击
+    try { modelRef.current.setParameterValueById('CatParamRightHandDown', 1) } catch {}
   }, [])
 
   const handleMouseUp = useCallback((e) => {
     if (!modelRef.current) return
-    if (e.button === 0) {
-      try { modelRef.current.setParameterValueById('ParamMouseLeftDown', 0) } catch {}
-    } else if (e.button === 2) {
-      try { modelRef.current.setParameterValueById('ParamMouseRightDown', 0) } catch {}
-    }
+    try { modelRef.current.setParameterValueById('CatParamRightHandDown', 0) } catch {}
   }, [])
 
   const handleMouseMove = useCallback((e) => {
@@ -125,8 +118,8 @@ export default function Live2DBongoCat() {
     const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2)
     const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2)
 
+    // 键盘版模型：使用角度参数跟随鼠标
     const params = [
-      ['ParamMouseX', x], ['ParamMouseY', y],
       ['ParamAngleX', x], ['ParamAngleY', y],
       ['ParamEyeBallX', x], ['ParamEyeBallY', y]
     ]

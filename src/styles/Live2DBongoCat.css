@@ -7,6 +7,11 @@
   cursor: grab;
   transition: opacity 0.3s ease;
   pointer-events: auto;
+  /* 修复4: 禁止选中模型 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .live2d-bongo-cat:active {
@@ -48,6 +53,13 @@
 .live2d-bongo-cat-container canvas {
   width: 100% !important;
   height: 100% !important;
+  /* 修复4: 禁止canvas被选中/拖拽 */
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 /* ⌨️ 键盘可视化层 — 在 canvas 上面（参照原版 KeyboardVisualization 的 Image absolute size-full） */
@@ -101,4 +113,62 @@
 .live2d-bongo-cat.dragging {
   opacity: 0.7;
   cursor: grabbing;
+}
+
+/* ====== 对话气泡 — 黑白漫画风格 ====== */
+.bongo-speech-bubble {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 100;
+  pointer-events: none;
+  max-width: 260px;
+}
+
+.bongo-speech-bubble.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+.bubble-text {
+  background: #fff;
+  color: #1a1a1a;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 2.5px solid #1a1a1a;
+  box-shadow: 3px 3px 0 #1a1a1a;
+  font-family: "Comic Sans MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-weight: 500;
+  word-break: break-word;
+  max-width: 260px;
+  min-width: 80px;
+}
+
+.bubble-tail {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 10px solid #1a1a1a;
+}
+
+.bubble-tail::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #fff;
 }

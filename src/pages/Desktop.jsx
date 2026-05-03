@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import '../styles/Desktop.css'
+import '../styles/TaskbarChat.css'
 import Live2DBongoCat from '../components/Live2DBongoCat'
 
 /**
@@ -593,6 +594,12 @@ export default function Desktop() {
   const [userAvatar, setUserAvatar] = useState('') // 当前用户头像
   const wasDraggedRef = useRef(false)
 
+  // 猫对话气泡回调
+  const catBubbleRef = useRef(null)
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const chatInputRef = useRef(null)
+
   // 加载用户头像
   useEffect(() => {
     const loadAvatar = () => {
@@ -890,6 +897,43 @@ export default function Desktop() {
     openWindow(icon)
   }, [openWindow])
 
+  // 发送消息给猫（调用 /api/ovo-chat）
+  const sendChatMessage = useCallback(async () => {
+    const msg = chatInput.trim()
+    if (!msg || chatLoading) return
+
+    setChatLoading(true)
+    // 先显示"思考中"
+    if (catBubbleRef.current) {
+      catBubbleRef.current('思考中...')
+    }
+
+    try {
+      const res = await fetch('/api/ovo-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+      })
+      const data = await res.json()
+      if (catBubbleRef.current) {
+        catBubbleRef.current(data.reply || data.error || '喵？我没听清～')
+      }
+    } catch {
+      if (catBubbleRef.current) {
+        catBubbleRef.current('网络开小差了，等下再找我玩吧～')
+      }
+    } finally {
+      setChatLoading(false)
+      setChatInput('')
+    }
+  }, [chatInput, chatLoading])
+
+  // 注册气泡回调（传给 Live2DBongoCat）
+  const handleCatReply = useCallback((callback) => {
+    catBubbleRef.current = callback
+    return () => { catBubbleRef.current = null }
+  }, [])
+
   const getWindowIcon = (appId) => DESKTOP_ICONS.find(i => i.id === appId)
 
   // 获取 iframe URL（当前页面 URL + hash 路由）
@@ -998,7 +1042,7 @@ export default function Desktop() {
       )}
 
       {/* Live2D Bongo Cat - 桌面宠物 */}
-      <Live2DBongoCat />
+      <Live2DBongoCat onReply={handleCatReply} />
 
       {/* 任务栏 */}
       <div className="taskbar">
@@ -1070,6 +1114,31 @@ export default function Desktop() {
         </div>
 
         <div className="taskbar-tray">
+          {/* 任务栏聊天输入框 */}
+          <div className="taskbar-chat-wrapper">
+            <input
+              ref={chatInputRef}
+              className="taskbar-chat-input"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  sendChatMessage()
+                }
+              }}
+              placeholder="跟猫说句话..."
+              disabled={chatLoading}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button
+              className="taskbar-chat-send"
+              onClick={(e) => { e.stopPropagation(); sendChatMessage() }}
+              disabled={chatLoading || !chatInput.trim()}
+            >
+              {chatLoading ? '...' : '发送'}
+            </button>
+          </div>
           <span className="tray-time">{new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       </div>

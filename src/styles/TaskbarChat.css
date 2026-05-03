@@ -1,0 +1,81 @@
+/* ====== 任务栏聊天输入框 — 黑白漫画风格 ====== */
+.taskbar-chat-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+}
+
+.taskbar-chat-input {
+  width: 140px;
+  height: 26px;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-family: "Comic Sans MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: #1a1a1a;
+  background: #fff;
+  border: 2px solid #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 #1a1a1a;
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.taskbar-chat-input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.taskbar-chat-input:focus {
+  box-shadow: 1px 1px 0 #1a1a1a;
+  transform: translate(1px, 1px);
+}
+
+.taskbar-chat-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.taskbar-chat-send {
+  height: 26px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-family: "Comic Sans MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-weight: 600;
+  color: #fff;
+  background: #1a1a1a;
+  border: 2px solid #1a1a1a;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.taskbar-chat-send:hover:not(:disabled) {
+  background: #333;
+  transform: translate(-1px, -1px);
+  box-shadow: 1px 1px 0 #1a1a1a;
+}
+
+.taskbar-chat-send:active:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+.taskbar-chat-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 响应式：窄屏下缩小输入框 */
+@media (max-width: 1200px) {
+  .taskbar-chat-input {
+    width: 100px;
+  }
+}
+
+@media (max-width: 900px) {
+  .taskbar-chat-wrapper {
+    display: none;
+  }
+}

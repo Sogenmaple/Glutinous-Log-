@@ -22,10 +22,13 @@ tangyuan-games/
 │   ├── components/         # 通用组件
 │   │   ├── Header.jsx      # 导航栏
 │   │   ├── PostCard.jsx    # 文章卡片
+│   │   ├── Live2DBongoCat.jsx # Live2D 桌面宠物 + 对话气泡 (v7.7)
 │   │   └── admin/          # 后台管理
 │   ├── styles/             # CSS 样式
 │   │   ├── manga-common.css    # ⭐ 漫画风格通用样式 (新增)
 │   │   ├── responsive.css      # ⭐ 全局响应式样式
+│   │   ├── TaskbarChat.css     # ⭐ 任务栏聊天输入框样式 (新增)
+│   │   ├── Live2DBongoCat.css  # ⭐ Live2D 猫样式（含对话气泡）
 │   │   ├── NewspaperHome.css   # 首页 (精简后 180 行)
 │   │   ├── GamesCollection.css # 游戏宇宙 (精简后 340 行)
 │   │   ├── MangaBlog.css       # 博客页面
@@ -451,12 +454,12 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 
 | 模块 | 版本 | 状态 |
 |------|------|------|
-| 首页 | v7.0 | ✅ 模拟电脑桌面（窗口系统+任务栏） |
+| 首页 | v7.7 | ✅ 模拟电脑桌面（窗口系统+任务栏+猫对话气泡） |
 | 番茄钟 | v8.2 | ✅ 完整功能 + 漫画风格 |
 | 博客 | v3.0 | ✅ 基础功能 + 漫画风格 |
 | 后台 | v2.0 | ✅ 管理功能 + 漫画风格 |
 | 用户系统 | v1.0 | ✅ 注册登录 + 漫画风格 |
-| 作品集 | v2.0 | ✅ 统一风格化排版 |
+| 作品集 | v5.3 | ✅ 时间轴排版 |
 | 漫画风格 | v3.0 | ✅ 全站统一 (100% 覆盖) |
 
 ---
@@ -1059,6 +1062,32 @@ grep -r "\.manga-" src/styles/ --include="*.css"
 - `fix: 导航栏CSS冲突修复 - 删除App.css中重复的旧导航栏样式(531行)`
 
 **教训**: 修改样式前先检查是否有重复定义的选择器，避免 CSS 冲突
+
+---
+
+### 2026-04-30: 桌面系统 v7.7 - Live2D 猫对话气泡 + 任务栏聊天
+
+**新功能**:
+- ✅ 对话气泡：猫头上弹出黑白漫画风格对话气泡
+- ✅ 自动打招呼：刷新页面时读取 localStorage 用户名并打招呼
+- ✅ 点击猫：弹出随机回复（8 条预设语料）
+- ✅ 3 秒自动消失：气泡显示 3 秒后渐隐
+- ✅ 任务栏输入框：黑白漫画风格聊天输入框
+- ✅ API 调用：通过 `/api/ovo-chat` 后端代理调用 AI，不暴露 API Key
+- ✅ 猫人设：名称"汤圆三号机"，身份"管理汤圆的小窝的吉祥物"
+
+**技术实现**:
+- `Live2DBongoCat.jsx`: 新增对话气泡状态管理、点击处理、自动打招呼、外部回复接收
+- `Live2DBongoCat.css`: 新增 `.bongo-speech-bubble` 对话气泡样式（白色背景 + 黑色边框 + 阴影 + 小三角尾巴）
+- `Desktop.jsx`: 新增 `sendChatMessage` 函数、`catBubbleRef` 引用、任务栏聊天输入框
+- `TaskbarChat.css`: 新增任务栏聊天输入框样式（140px 宽输入框 + 发送按钮）
+- API 保护：`.env` 已在 `.gitignore` 中，前端通过 `/api/ovo-chat` 代理调用
+
+**代码统计**:
+- `Live2DBongoCat.jsx`: 新增约 80 行
+- `Live2DBongoCat.css`: 新增约 50 行
+- `Desktop.jsx`: 新增约 50 行
+- `TaskbarChat.css`: 新增文件，62 行
 
 ---
 
